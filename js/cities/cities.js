@@ -73,6 +73,18 @@ SB.module('Cities', function (SB) {
     return 'SOUTHEAST';   // SPEC? a state in no list (HI): the smallest guess
   }
 
+  /* Basements: none where the water table is at your ankles or the ground is caliche. All of Florida and Louisiana, the
+   * hurricane coast, the low Southern coast and the desert: houses there sit on slabs, so no basement shows, no basement
+   * room names, no basement on a flyer. A pack can say otherwise with basements: true | false. */
+  var SLAB_STATES = { FL: 1, LA: 1 }, LOW_COAST_STATES = { TX: 1, MS: 1, AL: 1, GA: 1, SC: 1, NC: 1 };
+  function hasBasements(entry, traits) {
+    var st = entry && entry.state, tr = traits || (entry && entry.traits) || [];
+    if (SLAB_STATES[st]) return false;
+    if (tr.indexOf('HURRICANE') >= 0 || tr.indexOf('DESERT') >= 0) return false;
+    if (tr.indexOf('COASTAL') >= 0 && LOW_COAST_STATES[st]) return false;
+    return true;
+  }
+
   var NEEDS_BY_KIND = { HOUSE: ['HOST_TRUSTS_YOU'], DIY: ['VOUCH'], HALL: ['DEPOSIT'], BAR: ['ASK_NICELY'], CLUB: ['FULL_BILL'],
                         BIG: ['DEPOSIT'], SHOP: ['ASK_NICELY'], OUTDOOR: ['HOST_TRUSTS_YOU'] };   // SPEC? 03-content jobs.needs gives the keys, not the kinds
   var OWNER_BY_KIND = { HOUSE: 'HOST', BAR: 'BAR_OWNER', HALL: 'HALL_MANAGER', SHOP: 'SHOP_OWNER', DIY: 'LANDLORD', OUTDOOR: 'LANDLORD', CLUB: 'TALENT_BUYER', BIG: 'TALENT_BUYER' };
@@ -496,7 +508,9 @@ SB.module('Cities', function (SB) {
     P.region = raw.region || 'the region';
     P.missing = raw.missing === undefined ? null : raw.missing;
     if (!raw.missing && tn && no(tn.allAges)) P.missing = 'A safe, legal, all-ages room.';
+    P.basements = typeof raw.basements === 'boolean' ? raw.basements : hasBasements(ent || { state: '' }, traits);
     P.houseType = raw.houseType || (traits.indexOf('SNOW') >= 0 ? 'BASEMENT' : ((traits.indexOf('HURRICANE') >= 0 || traits.indexOf('DESERT') >= 0) ? 'CARPORT' : 'GARAGE'));
+    if (!P.basements && P.houseType === 'BASEMENT') P.houseType = 'CARPORT';
 
     /* whereGo */
     if (isArr(raw.whereGo) && raw.whereGo.length) P.whereGo = raw.whereGo.map(function (w) { return { name: w.name, state: w.state, lat: w.lat, lon: w.lon }; });
@@ -729,6 +743,9 @@ SB.module('Cities', function (SB) {
       cityInks: (stsrc.cityInks || (ent && ent.inks) || sp.cityInks).slice(), cityPaper: stsrc.cityPaper || (ent && ent.paper) || sp.cityPaper,
       dateStyle: stsrc.dateStyle || 'FRI_NOV_20'
     };
+    /* the flyer pictures this town never draws (flyer.js reads style.noPictures) */
+    P.style.noPictures = P.basements ? [] : ['basement'];
+    P.style.pictures = P.style.pictures.filter(function (x) { return P.style.noPictures.indexOf(x) < 0; });
     var w = raw.words || {};
     P.words = { street: (w.street || []).slice(), water: (w.water || []).slice(), hood: (w.hood || []).slice(), thing: (w.thing || []).slice(),
                 weather: (w.weather || []).slice(), order: (w.order || []).slice(), surnames: (w.surnames || []).slice(), bands: copy(w.bands || {}) };
@@ -760,7 +777,7 @@ SB.module('Cities', function (SB) {
   /* validate                                                            */
   /* ------------------------------------------------------------------ */
 
-  var TOP_KEYS = ['v', 'slug', 'confidence', 'banned', 'blocklist', 'blurb', 'hard', 'region', 'missing', 'whereGo', 'houseType', 'scene', 'money',
+  var TOP_KEYS = ['v', 'slug', 'confidence', 'banned', 'blocklist', 'blurb', 'hard', 'region', 'missing', 'whereGo', 'houseType', 'basements', 'scene', 'money',
                   'night', 'tilt', 'zones', 'chokepoints', 'hoods', 'routes', 'rooms', 'bookers', 'contacts', 'cast', 'weather', 'calendar', 'rules',
                   'points', 'roads', 'style', 'words', 'events'];
   var ZONE_KEYS = ['id', 'kind', 'name', 'state', 'minutes', 'bearing', 'scene', 'pop', 'slug', 'note', 'lean', 'gens', 'bands', 'beyond', 'season', 'rooms'];
@@ -820,6 +837,7 @@ SB.module('Cities', function (SB) {
     if (!isStr(raw.hard)) bad('hard is required');
     if (raw.region !== undefined && !isStr(raw.region)) bad('region must be a string');
     if (raw.houseType !== undefined && !enumHas(E.HOUSE_TYPE, raw.houseType)) bad('houseType "' + raw.houseType + '" is not a HOUSE_TYPE');
+    if (raw.basements !== undefined && typeof raw.basements !== 'boolean') bad('basements must be true or false');
     if (raw.whereGo !== undefined) {
       if (!isArr(raw.whereGo)) bad('whereGo must be a list');
       else raw.whereGo.forEach(function (w, q) { if (!isObj(w) || !isStr(w.name) || !isNum(w.lat) || !isNum(w.lon)) bad('whereGo[' + q + '] needs name, state, lat, lon'); });
@@ -1185,7 +1203,7 @@ SB.module('Cities', function (SB) {
   var Cities = {
     register: register, load: load, isLoaded: isLoaded, get: get, pack: pack, entry: entry, near: near,
     normalize: normalize, validate: validate, questions: questions,
-    presetFor: presetFor, generalBanned: null,
+    presetFor: presetFor, hasBasements: hasBasements, generalBanned: null,
     TABLES: { WEATHER: WEATHER, STYLE: STYLE }
   };
   return Cities;

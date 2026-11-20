@@ -249,6 +249,7 @@ SB.module('Flyer', function (SB) {
     function seasonMul(kind, id) { var m = 1; seas.forEach(function (s) { if (has(s[kind], id)) m *= s.x || 2; }); return m; }
     var pics = Object.keys(SB.Enums.PICTURE);
     R.picture = wpick(rpic, pics, function (id) {
+      if (has(st.noPictures, id)) return 0;             // a basement in a town of slabs
       var w = 0.4 + 3 * famBias(F, FAM_PIC, id);
       if (has(st.pictures, id)) w *= 3;
       return w * seasonMul('pictures', id);
@@ -1765,7 +1766,8 @@ SB.module('Flyer', function (SB) {
     t = SB.time && SB.time.date ? SB.time.date(day) : { m: 2, d: 18, y: 2027 };
     kind = r.pick(['HOUSE', 'HOUSE', 'DIY', 'BAR', 'HALL']);
     colors = N.shared && N.shared.color ? N.shared.color : ['Yellow', 'Blue', 'Green'];
-    room = 'the ' + r.pick(colors) + ' ' + (kind === 'HOUSE' ? r.pick(['House', 'Carport', 'Porch', 'Basement', 'Garage']) : kind === 'DIY' ? 'Room' : kind === 'BAR' ? 'Lounge' : 'Hall');
+    var slab = !!(city && SB.Cities && SB.Cities.hasBasements && !SB.Cities.hasBasements(city));
+    room = 'the ' + r.pick(colors) + ' ' + (kind === 'HOUSE' ? r.pick(['House', 'Carport', 'Porch', slab ? 'Duplex' : 'Basement', 'Garage']) : kind === 'DIY' ? 'Room' : kind === 'BAR' ? 'Lounge' : 'Hall');
     ages = r.pick(['ALL', 'ALL', 'ALL', '21', '18']);
     var MONTHS = (SB.time && SB.time.MONTHS) || ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     var dow = SB.time && SB.time.fmt ? SB.time.fmt(day, 'dow') : 'Friday';

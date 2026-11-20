@@ -34,9 +34,18 @@ slugs.forEach(slug => {
         const h = H.bannedHits(s, own);
         if (h.length) probs.push('banned term at ' + p + ': ' + h.join(', '));
       }, k => k === 'banned' || k === 'blocklist');
+      /* a town with no basements (SB.Cities.hasBasements) never gets one: not in its own words, not in a room name */
+      const slab = np && np.basements === false;
+      if (slab) H.eachString(rp.pack, (p, s) => {
+        String(s).split(/[.;:!?]/).forEach(bit => {
+          if (/basement/i.test(bit) && !/\b(no|nobody|without|never|stands? in for)\b/i.test(bit)) probs.push('a basement in a town with none, at ' + p + ': "' + bit.trim() + '"');
+        });
+      }, k => k === 'banned' || k === 'blocklist');
       if (np) {
-        try { H.newGame(SB, { citySlug: slug, seed: 'check-' + slug }); }
+        let st = null;
+        try { st = H.newGame(SB, { citySlug: slug, seed: 'check-' + slug }); }
         catch (e) { probs.push('new game failed: ' + e.message); }
+        if (st && slab) Object.keys(st.rooms || {}).forEach(id => { if (/basement/i.test(st.rooms[id].name || '')) probs.push('room named "' + st.rooms[id].name + '" in a town with no basements'); });
       }
     }
   }

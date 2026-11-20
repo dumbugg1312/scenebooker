@@ -488,7 +488,7 @@ SB.CityIndex = [
   { slug: 'lafayette-la', name: 'Lafayette', state: 'LA', lat: 30.21, lon: -92.03, pop: 423758, size: 'MID',
     traits: ['HURRICANE'],
     blurb: 'Fiddle-and-accordion country where loud is normal; punk lives in carports and rented halls.',
-    hard: 'Few basements, heat and rain, and halls that want a flat fee.',
+    hard: 'No basements, heat and rain, and halls that want a flat fee.',
     inks: ['bayouTeal', 'fluorYellow'], paper: 'goldenrod',
     thin: true, featured: false },
   { slug: 'lakeland-fl', name: 'Lakeland', state: 'FL', lat: 28.06, lon: -81.95, pop: 874790, size: 'MID',

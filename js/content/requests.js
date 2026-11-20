@@ -340,7 +340,7 @@ SB.Content.requests = {
         "Writing for {band}. Some people in {city} might remember us from {era}. We've been asked enough times that we're doing it: " +
         "{day1} the {date1:ord} (?date2: or {day2} the {date2:ord}), one night, then back to work.\n" +
         "(?shortNotice: Short notice. Our fault.)\n\n" +
-        "We'd like a hall or a bar, somewhere with parking. We play at 10, not before. {setLen} minutes. Door deal, or whatever's usual now; we haven't done this in a while.\n" +
+        "We'd like a hall or a bar, somewhere with parking. We'd like to go on last, if that's all right. {setLen} minutes. Door deal, or whatever's usual now; we haven't done this in a while.\n" +
         "(?hasLocal: {local} offered to open. Their singer's brother was our first drummer.)\n\n" +
         "Thank you for reading.\n{member}"
       ],
@@ -446,8 +446,8 @@ SB.Content.requests = {
     ],
     YES_IF: [
       'We can do the door deal if you can find us a floor. {n:words:cap} people(%20: , one dog. The dog\'s quiet).',
-      'Yes if we can go on before 10. We drive to {town} right after.',
-      'We\'re in if somebody can lend us a bass amp. Ours died in {prev}.'
+      'Yes. We\'re in. Still looking for a floor for {n:words} if anybody has one. If not we\'ll sleep in the van.',
+      'In. Is there anywhere we can crash after? {n:words:cap} of us, we bring our own sleeping bags.'
     ],
     COUNTER: [
       'Could you do {amount:money} guaranteed? Gas from {prev} is killing us. If not, door\'s fine, we still want to come.',

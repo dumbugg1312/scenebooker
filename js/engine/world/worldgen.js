@@ -432,6 +432,14 @@ SB.module('WorldGen', function (SB) {
     return r.chance(0.5) ? 1 : 2;
   }
 
+  function withoutBasements(g) {
+    var o = {}, k, keep = function (x) { return !/basement/i.test(x); };
+    for (k in g) o[k] = g[k];
+    if (g.patterns) o.patterns = g.patterns.filter(keep);
+    if (g.whole) o.whole = g.whole.filter(keep);
+    return o;
+  }
+
   /** room(state, spec) -> roomId. spec: a pack room entry, or { kind, zoneId, hood } to generate one. */
   function room(state, spec, quiet) {
     spec = spec || {};
@@ -454,6 +462,8 @@ SB.module('WorldGen', function (SB) {
     var ownerKind = spec.owner || OWNER_BY_KIND[kind];
     var name = spec.name;
     var roomGroup = (names().room || {})[kind];
+    /* no "the Basement on ..." in a town where houses sit on slabs (SB.Cities hasBasements) */
+    if (roomGroup && P && P.basements === false) roomGroup = withoutBasements(roomGroup);
     /* A written name that fails the rule, or is already taken in this save, is replaced by a generated one. */
     if (!name || !SB.text.nameOk(name, localWords(P)) || usedNames(state)[SB.text.normName(name)]) {
       name = groupName(state, P, roomGroup, rn, null, 'WorldGen.room');

@@ -119,7 +119,7 @@ function newGame(SB, over) {
   return SB.Game.newGame({
     seed: over.seed || 'seed-1', citySlug: slug, bookingName: over.bookingName || 'Carport Weather', mark: MARK,
     settings: { bills: over.bills !== false, fog: over.fog || 'NORMAL', windows: over.windows || 'NORMAL' },
-    tune: over.tune || null
+    tune: over.tune || null, tutorial: over.tutorial
   });
 }
 

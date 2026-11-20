@@ -17,7 +17,7 @@ SB.module('Director', function (SB) {
 
   /* The scripted first month of 03-content 10, used when SB.Content.legacy.opening.script is absent. */
   var DEFAULT_SCRIPT = [
-    { week: 0, day: 0, post: 'REQUEST', template: 'CAREFUL', first: true, from: 'PEER', dates: [31, 32], ask: 'DOOR' },
+    { week: 0, day: 0, post: 'REQUEST', template: 'CAREFUL', first: true, from: 'PEER', dates: [31, 32], guided: [11, 12], ask: 'DOOR' },
     { week: 0, day: 0, post: 'LOCAL', path: 'people.band.FIRST_ASK', band: 'CLOSER' },
     { week: 0, day: 0, post: 'REQUEST', template: 'MASS' },
     { week: 0, day: 0, post: 'OWNER', path: 'people.owner.HOST.HELLO' },
@@ -376,6 +376,13 @@ SB.module('Director', function (SB) {
         spec.from = 'PEER';
         spec.home = peerPlace(state);
         spec.tier = 1;
+        /* the guided first show (Dana texts you through it) is a week and a half out, so the walkthrough is not three
+         * weeks of waiting; a player who skipped it gets the month-out dates. The short one reads as short notice, but
+         * this band waits for an answer until the night before: the walkthrough holds and confirms the room first. */
+        if (e.guided && guidedStart(state)) {
+          spec.dates = e.guided.slice();
+          spec.replyBy = Math.max(1, e.guided[0] - (e.week * 7 + (e.day || 0)) - 1);
+        }
       } else if (e.template === 'SWAP') {
         spec.kind = E.REQ_KIND.SWAP;
         spec.from = 'PEER';
@@ -413,9 +420,9 @@ SB.module('Director', function (SB) {
     if (e.post === 'LOCAL') {
       from = localBand(state, e.band);
       if (!from) return [];
-      var b = state.bands[from];
+      var b = state.bands[from], fq = firstReq(state), fd = fq && fq.dates && fq.dates.length ? fq.dates[0] : 31;
       return [SB.Effects.post(state, { kind: E.MSG.BAND, fromId: b.contactId || null, fromName: b.name,
-        subject: b.name, body: line(state, SB.Effects.textPath(state, e.path, b.contactId), { band: b.name, date: SB.time.date(31).d, dow: SB.time.fmt(31, 'dow') }),
+        subject: b.name, body: line(state, SB.Effects.textPath(state, e.path, b.contactId), { band: b.name, date: SB.time.date(fd).d, dow: SB.time.fmt(fd, 'dow') }),
         needs: false, refs: { bandId: from } })];
     }
     if (e.post === 'OWNER') {
@@ -432,6 +439,10 @@ SB.module('Director', function (SB) {
     }
     return [];
   }
+
+  /* is this game walked through its first show? (SB.Game.newGame skips the walkthrough before the opening when the
+   * start screen said "I've done this before") */
+  function guidedStart(state) { var t = state.story && state.story.tutorial; return !(t && t.skipped); }
 
   /* the first show's request: the band that wrote on day one (an older save: the opening's swap) */
   function firstReqId(state) { var d = dir(state); return d.firstRequestId || d.swapRequestId || null; }

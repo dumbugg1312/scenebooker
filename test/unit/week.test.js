@@ -9,7 +9,7 @@
 //   * a decision handed to Week.raise during nextWeek is the first stop on Monday;
 //   * after a show played through Night.begin, next and settle (not auto), state.week.log holds NIGHT_START, SET_START and SET_END, SETTLE_LINE,
 //     SHOW_RESULT, LEARNED and TRUST records exactly once each, and Week.close reports `learned` and `people` from them;
-//   * the scripted opening: the swap's first date is day 31, every job of that show can be on time for a player who acts in week 0,
+//   * the scripted opening: the guided first show's first date is day 11 (the walkthrough); skipped, it is day 31 and every job of that show can be on time for a player who acts in week 0,
 //     and the Checklist bot reaches a PLAYED show by week 4 with a verdict against Par of ABOUT or better in 80 percent of seeds.
 // It needs the whole week machinery, so it runs when every module it names is a real file.
 const H = require('../helpers.js');
@@ -36,11 +36,20 @@ module.exports = function (t) {
 
   /* ---- the scripted opening ---- */
   H.section(t, 'opening', () => {
-    const state = fresh();
+    /* walked through (the default): Dana's first show is a week and a half out, and the band waits for an answer */
+    const guided = fresh(), gq = openingRequest(guided);
+    t.ok(!!gq, 'a guided week 0 has the first show\'s request');
+    if (gq) {
+      t.eq(gq.dates[0], 11, 'the guided first show\'s first date is day 11, a Friday');
+      t.eq(SB.time.fmt(11, 'dow'), 'Friday', 'day 11 is a Friday');
+      t.ok(gq.replyBy >= 10, 'the guided first show\'s band waits for an answer until the night before (reply by day ' + gq.replyBy + ')');
+    }
+    /* "I've done this before": the month-out first show, every job of it on time for a player who acts in week 0 */
+    const state = H.newGame(SB, { seed: 'week-1', tutorial: false });
     const q = openingRequest(state);
     t.ok(!!q, 'week 0 has the first show\'s request');
     if (!q) return;
-    t.eq(q.dates[0], 31, 'the swap\'s first date is day 31');
+    t.eq(q.dates[0], 31, 'the swap\'s first date is day 31 when the walkthrough is skipped');
     t.eq(SB.time.fmt(31, 'long'), 'Thursday, February 18', 'day 31 is Thursday, February 18');
     const d = draftShow(state);
     t.ok(!!d, 'a show can be drafted from the swap');

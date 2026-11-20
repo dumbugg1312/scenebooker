@@ -36,7 +36,7 @@ SB.Content.story = {
     },
     steps: {
       ANSWER: {
-        text: "{touring} from {touringHome} want {date}. Say yes. And put {local} on it, they bring forty people.",
+        text: "{touring} from {touringHome} want {dow}, {date}. That's a week and a half out. Tight, but plenty for {room}. Say yes. And put {local} on it, they bring forty people.",
         nudge: "you there? {touring} are waiting on an answer. just say yes.",
         stages: {
           REPLY: "It's the message from {sender}. Open it and tell them you're interested."
@@ -64,7 +64,7 @@ SB.Content.story = {
         }
       },
       SOUND: {
-        text: "{sound} for sound. {soundRate:money}. Late every time, never misses.",
+        text: "{sound} for sound. {soundRate:money}. Late every time, never misses. Unless a wedding calls. Weddings pay better than we do.",
         nudge: "you need sound. {sound} answers texts faster than calls.",
         stages: {
           ASK: "It's on the clipboard, down by the crew. Ask {sound}.",
@@ -72,7 +72,7 @@ SB.Content.story = {
         }
       },
       FLYER: {
-        text: "Make the flyer today. The day you confirm, not the week of. Today.",
+        text: "Make the flyer today. The room's confirmed and the bands said yes, so there's nothing left to wait on. Every day it sits, somebody makes other plans.",
         nudge: "flyer. today. every day it waits is people making other plans.",
         wrong: "That flyer's late. Every day it sat in your head, somebody made other plans. It'll still help. Next time, the day you confirm.",
         stages: {

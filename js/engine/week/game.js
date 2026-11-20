@@ -91,11 +91,13 @@ SB.module('Game', function (SB) {
     SB.WorldGen.build(state, pack);
     SB.Notebook.init(state);
     SB.Jobs.refreshAll(state);
+    /* "I've done this before" is settled before the opening, which writes a guided first show closer in (Director) */
+    if (o.tutorial === false) SB.Tutorial.skip(state);
     SB.Director.opening(state);
     SB.Director.planWeek(state);
     SB.Week.refreshHours(state);
     /* the guided first show is on until the start screen skips it (opts.tutorial === false starts with it skipped) */
-    if (o.tutorial === false) SB.Tutorial.skip(state); else SB.Tutorial.start(state);
+    if (o.tutorial !== false) SB.Tutorial.start(state);
     SB.Chapters.check(state);
     SB.Patches.check(state);
     return state;

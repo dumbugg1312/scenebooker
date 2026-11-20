@@ -29,6 +29,8 @@ function make(cfg) {
     M.drafts[q.requestId] = draft.showId;
     const fund = L.fundOf(state), bank = L.bankOf(state), cover = state.settings && state.settings.bills === false ? fund : Math.max(fund, bank / 3);
     const guarantee = L.num(req && req.ask && req.ask.guarantee);
+    // the walkthrough's first show (Dana's texts say "say yes"): a player following them takes it whatever the Par says
+    const tut = state.story && state.story.tutorial, guided = !!(tut && tut.on && tut.requestId === q.requestId);
     let best = null;
     dates.forEach(d => {
       // "a bookable room is open on one of its dates" (06-harness 4): the rooms whose owner would grant a hold today
@@ -44,7 +46,7 @@ function make(cfg) {
         let w = null;
         try { w = SB.Forecast.what(state, draft.showId, { roomId: roomId, day: d.day }); } catch (e) { w = null; }
         const par = w && w.par ? L.num(w.par.heads, 0) : 0;
-        if (par < (cfg.parMin === undefined ? .4 : cfg.parMin) * cap) return;
+        if (par < (guided ? 0 : (cfg.parMin === undefined ? .4 : cfg.parMin)) * cap) return;
         let owed = guarantee;
         try { const t = SB.Rooms.terms(state, roomId, draft.showId) || {}; owed += L.num(t.rent) + L.num(t.deposit) + L.num(t.soundFee) + L.num(t.houseCosts); } catch (e) { /* none */ }
         if (!cfg.ignoreCover && owed > cover) return;

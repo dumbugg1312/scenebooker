@@ -115,8 +115,10 @@ SB.module('Save', function (SB) {
         if (Array.isArray(s.jobs)) s.jobs = [];
       }
       /* SPEC?: 01-state 3 deletes a played show after 104 weeks and says nothing of a cancelled one, which has no
-       * ShowRecord and nothing that reads it; it goes at the same age. */
-      if (done && s.day < today - 728) delete state.shows[id];
+       * ShowRecord and nothing that reads it (every reader skips CANCELLED): it goes with its jobs and asks, 8 weeks
+       * on. A career that drafts and drops a lot of shows would otherwise carry two years of them in the save. */
+      if (s.status === 'CANCELLED' && dead[id]) delete state.shows[id];
+      else if (done && s.day < today - 728) delete state.shows[id];
     }
     for (i = 0; i < ((state.week && state.week.plan) || []).length; i++) planned[state.week.plan[i].jobId] = true;
     /* SPEC?: 01-state 3 gives a lifetime only to the jobs and asks "of a played or cancelled show". Those with no show

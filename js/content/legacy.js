@@ -22,7 +22,7 @@ SB.Content.legacy = {
     },
     notes: ['Answer everyone.', 'Flyer the day you confirm.', '{room}: done by {curfew}.'],     // the first three notebook notes, conf RUMOR
     script: [                              // the scripted first weeks (story 4.4), as 03-content section 10 gives them
-      { week: 0, day: 0, post: 'REQUEST', template: 'CAREFUL', first: true, from: 'PEER', dates: [31, 32], ask: 'DOOR' },  // the first show: a band writes you
+      { week: 0, day: 0, post: 'REQUEST', template: 'CAREFUL', first: true, from: 'PEER', dates: [31, 32], guided: [11, 12], ask: 'DOOR' },  // the first show: a band writes you (guided: a week and a half out)
       { week: 0, day: 0, post: 'LOCAL', path: 'people.band.FIRST_ASK', band: 'CLOSER' },
       { week: 0, day: 0, post: 'REQUEST', template: 'MASS' },
       { week: 0, day: 0, post: 'OWNER', path: 'people.owner.HOST.HELLO' },

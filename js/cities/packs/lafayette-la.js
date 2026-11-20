@@ -14,8 +14,8 @@ SB.Cities.register('lafayette-la', {
   blocklist: ['festival international*', 'ragin*', 'knights of columbus*', 'daily advertiser*', 'acadiana advocate*', 'tabasco*', 'cajundome*', 'lsu*'],
 
   blurb: ['Fiddle and accordion country, so loud is nothing new, but punk lives in carports, yards and rented halls. Rain cancels a show faster than the police do.',
-          'Few basements here. Somebody\'s uncle owns a hall and wants a flat fee and no glass, and the bands get fed before load-in.'],
-  hard: 'Few basements, heat and rain, and halls that want a flat fee and no glass.',
+          'Nobody has a basement here. Somebody\'s uncle owns a hall and wants a flat fee and no glass, and the bands get fed before load-in.'],
+  hard: 'No basements, heat and rain, and halls that want a flat fee and no glass.',
   region: 'the Gulf',
   houseType: 'CARPORT',
   whereGo: [
