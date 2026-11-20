@@ -225,8 +225,12 @@
       var S0 = game(), showId = params && params.showId, show = S0 && S0.shows ? S0.shows[showId] : null;
       var model = freshModel(), queue = [], flushing = false, stop = null, timer = null, view = null, savedView = null, fcard = null, photo = null,
           stageRecs = [], doorCache = null, phase = 'init', stopKey = '', alive = true, look = null, onResize = null, said = '';
+      var seenLines = 0, heroKey = '', heroLast = { gross: 0, net: 0 }, lastHeads = 0, lastCash = 0, ro = null;
+      function F() { return SB.Finish; }
+      /* the hero has the light: while a decision or the doors wait, the rest of the table sits back */
+      function quiet(on) { el.classList.toggle('is-quiet', !!on); }
       var region = {};
-      var el = h('section', { class: 'sb-night nt' + (reducedMotion() ? ' is-still' : ''), data: { show: showId || '' } });
+      var el = h('section', { class: 'nt sb-stage' + (reducedMotion() ? ' is-still' : ''), data: { show: showId || '', 'mv-exit': 'wipe' } });
       root.appendChild(el);
 
       function S() { return game(); }
@@ -305,7 +309,7 @@
         var dec = stop && stop.decision, r;
         if (!dec || (decId && decId !== dec.id)) return;     // a tab of a note already torn: the night has moved on
         /* the torn note goes at once: it is not left on the surface while the night's records play out under it */
-        stopKey = 'torn:' + dec.id;
+        stopKey = 'torn:' + dec.id; quiet(false);
         if (region.stop) SB.UI.clear(region.stop);
         r = SB.UI.act(function (s) { return SB.Night.next(s, showId, { decisionId: dec.id, optionId: optionId }); });
         if (!r) { stopKey = ''; paintStop(true); return; }
@@ -397,6 +401,12 @@
         if (gross === null && sh && sh.result && sh.result.door) { gross = sh.result.door.gross; hat = sh.result.door.hat; }
         return { gross: gross, hat: hat };
       }
+      /* the door count and the cash count up (three held frames) when they change; a flush just sets them */
+      function countChip(host, to, from, fmt) {
+        var n = host.querySelector('.nc-chip span');
+        if (!n || flushing || !F() || to === from) return;
+        F().countUp(n, to, { from: from, fmt: fmt });
+      }
       function paintDoor() {
         var host = region.counter, c = cashFigure(), cash = c.gross === null ? '?' : money(c.gross) + (num(c.hat) && c.hat > 0 ? ' +' + money(c.hat) : ''), sx = settling(), P = NS().parts,
             sayCash = c.gross === null ? L('cashSayPending') : L('cashSay', { cash: money(c.gross) + (num(c.hat) && c.hat > 0 ? ' ' + L('hat') + ' ' + money(c.hat) : '') }),
@@ -407,7 +417,9 @@
         if (!host) return;
         SB.UI.clear(region.counter); SB.UI.clear(region.cash); SB.UI.clear(region.drink); SB.UI.clear(region.call);
         put(region.counter, P.thing({ kind: 'clicker', art: { count: model.heads }, name: 'clicker', cls: 'nt-counter nc-clicker', label: L('door') + ': ' + counterSay, onClick: function () { say(counterSay); } }, sx));
-        put(region.counter, P.chip(L('door').toUpperCase(), String(model.heads || 0), 'doorChip'));
+        put(region.counter, P.chip(null, String(model.heads || 0), 'doorChip'));
+        countChip(region.counter, model.heads || 0, lastHeads, String);
+        lastHeads = model.heads || 0;
         put(region.counter, P.strip(model.byGen[0] + ' ' + L('kids') + ' · ' + model.byGen[1] + ' ' + L('middle') + ' · ' + model.byGen[2] + ' ' + L('old'), 'gens', sx));
         if (num(par)) aria.push(word('ui.c.par', 'par') + ' ' + par);
         if (call) aria.push(L('callLine', { lo: call.lo, hi: call.hi }));
@@ -417,7 +429,8 @@
           cap: cap ? SB.text.label('ui.c.cap', { n: cap }).toUpperCase() : '', away: model.ended && model.turnedAway > 0 ? L('turnedAway', { n: model.turnedAway }) : '', aria: aria.join('. ') + '.' }, sx));
         put(region.cash, P.thing({ kind: 'tin', art: { fill: Math.min(1, (model.heads || 0) / Math.max(10, cap || 40)), empty: sx, seed: sx ? 'out' : 'in', size: 0.86 }, name: 'tin', cls: 'nt-cash',
           label: L('cashBox') + ': ' + sayCash, onClick: function () { say(sayCash); } }, sx));
-        put(region.cash, P.chip(L('cashBox').toUpperCase(), cash === '?' ? L('cashPending') : cash, 'cashChip'));
+        put(region.cash, P.chip(null, cash === '?' ? L('cashPending') : cash, 'cashChip'));
+        if (c.gross !== null) { countChip(region.cash, c.gross, lastCash, function (n) { return money(n) + (num(c.hat) && c.hat > 0 ? ' +' + money(c.hat) : ''); }); lastCash = c.gross; }
         put(region.drink, P.thing({ kind: 'rings', art: { n: Math.min(5, 1 + model.sets.length), seed: showId }, name: 'rings' }, sx));
         put(region.drink, P.thing({ kind: 'can', art: { empty: !!model.ended, cup: look.drink === 'coffee' }, name: 'can', cls: 'nt-drink', label: L(look.drink), onClick: function () { say(drinkSay); } }, sx));
         put(region.drink, P.card(L(look.drink), rulesFor(look.seed), sx));
@@ -430,7 +443,6 @@
         put(region.stamp, NS().parts.thing({ kind: 'stamp', art: { size: sx ? 0.62 : 1 }, name: 'stamp', cls: 'nt-stampset', label: L('stamp') + ', ' + L('marker'),
           onClick: function () { say(look.allAges ? L('stampSay') : L('stampSay21')); } }, sx));
         put(region.stamp, NS().parts.thing({ kind: 'marker', art: { size: sx ? 0.7 : 1 }, name: 'marker' }, sx));
-        if (!sx) put(region.stamp, NS().parts.chip(L('stamp').toUpperCase(), null, 'stampChip'));
       }
       function paintPosts() {
         var host = region.posts, items = [];
@@ -461,7 +473,7 @@
         else if (model.ended) line = L('nowOver');
         else if (model.phase === 'set' && cur) line = L('nowSet', { band: cur.name, present: num(cur.present) ? cur.present : model.heads });
         else line = L('nowDoors', { heads: model.heads });
-        host.appendChild(h('p', { class: 'cb-typed nt-now-line nc-now nc-piece', style: { left: '34px', top: '768px', '--rot': '-0.8deg' } }, [line, !said && model.ticker.length ? h('span', { class: 'nt-now-tick', text: ' · ' + model.ticker[model.ticker.length - 1].text }) : null]));
+        host.appendChild(h('p', { class: 'cb-typed nt-now-line nc-now nc-piece', style: NS().layout.at(34, 768, -0.8) }, [line, !said && model.ticker.length ? h('span', { class: 'nt-now-tick', text: ' · ' + model.ticker[model.ticker.length - 1].text }) : null]));
       }
       function paint(r) {
         if (r && r.t === 'POST') { paintPosts(); return; }
@@ -477,14 +489,14 @@
         if (!host) return;
         SB.UI.clear(host);
         if (phase === 'night' && sh && sh.night && !dec && !model.ended)
-          host.appendChild(h('button', { type: 'button', class: 'nc-piece nc-btn', style: { left: '1100px', top: '762px', '--rot': '-2deg' }, aria: { label: L('skip') }, data: { fk: 'skip' }, on: { click: skip } }, [h('span', { text: L('skip') })]));
+          host.appendChild(h('button', { type: 'button', class: 'nc-piece nc-btn pz-hl', style: NS().layout.at(1100, 762, -2), aria: { label: L('skip') }, data: { fk: 'skip' }, on: { click: skip } }, [h('span', { text: L('skip') })]));
       }
 
       /* ---------- the note slid onto the surface, the envelope, how it went ---------- */
       /* a tear-off tab: a perforated slip; the words of the choice, then what it costs */
       function tab(o, i, onPick) {
         var dis = o.enabled === false, costs = (o.costs || []).map(costText);
-        return h('button', { type: 'button', class: 'nt-tab', disabled: dis, data: { fk: 'opt-' + i, option: o.id || null },
+        return h('button', { type: 'button', class: 'nt-tab pz-hl', disabled: dis, data: { fk: 'opt-' + i, option: o.id || null },
                              aria: { label: (i + 1) + '. ' + (o.label || '') + (costs.length ? '. ' + costs.join(', ') : '') + (dis && o.why ? '. ' + L('cannot') + ' ' + o.why : '') },
                              on: { click: function () { if (!dis) onPick(o); } } }, [
           h('span', { class: 'nt-tab-n', aria: { hidden: 'true' }, text: String(i + 1) }),
@@ -500,32 +512,48 @@
           opts.map(function (o, i) { return tab(o, i, onPick); }));
       }
       function noteFor(dec) {
-        var bang = D().art(D().bang(4, 30, 30), 50, 40);
+        var bang = D().art(D().bang(4, 52, 52), 88, 70);
         var el2 = h('section', { class: 'nt-note cb-piece cb-stock-white', role: 'group', tabindex: '-1', aria: { live: 'assertive', label: (dec.title || '') + ' ' + L('needsYou') } }, [
           h('div', { class: 'nt-note-head' }, [bang, h('h2', { class: 'nt-note-title', text: dec.title || '' })]),
           dec.body ? h('p', { class: 'cb-typed nt-note-body', text: dec.body }) : null,
           tabRow((dec.options || []).slice(0, 4), function (o) { choose(o.id, dec.id); }, dec.title)
         ]);
+        if (F()) F().move(el2, 'stamp', { cue: 'stamp', cueAt: 83, cueOpts: { gain: -5 } });
         if (typeof requestAnimationFrame === 'function') requestAnimationFrame(function () { try { var b = el2.querySelector('.nt-tab:not([disabled])'); if (b) b.focus(); } catch (e) { /* fine */ } });
         return el2;
       }
       function envelope(v, lines, done) {
-        var kids = [], split, opts;
+        var kids = [], split, opts, shN = curShow(), hero, heroN, heroV, key, from;
+        var netV = done && shN ? (shN.result && num(shN.result.playerNet) ? shN.result.playerNet : (shN.night && shN.night.settled ? shN.night.settled.playerNet : null)) : null;
         kids.push(h('div', { class: 'nt-env-flap', aria: { hidden: 'true' } }));
         kids.push(D().word(L('envelope'), 26, { cls: 'nt-env-h' }));
+        /* the hero: the night's money, stamped on and counted up; once it is paid out, what you keep */
+        key = num(netV) ? 'net' : 'gross';
+        heroV = key === 'net' ? netV : (v && v.door && num(v.door.gross) ? v.door.gross : null);
+        if (heroV !== null) {
+          heroN = h('strong', { class: 'nt-fig nt-hero-n', text: (key === 'net' && heroV > 0 ? '+' : '') + money(heroV) });
+          hero = h('p', { class: 'nt-hero nt-hero--' + key, data: { n: String(heroV) } }, [key === 'net' ? h('span', { class: 'cb-typed nt-hero-k', text: SB.text.label('settle.NET') }) : null, heroN]);
+          kids.push(hero);
+          from = heroKey === key ? heroLast[key] : 0;
+          if (F()) {
+            if (heroKey !== key) F().move(hero, 'stamp', { cue: 'stamp', cueAt: 83, cueOpts: { gain: -5 } });
+            F().countUp(heroN, heroV, { from: from, delay: heroKey !== key ? 83 : 0, fmt: function (n) { return (key === 'net' && n > 0 ? '+' : '') + money(n); } });
+          }
+          heroKey = key; heroLast[key] = heroV;
+        }
         if (v && v.door) {
-          kids.push(h('p', { class: 'cb-typed nt-env-door' }, [L('doorLine', { paid: v.door.paid, price: money(v.door.price || 0) }) + ' = ', h('strong', { class: 'nt-fig', text: money(v.door.gross || 0) })]));
+          kids.push(h('p', { class: 'cb-typed nt-env-door' }, [L('doorLine', { paid: v.door.paid, price: money(v.door.price || 0) })]));
           if (v.door.hat) kids.push(h('p', { class: 'cb-typed nt-env-door' }, [L('hat') + ' ', h('strong', { class: 'nt-fig', text: money(v.door.hat) })]));
         }
         kids.push(h('ol', { class: 'nt-env-lines' }, lines.map(function (l, i) {
-          return h('li', { class: 'nt-env-line' + (l.k === 'YOU' ? ' is-you' : ''), style: { '--i': String(i) }, data: { tut: ({ ROOM: 'settle-pay-room', SOUND: 'settle-pay-sound', SHARE: 'settle-pay-touring', LOCAL: 'settle-pay-local' })[l.k] || null, 'tut-ref': showId || null } }, [
+          var fresh = i >= seenLines;
+          return h('li', { class: 'nt-env-line' + (l.k === 'YOU' ? ' is-you' : '') + (fresh ? ' mv-slap' : ''), style: { '--i': String(Math.max(0, i - seenLines)) }, data: { tut: ({ ROOM: 'settle-pay-room', SOUND: 'settle-pay-sound', SHARE: 'settle-pay-touring', LOCAL: 'settle-pay-local' })[l.k] || null, 'tut-ref': showId || null } }, [
             h('span', { class: 'cb-typed nt-env-label', text: l.label || '' }),
             h('span', { class: 'nt-fig', text: num(l.amount) ? money(l.amount) : '' }),
             num(l.running) ? h('span', { class: 'nt-env-run', text: money(l.running) }) : null
           ]);
         })));
-        var shN = curShow(), netV = done && shN ? (shN.result && num(shN.result.playerNet) ? shN.result.playerNet : (shN.night && shN.night.settled ? shN.night.settled.playerNet : null)) : null;
-        if (num(netV)) kids.push(h('p', { class: 'cb-typed nt-env-net' }, [SB.text.label('settle.NET') + ': ', h('strong', { class: 'nt-fig', text: (netV > 0 ? '+' : '') + money(netV) })]));
+        seenLines = lines.length;
         if (v && !done) {
           if (num(v.gap) && v.gap > 0) {
             var gapT = L('short', { gap: money(v.gap) }).toUpperCase(), gapW = K().markerWidth(gapT, 22) + 24;
@@ -541,8 +569,9 @@
             kids.push(tabRow(opts, function (o) { settle({ shortfall: null, keep: o.keep }); }, L('envelope'), 'settle-done'));
           }
         }
-        return h('section', { class: 'nt-env nt-envelope' + (done ? ' is-done' : ''), role: 'group', aria: { label: L('envelope') } }, kids);
+        return h('section', { class: 'nt-env nt-envelope pz-paper' + (done ? ' is-done' : ''), role: 'group', aria: { label: L('envelope') } }, kids);
       }
+
       function result(sh) {
         var r = sh.result, kids = [], stamps;
         if (!r) return null;
@@ -584,6 +613,8 @@
         SB.UI.clear(host);
         paintDoor();
         put(host, NS().parts.sign(L('openL1'), L('openL2'), [doors, L('setsSay', { n: (view ? view.bands : []).length, cur: '' }).trim()].filter(Boolean).join(' · '), L('open'), 'open', begin));
+        quiet(true);
+        if (F() && host.querySelector('.nc-sign')) F().move(host.querySelector('.nc-sign'), 'stamp', { delay: 560, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5 } });
         if (typeof requestAnimationFrame === 'function') requestAnimationFrame(function () { try { var b = host.querySelector('[data-fk="open"]'); if (b) b.focus(); } catch (e) { /* fine */ } });
       }
 
@@ -597,12 +628,13 @@
           if (key === stopKey) return;
           stopKey = key;
           SB.UI.clear(host); SB.UI.clear(region.result); SB.UI.clear(region.leave);
-          host.className = 'nt-at nt-at--stop is-env';
+          host.className = 'nt-at nt-at--stop is-env'; quiet(false);
           host.appendChild(envelope(savedView, model.lines, true));
           if (!queue.length && sh && sh.result) {
             region.result.appendChild(result(sh));
             afterJobs(region.result);
             put(region.leave, NS().parts.sign(L('leaveL1'), L('leaveL2'), '', L('toWeek'), 'leave', leave, 'leave'));
+            if (F() && region.leave.querySelector('.nc-sign')) F().move(region.leave.querySelector('.nc-sign'), 'slap');
             paintPiles(); paintStamp();
           }
           return;
@@ -613,7 +645,7 @@
           if (key === stopKey) return;
           stopKey = key;
           SB.UI.clear(host);
-          host.className = 'nt-at nt-at--stop is-note';
+          host.className = 'nt-at nt-at--stop is-note'; quiet(true);
           host.appendChild(noteFor(dec));
           if (SB.Sfx) SB.Sfx.noteIn();
           return;
@@ -623,30 +655,32 @@
           if (key === stopKey) return;
           stopKey = key;
           SB.UI.clear(host);
-          host.className = 'nt-at nt-at--stop is-env';
+          host.className = 'nt-at nt-at--stop is-env'; quiet(false);
           try { savedView = SB.Night.settleView(S(), showId); } catch (e) { savedView = null; }
           host.appendChild(envelope(savedView, savedView ? savedView.lines.map(function (l) { return { k: l.k, label: l.label, amount: l.amount }; }) : [], false));
           paintDoor(); paintPiles(); paintCrowd(); paintSetList(); paintStamp();
           if (typeof requestAnimationFrame === 'function') requestAnimationFrame(function () { try { var b = host.querySelector('.nt-tab:not([disabled])'); if (b) b.focus(); } catch (e) { /* fine */ } });
           return;
         }
-        if (phase === 'night' && stopKey !== 'none') { stopKey = 'none'; SB.UI.clear(host); host.className = 'nt-at nt-at--stop'; }
+        if (phase === 'night' && stopKey !== 'none') { stopKey = 'none'; quiet(false); SB.UI.clear(host); host.className = 'nt-at nt-at--stop'; }
       }
 
       /* ---------- the skeleton: the board, the doorway sheet past the table, the objects on it ---------- */
       function fit() {
-        /* its own box, which leaves room at the bottom for the walkthrough's strip when one is up (css/story.css) */
-        var vw = el.clientWidth || (typeof window !== 'undefined' ? window.innerWidth : W), vh = (el.clientHeight - (parseFloat(typeof getComputedStyle === 'function' ? getComputedStyle(el).paddingBottom : 0) || 0)) || (typeof window !== 'undefined' ? window.innerHeight : HT), k = Math.min(vw / W, vh / HT);
+        /* the board is 1280 x 800 of --p and fills the stage; with the walkthrough's strip up (css/story.css gives .nt a
+           bottom band) it shrinks to what is left, so nothing of the night sits under the strip */
+        var cw = region.stage ? region.stage.offsetWidth : 0, pb = 0, k = 1;        /* the board's own width: 1280 of --p, in px */
         if (!region.stage) return;
-        k = Math.max(0.3, k);
-        region.stage.style.transform = 'scale(' + k.toFixed(4) + ')';
-        region.fit.style.width = Math.round(W * k) + 'px'; region.fit.style.height = Math.round(HT * k) + 'px';
+        try { pb = parseFloat(getComputedStyle(el).paddingBottom) || 0; } catch (e) { pb = 0; }
+        if (cw > 0 && pb > 0) k = Math.max(0.3, Math.min(1, (el.clientHeight - pb) / (HT * cw / W)));
+        el.style.setProperty('--k', k.toFixed(4));
       }
       function build() {
         var sh = curShow(), room = roomOf(), title;
         SB.UI.clear(el);
         region = {};
         look = doorLook(room, sh);
+        quiet(false); seenLines = 0; heroKey = '';
         try { fcard = SB.Forecast.card(S(), showId); } catch (e) { fcard = null; }
         title = [room ? room.name : '', sh ? SB.time.fmt(sh.day, 'long') : ''].filter(Boolean).join(' · ');
         ['door', 'setlist', 'watch', 'stamp', 'counter', 'call', 'cash', 'drink', 'piles', 'posts', 'sign', 'stop', 'result', 'leave', 'now', 'actions'].forEach(function (k2) {
@@ -666,8 +700,15 @@
         el.appendChild(region.fit);
         fit();
         if (!onResize && typeof window !== 'undefined') { onResize = function () { fit(); }; window.addEventListener('resize', onResize); }
+        if (!ro && typeof ResizeObserver === 'function') { try { ro = new ResizeObserver(function () { fit(); }); ro.observe(el); } catch (e) { ro = null; } }
+        if (F()) { F().scrollbar(region.stop); F().scrollbar(region.result); }
         paint();
         paintButtons();
+        /* the papers slap down one after another */
+        if (F()) {
+          var pieces = Array.prototype.slice.call(region.stage.querySelectorAll('.nc-piece'));
+          pieces.forEach(function (pc, n) { pc.style.setProperty('--i', String(Math.min(n, 16))); pc.classList.add('mv-slap'); });
+        }
       }
 
       /* ---------- start ---------- */
@@ -708,7 +749,7 @@
       return {
         update: function () { if (phase === 'night' || phase === 'settled') { paint(); paintButtons(); } },
         flush: flush,
-        unmount: function () { alive = false; clearTimer(); if (onResize && typeof window !== 'undefined') window.removeEventListener('resize', onResize); }
+        unmount: function () { alive = false; clearTimer(); if (ro) { try { ro.disconnect(); } catch (e) { /* fine */ } } if (onResize && typeof window !== 'undefined') window.removeEventListener('resize', onResize); }
       };
     }
   });

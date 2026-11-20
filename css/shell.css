@@ -1,0 +1,74 @@
+/* Scene Booker — css/shell.css: the game's shell (polish brief job 8): the loading screen (#boot, js/ui/boot.js), the
+ * small tape that shows while a cutscene's pictures come in (.bt-hold), and the quick menu (.pm, js/ui/pause.js).
+ * Stage units and the shared finish (css/finish.css), toner on copy paper, moves in held steps. */
+
+/* ---------- the loading screen: the black stage, the title, a strip of tape filling a part at a time ---------- */
+html.is-booting body { overflow: hidden; }
+#boot {
+  position: fixed; inset: 0; z-index: 8000; display: flex; align-items: center; justify-content: center;
+  background: var(--pitch); color: var(--pp-bond);
+}
+.bt-stage { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--u) * 34);
+  width: calc(var(--u) * 1600); height: calc(var(--u) * 1000); }
+.bt-title { margin: 0; display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 6); transform: rotate(-2.5deg); }
+.bt-title span { display: block; padding: calc(var(--u) * 4) calc(var(--u) * 26) calc(var(--u) * 10); background: var(--pp-bond); color: var(--toner);
+  font: 400 calc(var(--u) * 138)/1 var(--f-gothic); letter-spacing: .02em; text-transform: uppercase;
+  clip-path: var(--edge-torn-b); box-shadow: var(--sh-l) 0 var(--pitch); }
+.bt-title span + span { transform: translateX(calc(var(--u) * 70)) rotate(3deg); background: var(--toner); color: var(--pp-bond); clip-path: var(--edge-cut-2); outline: calc(var(--u) * 3) solid var(--pp-bond); outline-offset: calc(var(--u) * -9); }
+.bt-tape { position: relative; width: calc(var(--u) * 620); height: calc(var(--u) * 44); transform: rotate(1.2deg);
+  border: calc(var(--u) * 2.5) dashed rgba(243, 240, 230, .35); }
+.bt-fill { position: absolute; left: calc(var(--u) * -6); top: calc(var(--u) * -4); bottom: calc(var(--u) * -4); width: calc((100% + var(--u) * 12) * var(--bt, .06));
+  background: rgba(230, 220, 184, .94); clip-path: var(--edge-torn-r);
+  background-image: repeating-linear-gradient(90deg, rgba(0, 0, 0, .05) 0 calc(var(--u) * 2), transparent calc(var(--u) * 2) calc(var(--u) * 9));
+  transition: width 250ms steps(3, end); }
+.bt-word { margin: 0; font: 400 calc(var(--u) * 22)/1.2 var(--f-type); letter-spacing: .06em; color: rgba(243, 240, 230, .8); }
+.bt-word::after { content: " ..."; }
+#boot[aria-busy="false"] .bt-word::after { content: none; }
+
+/* the in-game loading moment: a short strip of tape at the top of the stage, its fill walking in held steps */
+.bt-hold { position: fixed; z-index: 7000; left: 50%; top: calc((100vh - var(--u) * 1000) / 2 + var(--u) * 24); transform: translateX(-50%) rotate(-1.5deg); pointer-events: none; }
+.bt-hold-tape { display: block; position: relative; overflow: hidden; width: calc(var(--u) * 180); height: calc(var(--u) * 26); border: calc(var(--u) * 2) dashed rgba(243, 240, 230, .45); }
+.bt-hold-fill { position: absolute; top: 0; bottom: 0; width: 34%; background: rgba(230, 220, 184, .9); animation: bt-walk 1s steps(3, end) infinite; }
+@keyframes bt-walk { from { left: -34%; } to { left: 100%; } }
+:root[data-motion="reduce"] .bt-fill, :root[data-motion="reduce"] .bt-hold-fill { transition: none; animation: none; }
+@media (prefers-reduced-motion: reduce) { :root:not([data-motion="full"]) .bt-fill, :root:not([data-motion="full"]) .bt-hold-fill { transition: none; animation: none; } }
+
+/* a cutscene picture waiting for its photos (js/ui/cutscene.js) */
+.cs-wait { visibility: hidden; }
+
+/* ---------- the quick menu ---------- */
+.pm { display: flex; flex-direction: column; gap: calc(var(--p) * 16); width: calc(var(--p) * 540); color: var(--toner); font: 400 calc(var(--fs) * 15)/1.3 var(--f-type); }
+.pm-hero { align-self: flex-start; margin: calc(var(--p) * -6) 0 calc(var(--p) * 4) calc(var(--p) * -4); padding: 0 calc(var(--p) * 14);
+  font: 400 calc(var(--fs) * 76)/1 var(--f-gothic); letter-spacing: .02em; transform: rotate(-6deg);
+  background: linear-gradient(176deg, transparent 22%, var(--hl-swipe) 24%, var(--hl-swipe) 82%, transparent 84%); }
+.pm-resume { align-self: flex-start; border: 0; padding: calc(var(--p) * 10) calc(var(--p) * 20) calc(var(--p) * 9); background: var(--toner); color: var(--pp-bond);
+  font: 400 calc(var(--fs) * 22)/1 var(--f-gothic); letter-spacing: .08em; text-transform: uppercase; box-shadow: var(--sh-m) 0 rgba(0, 0, 0, .45);
+  clip-path: var(--edge-cut-1); transform: rotate(-1.5deg); transition: transform 120ms steps(2, end); }
+.pm-resume:hover { transform: rotate(0) translateY(calc(var(--p) * -2)); }
+.pm-rows { display: flex; flex-direction: column; gap: calc(var(--p) * 12); padding: calc(var(--p) * 12) 0; border-top: calc(var(--p) * 2) dashed var(--toner); border-bottom: calc(var(--p) * 2) dashed var(--toner); }
+.pm-row { display: grid; grid-template-columns: calc(var(--p) * 130) minmax(0, 1fr); align-items: center; gap: calc(var(--p) * 12); }
+.pm-label { font-size: calc(var(--fs) * 14); letter-spacing: .12em; text-transform: uppercase; color: var(--toner-mid); }
+
+/* a fader: a pencil line, the level in toner, a knob of black tape */
+.pm-fader { position: relative; height: calc(var(--p) * 34); margin-right: calc(var(--p) * 16); touch-action: none; }
+.pm-track { position: absolute; left: 0; right: 0; top: 50%; border-top: calc(var(--p) * 2) dashed var(--toner-soft); }
+.pm-fill { position: absolute; left: 0; top: calc(50% - var(--p) * 4); height: calc(var(--p) * 8); width: calc(var(--v) * (100% - var(--p) * 22) + var(--p) * 11); background: var(--toner); clip-path: var(--edge-cut-3); }
+.pm-knob { position: absolute; top: calc(50% - var(--p) * 15); left: calc(var(--v) * (100% - var(--p) * 22)); width: calc(var(--p) * 22); height: calc(var(--p) * 30);
+  background: var(--toner); outline: calc(var(--p) * 2) solid var(--pp-bond); outline-offset: calc(var(--p) * -6); box-shadow: var(--sh-s) 0 rgba(0, 0, 0, .5); transform: rotate(-3deg); }
+.pm-fader:hover .pm-knob { transform: rotate(0) scale(1.08); }
+
+/* a drawn box to tick */
+.pm-tick { justify-self: start; padding: 0; border: 0; background: none; }
+.pm-box { display: block; position: relative; width: calc(var(--p) * 28); height: calc(var(--p) * 28); border: calc(var(--p) * 2.5) solid var(--toner); background: var(--pp-white); transform: rotate(-2deg); }
+.pm-tick.is-on .pm-box::before, .pm-tick.is-on .pm-box::after { content: ""; position: absolute; left: 50%; top: calc(var(--p) * -4); bottom: calc(var(--p) * -4);
+  width: calc(var(--p) * 4); margin-left: calc(var(--p) * -2); background: var(--ink-ball); transform: rotate(40deg); }
+.pm-tick.is-on .pm-box::after { transform: rotate(-40deg); }
+
+/* typed words to pick one of; yours is on black tape */
+.pm-choices { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 4) calc(var(--p) * 6); }
+.pm-choice { border: 0; background: none; padding: calc(var(--p) * 3) calc(var(--p) * 6) calc(var(--p) * 2); font: 400 calc(var(--fs) * 14)/1.2 var(--f-type); color: var(--toner-mid); }
+.pm-choice:hover { color: var(--toner); text-decoration: underline calc(var(--p) * 2); text-underline-offset: calc(var(--p) * 4); }
+.pm-choice.is-on { background: var(--toner); color: var(--pp-bond); transform: rotate(-1.5deg); text-decoration: none; }
+.pm-quit { align-self: flex-start; border: 0; background: none; padding: calc(var(--p) * 2) 0; font: 400 calc(var(--fs) * 14)/1.2 var(--f-type); letter-spacing: .04em; color: var(--toner-mid);
+  text-decoration: underline calc(var(--p) * 1.5) dashed; text-underline-offset: calc(var(--p) * 4); }
+.pm-quit:hover { color: var(--toner); }

@@ -89,7 +89,9 @@
     you: 'you',
     toWho: 'to {name}:',
     signals: 'What you notice',
-    phone: 'Phone'
+    phone: 'Phone',
+    heroGo: 'answer them',
+    heroAll: 'show all'
   };
 
   /* SPEC?: 05-interface 4.4 names the filters, Mail.inbox filters by MSG kind; the filter-to-kind mapping is ours. */
@@ -97,8 +99,9 @@
   var OPEN = { NEW: 1, REPLIED: 1, NEGOTIATING: 1 };
   var VETS = ['LISTEN', 'CLIP', 'HISTORY', 'ASK_BOOKER', 'ASK_AROUND'];
   var T = '#141413', W = '#f4f2ea';
-  /* the glass inside the phone's cut-out body, px from each edge: top, right, bottom, left */
-  var GLASS = [54, 25, 44, 25];
+  /* the photos' copy stock: the flyers' papers (css/finish.css --pp-blue, --pp-green, --pp-salmon, --pp-buff) */
+  var STOCK = ['#c2d0dc', '#cde3bd', '#e4b49b', '#eadbc7'];
+  /* the glass inside the phone's cut-out body: css/cu-phone.css .ph-glass, in phone units */
 
   function h(t, a, k) { return SB.UI.h(t, a, k); }
   function C() { return SB.UI.C; }
@@ -125,22 +128,28 @@
   /* the kit numbers its clip paths; the same drawing must find its copy again */
   function copyKey(mk) { return mk.replace(/\b(?:pc|ph|dk)\d+\b/g, '~'); }
   function put(el, url, w, ht) { el.innerHTML = '<img src="' + url + '" width="' + w + '" height="' + ht + '" alt="" draggable="false">'; }
+  /* px in one phone unit (--p, 1.25 stage units), and how fine the copier has to raster to stay sharp at that size */
+  function pxPerP() { return (SB.UI.unit ? SB.UI.unit() : 0.8) * 1.25; }
+  function copyRes() { return Math.max(1, Math.min(4, Math.round(pxPerP() * ((typeof window !== 'undefined' && window.devicePixelRatio) || 1) * 4) / 4)); }
+  /* an SVG drawn as an image cannot reach the page's fonts: the copier's copy carries the shipped faces itself */
+  function withFonts(mk) { var st = SB.Finish && SB.Finish.fontStyle ? SB.Finish.fontStyle(mk) : '', i = mk.indexOf('>'); return st && i > 0 ? mk.slice(0, i + 1) + st + mk.slice(i + 1) : mk; }
 
   /** copyInto(el, markup, w, ht): show the SVG now, then the photocopied raster of it when the copier is done. */
   function copyInto(el, mk, w, ht) {
-    var d = typeof document !== 'undefined' ? document : null, key, url, im;
+    var d = typeof document !== 'undefined' ? document : null, key, url, im, res;
     if (!d || typeof Image === 'undefined' || typeof Blob === 'undefined' || typeof URL === 'undefined' || !URL.createObjectURL || typeof window === 'undefined') return;
-    key = copyKey(mk);
+    res = copyRes();
+    key = copyKey(mk) + '@' + res;
     if (COPIES[key]) { put(el, COPIES[key], w, ht); return; }
     if (PEND[key]) { PEND[key].push(el); return; }
     PEND[key] = [el];
-    try { url = URL.createObjectURL(new Blob([mk], { type: 'image/svg+xml' })); } catch (e) { delete PEND[key]; return; }
+    try { url = URL.createObjectURL(new Blob([withFonts(mk)], { type: 'image/svg+xml' })); } catch (e) { delete PEND[key]; return; }
     im = new Image();
     im.onload = function () {
       var waiting = PEND[key] || [], cv, ctx, sc, out = null;
       delete PEND[key];
       try {
-        sc = Math.min(2, window.devicePixelRatio || 1);
+        sc = res;
         cv = d.createElement('canvas'); cv.width = Math.max(1, Math.round(w * sc)); cv.height = Math.max(1, Math.round(ht * sc));
         ctx = cv.getContext('2d');
         ctx.drawImage(im, 0, 0, cv.width, cv.height);
@@ -161,8 +170,10 @@
   function pic(inner, w, ht, o) {
     o = o || {};
     w = Math.ceil(w); ht = Math.ceil(ht);
+    /* drawn in phone units: shown at w by ht --p whatever the window, so it keeps its place on the stage */
     var mk = svgDoc(inner, w, ht),
-        el = h('span', { class: 'ph-pic' + (o.cls ? ' ' + o.cls : ''), html: mk, role: o.label ? 'img' : null, aria: o.label ? { label: o.label } : { hidden: 'true' } });
+        el = h('span', { class: 'ph-pic' + (o.cls ? ' ' + o.cls : ''), html: mk, role: o.label ? 'img' : null, aria: o.label ? { label: o.label } : { hidden: 'true' },
+                         style: { width: 'calc(var(--p, 1px) * ' + w + ')', aspectRatio: w + ' / ' + ht } });
     copyInto(el, mk, w, ht);
     return el;
   }
@@ -201,14 +212,6 @@
     };
     return pic(k.arrow(2, 32, 24, 18, { seed: 'ha' + seed, stroke: c, sw: 4, head: 9, wob: 2 }) + bang(36, -6) + bang(50, 4), 62, 42, { cls: 'ph-bang' });
   }
-  /** a torn scrap of copy paper with marker words on it and one highlighter swipe across them (not a block of ink) */
-  function hotScrap(text, seed) {
-    var k = K(), w = k.markerWidth(up(text), 16) + 26;
-    return pic(k.paper(3, 3, w, 30, { seed: 'hs' + seed, stock: 'white', torn: 'r', sx: 3, sy: 4, burn: 0.3, rot: -3,
-                                   inner: '<path d="M8 19L' + f1(w - 6) + ' 17" stroke="' + ink('fluorYellow') + '" stroke-opacity=".62" stroke-width="15"/>' +
-                                          k.marker(up(text), 12, 26, 16, { fill: T, maxWidth: w - 20, seed: 'hst' + seed }) }), w + 12, 42, { cls: 'ph-hotscrap' });
-  }
-
   /** an Identity SVG (a band mark or a person stamp) nested at x, y, scaled to size s from its own size n */
   function nest(svgStr, x, y, s, n) {
     var m = String(svgStr || '').replace(/<title>[\s\S]*?<\/title>/g, '').replace(/ role="img"/, '').replace(/ aria-label="[^"]*"/, '').replace('<svg', '<svg x="0" y="0"');
@@ -358,7 +361,7 @@
   function tab(key, label, onClick, o) {
     o = o || {};
     var hot = o.hot ? hotInk() : null;
-    return h('button', { type: 'button', class: ['ph-tab', o.on ? 'is-on' : '', o.done ? 'is-done' : '', o.hot ? 'is-hot' : '', o.big ? 'is-big' : '', o.cls || ''],
+    return h('button', { type: 'button', class: ['ph-tab', 'pz-hl', o.on ? 'is-on' : '', o.done ? 'is-done' : '', o.hot ? 'is-hot' : '', o.big ? 'is-big' : '', o.cls || ''],
                          data: { fk: 'tab-' + key, option: o.option, tut: o.tut, 'tut-ref': o.ref }, disabled: !!o.disabled, role: o.role || null,
                          aria: { pressed: o.role ? null : o.pressed, checked: o.checked, label: o.aria || label },
                          style: hot ? { '--hot': hot, '--hot-ink': lightInk(hot) ? T : W } : null, on: { click: onClick } }, [
@@ -371,13 +374,13 @@
   }
   /** strip(key, text, onClick, aria): a label-maker strip, the one sign for "this opens something" */
   function strip(key, text, onClick, aria) {
-    return h('button', { type: 'button', class: 'ph-strip ph-strip--btn', data: { fk: key }, aria: { label: aria || text }, on: { click: onClick } }, up(text));
+    return h('button', { type: 'button', class: 'ph-strip ph-strip--btn pz-hl', data: { fk: key }, aria: { label: aria || text }, on: { click: onClick } }, up(text));
   }
   /** tickBox(key, label, on, glyphKind, onClick, radio): a drawn box to tick, with a typed label */
   function tickBox(key, label, on, dood, onClick, radio) {
     var k = K(), out = k.rect(4, 5, 22, 22, { seed: 'tb' + key, fill: W, sw: 2.6, wob: 0.7, over: 2.5 });
     if (on) out += k.path([[6, 15], [13, 25], [30, 2]], { seed: 'tk' + key, sw: 4.2, cap: 'square', wob: 0.8, stroke: ink('ballpointBlue') });
-    return h('button', { type: 'button', class: 'ph-tick' + (on ? ' is-on' : ''), data: { fk: 'tick-' + key }, role: radio ? 'radio' : 'checkbox', aria: { checked: on ? 'true' : 'false', label: label }, on: { click: onClick } }, [
+    return h('button', { type: 'button', class: 'ph-tick pz-hl' + (on ? ' is-on' : ''), data: { fk: 'tick-' + key }, role: radio ? 'radio' : 'checkbox', aria: { checked: on ? 'true' : 'false', label: label }, on: { click: onClick } }, [
       pic(out, 34, 32), dood ? gpic(dood, 30, key) : null, h('span', { class: 'ph-tick-t', text: label })
     ]);
   }
@@ -459,15 +462,38 @@
 
     /* ---------------- render ---------------- */
 
+    /* the body is drawn in phone units (460 wide); only its height can differ, and the copier's grain follows the window */
     function drawShell(phone, shell) {
-      var r, w, ht, key;
-      try { r = phone.getBoundingClientRect(); } catch (e) { r = null; }
-      w = r && r.width ? Math.round(r.width) : 460; ht = r && r.height ? Math.round(r.height) : 760;
-      key = w + 'x' + ht;
+      var w = phone.offsetWidth || 460, ht = phone.offsetHeight || 752, hp = Math.round(ht / (w / 460)), key = hp + '@' + copyRes();
       if (shell.getAttribute('data-size') === key) return;
       shell.setAttribute('data-size', key);
       SB.UI.clear(shell);
-      shell.appendChild(pic(shellSvg(w, ht), w, ht));
+      shell.appendChild(pic(shellSvg(460, hp), 460, hp));
+    }
+
+    /* the moves (js/ui/finish.js): the rows slap down one after another when the list is new or filtered, a new page in
+       the phone tears across, and the count of who needs an answer is stamped on and counted up */
+    var animKey = null, lastNeed = 0;
+    function moves(phone, body, same, first) {
+      var F = SB.Finish, hero, n, rows, key = view + ':' + tab0;
+      if (!F) return;
+      F.scrollbar(body);
+      if (!same && !first) F.move(body, 'wipe');
+      if (view === 'list' && key !== animKey) {
+        rows = Array.prototype.slice.call(body.querySelectorAll('.ph-convs > li'));
+        F.stagger(rows, first ? 3 : 0);
+        rows.forEach(function (li) { li.classList.add('mv-slap'); });
+      }
+      animKey = key;
+      hero = phone.querySelector('.ph-hero-need');
+      if (hero) {
+        n = parseInt(hero.getAttribute('data-n'), 10) || 0;
+        if (n !== lastNeed) {
+          F.move(hero, 'stamp', { delay: first ? 220 : 0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: hero } });
+          F.countUp(hero.querySelector('.ph-hn-n'), n, { from: first ? 0 : lastNeed, delay: (first ? 220 : 0) + 83 });
+        }
+        lastNeed = n;
+      } else lastNeed = 0;
     }
 
     function render() {
@@ -482,7 +508,7 @@
       if (c && view === 'page' && !c.req) view = 'chat';
       same = lastView === view;
       shell = h('div', { class: 'ph-shell', aria: { hidden: 'true' } });
-      glass = h('div', { class: 'ph-glass ph--' + view, style: { top: GLASS[0] + 'px', right: GLASS[1] + 'px', bottom: GLASS[2] + 'px', left: GLASS[3] + 'px' } }, [
+      glass = h('div', { class: 'ph-glass ph--' + view }, [
         statusBar(s),
         view === 'list' ? null : convHead(s, c),
         body = h('div', { class: 'ph-body', tabindex: '-1' }, view === 'list' ? listView(s) : (view === 'chat' ? chatView(s, c) : (view === 'page' ? pageView(s, c) :
@@ -490,9 +516,10 @@
         view === 'list' ? null : dock(s, c),
         crack()
       ]);
-      phone = h('div', { class: 'ph-phone', role: 'region', aria: { label: L('phone') } }, [shell, glass]);
+      phone = h('div', { class: 'ph-phone', role: 'region', aria: { label: L('phone') } }, [shell, glass, view === 'list' ? heroNeed(s) : null]);
       root.appendChild(h('div', { class: 'ph' }, phone));
       drawShell(phone, shell);
+      safe(function () { moves(phone, body, same, lastView === null); });
       if (typeof ResizeObserver === 'function') {
         ro = new ResizeObserver(function () { if (alive) drawShell(phone, shell); });
         try { ro.observe(phone); } catch (e) { /* fine */ }
@@ -516,13 +543,10 @@
     /* ---------------- the list ---------------- */
 
     function listView(s) {
-      var filter = TABS.filter(function (t) { return t[0] === tab0; })[0][1], list = conversations(s, filter),
-          need = conversations(s, 'ALL').filter(function (c) { return c.needs; }).length;
+      var filter = TABS.filter(function (t) { return t[0] === tab0; })[0][1], list = conversations(s, filter);
       return [
-        h('div', { class: 'ph-top' }, [
-          h('h2', { class: 'ph-title', aria: { label: L('title') } }, rn(up(L('title')), 27, { seed: 'inbox' })),
-          need ? h('span', { class: 'ph-need', role: 'note', aria: { label: L('needN', { n: need }) } }, hotScrap(L('needN', { n: need }), 'top')) : null
-        ]),
+        /* no "messages" label on a phone's messages: the heading is for screen readers only */
+        h('h2', { class: 'ph-title ph-sr', text: L('title') }),
         /* the walkthrough: the outgoing booker's texts, pinned above the mail (js/ui/story.js) */
         SB.UI.story && SB.UI.story.phone ? safe(function () { return SB.UI.story.phone(s); }, null) : null,
         fringe('ph-fringe--filters', L('filters'), TABS.map(function (t) {
@@ -534,9 +558,23 @@
       ];
     }
 
+    /* the one loud thing on the list: how many need an answer, on a torn scrap stamped across the phone. It is the
+       "answer" filter too: pressing it shows just them, pressing it again shows everything. */
+    function heroNeed(s) {
+      var need = conversations(s, 'ALL').filter(function (c) { return c.needs; }).length, on = tab0 === 'NEEDS';
+      if (!need) return null;
+      return h('button', { type: 'button', class: 'ph-hero-need pz-paper pz-hl' + (on ? ' is-on' : ''), data: { fk: 'hero-need', n: String(need) },
+                           aria: { label: L('needN', { n: need }) + '. ' + L(on ? 'heroAll' : 'heroGo'), pressed: on ? 'true' : 'false' },
+                           on: { click: function () { tab0 = on ? 'ALL' : 'NEEDS'; render(); } } }, [
+        h('span', { class: 'ph-hn-n', text: String(need) }),
+        h('span', { class: 'ph-hn-t', text: L('needN', { n: '' }).replace(/^\s+|\s+$/g, '') }),
+        h('span', { class: 'ph-hn-go', text: up(L(on ? 'heroAll' : 'heroGo')) })
+      ]);
+    }
+
     function row(s, c, i) {
       var m = c.last, name = nameOf(s, c), line = (m.subject && m.kind === 'REQUEST' ? m.subject : (m.body || m.subject || '')).replace(/\s+/g, ' ');
-      return h('li', null, h('button', { type: 'button', class: ['ph-row', 'ph-cut' + (i % 3), c.unread ? 'is-unread' : '', c.gone ? 'is-gone' : '', c.needs ? 'is-needs' : ''], data: { fk: 'c-' + c.key, tut: c.req ? 'req-row' : null, 'tut-ref': c.req ? c.req.id : null },
+      return h('li', null, h('button', { type: 'button', class: ['ph-row', 'pz-paper', 'pz-hl', 'ph-cut' + (i % 3), c.unread ? 'is-unread' : '', c.gone ? 'is-gone' : '', c.needs ? 'is-needs' : ''], data: { fk: 'c-' + c.key, tut: c.req ? 'req-row' : null, 'tut-ref': c.req ? c.req.id : null },
         aria: { label: name + (c.needs ? ', ' + L('needs') : '') + (c.unread ? ', ' + L('unread') : '') }, on: { click: function () { openConv(c.key); } } }, [
         h('span', { class: 'ph-row-mark' }, avatar(s, c, 38)),
         h('span', { class: 'ph-row-mid' }, [
@@ -570,7 +608,7 @@
     function attachment(s, c) {
       var b = bandFor(s, c), room = b ? null : roomFor(s, c), KT = SB.UI.Kit, fig, cv, key, S = SB.Scenes;
       if (b && KT && KT.photo) {
-        return h('div', { class: 'ph-attach ph-attach--band' }, KT.photo({ ids: PLAYERS[hashOf(b.id) % PLAYERS.length], w: 300, h: 168, paper: ['canary', 'pink', 'blue', 'goldenrod'][hashOf(b.id + 'p') % 4],
+        return h('div', { class: 'ph-attach ph-attach--band' }, KT.photo({ ids: PLAYERS[hashOf(b.id) % PLAYERS.length], w: 300, h: 168, unit: 'var(--p)', res: copyRes(), paper: STOCK[hashOf(b.id + 'p') % STOCK.length],
           tape: ['tl', 'tr'], rot: -1, caption: up(b.name) + (b.home ? ' / ' + up(b.home) : ''), seed: 'att' + b.id, alt: b.name }));
       }
       if (room && S && S.draw && typeof document !== 'undefined') {
@@ -636,7 +674,7 @@
 
     function theirBubble(s, m, rv, c) {
       var sig = rv && m.kind === 'REQUEST' && rv.signals ? rv.signals : [], hot = c && c.needs ? hotInk() : null;
-      return h('div', { class: 'ph-bub ph-bub--them' }, [
+      return h('div', { class: 'ph-bub ph-bub--them pz-paper' }, [
         m.subject && m.kind === 'REQUEST' ? h('p', { class: 'ph-bub-subj', text: m.subject }) : null,
         h('p', { class: 'ph-bub-text', text: m.body || m.text || m.subject || '' }),
         num(m.replyBy) ? h('p', { class: 'ph-replyby' + (hot ? ' is-hot' : ''), style: hot ? { '--hot': hot, '--hot-ink': lightInk(hot) ? T : W } : null, text: up(L('replyBy', { day: SB.time.fmt(m.replyBy, 'short') })) }) : null,
@@ -679,7 +717,7 @@
     }
     function decisionCard(d) {
       var hot = hotInk();
-      return h('div', { class: 'ph-bub ph-bub--them ph-bub--card', role: 'note', style: { '--hot': hot, '--hot-ink': lightInk(hot) ? T : W } }, [
+      return h('div', { class: 'ph-bub ph-bub--them ph-bub--card pz-paper', role: 'note', style: { '--hot': hot, '--hot-ink': lightInk(hot) ? T : W } }, [
         d.title ? h('p', { class: 'ph-bub-subj ph-bub-subj--hot', text: d.title }) : null,
         d.body ? h('p', { class: 'ph-bub-text', text: d.body }) : null,
         h('ul', { class: 'ph-likely' }, (d.options || []).slice(0, 4).map(function (o, i) {
@@ -715,7 +753,7 @@
       return h('section', { class: 'ph-hero', aria: { label: b.name } }, [
         pic(inner, W2, H2, { label: b.name, cls: 'ph-hero-art' }),
         h('div', { class: 'ph-hero-row' }, [
-          SB.UI.Kit && SB.UI.Kit.photo ? SB.UI.Kit.photo({ ids: PLAYERS[hashOf(b.id) % PLAYERS.length], w: 150, h: 92, paper: 'canary', tape: ['top'], rot: -2, seed: 'hero' + b.id, cls: 'ph-hero-photo', alt: b.name }) : null,
+          SB.UI.Kit && SB.UI.Kit.photo ? SB.UI.Kit.photo({ ids: PLAYERS[hashOf(b.id) % PLAYERS.length], w: 150, h: 92, unit: 'var(--p)', res: copyRes(), paper: STOCK[0], tape: ['top'], rot: -2, seed: 'hero' + b.id, cls: 'ph-hero-photo', alt: b.name }) : null,
           h('p', { class: 'ph-hero-line' }, [
           b.home ? h('span', { class: 'ph-hero-from' }, [gpic('VAN', 26, 'hv'), up(L('from', { home: b.home }))]) : null,
           num(ask.members) ? h('span', { class: 'ph-hero-from' }, [gpic('HEADS', 26, 'hh'), up(L('members', { n: ask.members }))]) : null
@@ -738,7 +776,7 @@
       function n(v) { return Math.round(v / unit); }
       a = says === null ? null : crowd(n(says), 0, 'say' + q.id, 7);
       b2 = here ? crowd(n(here.lo50), Math.max(0, n(here.hi90) - n(here.lo50)), 'gs' + q.id, 7) : null;
-      return h('section', { class: 'ph-crowds', role: 'group', aria: { label: L('theySay') + ' ' + (says === null ? '?' : says) + '. ' + L('guess') + ' ' + lbl } }, [
+      return h('section', { class: 'ph-crowds pz-paper', role: 'group', aria: { label: L('theySay') + ' ' + (says === null ? '?' : says) + '. ' + L('guess') + ' ' + lbl } }, [
         h('div', { class: 'ph-crowd' }, [
           h('div', { class: 'ph-crowd-top' }, [kicker(L('theySay')), mk(says === null ? '?' : String(says), 30, { seed: 'cs' })]),
           a ? pic(a[0], a[1], a[2]) : null
@@ -765,7 +803,7 @@
         if (clash) out += k.xout(10, 28, w - 24, ht - 40, { seed: 'cx' + d.day, sw: 3.4 });
         if (crowd) out += '<g transform="translate(' + (w - 24) + ' 26)">' + glyph('HEADS', 14, 'cw' + d.day) + '</g>';
         for (i = 0; i < Math.min(3, busy.length); i++) out += '<g transform="translate(' + (6 + i * 14) + ' ' + (ht - 22) + ')">' + glyph('KEY', 14, 'bk' + i) + '</g>';
-        return h('button', { type: 'button', class: 'ph-tear-pg' + (on ? ' is-on' : ''), data: { fk: 'day-' + d.day }, aria: { pressed: on ? 'true' : 'false',
+        return h('button', { type: 'button', class: 'ph-tear-pg pz-hl' + (on ? ' is-on' : ''), data: { fk: 'day-' + d.day }, aria: { pressed: on ? 'true' : 'false',
                  label: SB.time.fmt(d.day, 'long') + (clash ? ', ' + L('clash') + ': ' + d.clash.join(', ') : '') + (busy.length ? ', ' + busy.map(function (x) { return x.name + ' ' + String(x.state).toLowerCase(); }).join(', ') : '') + (crowd ? ', ' + crowd.join(' ') : '') },
                  title: [clash ? d.clash.join(', ') : (busy.length ? busy.map(function (x) { return x.name + ': ' + String(x.state).toLowerCase(); }).join(', ') : '')].concat(crowd || []).filter(Boolean).join('\n') || null,
                  on: { click: function () { onPick(d.day); } } }, pic(out, w, ht));
@@ -820,7 +858,7 @@
     }
 
     function askNote(ask) {
-      return h('section', { class: 'ph-ask', aria: { label: L('theAsk') } }, [
+      return h('section', { class: 'ph-ask pz-paper', aria: { label: L('theAsk') } }, [
         pic(K().tape(40, 12, 76, 20, { seed: 'askt', rot: -4 }), 80, 24, { cls: 'ph-ask-tape' }),
         kicker(L('theAsk')),
         h('p', { class: 'ph-ask-deal', text: dealWords(ask) }),
@@ -896,7 +934,7 @@
       return h('section', { class: 'ph-sec ph-margin', aria: { label: L('notes') } }, [
         kicker(L('notes')),
         notes.map(function (nt, i) {
-          return h('p', { class: 'ph-note ph-cut' + (i % 3) }, [num(nt.day) ? h('b', { text: up(SB.time.fmt(nt.day, 'md')) + '  ' }) : null, nt.text]);
+          return h('p', { class: 'ph-note pz-paper ph-cut' + (i % 3) }, [num(nt.day) ? h('b', { text: up(SB.time.fmt(nt.day, 'md')) + '  ' }) : null, nt.text]);
         }),
         (rv.flags || []).map(function (fl) { return h('div', { aria: { label: L('flags') + ': ' + fl.text } }, hotNote(fl.text)); })
       ]);
@@ -1005,14 +1043,14 @@
     function slipView(s, c) {
       var q = c.req, show = showFor(s, q), rv = safe(function () { return SB.Requests.view(s, q.id); }, null), ask = (rv && rv.ask) || {}, d, withG, ex, b = rv && rv.band, gIn;
       if (!draft.deal) draft.deal = { shape: ask.shape || 'DOOR', guarantee: ask.guarantee || 0, pct: ask.pct == null ? 1 : ask.pct, lodging: !!ask.lodging, meal: !!ask.meal };
-      if (!show) return h('div', { class: 'ph-sheet' }, [h('p', { class: 'ph-note', text: L('needShow') }),
+      if (!show) return h('div', { class: 'ph-sheet' }, [h('p', { class: 'ph-note pz-paper', text: L('needShow') }),
         tab('toHold', L('hold'), function () { view = 'hold'; draft.mode = 'HOLD'; render(); }, { icon: gpic('KEY', 18, 'th') })]);
       d = draft.deal; withG = d.shape === 'GUARANTEE' || d.shape === 'GUARANTEE_PLUS' || d.shape === 'VERSUS';
       ex = safe(function () { return SB.Money.exposure(s, show.id); }, null);
       gIn = h('input', { type: 'number', class: 'ph-fig-in', min: '0', step: '5', value: String(d.guarantee || 0), aria: { label: L('guarantee') }, data: { fk: 'g-in' },
                          on: { change: function (e) { d.guarantee = Math.max(0, Math.round(Number(e.target.value) || 0)); render(); } } });
       return h('div', { class: 'ph-sheet' }, [
-        h('section', { class: 'ph-slip', aria: { label: L('slip') } }, [
+        h('section', { class: 'ph-slip pz-paper', aria: { label: L('slip') } }, [
           h('div', { class: 'ph-slip-top' }, [
             rn(up(L('slip')), 22, { seed: 'slip', stock: 'white' }),
             b ? h('span', { class: 'ph-slip-mark' }, markPic(SB.Identity.bandMark({ id: b.id, name: b.name, genre: b.genre }, 20), 20, 30, b.id)) : null,

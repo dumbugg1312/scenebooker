@@ -74,11 +74,12 @@
   function money(n) { return SB.text.money ? SB.text.money(n || 0) : '$' + Math.round(n || 0); }
   function f(n) { return Math.round(n * 10) / 10; }
 
-  var TONER = '#141413', PAPER = '#f4f2ea', PENCIL = '#6d6a62';
-  var HANDS = [TONER, '#2F4FB5', '#3a3a37', TONER, '#6d6a62'];
+  var TONER = '#141413', PAPER = '#f4f2ea', PENCIL = '#6d6a62', INK = '#2F4FB5';
+  var HANDS = [TONER, INK, '#3a3a37', TONER, '#6d6a62'];
   var STOCKS = ['white', 'bone', 'goldenrod', 'white', 'pink', 'bone', 'blue'];
 
   /* a phone number's shape, scribbled: the made-up exchange every film uses, and four seeded digits */
+  function pu(n) { return 'calc(var(--p) * ' + n + ')'; }
   function numberScribble(id) {
     var r = SB.rng.make('num:' + id), d = '', i;
     for (i = 0; i < 4; i++) d += String(Math.floor(r.next() * 10));
@@ -109,7 +110,7 @@
   function portrait(id, i, w, hh) {
     var n = hash(id), ids = [FACES[n % FACES.length]];
     if (!SB.UI.Kit || !SB.UI.Kit.photo) return null;
-    return SB.UI.Kit.photo({ ids: ids, w: w || 300, h: hh || 200, paper: PAPERS[(n >> 3) % PAPERS.length], tape: ['top'], rot: ((n % 5) - 2) * 0.6, seed: 'pp' + id, cls: 'pp-portrait', flip: n % 2 === 1 });
+    return SB.UI.Kit.photo({ ids: ids, w: w || 170, h: hh || 112, paper: PAPERS[(n >> 3) % PAPERS.length], tape: ['top'], rot: ((n % 5) - 2) * 0.6, seed: 'pp' + id, cls: 'pp-portrait', flip: n % 2 === 1 });
   }
 
   /* ---------------- drawn bits ---------------- */
@@ -130,7 +131,7 @@
   }
   /** an IOU slip: a cut strip with IOU in marker and the engine's sentence typed under it */
   function iouSlip(text, seed, theyOwe) {
-    return h('div', { class: 'pp-iou' + (theyOwe ? ' is-theirs' : ''), role: 'note', style: { '--r': (theyOwe ? -3 : 2.5) + 'deg' } }, [
+    return h('div', { class: 'pp-iou pz-paper' + (theyOwe ? ' is-theirs' : ''), role: 'note', style: { '--r': (theyOwe ? -3 : 2.5) + 'deg' } }, [
       D().art(D().marker(L('iou'), 4, 26, 22, { seed: 'iou' + seed }), 64, 32),
       h('span', { class: 'pp-typed', text: text })
     ]);
@@ -145,7 +146,7 @@
   SB.UI.screen('people', {
     rail: 'people', title: 'ui.people.title', full: false,
     mount: function (root, params) {
-      var tab = params && params.tab ? params.tab : 'help', wrap = h('section', { class: 'pp' }), tabsEl = h('div', { class: 'pp-tabs' }), body = h('div', { class: 'pp-body' });
+      var tab = params && params.tab ? params.tab : 'help', wrap = h('section', { class: 'pp' }), tabsEl = h('div', { class: 'pp-tabs' }), body = h('div', { class: 'pp-body pz-paper' });
       root.appendChild(wrap);
       wrap.appendChild(h('h1', { class: 'cb-sr', text: L('title') }));
       wrap.appendChild(tabsEl); wrap.appendChild(body);
@@ -186,17 +187,16 @@
       }
 
       function helperPiece(s, c, i) {
-        var kind = ['match', 'scrap', 'corner'][i % 3], taste = c.taste || {}, loves = (taste.loves || []).map(function (g) { return SB.text.label('genre.' + g + '.name'); }),
+        var hero = i === 0, kind = ['match', 'scrap', 'corner'][i % 3], taste = c.taste || {}, loves = (taste.loves || []).map(function (g) { return SB.text.label('genre.' + g + '.name'); }),
             wont = taste.wont ? SB.text.label('genre.' + taste.wont + '.name') : null, last = (c.last || []).slice(-10), t = last.length ? tallyArt(last) : null,
             roles = (c.roles || []).map(function (r) { return lbl('role.' + r, String(r).toLowerCase()); }).join(' / ');
-        return h('li', { class: 'pp-piece pp-' + kind + ' pp-stock-' + STOCKS[i % STOCKS.length], style: { '--r': (((i * 7) % 5) - 2) * 0.7 + 'deg' }, aria: { label: c.name }, data: (c.roles || []).some(function (r) { return String(r).toLowerCase() === 'sound'; }) ? { tut: 'people-sound' } : null }, [
-          kind === 'match' ? h('div', { class: 'pp-cover', aria: { hidden: 'true' } }, [h('span', { class: 'pp-striker' }), D().art(K().marker(String(roles || '').toUpperCase().slice(0, 18), 6, 24, 16, { fill: PAPER, seed: 'mc' + c.id, maxWidth: 220 }), 240, 32)]) : null,
-          portrait(c.id, i),
+        return h('li', { class: 'pp-piece pz-paper pp-' + kind + ' pp-stock-' + STOCKS[i % STOCKS.length] + (hero ? ' pp-hero' : ''), style: { '--r': hero ? '-5deg' : (((i * 7) % 5) - 2) * 0.7 + 'deg' }, aria: { label: c.name }, data: (c.roles || []).some(function (r) { return String(r).toLowerCase() === 'sound'; }) ? { tut: 'people-sound' } : null }, [
+          portrait(c.id, i, hero ? 400 : 170, hero ? 270 : 112),
           h('div', { class: 'pp-who' }, [
-            stampArt(c.id, c.name, 48),
+            stampArt(c.id, c.name, hero ? 64 : 34),
             h('div', { class: 'pp-namebox' }, [
-              h('p', { class: 'pp-name', aria: { label: c.name + (c.nick ? ' (' + c.nick + ')' : '') } }, Kc().hand(c.name, 30, { max: 250, say: false })),
-              h('p', { class: 'pp-number', aria: { hidden: 'true' } }, Kc().hand(numberScribble(c.id), 20, { stroke: '#2F4FB5', say: false })),
+              h('p', { class: 'pp-name', aria: { label: c.name + (c.nick ? ' (' + c.nick + ')' : '') } }, Kc().hand(c.name, hero ? 64 : 24, { max: hero ? 420 : 200, say: false })),
+              h('p', { class: 'pp-number', aria: { hidden: 'true' } }, Kc().hand(numberScribble(c.id), hero ? 30 : 17, { stroke: INK, say: false })),
               c.nick ? h('p', { class: 'pp-pencil', text: '"' + c.nick + '"' }) : null
             ])
           ]),
@@ -221,29 +221,29 @@
         return h('ul', { class: 'pp-pile' }, list.map(function (c, i) { return helperPiece(s, c, i); }));
       }
 
-      function emptySlip(text) { return h('p', { class: 'pp-empty pp-typed', text: text }); }
+      function emptySlip(text) { return h('p', { class: 'pp-empty pz-paper pp-typed', text: text }); }
 
       function regularsView(s) {
         var r = safe(function () { return SB.Crowd.regulars(s); }, null), faces = [], extra, sheet = [], heads = '', unit, n, i, gens = ['KIDS', 'MIDDLE', 'OLD'], stats = [];
-        if (!r || !(r.total > 0)) return h('div', { class: 'pp-reg' }, [h('div', { class: 'pp-sheet' }, [h('p', { class: 'pp-sheethead', aria: { label: L('regHead') } }, Kc().mk(L('regHead'), 30, { say: false })), h('p', { class: 'pp-pencil', text: L('regNone') })])]);
+        if (!r || !(r.total > 0)) return h('div', { class: 'pp-reg' }, [h('div', { class: 'pp-sheet pz-paper' }, [h('p', { class: 'pp-sheethead', aria: { label: L('regHead') } }, Kc().mk(L('regHead'), 24, { say: false })), h('p', { class: 'pp-pencil', text: L('regNone') })])]);
         faces = (r.faces || []).map(function (id) { return s.people && s.people[id] ? s.people[id] : null; }).filter(Boolean);
         faces.forEach(function (p, j) {
           var lapsed = p.state && p.state !== 'ACTIVE', name = [p.first, p.last ? p.last.charAt(0) + '.' : ''].filter(Boolean).join(' ');
-          sheet.push(h('li', { class: 'pp-sign' + (lapsed ? ' is-lapsed' : ''), style: { '--r': (((j * 5) % 7) - 3) * 0.9 + 'deg', '--x': ((j * 13) % 4) * 6 + 'px' } }, [
+          sheet.push(h('li', { class: 'pp-sign' + (lapsed ? ' is-lapsed' : ''), style: { '--r': (((j * 5) % 7) - 3) * 0.9 + 'deg', '--x': pu(((j * 13) % 4) * 6) } }, [
             h('span', { class: 'pp-signname', aria: { label: name + (lapsed ? ', ' + L('regLapsed') : '') } }, Kc().hand(name, 15 + (j * 3) % 7, { stroke: HANDS[j % HANDS.length], max: 200, say: false })),
             p.regularType ? h('span', { class: 'pp-pencil', text: lbl('regularType.' + p.regularType, '') }) : null]));
         });
         extra = displayNames(s, Math.max(0, Math.min(24, Math.round(r.total / 4)) - faces.length));
         extra.forEach(function (nm, j) {
           var k = j + faces.length;
-          sheet.push(h('li', { class: 'pp-sign is-drawn', style: { '--r': (((k * 5) % 7) - 3) * 0.9 + 'deg', '--x': ((k * 13) % 4) * 6 + 'px' } },
+          sheet.push(h('li', { class: 'pp-sign is-drawn', style: { '--r': (((k * 5) % 7) - 3) * 0.9 + 'deg', '--x': pu(((k * 13) % 4) * 6) } },
             h('span', { class: 'pp-signname', aria: { label: nm } }, Kc().hand(nm, 14 + (k * 3) % 8, { stroke: HANDS[k % HANDS.length], max: 200, say: false }))));
         });
         /* the count of heads */
         n = Math.min(40, r.total); unit = Math.max(1, Math.ceil(r.total / 40)); n = Math.round(r.total / unit);
         for (i = 0; i < n; i++) heads += D().head(10 + (i % 20) * 15, 26 + Math.floor(i / 20) * 26, 20, i >= n - Math.round((r.drifting || 0) / unit) ? { mode: 'open', dash: true } : { mode: 'solid' });
         stats.push(h('div', { class: 'pp-count', role: 'img', aria: { label: L('regTotal', { n: r.total }) + (r.drifting > 0 ? ', ' + L('regDrifting', { n: r.drifting }) : '') } }, [
-          D().art(heads, 316, 30 + Math.ceil(n / 20) * 26), h('div', { class: 'pp-countfig' }, [fig('~' + r.total, 30), h('span', { class: 'pp-typed', text: L('regTotal', { n: r.total }) }),
+          D().art(heads, 316, 30 + Math.ceil(n / 20) * 26), h('div', { class: 'pp-countfig pp-hero' }, [fig('~' + r.total, 76), h('span', { class: 'pp-typed', text: L('regTotal', { n: r.total }) }),
             unit > 1 ? h('span', { class: 'pp-pencil', text: L('regUnit', { n: unit }) }) : null,
             r.drifting > 0 ? h('span', { class: 'pp-pencil', text: L('regDrifting', { n: r.drifting }) }) : null])]));
         stats.push(h('p', { class: 'pp-sub', text: L('regGen') }));
@@ -265,9 +265,9 @@
           stats.push(h('p', { class: 'pp-floor', role: 'img', aria: { label: L('regMailing') + ': ' + r.mailingList } }, [D().art(env, 90, 56), h('span', { class: 'pp-typed', text: L('regMailing') }), fig(r.mailingList, 20)]));
         }
         return h('div', { class: 'pp-reg' }, [
-          h('div', { class: 'pp-sheet' }, [h('p', { class: 'pp-sheethead', aria: { label: L('regHead') } }, Kc().mk(L('regHead'), 30, { say: false })), h('p', { class: 'pp-pencil', text: L('regIntro') }),
+          h('div', { class: 'pp-sheet pz-paper' }, [h('p', { class: 'pp-sheethead', aria: { label: L('regHead') } }, Kc().mk(L('regHead'), 24, { say: false })), h('p', { class: 'pp-pencil', text: L('regIntro') }),
             h('ol', { class: 'pp-signs' }, sheet), extra.length ? h('p', { class: 'pp-pencil', text: L('regMore') }) : null]),
-          h('div', { class: 'pp-stats pp-piece pp-stock-white' }, [SB.UI.Kit && SB.UI.Kit.photo ? SB.UI.Kit.photo({ id: 'crowd-0' + (1 + hash(s.citySlug || 'x') % 4), w: 420, h: 220, paper: 'canary', tape: ['top'], rot: -0.8, seed: 'ppcrowd', cls: 'pp-portrait' }) : null].concat(stats))
+          h('div', { class: 'pp-stats pp-piece pz-paper pp-stock-white' }, [SB.UI.Kit && SB.UI.Kit.photo ? SB.UI.Kit.photo({ id: 'crowd-0' + (1 + hash(s.citySlug || 'x') % 4), w: 300, h: 130, paper: 'canary', tape: ['top'], rot: -0.8, seed: 'ppcrowd', cls: 'pp-portrait' }) : null].concat(stats))
         ]);
       }
 
@@ -275,9 +275,10 @@
         var list = safe(function () { return SB.Rooms.bookers(s).filter(function (b) { return b.active; }); }, []);
         if (!list.length) return emptySlip(L('bookersEmpty'));
         return h('ul', { class: 'pp-pile' }, list.map(function (b, i) {
-          return h('li', { class: 'pp-piece pp-scrap pp-stock-' + STOCKS[(i + 1) % STOCKS.length], style: { '--r': (((i * 7) % 5) - 2) * 0.8 + 'deg' }, aria: { label: b.name } }, [
-            portrait(b.id, i),
-            h('div', { class: 'pp-who' }, [h('p', { class: 'pp-name', aria: { label: b.name } }, Kc().mk(String(b.name || '').toUpperCase(), 26, { max: 280, say: false }))]),
+          var hero = i === 0;
+          return h('li', { class: 'pp-piece pz-paper pp-scrap pp-stock-' + STOCKS[(i + 1) % STOCKS.length] + (hero ? ' pp-hero' : ''), style: { '--r': hero ? '4.5deg' : (((i * 7) % 5) - 2) * 0.8 + 'deg' }, aria: { label: b.name } }, [
+            portrait(b.id, i, hero ? 400 : 170, hero ? 270 : 112),
+            h('div', { class: 'pp-who' }, [h('p', { class: 'pp-name', aria: { label: b.name } }, Kc().mk(String(b.name || '').toUpperCase(), hero ? 56 : 22, { max: hero ? 420 : 200, say: false }))]),
             h('p', { class: 'pp-typed pp-caps', text: lbl('booker.' + b.kind, '') }),
             (b.genres || []).length ? h('p', { class: 'pp-typed' }, [h('b', { text: L('books') + ': ' }), (b.genres || []).map(function (g) { return SB.text.label('genre.' + g + '.name'); }).join(', ')]) : null,
             (b.homeRooms || []).length ? h('p', { class: 'pp-typed' }, [h('b', { text: L('rooms') + ': ' }), b.homeRooms.join(', ')]) : null,
@@ -290,17 +291,36 @@
         var list = safe(function () { return SB.Territory.contacts(s); }, []);
         if (!list.length) return emptySlip(L('outEmpty'));
         return h('ul', { class: 'pp-pile' }, list.map(function (c, i) {
-          var place = c.place ? c.place.name + (c.place.state ? ', ' + c.place.state : '') : '';
-          return h('li', { class: 'pp-piece pp-card pp-stock-' + ['blue', 'mint', 'bone', 'goldenrod'][i % 4], style: { '--r': (((i * 7) % 5) - 2) * 0.8 + 'deg' }, aria: { label: c.name + (place ? ', ' + place : '') } }, [
-            portrait(c.id || c.name, i),
-            place ? h('p', { class: 'pp-place', aria: { hidden: 'true' } }, Kc().mk(String(place).toUpperCase(), 24, { max: 290, say: false })) : null,
-            h('p', { class: 'pp-name', aria: { hidden: 'true' } }, Kc().hand(c.name, 28, { max: 270, say: false })),
+          var place = c.place ? c.place.name + (c.place.state ? ', ' + c.place.state : '') : '', hero = i === 0;
+          return h('li', { class: 'pp-piece pz-paper pp-card pp-stock-' + ['blue', 'mint', 'bone', 'goldenrod'][i % 4] + (hero ? ' pp-hero' : ''), style: { '--r': hero ? '-6deg' : (((i * 7) % 5) - 2) * 0.8 + 'deg' }, aria: { label: c.name + (place ? ', ' + place : '') } }, [
+            portrait(c.id || c.name, i, hero ? 400 : 170, hero ? 270 : 112),
+            place ? h('p', { class: 'pp-place', aria: { hidden: 'true' } }, Kc().mk(String(place).toUpperCase(), hero ? 30 : 16, { max: hero ? 420 : 200, say: false })) : null,
+            h('p', { class: 'pp-name', aria: { hidden: 'true' } }, Kc().hand(c.name, hero ? 62 : 24, { max: hero ? 420 : 200, say: false })),
             h('p', { class: 'pp-marks' }, [D().art(D().heartMeter(c.strength, 20, 20, 30, 'ct' + c.id), 42, 40), h('span', { class: 'pp-pencil', text: lbl('stage.' + c.stage, '') })]),
             (c.owes && c.owes.length) ? iouSlip(L('owesYou') + ' ' + c.owes.length, 'o' + c.id, true) : null,
             (c.youOwe && c.youOwe.length) ? iouSlip(L('youOwe') + ' ' + c.youOwe.length, 'y' + c.id, false) : null
           ]);
         }));
       }
+
+      /* the moves (js/ui/finish.js): a new tab tears across, the pieces slap on one after another when the pile is new, and the one on top (or the head count) is stamped */
+      var lastTab = null, animKey = null;
+      function moves(first) {
+        var F = SB.Finish, rows, hero, key, labels = [];
+        if (!F) return;
+        if (!first && lastTab !== null && lastTab !== tab) F.move(body, 'wipe');
+        rows = Array.prototype.slice.call(body.querySelectorAll('.pp-pile > li:not(.pp-hero), .pp-reg > *'));
+        Array.prototype.forEach.call(body.querySelectorAll('[aria-label]'), function (e) { labels.push(e.getAttribute('aria-label')); });
+        key = tab + ':' + labels.slice(0, 16).join('|');
+        if (key !== animKey) {
+          F.stagger(rows, first ? 4 : 1);
+          rows.forEach(function (li) { li.classList.add('mv-slap'); });
+          hero = body.querySelector('.pp-hero');
+          if (hero) F.move(hero, 'stamp', { delay: first ? 220 : 0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: hero } });
+        }
+        animKey = key; lastTab = tab;
+      }
+      var drawn = false;
 
       function render() {
         var s = game(), list = [['help', 'tabHelp'], ['regulars', 'tabRegulars'], ['bookers', 'tabBookers'], ['out', 'tabOut']];
@@ -311,6 +331,8 @@
         safe(function () { tabsEl.firstChild.setAttribute('role', 'radiogroup'); tabsEl.firstChild.setAttribute('aria-label', L('title')); });
         if (!s) { body.appendChild(emptySlip(L('helpEmpty'))); return; }
         body.appendChild(tab === 'regulars' ? regularsView(s) : (tab === 'bookers' ? bookersView(s) : (tab === 'out' ? outView(s) : helpView(s))));
+        safe(function () { moves(!drawn); });
+        drawn = true;
       }
 
       render();

@@ -67,6 +67,15 @@
   function C() { return SB.UI.C; }
   function D() { return SB.UI.cuDraw; }
   function K() { return SB.DeskKit; }
+  /* a drawn piece, shown w by ht in --p (the stage's unit) and photocopied fine enough for the screen: the drawing is made
+     k times larger and scaled back down, so the copier's raster has the pixels this window's --p needs */
+  function artP(inner, w, ht, cls) {
+    var res = SB.Finish && SB.Finish.res ? SB.Finish.res() : 1, dpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1,
+        k = Math.max(1, Math.min(3, Math.ceil(res / Math.max(1.5, Math.min(2, dpr))))), el;
+    el = D().art(k > 1 ? '<g transform="scale(' + k + ')">' + inner + '</g>' : inner, w * k, ht * k, cls);
+    el.style.width = 'calc(var(--p) * ' + w + ')'; el.style.height = 'auto'; el.style.aspectRatio = w + ' / ' + ht;
+    return el;
+  }
   function L(key, ctx) { return SB.text.label('ui.money.' + key, ctx); }
   function has(key) { try { return SB.text.has('strings.' + key) || SB.text.has(key); } catch (e) { return false; } }
   function word(key, fb) { return has(key) ? SB.text.label(key) : (fb === undefined ? '' : fb); }
@@ -77,7 +86,7 @@
   function money(n, signed) { var t = SB.text.money(Math.round(n || 0)); return signed && n > 0 ? '+' + t : t; }
   /* marker capitals have a plain hyphen, not the typeset minus */
   function mm(n, signed) { return money(n, signed).replace(/−/g, '-'); }
-  var TONER = '#141413', PAPER = '#f4f2ea', BONE = '#e7ddc4';
+  var TONER = '#141413', PAPER = '#f4f2ea', BONE = '#e7ddc4';   /* inside the drawings: the copier prints these, so they are toner and copy paper */
 
   /* ---------------- drawn pieces (markup; D().art photocopies them) ---------------- */
 
@@ -121,7 +130,7 @@
   }
 
   function mount(root) {
-    var cat = '', showId = '', allSlips = false;
+    var cat = '', showId = '', allSlips = false, lastOwed = null, animed = false, lastKey = '';
 
     function act(fn) { return SB.UI.act(fn); }
     function keepFocus(fn) {
@@ -150,6 +159,32 @@
         ]),
         SB.UI.calKit && SB.UI.calKit.grainEl ? SB.UI.calKit.grainEl() : null
       ]));
+      safe(function () { dress(bills ? safe(function () { return SB.Money.owedAhead(s); }, null) : null); });
+    }
+
+    /* the moves (js/ui/finish.js): the pieces slap down one after another when the envelope first opens, a new filter on
+       the ledger tears across the tape, the total owed is stamped on and counted up; every button gets the highlighter */
+    function dress() {
+      var F = SB.Finish, hero, n, pieces, tp, key = cat + '|' + showId, first = !animed;
+      Array.prototype.forEach.call(root.querySelectorAll('button, a[href], [role="button"]'), function (b) { b.classList.add('pz-hl'); });
+      if (!F) return;
+      tp = root.querySelector('.p2-tape');
+      if (tp) F.scrollbar(tp);
+      if (first) {
+        pieces = Array.prototype.slice.call(root.querySelectorAll('.p2-col > *'));
+        F.stagger(pieces, 3);
+        pieces.forEach(function (el) { el.classList.add('mv-slap'); });
+      } else if (tp && key !== lastKey) F.move(tp, 'wipe');
+      lastKey = key; animed = true;
+      hero = root.querySelector('.p2m-hero');
+      if (hero) {
+        n = parseInt(hero.getAttribute('data-n'), 10) || 0;
+        if (n !== lastOwed) {
+          F.move(hero, 'stamp', { delay: first ? 300 : 0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: hero } });
+          F.countUp(hero.querySelector('.p2m-hero-n'), n, { from: first ? 0 : (lastOwed || 0), delay: (first ? 300 : 0) + 83, fmt: function (v) { return mm(v); } });
+        }
+        lastOwed = n;
+      } else lastOwed = null;
     }
 
     /* ---------------- the pieces: flat copy paper, typed in Courier, no texture under a figure ---------------- */
@@ -175,9 +210,9 @@
       }
       for (i = 0; i < b.coins; i++) out += coinArt(70 + i * 26, 274 - (i % 2) * 8, 11, 'ec' + i);
       return h('div', { class: 'p2-envelope p2m-env', data: { drop: 'FUND' }, role: 'img', aria: { label: L('fundSay', { amount: money(fund) }) + (prev !== null && prev !== fund ? ', ' + L('was', { amount: money(prev) }) : '') } }, [
-        D().art(out, W, H, 'p2m-envart'),
+        artP(out, W, H, 'p2m-envart'),
         tag(word('pot.FUND', 'cash box'), 'p2m-envtag'),
-        h('div', { class: 'p2m-fig' }, [
+        h('div', { class: 'p2m-fig pz-paper' }, [
           prev !== null && prev !== fund ? h('span', { class: 'p2m-old', text: mm(prev) }) : null,
           h('span', { class: 'p2m-now', text: mm(fund) }),
           fund <= 0 ? h('span', { class: 'p2m-empty', text: L('empty') }) : null
@@ -215,7 +250,7 @@
           type((from === 'FUND' ? '→ ' + L('slideBank') : '← ' + L('slideFund')).toUpperCase(), 'p2m-k kt-small'),
           h('div', { class: 'p2-bills' }, list.map(function (it, i) {
             var amt = it.a, ok = amt > 0 && have >= amt,
-                el = h('button', { type: 'button', class: 'p2m-bill cc-lift' + (it.all ? ' is-all' : '') + (from === 'FUND' ? '' : ' is-bank'), disabled: !ok,
+                el = h('button', { type: 'button', class: 'p2m-bill pz-paper cc-lift' + (it.all ? ' is-all' : '') + (from === 'FUND' ? '' : ' is-bank'), disabled: !ok,
                                    style: { '--r': (i % 2 ? 1.4 : -1.4) + 'deg' }, data: { fk: 'sl-' + from + '-' + i },
                                    aria: { label: L('slideSay', { amount: money(amt), from: word('pot.' + from, from), to: word('pot.' + to, to) }) },
                                    on: { click: function () { slide(from, to, amt); } } }, h('span', { text: it.t }));
@@ -238,7 +273,7 @@
           var a = safe(function () { return SB.Money.showAccounts(s, x.id); }, null), rec = recs[x.id], room = x.roomId && s.rooms[x.roomId] ? s.rooms[x.roomId].name : '',
               played = x.status === 'PLAYED', heads = rec && num(rec.heads) ? rec.heads : (x.result && num(x.result.heads) ? x.result.heads : null),
               you = a && num(a.player) ? a.player : null, door = a && num(a.door) ? a.door : null, name = SB.time.fmt(x.day, 'short') + (room ? ', ' + room : '');
-          return h('li', { class: 'p2m-slipli' }, h('button', { type: 'button', class: 'p2m-slip' + (showId === x.id ? ' is-on' : '') + (i % 2 ? ' is-bone' : ''), style: { '--r': ((i * 37) % 7 - 3) * 0.5 + 'deg' },
+          return h('li', { class: 'p2m-slipli' }, h('button', { type: 'button', class: 'p2m-slip pz-paper' + (showId === x.id ? ' is-on' : '') + (i % 2 ? ' is-bone' : ''), style: { '--r': ((i * 37) % 7 - 3) * 0.5 + 'deg' },
               aria: { label: L('slipSay', { show: name, door: door === null ? '?' : money(door), you: you === null ? '?' : money(you, true) }), pressed: String(showId === x.id) },
               data: { fk: 'slip-' + x.id }, on: { click: function () { showId = showId === x.id ? '' : x.id; keepFocus(render); } } }, [
             h('span', { class: 'p2m-slipa' }, [h('b', { text: SB.time.fmt(x.day, 'md') }), h('span', { text: room.replace(/^the /i, '').toUpperCase() })]),
@@ -280,13 +315,19 @@
     }
 
     /* ---------------- what is owed: bills, nearest on top ---------------- */
+    /* the one loud thing: the total, big, askew, on a torn scrap (css .p2m-hero; dress() stamps it and counts it up) */
+    function hero(total, short) {
+      return h('div', { class: 'p2m-hero pz-paper' + (short ? ' is-short' : '') + (total ? '' : ' is-none'), role: 'img', data: { n: String(total) }, aria: { label: L('owed') + ': ' + money(total) } }, [
+        h('span', { class: 'p2m-hero-k', text: L('owedTotal', { amount: '' }).replace(/\s+$/, '').toUpperCase() }),
+        h('span', { class: 'p2m-hero-n', text: mm(total) })
+      ]);
+    }
     function owed(s, bv) {
       var o = safe(function () { return SB.Money.owedAhead(s); }, { total: null, lines: [] }), lines = (o.lines || []).slice().sort(function (a, b) { return a.day - b.day; }),
           short = bv && bv.after < 0;
-      if (!lines.length) return h('section', { class: 'p2-owed' }, [card('white', 'p2m-owedhead', [big(L('owedTotal', { amount: mm(o.total || 0) }), 34)], ['top'], 'owh'), card('bone', 'p2m-note', [type(L('owedNone'))], [], 'ow0')]);
+      if (!lines.length) return h('section', { class: 'p2-owed' }, [hero(o.total || 0, false), card('bone', 'p2m-note', [type(L('owedNone'))], [], 'ow0')]);
       return h('section', { class: 'p2-owed', aria: { label: L('owed') } }, [
-        h('div', { role: 'img', aria: { label: L('owed') + ': ' + money(o.total || 0) } },
-          card(short ? 'canary' : 'white', 'p2m-owedhead', [big(L('owedTotal', { amount: mm(o.total || 0) }), 34)], ['tr'], 'owh')),
+        hero(o.total || 0, !!short),
         h('ul', { class: 'p2m-bills' }, lines.slice(0, 5).map(function (l, i) {
           var due = L('due', { day: SB.time.fmt(l.day, 'md') }), days = l.day - s.clock.day, soon = i === 0 && days <= 7;
           return h('li', { class: 'p2m-billli', role: 'img', aria: { label: (l.label || '') + ', ' + money(l.amount) + ', ' + due } },
@@ -353,7 +394,7 @@
       if (solid.length > 1) inner += k.path(solid, { seed: 'sp1', sw: 3 });
       if (dot.length > 1) inner += k.path(dot, { seed: 'sp2', sw: 2.4, dash: '3 5' });
       return h('section', { class: 'p2-spark', role: 'img', aria: { label: L('line') + '. ' + L('lineHelp') } },
-        card('white', 'p2m-graph', [D().art(inner, W, Hh, 'p2m-graphart'), type(L('lineHelp'), 'kt-pencil p2m-gcap')], ['tr'], 'grph'));
+        card('white', 'p2m-graph', [artP(inner, W, Hh, 'p2m-graphart'), type(L('lineHelp'), 'kt-pencil p2m-gcap')], ['tr'], 'grph'));
     }
 
     render();

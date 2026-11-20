@@ -49,7 +49,7 @@
   function tape(o) {
     o = o || {};
     var st = {};
-    if (o.w) st['--kt-w'] = o.w + 'px';
+    if (o.w) st['--kt-w'] = 'calc(var(--p) * ' + o.w + ')';
     if (o.rot !== undefined) st['--kt-trot'] = o.rot + 'deg';
     return h('span', { class: cls('kt-tape', o.at ? 'kt-tape--' + o.at : null, o.cls), aria: { hidden: 'true' }, style: st });
   }
@@ -118,7 +118,7 @@
     if (o.big && kind === 'primary') art = markerSvg(String(o.label).toUpperCase(), o.big === true ? 26 : o.big, { fill: CREAM });
     if (art) defs();
     if (o.disabled && o.why) say = (say || o.label) + ', ' + o.why;
-    return h('button', { type: o.type || 'button', id: o.id || null, class: cls('kt-btn', 'kt-btn--' + kind, art ? 'kt-btn--big' : null, o.paper === 'white' ? 'kt-btn--white' : null, o.cls),
+    return h('button', { type: o.type || 'button', id: o.id || null, class: cls('kt-btn pz-paper pz-hl', 'kt-btn--' + kind, art ? 'kt-btn--big' : null, o.paper === 'white' ? 'kt-btn--white' : null, o.cls),
                          disabled: !!o.disabled, title: o.disabled && o.why ? o.why : null, data: data, aria: say ? { label: say } : null,
                          style: { '--kt-rot': rotStyle(o, o.label) },
                          on: { click: function (e) { if (!o.disabled && typeof o.on === 'function') o.on(e); } } }, [
@@ -140,7 +140,7 @@
     }
     return h('div', { class: cls('kt-tabs', o.cls), role: 'tablist', aria: { label: o.label || null } }, list.map(function (t, i) {
       var on = t.id === o.value;
-      return h('button', { type: 'button', role: 'tab', id: pre + t.id, class: 'kt-tab', tabindex: on ? '0' : '-1', data: { fk: 'tab-' + t.id },
+      return h('button', { type: 'button', role: 'tab', id: pre + t.id, class: 'kt-tab pz-hl', tabindex: on ? '0' : '-1', data: { fk: 'tab-' + t.id },
                            aria: { selected: on ? 'true' : 'false', controls: o.panel || null }, style: { '--kt-rot': rotStyle({}, 'tab' + t.id + i) },
                            on: { click: function () { if (!on) go(t.id); },
                                  keydown: function (e) {
@@ -255,7 +255,7 @@
     var seed = o.seed || o.label, aria = { label: o.say || null };
     if (o.role === 'option') aria.selected = o.on ? 'true' : 'false';
     else if (o.toggle) aria.pressed = o.on ? 'true' : 'false';
-    return h('button', { type: 'button', role: o.role || null, class: cls('kt-slipbtn', o.on ? 'is-on' : null, o.struck ? 'is-struck' : null, o.cls), disabled: !!o.disabled,
+    return h('button', { type: 'button', role: o.role || null, class: cls('kt-slipbtn pz-hl', o.on ? 'is-on' : null, o.struck ? 'is-struck' : null, o.cls), disabled: !!o.disabled,
                          data: o.fk ? { fk: o.fk } : null, aria: aria,
                          on: { click: function (e) { if (!o.disabled && typeof o.click === 'function') o.click(e); }, keydown: typeof o.keydown === 'function' ? o.keydown : null } },
       h('span', { class: 'kt-slip__p', style: { '--kt-rot': rotStyle({}, seed), '--kt-slip': o.paper && o.paper !== 'bone' ? 'var(--kt-' + o.paper + ')' : null },
@@ -304,10 +304,10 @@
   function photo(o) {
     o = o || {};
     var ids = o.ids || (o.id ? [o.id] : []), W = Math.max(20, o.w || 240), H = Math.max(20, o.h || 180),
-        dpr = Math.min(2, Math.max(1, (typeof window !== 'undefined' && window.devicePixelRatio) || 1)),
+        dpr = o.res || (SB.Finish && SB.Finish.res ? SB.Finish.res() : Math.min(2, Math.max(1, (typeof window !== 'undefined' && window.devicePixelRatio) || 1))),
         key = [ids.join(','), W, H, o.paper, o.cut ? 1 : 0, o.cell, o.tone, o.scale, o.flip ? 1 : 0, o.seed, dpr].join('|'),
         cv = h('canvas', { class: 'kt-photo__c', width: String(Math.round(W * dpr)), height: String(Math.round(H * dpr)),
-                           style: { width: W + 'px', height: H + 'px' }, aria: { hidden: 'true' } }),
+                           style: { width: 'calc(' + (o.unit || 'var(--p)') + ' * ' + W + ')', height: 'calc(' + (o.unit || 'var(--p)') + ' * ' + H + ')' }, aria: { hidden: 'true' } }),
         paper = (SB.Scenes && SB.Scenes.papers && SB.Scenes.papers[o.paper]) || (/^#/.test(String(o.paper)) ? o.paper : null),
         tapes = (o.tape || []).map(function (at) { return tape(typeof at === 'string' ? { at: at } : at); }), fig;
     if (paper && !o.cut && cv.style && cv.style.setProperty) cv.style.setProperty('--kt-paper', paper);   // the paper shows while the photo loads

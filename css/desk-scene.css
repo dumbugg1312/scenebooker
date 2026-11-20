@@ -5,13 +5,13 @@
  */
 
 /* ---------- the desk ---------- */
-body.at-desk { overflow: hidden; background: #0c0c0d; }
+body.at-desk { overflow: hidden; background: var(--pitch); }
 .dk-desk {
   position: fixed; inset: 0; z-index: 0;
   display: flex; align-items: center; justify-content: center;
-  background: #0c0c0d;
+  background: var(--pitch);
 }
-.dk-stage { position: relative; width: min(100vw, 160vh); aspect-ratio: 16 / 10; max-height: 100vh; background: #0c0c0d; --u: .8px; }
+.dk-stage { position: relative; width: min(100vw, 160vh); aspect-ratio: 16 / 10; max-height: 100vh; background: var(--pitch); }
 .dk-art, .dk-art > svg, .dk-copy { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
 .dk-stage.is-copied > .dk-art { visibility: hidden; }
 .dk-hits { position: absolute; inset: 0; }
@@ -19,7 +19,7 @@ body.at-desk:not(.is-closeup) .sb-main { display: none; }
 
 /* each object is a button holding its own drawing; the button's box includes a margin of bare table */
 .dk-hit {
-  position: absolute; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer;
+  position: absolute; margin: 0; padding: 0; border: 0; background: transparent;
   color: inherit; font: inherit; -webkit-tap-highlight-color: transparent; pointer-events: none;
 }
 /* only the object itself (not the bare table round it) takes the pointer, so neighbours that overlap a little stay pickable */
@@ -28,30 +28,31 @@ body.at-desk:not(.is-closeup) .sb-main { display: none; }
 .dk-obj {
   position: absolute; inset: 0; display: block;
   transform: rotate(var(--r, 0deg)); transform-origin: 50% 50%;
-  transition: transform 110ms ease-out, filter 110ms ease-out;
+  transition: transform 120ms steps(2, end), filter 120ms steps(2, end);
 }
 .dk-ink, .dk-ink > svg, .dk-cut, .dk-live, .dk-live > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
 .dk-obj.is-copied > .dk-ink { visibility: hidden; }
 
-/* the label-maker strip (name) and the second strip (live state), same corner on every object */
+/* the label-maker strip (name) and the second strip (live state), same corner on every object. The name only shows
+   when you point at the thing (a phone does not need PHONE written on it); the state shows what the drawing cannot */
 .dk-strips { position: absolute; display: flex; flex-wrap: wrap; align-items: flex-start; gap: calc(var(--u) * 6); max-width: 92%; pointer-events: none; z-index: 2; }
 .dk-strip {
-  display: inline-block; white-space: nowrap;
-  font: 800 calc(var(--u) * 17)/1 'Arial Black', 'Helvetica Neue', Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase;
-  color: #f4f2ea; background: #141413; padding: calc(var(--u) * 6) calc(var(--u) * 10) calc(var(--u) * 5);
-  border: calc(var(--u) * 2) solid #f4f2ea; box-shadow: calc(var(--u) * 4) calc(var(--u) * 5) 0 #000;
+  display: none; white-space: nowrap;
+  font: 400 calc(var(--u) * 19)/1 var(--f-gothic); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--pp-bond); background: var(--toner); padding: calc(var(--u) * 6) calc(var(--u) * 10) calc(var(--u) * 5);
+  border: calc(var(--u) * 2) solid var(--pp-bond); box-shadow: calc(var(--u) * 4) calc(var(--u) * 5) 0 var(--pitch);
   text-shadow: 0 calc(var(--u) * 1) 0 rgba(255, 255, 255, .28), 0 calc(var(--u) * -1) 0 rgba(0, 0, 0, .8);
   transform: rotate(-1.2deg);
 }
 .dk-state {
   display: inline-block; white-space: nowrap;
-  font: 700 calc(var(--u) * 15)/1 'Courier New', Courier, monospace; letter-spacing: .02em; text-transform: uppercase;
-  color: #141413; background: #e7ddc4; padding: calc(var(--u) * 6) calc(var(--u) * 8);
-  box-shadow: calc(var(--u) * 4) calc(var(--u) * 5) 0 #000; transform: rotate(1.4deg) translateY(calc(var(--u) * 2));
+  font: 400 calc(var(--u) * 16)/1 var(--f-type); letter-spacing: .02em; text-transform: uppercase;
+  color: var(--toner); background: var(--pp-buff); padding: calc(var(--u) * 6) calc(var(--u) * 8);
+  box-shadow: calc(var(--u) * 4) calc(var(--u) * 5) 0 var(--pitch); transform: rotate(1.4deg) translateY(calc(var(--u) * 2));
 }
 .dk-state[hidden] { display: none; }
 .dk-hit.is-hot .dk-state {
-  font-weight: 800; position: relative; margin-left: calc(var(--u) * 30);
+  position: relative; margin-left: calc(var(--u) * 30);
   background-image: linear-gradient(174deg, transparent 0 30%, var(--hl, rgba(255, 232, 0, .72)) 34% 76%, transparent 80%);
   background-size: 100% 100%; background-repeat: no-repeat;
 }
@@ -67,11 +68,11 @@ body.at-desk:not(.is-closeup) .sb-main { display: none; }
   transform: rotate(0deg) translate(calc(var(--u) * -4), calc(var(--u) * -8)) scale(1.025);
   filter: drop-shadow(calc(var(--u) * 12) calc(var(--u) * 18) 0 rgba(0, 0, 0, .9));
 }
-.dk-hit:hover .dk-strip, .dk-hit:focus-visible .dk-strip { color: #141413; background: #f4f2ea; border-color: #141413; text-shadow: none; }
-/* keyboard focus: marker brackets at the corners */
+.dk-hit:hover .dk-strip, .dk-hit:focus-visible .dk-strip { display: inline-block; color: var(--toner); background: var(--pp-bond); border-color: var(--toner); text-shadow: none; }
+/* keyboard focus: highlighter brackets at the corners */
 .dk-hit:focus-visible::after {
   content: ""; position: absolute; inset: 2%; pointer-events: none;
-  --c: #f4f2ea; --t: calc(var(--u) * 5); --l: calc(var(--u) * 34);
+  --c: var(--hl-solid); --t: calc(var(--u) * 5); --l: calc(var(--u) * 34);
   background:
     linear-gradient(var(--c), var(--c)) top left / var(--l) var(--t) no-repeat, linear-gradient(var(--c), var(--c)) top left / var(--t) var(--l) no-repeat,
     linear-gradient(var(--c), var(--c)) top right / var(--l) var(--t) no-repeat, linear-gradient(var(--c), var(--c)) top right / var(--t) var(--l) no-repeat,
@@ -88,68 +89,61 @@ body.at-desk:not(.is-closeup) .sb-main { display: none; }
 @keyframes dk-flicker { 0%, 100% { opacity: 1; } 46% { opacity: .2; } 50% { opacity: 1; } 71% { opacity: .5; } 73% { opacity: 1; } }
 
 /* ---------- close-ups ---------- */
-body.is-closeup .sb-main { position: fixed; inset: 0; z-index: 30; padding: 0; overflow: hidden; }
-.cu-back {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  padding: 16px; background: rgba(8, 8, 9, .88); cursor: zoom-out;
-}
+/* Every close-up is held on the stage (js/desk/closeup.js, polish brief job 3): the same 16:10 stage as the desk,
+   letterboxed, sized in stage units (--p is one px of the old 1280 x 800 layout, so each object keeps the size it had
+   there). The dim comes down and goes back up in the moves' three frames; the object slaps down (mv-slap) and peels
+   off (mv-peel, SB.Finish.leave). Nothing on a stage scrolls the stage: a move's first frame or a focus() must never
+   push it out of the window. */
+body.is-closeup .sb-main { position: fixed; inset: 0; z-index: 30; padding: 0; overflow: clip; }
+.cu-back { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0; overflow: clip; }
+.cu-back::before { content: ""; position: absolute; inset: 0; background: rgba(8, 8, 9, .88); animation: mv-dim 250ms steps(1, end) both; }
+.cu-back.is-held::before { animation: none; }
+.cu-back.is-leaving::before { animation: mv-undim 250ms steps(1, end) forwards; }
+.cu-stage { position: relative; flex: none; display: flex; align-items: center; justify-content: center;
+  width: calc(var(--u) * 1600); height: calc(var(--u) * 1000); padding: calc(var(--p) * 16); box-sizing: border-box; }
 .cu-obj {
-  position: relative; cursor: auto; box-sizing: border-box;
-  width: min(1120px, 96vw); height: min(860px, 92vh);
-  animation: cu-up 240ms cubic-bezier(.3, 1.3, .5, 1);
+  position: relative; box-sizing: border-box; flex: none;
+  width: calc(var(--p) * 1120); height: calc(var(--p) * 736);
 }
-/* moving from one page to another inside the same object: it is already in your hands */
-.cu-obj.is-held { animation: none; }
-@keyframes cu-up { 0% { transform: translateY(-18px) rotate(-2deg) scale(1.03); opacity: .4; } 70% { transform: translateY(2px) rotate(.3deg); opacity: 1; } 100% { transform: none; } }
-.cu--phone { width: min(560px, 96vw); height: min(900px, 94vh); transform: rotate(-.6deg); }
-.cu--calendar { width: min(1160px, 96vw); }
-.cu--clipboard { width: min(1000px, 96vw); transform: rotate(.4deg); }
-.cu--book { width: min(860px, 96vw); }
-.cu--tin { width: min(960px, 96vw); }
-.cu--drawer, .cu--window, .cu--folder { width: min(1000px, 96vw); }
-.cu--mat, .cu--wall { width: min(1240px, 97vw); height: min(900px, 94vh); }
+.cu--calendar { width: calc(var(--p) * 1160); }
+.cu--clipboard { width: calc(var(--p) * 1000); transform: rotate(.4deg); }
+.cu--book { width: calc(var(--p) * 860); }
+.cu--tin { width: calc(var(--p) * 960); }
+.cu--drawer, .cu--window, .cu--folder { width: calc(var(--p) * 1000); }
+.cu--mat, .cu--wall { width: calc(var(--p) * 1240); height: calc(var(--p) * 752); }
+:root[data-motion="reduce"] .cu-back::before { animation: none; }
+@media (prefers-reduced-motion: reduce) { :root:not([data-motion="full"]) .cu-back::before { animation: none; } }
 .cu-art { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 0; }
 .cu-art svg { display: block; }
 .cu-in {
   position: absolute; z-index: 1; box-sizing: border-box;
-  top: var(--cu-pt, 24px); right: var(--cu-pr, 24px); bottom: var(--cu-pb, 24px); left: var(--cu-pl, 24px);
-  overflow: auto; overscroll-behavior: contain; padding: 14px 16px;
+  top: var(--cu-pt, calc(var(--p) * 24)); right: var(--cu-pr, calc(var(--p) * 24)); bottom: var(--cu-pb, calc(var(--p) * 24)); left: var(--cu-pl, calc(var(--p) * 24));
+  overflow: auto; overscroll-behavior: contain; padding: calc(var(--p) * 14) calc(var(--p) * 16);
   background: var(--paper);
 }
-.cu--phone .cu-in { padding: 10px; }
-/* the inbox's two columns stack on the phone: the list, then the open message */
-.cu--phone .sb-inbox-cols { grid-template-columns: minmax(0, 1fr); }
 .cu--notebook .cu-in {
-  background: var(--paper) repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(127, 163, 201, .35) 27px, rgba(127, 163, 201, .35) 28px);
+  background: var(--paper) repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--p) * 27), rgba(127, 163, 201, .35) calc(var(--p) * 27), rgba(127, 163, 201, .35) calc(var(--p) * 28));
 }
-.cu--notebook .cu-in::before { content: ""; position: sticky; float: left; top: 0; margin-left: -10px; width: 2px; height: 100%; background: rgba(216, 57, 43, .35); }
+.cu--notebook .cu-in::before { content: ""; position: sticky; float: left; top: 0; margin-left: calc(var(--p) * -10); width: calc(var(--p) * 2); height: 100%; background: rgba(216, 57, 43, .35); }
 .cu-down {
-  position: absolute; z-index: 3; top: -18px; right: 6px; margin: 0; padding: 0; border: 0; background: none; cursor: pointer;
-  transform: rotate(4deg);
+  position: absolute; z-index: 3; top: calc(var(--p) * -18); right: calc(var(--p) * 6); margin: 0; padding: 0; border: 0; background: none;
+  transform: rotate(4deg); transition: transform 120ms steps(2, end);
 }
-.cu-down:hover { transform: rotate(-2deg) translateY(-2px); }
-.cu-down:focus-visible { outline: 3px solid #FFE800; outline-offset: 2px; }
-.cu-down svg { display: block; }
+.cu-down:hover { transform: rotate(-2deg) translateY(calc(var(--p) * -2)); }
+.cu-down svg { display: block; width: auto; height: calc(var(--p) * 50); }
+.cu-down text { font-family: var(--f-type); font-weight: 400; }
 
 /* the mug picked up: what is weighing on you */
-.cu-mug { position: relative; max-width: 440px; padding-top: 8px; }
-.cu-mug-art { float: right; margin: -10px -6px 4px 8px; transform: rotate(8deg); }
+.cu-mug { position: relative; max-width: calc(var(--p) * 440); padding-top: calc(var(--p) * 8); }
+.cu-mug-art { float: right; margin: calc(var(--p) * -10) calc(var(--p) * -6) calc(var(--p) * 4) calc(var(--p) * 8); transform: rotate(8deg); }
 .cu-mug-zone { font-family: var(--font-type); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-.cu-down--inline { position: static; display: block; margin-top: 12px; }
-
-/* ---------- narrow screens: the desk scrolls sideways rather than shrinking past reading ---------- */
-@media (max-width: 700px) {
-  .dk-desk { align-items: flex-start; justify-content: flex-start; overflow: auto; }
-  .dk-stage { width: 760px; flex: 0 0 auto; }
-  .cu-back { padding: 6px; }
-  .cu-obj { width: 98vw; height: 96vh; }
-}
+.cu-down--inline { position: static; display: block; margin-top: calc(var(--p) * 12); }
 
 /* ---------- reduced motion ---------- */
-:root[data-motion="reduce"] .dk-reel, :root[data-motion="reduce"] .dk-glow, :root[data-motion="reduce"] .cu-obj { animation: none; }
+:root[data-motion="reduce"] .dk-reel, :root[data-motion="reduce"] .dk-glow { animation: none; }
 :root[data-motion="reduce"] .dk-obj { transition: none; }
 @media (prefers-reduced-motion: reduce) {
-  :root:not([data-motion="full"]) .dk-reel, :root:not([data-motion="full"]) .dk-glow, :root:not([data-motion="full"]) .cu-obj { animation: none; }
+  :root:not([data-motion="full"]) .dk-reel, :root:not([data-motion="full"]) .dk-glow { animation: none; }
   :root:not([data-motion="full"]) .dk-obj { transition: none; }
 }
 :root[data-gray="1"] .dk-desk { filter: grayscale(1); }

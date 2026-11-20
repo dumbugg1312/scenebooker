@@ -82,12 +82,18 @@
 
   /** toast(text, kind): one line, bottom left, 4 seconds. kind: 'info' | 'learned' | 'no'. */
   function toast(text, kind) {
-    var box = el('toasts'), t;
+    var box = el('toasts'), t, F;
     if (!box || !text) return;
-    t = h('div', { class: 'sb-toast sb-toast--' + (kind || 'info'), role: 'status', text: String(text) });
+    t = h('div', { class: 'sb-toast pz-paper sb-toast--' + (kind || 'info'), role: 'status', text: String(text) });
     box.appendChild(t);
     while (box.children && box.children.length > 4) box.removeChild(box.firstChild);
-    setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 4000);
+    F = SB.Finish;
+    if (F && F.move) F.move(t, 'slap', { cue: 'scrap', cueOpts: { gain: -7 } });
+    setTimeout(function () {
+      if (!t.parentNode) return;
+      if (F && F.move) F.move(t, 'peel', { cue: 'tear', cueOpts: { gain: -12 }, done: function () { if (t.parentNode) t.parentNode.removeChild(t); } });
+      else t.parentNode.removeChild(t);
+    }, 4000);
   }
 
   var FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -95,19 +101,23 @@
   /** card(element, opts) -> close(). A centered card over the scrim in #overlay; traps focus; returns focus on close.
    *  opts: { label, dismiss (default true: Esc and a click on the scrim close it), onClose, wide }. */
   function card(content, opts) {
-    var o = opts || {}, overlay = el('overlay'), prev = (typeof document !== 'undefined') ? document.activeElement : null, box, scrim, rec, closed = false;
+    var o = opts || {}, overlay = el('overlay'), prev = (typeof document !== 'undefined') ? document.activeElement : null, box, frame, scrim, rec, hero, closed = false, F = SB.Finish;
     if (!overlay) return function () {};
     function close() {
       var i;
       if (closed) return;
       closed = true;
-      if (scrim.parentNode) scrim.parentNode.removeChild(scrim);
+      if (F && F.move && scrim.parentNode && !(F.reduced && F.reduced())) {          // the card peels off; the dim lifts at once
+        scrim.classList.add('is-leaving'); scrim.inert = true;
+        F.move(frame, 'peel', { cue: 'tear', cueOpts: { gain: -10 }, done: function () { if (scrim.parentNode) scrim.parentNode.removeChild(scrim); } });
+      } else if (scrim.parentNode) scrim.parentNode.removeChild(scrim);
       i = cards.indexOf(rec); if (i >= 0) cards.splice(i, 1);
       if (!cards.length) overlay.classList.remove('is-open');
       if (prev && typeof prev.focus === 'function') { try { prev.focus(); } catch (e) { /* gone */ } }
       if (typeof o.onClose === 'function') o.onClose();
     }
     box = h('div', { class: 'sb-card' + (o.wide ? ' sb-card--wide' : ''), role: 'dialog', tabindex: '-1', 'aria-modal': 'true', aria: { label: o.label || null } }, content);
+    frame = h('div', { class: 'sb-card-frame' + (o.wide ? ' sb-card-frame--wide' : '') }, box);
     scrim = h('div', { class: 'sb-scrim', on: {
       mousedown: function (e) { if (e.target === scrim && o.dismiss !== false) close(); },
       keydown: function (e) {
@@ -120,11 +130,18 @@
           if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
           else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
         }
-      } } }, box);
+      } } }, frame);
     rec = { el: scrim, close: close };
     cards.push(rec);
     overlay.appendChild(scrim);
     overlay.classList.add('is-open');
+    if (F && F.move) {
+      /* a content that slaps itself (class mv-slap) keeps its own entrance; the card's one number or answer stamps in */
+      if (!(content && content.classList && content.classList.contains('mv-slap'))) F.move(frame, 'slap', { cue: 'scrap', cueOpts: { gain: -6 } });
+      hero = box.querySelector('.sb-hero, .cu-mug-zone');
+      if (hero) F.move(hero, 'stamp', { delay: 220, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: hero } });
+    }
+    if (F && F.scrollbar) { try { F.scrollbar(box); } catch (e) { /* fine */ } }
     (function focusIn() {
       var f = box.querySelector('.sb-decision') || box.querySelector(FOCUSABLE) || box;
       try { f.focus(); } catch (e) { /* fine */ }
@@ -134,25 +151,29 @@
 
   /** popover(anchor, element) -> close(). Below the anchor; Esc or a click outside closes it. */
   function popover(anchor, content) {
-    var overlay = el('overlay'), box, r, offDown, offKey;
+    var overlay = el('overlay'), box, r, offDown, offKey, F = SB.Finish, u = (SB.UI.unit && SB.UI.unit()) || 1;
     if (pop) pop.close();
     if (!overlay) return function () {};
-    box = h('div', { class: 'sb-popover', role: 'dialog', tabindex: '-1' }, content);
+    box = h('div', { class: 'sb-popover pz-paper', role: 'dialog', tabindex: '-1' }, content);
     try {
       r = anchor && anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : null;
-      if (r) { box.style.top = Math.round(r.bottom + 6) + 'px'; box.style.left = Math.round(Math.max(8, r.left)) + 'px'; }
+      if (r) { box.style.top = 'calc(var(--u) * ' + ((r.bottom / u) + 6).toFixed(1) + ')'; box.style.left = 'calc(var(--u) * ' + (Math.max(8, r.left) / u).toFixed(1) + ')'; }
     } catch (e) { /* positioned by CSS */ }
     function close() {
       if (!pop || pop.el !== box) return;
       pop = null;
-      if (box.parentNode) box.parentNode.removeChild(box);
       offDown(); offKey();
+      if (F && F.move && box.parentNode && !(F.reduced && F.reduced())) {
+        box.inert = true;
+        F.move(box, 'peel', { cue: 'tear', cueOpts: { gain: -12 }, done: function () { if (box.parentNode) box.parentNode.removeChild(box); } });
+      } else if (box.parentNode) box.parentNode.removeChild(box);
       if (anchor && anchor.focus) { try { anchor.focus(); } catch (e) { /* gone */ } }
     }
     offDown = SB.UI.on(document, 'mousedown', function (e) { if (!box.contains(e.target) && e.target !== anchor) close(); });
     offKey = SB.UI.on(document, 'keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); close(); } });
     overlay.appendChild(box);
     pop = { el: box, close: close };
+    if (F && F.move) F.move(box, 'slap', { cue: 'scrap', cueOpts: { gain: -9 } });
     try { box.focus(); } catch (e) { /* fine */ }
     return close;
   }
@@ -297,8 +318,10 @@
   }
 
   function mount(name, params) {
-    var main = el('main'), def = SB.UI.screens[name], hooks = null, title, host;
+    var main = el('main'), def = SB.UI.screens[name], hooks = null, title, host, was = current ? current.name : null;
     unmountCurrent();
+    /* the outgoing close-up leaves with its move over the next screen (js/ui/finish.js) */
+    if (main && SB.Finish && SB.Finish.leave) { try { SB.Finish.leave(main, was, name); } catch (e) { SB.log('warn', 'SB.UI.mount', 'leave: ' + (e && e.message)); } }
     current = { name: name, params: params || {}, def: def || null, hooks: null, keys: [] };
     try { if (typeof location !== 'undefined' && location) location.hash = '#/' + name; } catch (e) { /* file:// without hash support */ }
     if (main) {
@@ -375,6 +398,15 @@
     current = current ? (unmountCurrent(), null) : null;
     mount('desk', {});
     autosave();
+  }
+
+  /** quit(): save now and put the game away: back to the title (the quick menu's last line, js/ui/pause.js). */
+  function quit() {
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    doSave();
+    cards.slice().forEach(function (c) { c.close(); });
+    state = null; slot = null; playing = false; trail = [];
+    mount('start', {});
   }
 
   /** keys(map): screen-level key bindings { key: fn(event) }, removed when the screen unmounts. Returns a remover. */
@@ -506,12 +538,17 @@
       if (busy) { for (i = current.keys.length - 1; i >= 0; i--) { m = current.keys[i]; if (m && typeof m.Escape === 'function') { e.preventDefault(); m.Escape(e); return; } } }
       e.preventDefault(); go('desk'); return;
     }
+    /* on the desk, Escape is the quick menu: the week screen hidden under it to run the play loop binds Escape too,
+       but only to drop a note you are dragging on the calendar, which never happens there */
+    if (k === 'Escape' && SB.Pause && current && current.name === 'desk' && (!SB.Boot || SB.Boot.done())) { e.preventDefault(); SB.Pause.open(); return; }
     if (current && current.keys.length) {
       for (i = current.keys.length - 1; i >= 0; i--) {
         m = current.keys[i];
         if (m && typeof m[k] === 'function') { e.preventDefault(); m[k](e); return; }
       }
     }
+    /* Escape anywhere else (the desk, the title, the night): the quick menu (js/ui/pause.js), not while loading */
+    if (k === 'Escape' && SB.Pause && (!SB.Boot || SB.Boot.done())) { e.preventDefault(); SB.Pause.open(); return; }
     if (!state || (current && current.def && current.def.full)) return;
     if (/^[0-9]$/.test(k)) {
       idx = k === '0' ? 9 : parseInt(k, 10) - 1;
@@ -579,7 +616,7 @@
   }
 
   SB.UI.extend({
-    go: go, back: back, act: act, game: game, toast: toast, start: start, card: card, popover: popover, keys: keys,
+    go: go, back: back, act: act, game: game, toast: toast, start: start, quit: quit, card: card, popover: popover, keys: keys,
     /** SPEC?: 07-desk section 3 (the lamp). label() -> { key, text } of what pulling the chain does; pull() does it. */
     lamp: { label: lampLabel, pull: lampPull },
     /** SPEC?: not in 05-interface 1.1; whether the week screen's play loop should be running (see the file head). */

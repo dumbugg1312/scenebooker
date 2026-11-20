@@ -1,151 +1,149 @@
 /* Scene Booker: css/night-collage.css (pairs with js/art/nightscene.js)
- * The show night as a paste-up: a 1280 x 800 board scaled to the window (night.js's .nt-stage, the sample's own). Paper
- * pieces carry live text (Courier for the typewriter, SB.Skeleton strokes for the marker). Every control is a real
- * <button>. The tear-off tabs, the note and the envelope are styled in cu-night.css.
+ * The show night as a paste-up: a 1280 x 800 board in --p units that fills the stage (night.js's .nt-stage, the sample's
+ * own). Paper pieces carry live text (the typewriter for words, SB.Skeleton strokes for the marker, the mono for numbers).
+ * Every control is a real <button>. The tear-off tabs, the note and the envelope are styled in cu-night.css.
+ * Paper pieces are .pz-paper (css/finish.css): --paper is the stock (and the toner specks), --edge the cut or tear.
  */
-.nc-fit { position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #0d0c0b; }
-.nc-stage { position: absolute; width: 1280px; height: 800px; transform-origin: 0 0; overflow: hidden;
-  background-color: #151413; color: #141312; font-family: "Courier New", Courier, monospace;
+.nc-fit { position: relative; width: calc(var(--p) * 1280); height: calc(var(--p) * 800); overflow: hidden; background: var(--pitch); }
+.nc-stage { position: absolute; width: calc(var(--p) * 1280); height: calc(var(--p) * 800); transform-origin: 0 0; overflow: hidden;
+  background-color: var(--toner); color: var(--toner); font-family: var(--f-type);
   background-image:
-    radial-gradient(ellipse 900px 520px at 50% 72%, rgba(255, 236, 190, .07), transparent 70%),
-    radial-gradient(circle at 20% 30%, rgba(255,255,255,.035) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 70% 60%, rgba(255,255,255,.03) 0 1px, transparent 1.5px),
-    repeating-linear-gradient(178deg, rgba(255,255,255,.012) 0 3px, transparent 3px 11px);
-  background-size: auto, 23px 23px, 31px 31px, auto; }
-.nc-piece { position: absolute; transform: rotate(var(--rot, 0deg)); }
-.nc-stage button.nc-piece { font: inherit; color: inherit; cursor: pointer; text-align: left; }
-.nc-stage button:focus-visible { outline: 3px solid #F2D93B; outline-offset: 4px; }
-.nc-stage button:disabled { cursor: not-allowed; opacity: .55; }
-.cb-sr, .nc-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    radial-gradient(ellipse calc(var(--p) * 900) calc(var(--p) * 520) at 50% 72%, rgba(255, 236, 190, .07), transparent 70%),
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.035) 0 calc(var(--p) * 1), transparent calc(var(--p) * 1.5)),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,.03) 0 calc(var(--p) * 1), transparent calc(var(--p) * 1.5)),
+    repeating-linear-gradient(178deg, rgba(255,255,255,.012) 0 calc(var(--p) * 3), transparent calc(var(--p) * 3) calc(var(--p) * 11));
+  background-size: auto, calc(var(--p) * 23) calc(var(--p) * 23), calc(var(--p) * 31) calc(var(--p) * 31), auto; }
+.nc-stage .nc-piece { position: absolute; transform: rotate(var(--rot, 0deg)); }
+.nc-stage button.nc-piece { font: inherit; color: inherit; text-align: left; }
+.nc-stage button:disabled { opacity: .55; }
+.cb-sr, .nc-sr { position: absolute; width: calc(var(--p) * 1); height: calc(var(--p) * 1); overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* type */
-.nc-type { font-family: "Courier New", Courier, monospace; font-weight: 700; letter-spacing: .01em; color: #141312;
-  text-shadow: .3px .3px 0 rgba(20,19,18,.55), -.2px 0 0 rgba(20,19,18,.35); }
-.nc-mk { display: block; color: #141312; overflow: visible; }
+.nc-type { font-family: var(--f-type); letter-spacing: .01em; color: var(--toner); }
+.nc-mk { display: block; color: var(--toner); overflow: visible; }
 
 /* the title: typed caps on black tape, a cream tab beside it (the desk's labels) */
-.nc-title { margin: 0; display: flex; gap: 0; font: 700 13px/1 "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; z-index: 20; }
-.nc-title b { background: #141312; color: #F4F1E8; padding: 6px 10px; box-shadow: 2px 2px 0 rgba(0,0,0,.5); }
-.nc-title span { background: #E6DCB8; color: #141312; padding: 6px 10px; transform: rotate(1.2deg); box-shadow: 2px 2px 0 rgba(0,0,0,.5); }
+.nc-title { margin: 0; display: flex; gap: 0; font: 400 calc(var(--fs) * 14)/1 var(--f-type); letter-spacing: .08em; text-transform: uppercase; z-index: 20; filter: drop-shadow(var(--sh-s) 0 rgba(0,0,0,.6)); }
+.nc-title b { font-weight: 400; background: var(--toner); color: var(--pp-bond); padding: calc(var(--p) * 6) calc(var(--p) * 10); clip-path: var(--edge-cut-1); }
+.nc-title span { background: var(--pp-buff); color: var(--toner); padding: calc(var(--p) * 6) calc(var(--p) * 10); transform: rotate(1.2deg); clip-path: var(--edge-cut-2); }
 
 /* the doorway sheet */
-.nc-photo { width: 1220px; height: 360px; background: #EBBA4E; box-shadow: 4px 7px 0 rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.3); z-index: 2; }
-.nc-photo canvas { display: block; width: 1220px; height: 360px; }
+.nc-photo { width: calc(var(--p) * 1220); height: calc(var(--p) * 360); background: var(--pp-kraft); filter: drop-shadow(var(--sh-m) 0 rgba(0,0,0,.6)); z-index: 2; }
+.nc-photo canvas { display: block; width: calc(var(--p) * 1220); height: calc(var(--p) * 360); }
 .nc-photo .nc-tape { position: absolute; }
 
 /* masking tape */
-.nc-tape { position: absolute; height: 24px; background: rgba(232, 224, 192, .82); z-index: 30; transform: rotate(var(--rot, 0deg));
-  box-shadow: 0 1px 1px rgba(0,0,0,.25); clip-path: polygon(0 8%, 4% 0, 10% 6%, 16% 0, 100% 3%, 97% 30%, 100% 55%, 96% 80%, 100% 100%, 8% 96%, 3% 100%, 0 70%, 4% 45%); }
-.nc-tape::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(0,0,0,.03) 0 2px, transparent 2px 7px); }
+.nc-tape { position: absolute; height: calc(var(--p) * 24); background: rgba(232, 224, 192, .82); z-index: 30; transform: rotate(var(--rot, 0deg));
+  clip-path: var(--edge-cut-3); }
+.nc-tape::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(0,0,0,.03) 0 calc(var(--p) * 2), transparent calc(var(--p) * 2) calc(var(--p) * 7)); }
 
 /* labels typed on strips, stuck to the photo */
-.nc-lbl { margin: 0; z-index: 12; }
-.nc-lbl span { display: inline-block; background: #F4F1E8; padding: 4px 10px 3px; font: 700 15px/1.1 "Courier New", monospace; letter-spacing: .04em; color: #141312; box-shadow: 2px 3px 0 rgba(0,0,0,.45); }
-.nc-lbl--on span { background: #141312; color: #F4F1E8; }
+.nc-lbl { margin: 0; z-index: 12; filter: drop-shadow(var(--sh-s) 0 rgba(0,0,0,.55)); }
+.nc-lbl span { display: inline-block; background: var(--pp-bond); padding: calc(var(--p) * 4) calc(var(--p) * 10) calc(var(--p) * 3); font: 400 calc(var(--fs) * 15)/1.1 var(--f-type); letter-spacing: .04em; color: var(--toner); clip-path: var(--edge-cut-2); }
+.nc-lbl--on span { background: var(--toner); color: var(--pp-bond); clip-path: var(--edge-cut-1); }
 
-/* black + cream chips, as on the desk */
-.nc-chip { display: flex; z-index: 25; font: 700 12px/1 "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; pointer-events: none; }
-.nc-chip b { background: #141312; color: #F4F1E8; padding: 5px 8px; border: 1px solid #F4F1E8; box-shadow: 2px 2px 0 rgba(0,0,0,.6); }
-.nc-chip span { background: #E6DCB8; padding: 5px 8px; margin-left: 4px; transform: rotate(-1.5deg); box-shadow: 2px 2px 0 rgba(0,0,0,.6); }
+/* the figure that is not on the thing it sits by: the count and the cash, in the mono, on a cream tab */
+.nc-chip { display: flex; z-index: 25; font: 400 calc(var(--fs) * 14)/1 var(--f-mono); letter-spacing: .04em; pointer-events: none; filter: drop-shadow(var(--sh-s) 0 rgba(0,0,0,.6)); }
+.nc-chip b { font-weight: 400; background: var(--toner); color: var(--pp-bond); padding: calc(var(--p) * 5) calc(var(--p) * 8); clip-path: var(--edge-cut-1); }
+.nc-chip span { background: var(--pp-buff); color: var(--toner); padding: calc(var(--p) * 5) calc(var(--p) * 8); transform: rotate(-1.5deg); clip-path: var(--edge-cut-2); }
 
-/* paper pieces */
-.nc-paper { border: 0; padding: 0; box-shadow: 3px 5px 0 rgba(0,0,0,.5); background-size: 360px 360px; }
-.nc-paper.nc-setlist, .nc-paper.nc-sign { filter: drop-shadow(3px 5px 0 rgba(0,0,0,.5)); box-shadow: none; }
-.nc-obj { border: 0; padding: 0; background: none; z-index: 8; filter: drop-shadow(3px 5px 0 rgba(0,0,0,.6)); }
-.nc-obj:hover, .nc-paper:is(button):hover { filter: drop-shadow(3px 5px 0 rgba(0,0,0,.6)) brightness(1.04); }
-.nc-objwrap { z-index: 6; pointer-events: none; filter: drop-shadow(2px 4px 0 rgba(0,0,0,.55)); }
+/* paper pieces: .pz-paper draws the edge and its shadow; the piece itself is only the box */
+.nc-stage .nc-piece.nc-paper { position: absolute; border: 0; padding: 0; background-size: auto; }
+.nc-obj { border: 0; padding: 0; background: none; z-index: 8; filter: drop-shadow(var(--sh-s) 0 rgba(0,0,0,.6)); }
+.nc-obj:hover, .nc-paper:is(button):hover { filter: drop-shadow(var(--sh-s) 0 rgba(0,0,0,.6)) brightness(1.04); }
+.nc-objwrap { z-index: 6; pointer-events: none; filter: drop-shadow(var(--sh-s) 0 rgba(0,0,0,.55)); }
 .nc-objart { display: block; }
 
 /* the set list */
-.nc-setlist { width: 236px; height: 352px; z-index: 9; padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 4px; }
-.nc-sl-h { margin-left: -2px; }
-.nc-sl-doors { font-size: 12px; }
-.nc-sl-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; flex: 1; }
-.nc-sl-band { position: relative; display: flex; flex-direction: column; padding-left: 18px; }
-.nc-sl-time { font-size: 12px; color: #4a4741; }
-.nc-sl-name { font-size: 17px; line-height: 1.12; }
-.nc-sl-heat { font-size: 11px; color: #4a4741; }
-.nc-sl-band.is-done .nc-sl-name { text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: rgba(20,19,18,.85); }
-.nc-sl-band.is-on .nc-sl-name { background: linear-gradient(176deg, transparent 8%, rgba(242,217,59,.85) 12%, rgba(242,217,59,.8) 88%, transparent 92%); padding: 0 4px; margin-left: -4px; }
-.nc-sl-arrow { position: absolute; left: -16px; top: 16px; }
-.nc-sl-stop { font-size: 13px; border-bottom: 3px double #141312; align-self: flex-start; }
+.nc-setlist { width: calc(var(--p) * 236); height: calc(var(--p) * 352); z-index: 9; padding: calc(var(--p) * 14) calc(var(--p) * 16) calc(var(--p) * 18); display: flex; flex-direction: column; gap: calc(var(--p) * 4); }
+.nc-sl-h { margin-left: calc(var(--p) * -2); }
+.nc-sl-doors { font-size: calc(var(--fs) * 12); }
+.nc-sl-list { list-style: none; margin: calc(var(--p) * 8) 0 0; padding: 0; display: flex; flex-direction: column; gap: calc(var(--p) * 12); flex: 1; }
+.nc-sl-band { position: relative; display: flex; flex-direction: column; padding-left: calc(var(--p) * 18); }
+.nc-sl-time { font: 400 calc(var(--fs) * 12)/1.2 var(--f-mono); color: var(--toner-mid); }
+.nc-sl-name { font-size: calc(var(--fs) * 17); line-height: 1.12; }
+.nc-sl-heat { font-size: calc(var(--fs) * 12); color: var(--toner-mid); }
+.nc-sl-band.is-done .nc-sl-name { text-decoration: line-through; text-decoration-thickness: calc(var(--p) * 3); text-decoration-color: var(--toner); }
+.nc-sl-band.is-on .nc-sl-name { background: linear-gradient(176deg, transparent 8%, var(--hl-swipe) 12%, var(--hl-swipe) 88%, transparent 92%); padding: 0 calc(var(--p) * 4); margin-left: calc(var(--p) * -4); }
+.nc-sl-arrow { position: absolute; left: calc(var(--p) * -16); top: calc(var(--p) * 16); }
+.nc-sl-stop { font-size: calc(var(--fs) * 13); border-bottom: calc(var(--p) * 3) double var(--toner); align-self: flex-start; }
 
 /* the tally scrap */
-.nc-tallyscrap { width: 252px; min-height: 196px; box-sizing: border-box; z-index: 7; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
-.nc-ts-k { font-size: 12px; letter-spacing: .06em; }
-.nc-ts-row { display: flex; align-items: flex-end; gap: 6px; color: #141312; }
-.nc-ts-n { margin-left: -60px; transform: rotate(-4deg); }
-.nc-ts-call { position: relative; display: block; height: 52px; margin-left: 20px; }
-.nc-ts-call .nc-mk { position: relative; top: 6px; }
-.nc-circle { position: absolute; left: -22px; top: 0; width: 170px; height: 56px; color: #141312; }
-.nc-ts-cap { font-size: 12px; margin-top: 2px; }
-.nc-ts-away { align-self: flex-end; margin-top: 2px; transform: rotate(-4deg); }
+.nc-tallyscrap { width: calc(var(--p) * 252); min-height: calc(var(--p) * 196); box-sizing: border-box; z-index: 7; padding: calc(var(--p) * 12) calc(var(--p) * 14); display: flex; flex-direction: column; gap: calc(var(--p) * 2); }
+.nc-ts-k { font-size: calc(var(--fs) * 12); letter-spacing: .06em; }
+.nc-ts-row { display: flex; align-items: flex-end; gap: calc(var(--p) * 6); color: var(--toner); }
+.nc-ts-n { margin-left: calc(var(--p) * -60); transform: rotate(-4deg); }
+.nc-ts-call { position: relative; display: block; height: calc(var(--p) * 52); margin-left: calc(var(--p) * 20); }
+.nc-ts-call .nc-mk { position: relative; top: calc(var(--p) * 6); }
+.nc-circle { position: absolute; left: calc(var(--p) * -22); top: 0; width: calc(var(--p) * 170); height: calc(var(--p) * 56); color: var(--toner); }
+.nc-ts-cap { font-size: calc(var(--fs) * 12); margin-top: calc(var(--p) * 2); }
+.nc-ts-away { align-self: flex-end; margin-top: calc(var(--p) * 2); transform: rotate(-4deg); }
 
 /* the gens strip under the clicker, the drink card, the hard stop */
-.nc-gens { margin: 0; padding: 4px 10px; z-index: 7; font-size: 12px; }
-.nc-drinkcard { width: 160px; height: 92px; z-index: 5; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; font-size: 11px;
-  background-image: repeating-linear-gradient(180deg, transparent 0 22px, rgba(91,111,168,.35) 22px 23px) !important; }
-.nc-drinkcard::before { content: ""; position: absolute; left: 0; right: 0; top: 30px; height: 2px; background: rgba(200,60,60,.5); }
-.nc-dc-h { margin-bottom: 4px; }
-.nc-stoptape { padding: 6px 14px 4px; z-index: 6; }
+.nc-gens { margin: 0; padding: calc(var(--p) * 4) calc(var(--p) * 10); z-index: 7; font-size: calc(var(--fs) * 12); }
+.nc-drinkcard { width: calc(var(--p) * 160); height: calc(var(--p) * 92); z-index: 5; padding: calc(var(--p) * 8) calc(var(--p) * 10); display: flex; flex-direction: column; gap: calc(var(--p) * 2); font-size: calc(var(--fs) * 12); }
+.nc-dc-h { margin-bottom: calc(var(--p) * 4); }
+.nc-stoptape { padding: calc(var(--p) * 6) calc(var(--p) * 14) calc(var(--p) * 4); z-index: 6; }
 
 /* what's happening now */
-.nc-now { margin: 0; max-width: 520px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 22; background: #F4F1E8; padding: 5px 12px 4px; box-shadow: 2px 3px 0 rgba(0,0,0,.5);
-  font: 700 14px/1.25 "Courier New", monospace; color: #141312; }
-.nc-now-k { color: #4a4741; }
+.nc-now { margin: 0; max-width: calc(var(--p) * 520); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 22; background: var(--pp-bond); padding: calc(var(--p) * 5) calc(var(--p) * 12) calc(var(--p) * 4); clip-path: var(--edge-cut-1);
+  font: 400 calc(var(--fs) * 14)/1.25 var(--f-type); color: var(--toner); }
+.nc-now-k { color: var(--toner-mid); }
 
-/* scraps */
-.nc-scrap { width: 146px; margin-left: -22px; padding: 16px 10px 8px; z-index: 4; font-size: 12.5px; line-height: 1.3; }
-.nc-scrap .nc-type { font-size: 12.5px; line-height: 1.3; display: block; }
-/* a masking-tape tab pins the post to the scene edge, like a .kt-strip */
-.nc-scrap::before { content: ""; position: absolute; top: 3px; right: 14px; width: 54px; height: 11px; background: rgba(214, 204, 160, .95); transform: rotate(-2deg); box-shadow: 0 1px 0 rgba(0,0,0,.25); pointer-events: none; }
+/* scraps: a post that went up, a thing that happened */
+.nc-scrap { width: calc(var(--p) * 146); margin-left: calc(var(--p) * -22); padding: calc(var(--p) * 16) calc(var(--p) * 10) calc(var(--p) * 10); z-index: 4; font-size: calc(var(--fs) * 12.5); line-height: 1.3; }
+.nc-scrap .nc-type { font-size: calc(var(--fs) * 12.5); line-height: 1.3; display: block; }
 
 /* the cardboard sign that opens the doors */
-.nc-sign { width: 340px; height: 176px; z-index: 12; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; gap: 0; color: #141312; }
-.nc-sign-l2 { display: flex; align-items: flex-end; gap: 14px; margin-top: -4px; }
-.nc-sign-sub { font-size: 11px; margin-top: 8px; letter-spacing: -.01em; white-space: nowrap; }
-.nc-sign:hover { transform: rotate(var(--rot)) translateY(-2px); }
+.nc-sign { width: calc(var(--p) * 340); height: calc(var(--p) * 176); z-index: 12; padding: calc(var(--p) * 14) calc(var(--p) * 18); display: flex; flex-direction: column; justify-content: center; gap: 0; color: var(--toner); }
+.nc-sign-l2 { display: flex; align-items: flex-end; gap: calc(var(--p) * 14); margin-top: calc(var(--p) * -4); }
+.nc-sign-sub { font-size: calc(var(--fs) * 12); margin-top: calc(var(--p) * 8); letter-spacing: -.01em; white-space: nowrap; }
+.nc-sign:hover { transform: rotate(var(--rot)) translateY(calc(var(--p) * -2)); }
+/* before the doors this is the hero: more than twice the size, turned, stamped on */
+.nc-sign--hero { width: calc(var(--p) * 660); height: calc(var(--p) * 350); padding: calc(var(--p) * 22) calc(var(--p) * 30); z-index: 12; }
+.nc-sign--hero .nc-sign-sub { font-size: calc(var(--fs) * 15); margin-top: calc(var(--p) * 14); color: var(--toner-mid); }
 
 /* the note slid onto the table, with tear-off tabs */
-.nc-note { width: 360px; z-index: 14; padding: 16px 16px 12px; }
-.nc-note-h { margin: 0 0 6px; display: flex; align-items: center; gap: 8px; font: 700 19px/1.15 "Courier New", monospace; text-transform: uppercase; }
-.nc-note-b { margin: 0 0 10px; font-size: 14px; line-height: 1.3; }
+.nc-note { width: calc(var(--p) * 360); z-index: 14; padding: calc(var(--p) * 16) calc(var(--p) * 16) calc(var(--p) * 12); }
+.nc-note-h { margin: 0 0 calc(var(--p) * 6); display: flex; align-items: center; gap: calc(var(--p) * 8); font: 400 calc(var(--fs) * 22)/1.15 var(--f-gothic); text-transform: uppercase; }
+.nc-note-b { margin: 0 0 calc(var(--p) * 10); font-size: calc(var(--fs) * 14); line-height: 1.3; }
 /* the payout sheet */
-.nc-payout { width: 352px; z-index: 14; padding: 16px 18px 14px; }
-.nc-pay-h { margin: 0 0 6px; }
-.nc-pay-door { margin: 0 0 8px; font-size: 14px; border-bottom: 2px solid #141312; padding-bottom: 6px; }
-.nc-pay-lines { list-style: none; margin: 0 0 10px; padding: 0; }
-.nc-pay-lines li { display: grid; grid-template-columns: 1fr 56px 60px; font-size: 14px; line-height: 1.55; }
+.nc-payout { width: calc(var(--p) * 352); z-index: 14; padding: calc(var(--p) * 16) calc(var(--p) * 18) calc(var(--p) * 14); }
+.nc-pay-h { margin: 0 0 calc(var(--p) * 6); }
+.nc-pay-door { margin: 0 0 calc(var(--p) * 8); font-size: calc(var(--fs) * 14); border-bottom: calc(var(--p) * 2) solid var(--toner); padding-bottom: calc(var(--p) * 6); }
+.nc-pay-lines { list-style: none; margin: 0 0 calc(var(--p) * 10); padding: 0; }
+.nc-pay-lines li { display: grid; grid-template-columns: 1fr calc(var(--p) * 56) calc(var(--p) * 60); font-size: calc(var(--fs) * 14); line-height: 1.55; }
 .nc-pay-lines li .nc-pay-l { overflow: hidden; white-space: nowrap; }
-.nc-pay-lines li .nc-pay-l::after { content: " ........................................"; color: #6b665b; }
-.nc-pay-a, .nc-pay-r { text-align: right; }
-.nc-pay-r { color: #6b665b; }
-.nc-pay-lines li.is-you { border-top: 1.5px dashed #141312; margin-top: 2px; }
-.nc-pay-gap { margin: 0 0 8px; }
-.nc-pay-net { display: flex; align-items: center; gap: 10px; margin: 0; }
-.nc-pilelabel { width: 104px; box-sizing: border-box; padding: 3px 6px 4px; z-index: 9; display: flex; flex-direction: column; gap: 1px; }
-.nc-pl-who { font-size: 10px; line-height: 1.15; }
-.nc-result { width: 250px; z-index: 13; padding: 14px; font-size: 13px; }
-.nc-result p { margin: 0 0 6px; }
-.nc-res-stamp { display: inline-block; color: #B42318; border: 3px solid #B42318; padding: 4px 6px; transform: rotate(-6deg); }
-.nc-res-stamp .nc-mk { color: #B42318; }
-.nc-leave { width: 220px; height: 110px; align-items: flex-start; z-index: 31; }
+.nc-pay-lines li .nc-pay-l::after { content: " ........................................"; color: var(--toner-soft); }
+.nc-pay-a, .nc-pay-r { text-align: right; font-family: var(--f-mono); }
+.nc-pay-r { color: var(--toner-mid); }
+.nc-pay-lines li.is-you { border-top: calc(var(--p) * 1.5) dashed var(--toner); margin-top: calc(var(--p) * 2); }
+.nc-pay-gap { margin: 0 0 calc(var(--p) * 8); }
+.nc-pay-net { display: flex; align-items: center; gap: calc(var(--p) * 10); margin: 0; }
+.nc-pilelabel { width: calc(var(--p) * 104); box-sizing: border-box; padding: calc(var(--p) * 3) calc(var(--p) * 6) calc(var(--p) * 4); z-index: 9; display: flex; flex-direction: column; gap: calc(var(--p) * 1); }
+.nc-pl-who { font-size: calc(var(--fs) * 12); line-height: 1.15; }
+.nc-result { width: calc(var(--p) * 250); z-index: 13; padding: calc(var(--p) * 14); font-size: calc(var(--fs) * 13); }
+.nc-result p { margin: 0 0 calc(var(--p) * 6); }
+.nc-res-stamp { display: inline-block; color: var(--late); border: calc(var(--p) * 3) solid var(--late); padding: calc(var(--p) * 4) calc(var(--p) * 6); transform: rotate(-6deg); }
+.nc-res-stamp .nc-mk { color: var(--late); }
+.nc-leave { width: calc(var(--p) * 220); height: calc(var(--p) * 110); align-items: flex-start; z-index: 31; }
 
 /* a small taped button */
-.nc-btn { z-index: 22; background: #E6DCB8; border: 0; padding: 6px 12px; font: 700 13px "Courier New", monospace; text-transform: uppercase; letter-spacing: .06em;
-  box-shadow: 2px 3px 0 rgba(0,0,0,.55); clip-path: polygon(0 6%, 5% 0, 100% 4%, 97% 50%, 100% 96%, 4% 100%, 0 60%); }
-.nc-x { z-index: 9; color: #141312; pointer-events: none; }
-.nc-x .nc-mk { color: #F4F1E8; }
+.nc-btn { z-index: 22; background: var(--pp-buff); border: 0; padding: calc(var(--p) * 6) calc(var(--p) * 12); font: 400 calc(var(--fs) * 14) var(--f-type); text-transform: uppercase; letter-spacing: .06em;
+  clip-path: var(--edge-cut-1); }
+.nc-x { z-index: 9; color: var(--toner); pointer-events: none; }
+.nc-x .nc-mk { color: var(--pp-bond); }
 
-@media (prefers-reduced-motion: reduce) { .nc-sign:hover { transform: rotate(var(--rot)); } }
 .nc-watch { z-index: 10; }
 .nc-chip, .nc-lbl span, .nc-btn { white-space: nowrap; }
-.nc-sign--small { width: 230px; height: 128px; padding: 10px 14px; }
+.nc-sign--small { width: calc(var(--p) * 230); height: calc(var(--p) * 128); padding: calc(var(--p) * 10) calc(var(--p) * 14); }
 /* on the table the tear-off tabs fit on one row (the note's, the envelope's) */
 .nt-env .nt-tabs, .nt-note .nt-tabs, .nc-payout .nt-tabs, .nc-note .nt-tabs { flex-wrap: nowrap; }
-.nt-env .nt-tab, .nt-note .nt-tab, .nc-payout .nt-tab, .nc-note .nt-tab { flex: 1 1 0; min-width: 0; padding: 16px 7px 10px; font-size: 12px; }
-/* more than three tabs (the shortfall's six ways to cover it) would be squeezed to ~60px columns: three to a row instead */
-.nt-env .nt-tabs:has(> .nt-tab:nth-child(4)), .nc-payout .nt-tabs:has(> .nt-tab:nth-child(4)) { flex-wrap: wrap; row-gap: 8px; }
+.nt-env .nt-tab, .nt-note .nt-tab, .nc-payout .nt-tab, .nc-note .nt-tab { flex: 1 1 0; min-width: 0; padding: calc(var(--p) * 18) calc(var(--p) * 8) calc(var(--p) * 12); font-size: calc(var(--fs) * 12); }
+.nt-note .nt-tab { padding: calc(var(--p) * 26) calc(var(--p) * 12) calc(var(--p) * 18); font-size: calc(var(--fs) * 15); }
+/* more than three tabs (the shortfall's six ways to cover it) would be squeezed to narrow columns: three to a row instead */
+.nt-env .nt-tabs:has(> .nt-tab:nth-child(4)), .nc-payout .nt-tabs:has(> .nt-tab:nth-child(4)) { flex-wrap: wrap; row-gap: calc(var(--p) * 8); }
 .nt-env .nt-tabs:has(> .nt-tab:nth-child(4)) > .nt-tab, .nc-payout .nt-tabs:has(> .nt-tab:nth-child(4)) > .nt-tab { flex: 1 1 30%; }
-.nt-env .nt-env-line { padding: 1px 0; }
-.nt-env .nt-fig { font-size: 17px; }
+.nt-env .nt-env-line { padding: calc(var(--p) * 1) 0; }
+.nt-env .nt-fig { font-size: calc(var(--fs) * 14); }
+.nt-env .nt-hero-n { font-size: calc(var(--fs) * 66); }

@@ -1,0 +1,96 @@
+/* Scene Booker: css/cu-sheet.css (was r-bands.css) — the sticker sheet: the bands screens (js/ui/screens/bands.js). Boxed finish: stage units,
+ * copy-paper stock, one light (shadows fall down and right), cut edges from css/finish.css, the four moves, the shipped faces only.
+ * The one loud thing on `bands` is the filter you are on (.rb-hero); on `band` it is the band's name across their photo (.rb-nameplate). */
+
+/* ---- bands + band: the board ---- */
+.cb-bands, .cb-band { position: relative; background-color: var(--toner); margin: calc(var(--p) * -14) calc(var(--p) * -18) calc(var(--p) * -30); padding: calc(var(--p) * 22) calc(var(--p) * 26) calc(var(--p) * 40); min-height: 100%; isolation: isolate;
+  background-image: radial-gradient(rgba(255, 255, 255, .05) calc(var(--p) * 1), transparent calc(var(--p) * 1.4)); background-size: calc(var(--p) * 14) calc(var(--p) * 14); }
+
+/* ---- bands: the hero, and a quiet slip of filters ---- */
+.cb-bands .rb-top { display: flex; flex-wrap: wrap; align-items: flex-start; gap: calc(var(--p) * 14) calc(var(--p) * 28); margin: 0 0 calc(var(--p) * 22); }
+.rb-herobox { flex: none; max-width: 100%; padding: calc(var(--p) * 8) calc(var(--p) * 10) calc(var(--p) * 14) calc(var(--p) * 10); }
+.rb-hero { display: flex; align-items: flex-end; gap: calc(var(--p) * 14); margin: 0; padding: calc(var(--p) * 6) calc(var(--p) * 22) calc(var(--p) * 16) calc(var(--p) * 18);
+  font: 400 calc(var(--fs) * 76)/.95 var(--f-gothic); letter-spacing: .01em; text-transform: uppercase; color: var(--toner);
+  --paper: var(--pp-bond); --edge: var(--edge-torn-b); --ring: calc(var(--p) * 2.5); --drop: calc(var(--p) * 8); transform: rotate(-5deg); }
+.rb-hero-n { display: block; margin-bottom: calc(var(--p) * 4); padding: calc(var(--p) * 4) calc(var(--p) * 12) calc(var(--p) * 2); background: var(--toner); color: var(--pp-bond);
+  font: 400 calc(var(--fs) * 44)/1 var(--f-mono); letter-spacing: 0; clip-path: var(--edge-cut-2); rotate: 3deg; }
+
+.rb-slip { flex: 1 1 calc(var(--p) * 400); min-width: 0; padding: calc(var(--p) * 12) calc(var(--p) * 16) calc(var(--p) * 10); color: var(--toner);
+  --paper: var(--pp-white); --edge: var(--edge-cut-1); --drop: calc(var(--p) * 5); transform: rotate(.4deg); }
+.rb-row { display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 8) calc(var(--p) * 22); }
+.rb-words { display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 2) calc(var(--p) * 1); }
+.rb-words--piles { margin: calc(var(--p) * 8) 0 0; padding: calc(var(--p) * 8) 0 0; border-top: calc(var(--p) * 2) dashed var(--toner-soft); }
+.cb-piletabs:empty { display: none; }
+.rb-word { margin: 0; padding: calc(var(--p) * 3) calc(var(--p) * 5) calc(var(--p) * 2); border: 0; background: none; font: 400 calc(var(--fs) * 12.5)/1.2 var(--f-type); letter-spacing: .02em; text-transform: uppercase; color: var(--toner-mid); }
+.rb-word:hover { color: var(--toner); text-decoration: underline calc(var(--p) * 2); text-underline-offset: calc(var(--p) * 4); }
+.rb-word.is-on { background: var(--toner); color: var(--pp-bond); text-decoration: none; transform: rotate(-1.5deg); }
+
+/* the search: a typed line on the slip, a swipe of highlighter when you are in it */
+.cb-bands .rb-find { flex: 0 1 calc(var(--p) * 200); width: calc(var(--p) * 200); min-width: 0; }
+.cb-bands .rb-find .kt-field__l { position: absolute; width: calc(var(--p) * 1); height: calc(var(--p) * 1); overflow: hidden; clip: rect(0 0 0 0); }
+.cb-bands .rb-find .kt-input { min-height: 0; padding: calc(var(--p) * 3) calc(var(--p) * 6) calc(var(--p) * 2); border: 0; border-bottom: calc(var(--p) * 2) dashed var(--toner-soft); border-radius: 0; background: none; box-shadow: none; outline: none;
+  font: 400 calc(var(--fs) * 14)/1.3 var(--f-type); letter-spacing: .02em; color: var(--toner); caret-color: var(--toner); }
+.cb-bands .rb-find .kt-input::placeholder { color: var(--toner-soft); font-weight: 400; }
+.cb-bands .rb-find .kt-input:focus-visible { background: linear-gradient(176deg, transparent 16%, var(--hl-swipe) 18%, var(--hl-swipe) 84%, transparent 86%); box-shadow: none; outline: none; }
+
+/* ---- the piles ---- */
+.rb-pilehead { display: flex; align-items: baseline; gap: calc(var(--p) * 14); margin: calc(var(--p) * 4) 0 calc(var(--p) * 12); flex-wrap: wrap; }
+.rb-pilename { margin: 0; font: 400 calc(var(--fs) * 14)/1 var(--f-type); letter-spacing: .1em; color: var(--pp-news); }
+.rb-pilen { font-family: var(--f-mono); color: var(--pp-buff); }
+.rb-trend { font: 400 calc(var(--fs) * 12)/1 var(--f-type); color: var(--pp-buff); text-transform: uppercase; }
+.rb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--p) * 250), 1fr)); gap: calc(var(--p) * 30) calc(var(--p) * 24); }
+.rb-card { position: relative; display: flex; flex-direction: column; align-items: stretch; gap: calc(var(--p) * 6); margin: 0; padding: calc(var(--p) * 14) calc(var(--p) * 12) calc(var(--p) * 12); text-align: left;
+  font: inherit; color: var(--toner); border: 0; width: auto; --paper: var(--pp-white); --edge: var(--edge-cut-1); --drop: calc(var(--p) * 6);
+  transform: rotate(var(--kt-rot, 0deg)); transition: transform 120ms steps(2, end); }
+.rb-card:nth-child(3n+2) { --edge: var(--edge-cut-2); }
+.rb-card:nth-child(3n) { --edge: var(--edge-cut-3); }
+.rb-card.is-down { --paper: var(--pp-buff); }
+.rb-card:hover { transform: translateY(calc(var(--p) * -3)) rotate(0deg); --drop: calc(var(--p) * 9); }
+.rb-card .kt-photo { margin: 0 auto; max-width: 100%; box-shadow: none; clip-path: var(--edge-cut-2); transform: none; }
+.rb-card .rb-mark { display: block; line-height: 0; margin: calc(var(--p) * 2) 0; overflow: hidden; }
+.rb-card .rb-name { display: block; font: 400 calc(var(--fs) * 20)/1 var(--f-gothic); letter-spacing: .04em; color: var(--toner); }
+.rb-card .rb-meta { font: 400 calc(var(--fs) * 13)/1.3 var(--f-type); color: var(--toner-mid); }
+.rb-card .rb-last { font: 400 calc(var(--fs) * 12)/1.3 var(--f-type); color: var(--toner-soft); }
+.rb-card.is-dim .kt-photo, .rb-card.is-dim .rb-mark { opacity: .55; }
+.rb-tag { position: absolute; right: calc(var(--p) * -6); top: calc(var(--p) * 118); background: var(--toner); color: var(--pp-bond); padding: calc(var(--p) * 4) calc(var(--p) * 10); font: 400 calc(var(--fs) * 12)/1.1 var(--f-type); letter-spacing: .08em; transform: rotate(3deg); box-shadow: var(--sh-s) 0 rgba(0, 0, 0, .4); }
+
+/* ---- band: the name across the photo ---- */
+.cb-band .cb-bandcols { gap: 0 calc(var(--p) * 34); }
+.cb-band.is-flipping .cb-bandcols { animation: none; }
+.cb-band .cb-frontpiece { position: relative; }
+.rb-shot { position: relative; margin: calc(var(--p) * 6) 0 calc(var(--p) * (var(--nh, 60) * .5 + 36)); }
+.rb-shot .kt-photo { display: block; margin: 0 auto; max-width: 100%; }
+.rb-shot .rb-nameplate { position: absolute; left: calc(var(--p) * -14); bottom: calc(var(--p) * (var(--nh, 60) * -.5 - 6)); z-index: 3; margin: 0; padding: calc(var(--p) * 4) calc(var(--p) * 10) calc(var(--p) * 8); line-height: 0;
+  --paper: var(--pp-bond); --edge: var(--edge-cut-1); --ring: calc(var(--p) * 2.5); --drop: calc(var(--p) * 8); transform: rotate(-6deg); transform-origin: 0 100%; }
+.rb-shot .rb-nameplate .cb-art { max-width: 100%; }
+.rb-markrow { line-height: 0; margin: 0 0 calc(var(--p) * 4); overflow: hidden; }
+.cb-band .cb-typed { font-weight: 400; text-shadow: none; color: var(--toner-mid); }
+.cb-band .cb-typed.cb-small, .cb-band .cb-slip .cb-typed { font-size: calc(var(--fs) * 13); }
+.cb-band .cb-frontpiece .cb-typed:not(.cb-small) { font-size: calc(var(--fs) * 14); }
+
+/* the people: typed names, no boxes */
+.rb-crew, .rb-past { list-style: none; margin: 0 0 calc(var(--p) * 10); padding: 0; display: flex; flex-wrap: wrap; gap: calc(var(--p) * 12) calc(var(--p) * 22); }
+.rb-member { display: flex; flex-direction: column; gap: calc(var(--p) * 2); align-items: flex-start; }
+.rb-who { display: flex; align-items: baseline; gap: calc(var(--p) * 8); }
+.rb-wn { font: 400 calc(var(--fs) * 14)/1.2 var(--f-type); letter-spacing: .06em; color: var(--toner); }
+.rb-wi { font: 400 calc(var(--fs) * 12)/1.2 var(--f-type); letter-spacing: .06em; text-transform: uppercase; color: var(--toner-mid); }
+.rb-member.is-listed .rb-wn { text-decoration: line-through calc(var(--p) * 3); }
+.rb-pencil { font: 400 calc(var(--fs) * 13)/1.2 var(--f-type); color: var(--ink-ball); }
+.rb-past { display: block; } .rb-past li { font: 400 calc(var(--fs) * 13)/1.3 var(--f-type); color: var(--toner-mid); margin: calc(var(--p) * 2) 0; }
+.cb-band .kt-small { font: 400 calc(var(--fs) * 12)/1.3 var(--f-type); letter-spacing: .07em; color: var(--toner-mid); }
+
+/* what you know: the drawn scraps, and one pencil line where you do not know */
+.cb-band .cb-know.rb-blank { display: flex; align-items: baseline; gap: calc(var(--p) * 12); padding: calc(var(--p) * 4) calc(var(--p) * 2); min-width: calc(var(--p) * 190); border-bottom: calc(var(--p) * 2) dashed var(--pp-news); }
+.rb-unk { flex: none; font: 400 calc(var(--fs) * 12)/1.2 var(--f-type); letter-spacing: .08em; color: var(--pp-news); }
+.cb-band .cb-know.rb-blank .rb-pencil { color: var(--pp-sky); }
+.rb-pencilline { margin: 0; font: 400 calc(var(--fs) * 13)/1.4 var(--f-type); color: var(--ink-ball); display: flex; align-items: center; gap: calc(var(--p) * 10); }
+.cb-band .cb-knowwrap { margin-bottom: calc(var(--p) * 26); }
+.cb-band .cb-scribble { font: 400 calc(var(--fs) * 13)/1.35 var(--f-type); color: var(--ink-ball); }
+.cb-band .cb-onboard { filter: none; }
+.cb-band .cb-typedsheet li b { font-weight: 400; color: var(--toner-mid); }
+.cb-band .cb-yourpart { font-style: normal; }
+:root[data-motion="reduce"] .rb-card:hover { transform: rotate(var(--kt-rot, 0deg)); }
+
+/* the list dialog (Not booking) */
+.sb-listdlg .sb-listdlg-why, .sb-listdlg .kt-input { width: 100%; }
+.sb-listdlg .cb-row { display: flex; gap: calc(var(--p) * 12); flex-wrap: wrap; margin-top: calc(var(--p) * 10); }

@@ -134,6 +134,16 @@
   function C() { return SB.UI.C; }
   function D() { return SB.UI.cuDraw; }
   function K() { return SB.DeskKit; }
+  /* how finely a canvas or copier picture has to raster to stay sharp at this window's --p (px per --p times dpr) */
+  function res() { return Math.max(1, Math.min(3, SB.Finish && SB.Finish.res ? SB.Finish.res() : 1)); }
+  /* a drawn piece, shown w by ht in --p (the stage's unit) and photocopied fine enough for the screen: drawn k times larger,
+     scaled back down, so the copier's raster has the pixels --p needs */
+  function artP(inner, w, ht, cls) {
+    var dpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1, k = Math.max(1, Math.min(3, Math.ceil(res() / Math.max(1.5, Math.min(2, dpr))))), el;
+    el = D().art(k > 1 ? '<g transform="scale(' + k + ')">' + inner + '</g>' : inner, w * k, ht * k, cls);
+    el.style.width = 'calc(var(--p) * ' + w + ')'; el.style.height = 'auto'; el.style.aspectRatio = w + ' / ' + ht;
+    return el;
+  }
   function num(v) { return typeof v === 'number' && isFinite(v); }
   function game() { return SB.UI.game(); }
   function count(v) { return Array.isArray(v) ? v.length : (num(v) ? v : 0); }
@@ -142,13 +152,20 @@
   var TONER = '#141413';
 
   /* a flyer as a thumb (the generator's real flyer), or a blank sheet when none was kept */
-  function flyerEl(rec, width) {
-    var el = null;
+  function flyerEl(rec, width, flat) {
+    var el = null, cv;
     if (rec && rec.flyer && SB.UI.parts && typeof SB.UI.parts.flyerThumb === 'function') {
-      try { el = SB.UI.parts.flyerThumb(rec.flyer, width); } catch (e) { el = null; }
+      /* the thumb part draws in px: ask it for the pixels this window needs, then show it width wide in --p */
+      try { el = SB.UI.parts.flyerThumb(rec.flyer, Math.round(width * res() / Math.max(1, (typeof window !== 'undefined' && window.devicePixelRatio) || 1))); } catch (e) { el = null; }
     }
-    if (el) return el;
-    return h('div', { class: 'p2-blankflyer', style: { width: width + 'px', height: Math.round(width * 22 / 17) + 'px' } }, [
+    if (el) {
+      el.style.width = 'calc(var(--p) * ' + width + ')';
+      cv = el.querySelector ? el.querySelector('canvas') : null;
+      if (cv) { cv.style.width = '100%'; cv.style.height = 'auto'; }
+      if (flat) el.style.transform = 'none';
+      return el;
+    }
+    return h('div', { class: 'p2-blankflyer', style: { width: 'calc(var(--p) * ' + width + ')', aspectRatio: '17 / 22' } }, [
       h('span', { class: 'p2-blankflyer-room', text: rec && rec.roomName ? rec.roomName : '' }),
       h('span', { text: rec && num(rec.day) ? SB.time.fmt(rec.day, 'short') : L('noFlyer') })
     ]);
@@ -199,7 +216,7 @@
     ht = 18 + lines.length * s * 1.25;
     out = k.tape(w / 2, ht / 2 + 2, w - 4, ht, { seed: 'tp' + seed, rot: 0, op: 0.92 });
     lines.forEach(function (l, j) { out += k.letter(l, w / 2, 10 + (j + 1) * s * 1.2, s, { anchor: 'middle', seed: 'tl' + seed + j, weight: 1.4, maxWidth: w - 16 }); });
-    return D().art(out, w, ht + 6, 'p2-tapeline-art');
+    return artP(out, w, ht + 6, 'p2-tapeline-art');
   }
   /* a head and shoulders, for counts of people */
   function heads(n, per, size) {
@@ -217,12 +234,18 @@
   /* sharpie capitals as SVG markup */
   function mk(text, size, o) { var n = NS(); return n ? safe(function () { return n.marker(String(text), size, o || {}); }, esc(text)) : '<span class="bx-mkfb">' + esc(text) + '</span>'; }
   function mkEl(tag, cls, text, size, o, label) { return h(tag, { class: 'bx-mk ' + (cls || ''), role: label === false ? null : 'img', aria: label === false ? { hidden: 'true' } : { label: label || text }, html: mk(text, size, o) }); }
-  /* cut from a sheet of copy paper: the night screen's paper texture and torn edges */
+  /* cut from a sheet of copy paper: the stock's colour, and a cut or torn edge from the shared set (css/finish.css --edge-*);
+     .pz-paper gives it the toner edge and the shadow down and right */
+  var STOCK = { white: 'var(--pp-white)', bone: 'var(--pp-buff)', canary: 'var(--pp-buff)', goldenrod: 'var(--pp-kraft)', pink: 'var(--pp-salmon)', blue: 'var(--pp-blue)', green: 'var(--pp-green)',
+                salmon: 'var(--pp-salmon)', lilac: 'var(--pp-gray)', kraft: 'var(--pp-kraft)', index: 'var(--pp-white)', tape: 'var(--pp-buff)' };
   function paperOn(el, stock, seed, edges) {
-    var n = NS(), st;
-    if (!n || !el || !el.style || !el.style.setProperty) return el;
-    st = safe(function () { return n.paperStyle(stock, seed, edges); }, null);
-    if (st) Object.keys(st).forEach(function (k) { if (st[k] != null) safe(function () { el.style.setProperty(k, st[k]); }); });
+    var e = String(edges || ''), n = 0, i, edge;
+    if (!el || !el.style || !el.style.setProperty) return el;
+    for (i = 0; i < String(seed).length; i++) n += String(seed).charCodeAt(i);
+    edge = e.indexOf('r') >= 0 ? 'torn-r' : (e.indexOf('b') >= 0 ? 'torn-b' : (e.indexOf('t') >= 0 ? 'torn-t' : 'cut-' + (n % 3 + 1)));
+    el.classList.add('pz-paper');
+    el.style.setProperty('--paper', STOCK[stock] || 'var(--pp-white)');
+    el.style.setProperty('--edge', 'var(--edge-' + edge + ')');
     return el;
   }
   function tilt(el, deg) { if (el && el.style && el.style.setProperty) el.style.setProperty('--r', f(deg) + 'deg'); return el; }
@@ -233,7 +256,7 @@
   function newCanvas(w, ht, cls) {
     var d = typeof document !== 'undefined' ? document : null, cv;
     if (!d || !d.createElement) return null;
-    cv = d.createElement('canvas'); cv.width = Math.round(w); cv.height = Math.round(ht);
+    cv = d.createElement('canvas'); cv.width = Math.round(w * res()); cv.height = Math.round(ht * res());
     cv.className = 'bx-photo' + (cls ? ' ' + cls : ''); if (cv.setAttribute) cv.setAttribute('aria-hidden', 'true');
     return cv;
   }
@@ -247,11 +270,12 @@
       safe(function () {
         var c = cv.getContext('2d'), g;
         if (!c) return;
+        c.scale(res(), res());
         c.fillStyle = '#d8d8d8'; c.fillRect(0, 0, w, ht);
         list.forEach(function (p) { S.paste(c, p.id, p); });
         g = c.createRadialGradient(w * 0.5, ht * 0.4, ht * 0.15, w * 0.5, ht * 0.45, w * 0.75);
         g.addColorStop(0, 'rgba(255,255,255,.1)'); g.addColorStop(1, 'rgba(0,0,0,.3)'); c.fillStyle = g; c.fillRect(0, 0, w, ht);
-        S.copier(cv, { paper: paperName, cell: Math.max(2.4, w / 160), contrast: 1.35, bias: 0.05, seed: 'box:' + seed });
+        S.copier(cv, { paper: paperName, cell: Math.max(2.4, w / 160) * res(), contrast: 1.35, bias: 0.05, seed: 'box:' + seed });
       });
     });
     return cv;
@@ -301,21 +325,21 @@
     var r = recap || {}, s = game(), recs = (s && s.legacy && s.legacy.records) || {}, k = K(), kids = [], tally = r.callTally, nShows = count(r.shows),
         hd = num(r.heads) ? r.heads : 0, hh, unit = hd > 400 ? 20 : (hd > 120 ? 10 : 5), i, out;
     kids.push(h('h2', { class: 'p2-zine-h', role: 'img', aria: { label: L('yearH', { n: num(r.year) ? r.year : '' }) } },
-      D().art(k.ransom(L('yearH', { n: num(r.year) ? r.year : '' }), 6, 40, 34, { seed: 'yr' + r.year }), k.ransomWidth(L('yearH', { n: r.year || '' }), 34) + 16, 54)));
+      artP(k.ransom(L('yearH', { n: num(r.year) ? r.year : '' }), 6, 40, 34, { seed: 'yr' + r.year }), k.ransomWidth(L('yearH', { n: r.year || '' }), 34) + 16, 54)));
     if (r.front) kids.push(h('p', { class: 'cb-typed p2-zine-front', text: r.front }));
     hh = heads(Math.max(1, Math.round(hd / unit)), 14, 18);
     out = k.marker(String(nShows), 6, 46, 44, { seed: 'yn' + nShows }) + k.type(L('yearShowsN').toUpperCase(), 10 + k.markerWidth(String(nShows), 44), 44, 13, { bold: true }) +
           k.marker(String(hd), 6, 112, 44, { seed: 'yh' + hd }) + k.type(L('yearHeadsN').toUpperCase(), 10 + k.markerWidth(String(hd), 44), 110, 13, { bold: true }) +
           '<g transform="translate(8 124)">' + hh.svg + '</g>' + D().head(12, 124 + hh.h + 22, 12) + k.type('= ' + unit, 22, 124 + hh.h + 20, 10, { bold: true });
-    kids.push(h('div', { class: 'p2-zine-figs', role: 'img', aria: { label: L('yearShows', { shows: nShows, heads: hd }) } }, D().art(out, Math.max(300, hh.w + 20), 124 + hh.h + 30)));
+    kids.push(h('div', { class: 'p2-zine-figs', role: 'img', aria: { label: L('yearShows', { shows: nShows, heads: hd }) } }, artP(out, Math.max(300, hh.w + 20), 124 + hh.h + 30)));
     if (r.crowd) kids.push(h('p', { class: 'cb-typed cb-small', text: r.crowd }));
     if (r.firstShows && r.firstShows.length) {
       kids.push(h('h3', { class: 'p2-zine-k', text: L('yearFirst') }));
-      kids.push(h('ul', { class: 'p2-cutnames' }, r.firstShows.map(function (n, j) { return h('li', { class: 'p2-cutname', style: { '--r': ((j * 41) % 7 - 3) * 0.8 + 'deg' }, text: n }); })));
+      kids.push(h('ul', { class: 'p2-cutnames' }, r.firstShows.map(function (n, j) { return h('li', { class: 'p2-cutname pz-paper', style: { '--r': ((j * 41) % 7 - 3) * 0.8 + 'deg' }, text: n }); })));
     }
     if (r.toured && r.toured.length) {
       kids.push(h('h3', { class: 'p2-zine-k', text: L('yearToured') }));
-      kids.push(h('ul', { class: 'p2-cutnames' }, r.toured.map(function (n) { return h('li', { class: 'p2-cutname is-black', text: n }); })));
+      kids.push(h('ul', { class: 'p2-cutnames' }, r.toured.map(function (n) { return h('li', { class: 'p2-cutname pz-paper is-black', text: n }); })));
     }
     if (num(r.roomsOpen) || (r.roomsClosed && r.roomsClosed.length)) {
       kids.push(h('p', { class: 'cb-typed' }, [num(r.roomsOpen) ? h('strong', { text: L('yearRoomsOpen') + ': ' + r.roomsOpen + '. ' }) : null,
@@ -333,7 +357,7 @@
       for (i = 0; i < Math.min(40, tally.shows); i++) out += D().tick(i < tally.inside ? 'DONE' : 'MISSED', 18).replace(/<path/g, '<path transform="translate(' + (i % 20) * 20 + ' ' + Math.floor(i / 20) * 22 + ')"');
       kids.push(h('h3', { class: 'p2-zine-k', text: L('yearCalls') }));
       kids.push(h('div', { class: 'p2-zine-calls', role: 'img', aria: { label: L('yearCallsLine', { inside: tally.inside, shows: tally.shows }) } }, [
-        D().art(out, Math.min(20, tally.shows) * 20 + 4, Math.ceil(Math.min(40, tally.shows) / 20) * 22 + 2),
+        artP(out, Math.min(20, tally.shows) * 20 + 4, Math.ceil(Math.min(40, tally.shows) / 20) * 22 + 2),
         h('p', { class: 'cb-typed cb-small', text: L('yearCallsLine', { inside: tally.inside, shows: tally.shows }) })]));
     }
     if (r.flyers && r.flyers.length) {
@@ -345,7 +369,7 @@
       kids.push(h('ul', { class: 'p2-zine-seasons' }, r.seasons.map(function (t) { return h('li', { class: 'cb-typed cb-small', text: t }); })));
     }
     if (r.forward) kids.push(h('p', { class: 'p2-zine-forward' }, [h('strong', { text: L('yearForward') + ': ' }), r.forward]));
-    return h('section', { class: 'p2-zine sb-yearpage' }, kids);
+    return h('section', { class: 'p2-zine pz-paper sb-yearpage' }, kids);
   });
 
   /* ---------------------------------------------------------------- */
@@ -356,7 +380,7 @@
     rail: 'legacy', title: 'ui.legacy.title', full: false,
     mount: function (root, params) {
       var VIEWS = ['wall', 'bands', 'town', 'years', 'end'], view = params && params.tab === 'flyers' ? 'wall' : (params && VIEWS.indexOf(params.tab) >= 0 ? params.tab : 'wall'),
-          flipped = {}, held = null, fYear = '', fRoom = '', picks = {}, lines = ['', '', ''], confirming = null;
+          flipped = {}, held = null, fYear = '', fRoom = '', picks = {}, lines = ['', '', ''], confirming = null, lastView = null, lastHero = null;
 
       function keepFocus(fn) {
         var a = (typeof document !== 'undefined') ? document.activeElement : null, key = a && a.getAttribute ? a.getAttribute('data-fk') : null, el;
@@ -443,7 +467,7 @@
           if (wallN) lines.push(wallN === 1 ? L('frontWallOne') : L('frontWallN', { n: wallN }));
           lines.push(L('frontLast', { date: SB.time.fmt(last.day, 'short'), room: last.roomName }));
         }
-        el = h('article', { class: 'bx-front', aria: { label: L('frontLabel') } }, [
+        el = h('article', { class: 'bx-front pz-paper', aria: { label: L('frontLabel') } }, [
           h('header', { class: 'bx-front-mast' }, [
             mkEl('h2', 'bx-front-h', String(who).toUpperCase(), 30, { seed: 'fronth', maxWidth: 300 }, who),
             h('p', { class: 'cb-typed cb-small bx-front-issue', text: L('frontIssue', { n: (s.clock && num(s.clock.week) ? s.clock.week : 0) + 1 }) })]),
@@ -460,7 +484,7 @@
       /* firsts typed on an index card, earned patches loose beside it */
       function firstsCard(s) {
         var firsts = safe(function () { return SB.Legacy.firsts(s); }, []), el;
-        el = h('section', { class: 'bx-card bx-firsts', aria: { label: L('townFirsts') } }, [
+        el = h('section', { class: 'bx-card bx-firsts pz-paper', aria: { label: L('townFirsts') } }, [
           mkEl('h2', 'bx-card-h', L('townFirsts').toUpperCase(), 22, { seed: 'fst' }, L('townFirsts')),
           firsts.length ? h('ol', null, firsts.filter(function (x) { return x.text; }).slice(0, 12).map(function (fi) {
             return h('li', { class: 'cb-typed cb-small' }, [h('strong', { text: L('townWeek', { n: fi.week + 1 }) + ' ' }), fi.text]); }))
@@ -473,7 +497,7 @@
         return h('section', { class: 'bx-patches', aria: { label: L('patchesH') } }, [
           h('h2', { class: 'bx-k' }, D().stripArt(L('patchesH'), 11)),
           h('ul', null, got.map(function (p, i) {
-            var w = words[p.id] || {}, name = w.name || String(p.id).replace(/_/g, ' ').toLowerCase(), cv = safe(function () { return SB.Scenes.patch(p.id, { name: name, kind: p.kind, earned: true, size: 84 }); }, null);
+            var w = words[p.id] || {}, name = w.name || String(p.id).replace(/_/g, ' ').toLowerCase(), cv = safe(function () { return SB.Scenes.patch(p.id, { name: name, kind: p.kind, earned: true, size: Math.round(84 * res()) }); }, null);
             if (cv && cv.setAttribute) cv.setAttribute('aria-hidden', 'true');
             return h('li', { class: 'bx-patch', style: { '--r': ((i * 47) % 11 - 5) * 1.6 + 'deg' }, aria: { label: name + (w.card ? '. ' + w.card : '') } }, cv ? [cv] : [h('span', { class: 'cb-typed cb-small', text: name })]);
           }))]);
@@ -490,7 +514,7 @@
           h('h2', { class: 'bx-k' }, D().stripArt(L('roomsH'), 11)),
           h('ul', null, list.slice(0, 8).map(function (x, i) {
             var gone = x.room.open === false, nm = String(x.room.name || '').replace(/^the /i, ''), cnt = x.n === 1 ? L('roomShowsOne') : L('roomShowsN', { n: x.n });
-            return h('li', { class: 'bx-room' + (gone ? ' is-gone' : ''), style: { '--r': ((i * 29) % 7 - 3) * 0.9 + 'deg' }, aria: { label: x.room.name + ', ' + cnt + (gone ? ', ' + L('roomGone') : '') } }, [
+            return h('li', { class: 'bx-room pz-paper' + (gone ? ' is-gone' : ''), style: { '--r': ((i * 29) % 7 - 3) * 0.9 + 'deg' }, aria: { label: x.room.name + ', ' + cnt + (gone ? ', ' + L('roomGone') : '') } }, [
               h('div', { class: 'bx-room-photo' }, [roomPhoto(x.room, 196, 122), gone ? h('span', { class: 'bx-gone', aria: { hidden: 'true' }, html: mk(L('roomGone').toUpperCase(), 26, { seed: 'gone' + x.room.id }) }) : null]),
               h('p', { class: 'bx-room-name', aria: { hidden: 'true' }, html: mk(nm.toUpperCase(), 15, { seed: 'rn' + x.room.id, maxWidth: 190 }) }),
               h('p', { class: 'cb-typed cb-small', aria: { hidden: 'true' }, text: cnt + ' · ' + L('roomLast', { date: SB.time.fmt(x.last, 'md') }) })
@@ -510,7 +534,7 @@
           h('ul', null, cards.slice(0, 10).map(function (x, i) {
             var c = safe(function () { return SB.People.card(s, x.id); }, null), el;
             if (!c) return null;
-            el = h('li', { class: 'bx-pcard' + (x.state !== 'ACTIVE' ? ' is-gone' : ''), style: { '--r': ((i * 31) % 7 - 3) * 0.8 + 'deg' } }, [
+            el = h('li', { class: 'bx-pcard pz-paper' + (x.state !== 'ACTIVE' ? ' is-gone' : ''), style: { '--r': ((i * 31) % 7 - 3) * 0.8 + 'deg' } }, [
               h('p', { class: 'cb-typed bx-pcard-n', text: c.name }),
               h('p', { class: 'cb-typed cb-small', text: x.roles.map(function (q) { return String(q).toLowerCase().replace(/_/g, ' '); }).join(', ') + (c.where ? ' · ' + c.where : '') })]);
             return el;
@@ -520,12 +544,13 @@
       function tapesBit(s) {
         var el = SB.UI.story && SB.UI.story.chapters ? safe(function () { return SB.UI.story.chapters(s); }, null) : null;
         if (!el) return null;
-        return h('section', { class: 'bx-tapes', aria: { label: L('tapesH') } }, [mkEl('h2', 'bx-card-h', L('tapesH').toUpperCase(), 20, { seed: 'tps' }, L('tapesH')), el]);
+        return h('section', { class: 'bx-tapes pz-paper', aria: { label: L('tapesH') } }, [mkEl('h2', 'bx-card-h', L('tapesH').toUpperCase(), 20, { seed: 'tps' }, L('tapesH')), el]);
       }
 
       function boxView(s) {
-        var all = safe(function () { return SB.Legacy.binder(s, {}); }, []), recs, years = {}, rooms = {}, groups = [], byYear = {}, yTabs, rTabs, tray, thin = all.length > 0 && all.length < 4, clipsEl = clipsView(s);
+        var all = safe(function () { return SB.Legacy.binder(s, {}); }, []), recs, years = {}, rooms = {}, groups = [], byYear = {}, yTabs, rTabs, tray, thin = all.length > 0 && all.length < 4, clipsEl = clipsView(s), newest = null;
         all.forEach(function (r) { years[SB.time.year(r.day)] = 1; if (r.roomId) rooms[r.roomId] = r.roomName; });
+        all.forEach(function (r) { if (!newest || r.day > newest.day) newest = r; });
         recs = all.filter(function (r) { return (!fYear || String(SB.time.year(r.day)) === fYear) && (!fRoom || r.roomId === fRoom); });
         recs.forEach(function (r) {
           var y = SB.time.year(r.day);
@@ -538,18 +563,17 @@
         rTabs = Object.keys(rooms).length > 1 ? D().tabs({ label: L('room'), title: L('room'), size: 10, cls: 'p2-roomtabs', items: [{ text: L('allRooms'), on: !fRoom, fk: 'r-', onClick: function () { fRoom = ''; keepFocus(render); } }]
               .concat(Object.keys(rooms).map(function (id) { var t = String(rooms[id] || '').replace(/^the /i, ''); return { text: t.slice(0, 22), label: rooms[id], on: fRoom === id, fk: 'r-' + id, onClick: function () { fRoom = fRoom === id ? '' : id; keepFocus(render); } }; })) }) : null;
         tray = h('section', { class: 'bx-tray' + (thin ? ' is-thin' : ''), aria: { label: L('boxLabel') } }, [
-          h('div', { class: 'bx-lid', aria: { hidden: 'true' } }, [
-            h('span', { class: 'bx-lid-label' }, [h('span', { class: 'bx-lid-mk', html: mk(L('lid').toUpperCase() + (all.length ? ' ' + SB.time.year(all[0].day) + '–' : ''), 22, { seed: 'lid' }) }),
-              h('span', { class: 'cb-typed cb-small', text: L('lidKeep') })])]),
           h('div', { class: 'bx-filters' }, [yTabs, rTabs, all.length ? h('p', { class: 'cb-typed cb-small bx-hint', text: L('holdHint') }) : null]),
           all.length ? h('div', { class: 'bx-years' }, groups.map(function (g) {
             var stack = g.recs.slice().reverse();
             return h('section', { class: 'bx-year', aria: { label: String(g.year) } }, [
-              h('div', { class: 'bx-yeartab', aria: { hidden: 'true' } }, [h('span', { class: 'bx-yeartab-mk', html: mk(String(g.year), 22, { seed: 'yt' + g.year, maxWidth: 76 }) }),
+              h('div', { class: 'bx-yeartab pz-paper', aria: { hidden: 'true' } }, [h('span', { class: 'bx-yeartab-mk', html: mk(String(g.year), 22, { seed: 'yt' + g.year, maxWidth: 76 }) }),
                 h('span', { class: 'cb-typed cb-small', text: stack.length === 1 ? L('stackOne') : L('stackN', { n: stack.length }) })]),
               h('div', { class: 'bx-stack' + (stack.length === 1 ? ' is-one' : '') }, stack.map(function (r, i) {
-                var rot = ((i * 53 + r.day) % 11 - 5) * (thin ? 1.5 : 1.1), dy = ((i * 31 + r.day) % 7) * (thin ? 4 : 2);
-                return h('div', { class: 'bx-piled', style: { '--r': f(rot) + 'deg', '--dy': dy + 'px', 'z-index': String(stack.length - i) } }, pickable(r, thin ? 205 : (stack.length === 1 ? 190 : 128), 'bx-flyer'));
+                var hero = r === newest, rot = hero ? 6 : ((i * 53 + r.day) % 11 - 5) * (thin ? 1.5 : 1.1), dy = ((i * 31 + r.day) % 7) * (thin ? 4 : 2);
+                /* the newest flyer on the pile is the one loud thing: 2.3 times the others, turned 6 degrees, stamped on (dress) */
+                return h('div', { class: 'bx-piled' + (hero ? ' is-hero' : ''), data: hero ? { hero: r.showId } : null,
+                                  style: { '--r': f(rot) + 'deg', '--dy': 'calc(var(--p) * ' + dy + ')', '--z': String(stack.length - i) } }, pickable(r, hero ? 360 : (thin ? 150 : (stack.length === 1 ? 140 : 128)), 'bx-flyer'));
               })),
               thin ? paperOn(tilt(h('div', { class: 'bx-thinnote' }, [h('p', { class: 'cb-typed', text: stack.length === 1 ? L('thinOne') : L('thinN', { n: ['', '', 'two', 'three'][stack.length] || stack.length }) })]), 1.6), 'canary', 'thin' + g.year, 'rb') : null
             ]);
@@ -572,11 +596,10 @@
         show = s.shows && s.shows[r.showId];
         back = !!flipped[r.showId];
         return h('div', { class: 'bx-held p2-held', aria: { label: L('holding') } }, [
-          h('p', { class: 'bx-k bx-held-k', aria: { hidden: 'true' } }, D().stripArt(L('holding'), 11)),
           back
             ? h('div', { class: 'cb-piece cb-stock-white p2-flyerback' }, [
                 show && show.result && C().ShowResult ? C().ShowResult({ show: show, onNote: function (key) { SB.UI.go('notebook', { key: key }); } }) : h('p', { class: 'cb-typed', text: billText(r) })])
-            : h('div', { class: 'bx-heldflyer p2-heldflyer' }, [flyerEl(r, 300), bxTape('bx-tape--tl'), bxTape('bx-tape--br')]),
+            : h('div', { class: 'bx-heldflyer p2-heldflyer' }, [flyerEl(r, 300, true), bxTape('bx-tape--tl')]),
           paperOn(h('div', { class: 'bx-heldcard p2-heldcard' }, [
             h('p', { class: 'cb-typed', text: showName(r) }),
             h('p', { class: 'cb-typed cb-small', text: billText(r) }),
@@ -601,7 +624,7 @@
           return h('li', { class: 'p2-bandstrip', style: { '--r': (i % 2 ? 0.6 : -0.5) + 'deg' } }, [
             D().thing({ cls: 'p2-bandsticker', label: L('openBand', { band: c.name }), fk: 'band-' + c.id, svg: D().bandSticker(c, 190), w: 190, h: 80, strip: c.name.slice(0, 18), stripSize: 9,
                         onClick: function () { SB.UI.go('band', { bandId: c.id }); } }),
-            h('div', { class: 'p2-filmstrip', role: 'list', aria: { label: c.name } }, recs.map(function (r) {
+            h('div', { class: 'p2-filmstrip pz-paper', role: 'list', aria: { label: c.name } }, recs.map(function (r) {
               return h('div', { class: 'p2-filmcell', role: 'listitem', aria: { label: showName(r) } }, [flyerEl(r, 62), h('span', { class: 'p2-filmdate', text: SB.time.fmt(r.day, 'md') })]);
             })),
             h('div', { class: 'cb-piece cb-stock-white p2-bandhist' }, [
@@ -645,7 +668,7 @@
         safe(function () { SB.Rooms.list(s, {}).forEach(function (id) { var r = s.rooms[id]; (r.open === false ? rooms.gone : rooms.open).push(r.name); }); }, null);
         return h('div', { class: 'p2-towncols' }, [
           h('div', { class: 'p2-col' }, [
-            h('div', { class: 'p2-linepage', role: 'img', aria: { label: L('townRungs') + (w ? '. ' + L('townNow') + ': ' + SB.text.label('wordTier.' + w.tier + '.name') : '') } }, [D().art(out, W, H), D().stripArt(L('townRungs'), 11)]),
+            h('div', { class: 'p2-linepage', role: 'img', aria: { label: L('townRungs') + (w ? '. ' + L('townNow') + ': ' + SB.text.label('wordTier.' + w.tier + '.name') : '') } }, [artP(out, W, H), D().stripArt(L('townRungs'), 11)]),
             w && w.text ? scrap(w.text, 'bone', 'p2-wordtext') : null
           ]),
           h('div', { class: 'p2-col' }, [
@@ -675,7 +698,7 @@
         last = pts[pts.length - 1];
         out += k.marker(String(Math.round(last)), W - 18, 70, 22, { anchor: 'end', seed: 'lsm' + seed + last });
         i = k.paper(4, 4, W - 12, Hh - 10, { seed: 'lsp' + seed, stock: 'white', torn: 'r', sx: 3, sy: 4, burn: 0.3, inner: out });
-        return h('div', { class: 'p2-linescrap', role: 'img', aria: { label: label + ': ' + Math.round(last) } }, D().art(i, W, Hh));
+        return h('div', { class: 'p2-linescrap', role: 'img', aria: { label: label + ': ' + Math.round(last) } }, artP(i, W, Hh));
       }
 
       /* ---------- years: zine pages ---------- */
@@ -690,7 +713,7 @@
         var ended = s.legacy && s.legacy.ended, people = [], ids = [], chosen;
         if (ended) {
           return h('div', { class: 'cb-piece cb-stock-white p2-endpage' }, [
-            h('h2', { role: 'img', aria: { label: L('ended') } }, D().art(K().ransom(L('ended'), 6, 40, 30, { seed: 'end' }), K().ransomWidth(L('ended'), 30) + 16, 54)),
+            h('h2', { role: 'img', aria: { label: L('ended') } }, artP(K().ransom(L('ended'), 6, 40, 30, { seed: 'end' }), K().ransomWidth(L('ended'), 30) + 16, 54)),
             h('p', { class: 'cb-typed p2-epilogue', text: ended.epilogue || '' })]);
         }
         safe(function () {
@@ -700,7 +723,7 @@
         chosen = Object.keys(picks).filter(function (q) { return picks[q]; }).length;
         return h('div', { class: 'p2-endcols' }, [
           h('section', { class: 'cb-piece cb-stock-white p2-endhand', aria: { label: L('endHand') } }, [
-            h('h2', { role: 'img', aria: { label: L('endHand') } }, D().art(K().marker(L('endHand'), 4, 34, 32, { seed: 'eh' }), K().markerWidth(L('endHand'), 32) + 12, 44)),
+            h('h2', { role: 'img', aria: { label: L('endHand') } }, artP(K().marker(L('endHand'), 4, 34, 32, { seed: 'eh' }), K().markerWidth(L('endHand'), 32) + 12, 44)),
             h('p', { class: 'cb-typed cb-small', text: L('endIntro') + ' ' + L('endHandHelp') }),
             h('h3', { class: 'cb-typed', text: L('endHandPick').toUpperCase() + ' (' + chosen + '/3)' }),
             people.length ? h('ul', { class: 'p2-endpeople' }, people.map(function (p) {
@@ -719,7 +742,7 @@
           ]),
           h('section', { class: 'p2-col' }, [
             h('div', { class: 'cb-piece cb-stock-bone p2-endlast', aria: { label: L('endLast') } }, [
-              h('h2', { role: 'img', aria: { label: L('endLast') } }, D().art(K().marker(L('endLast'), 4, 30, 28, { seed: 'el' }), K().markerWidth(L('endLast'), 28) + 12, 40)),
+              h('h2', { role: 'img', aria: { label: L('endLast') } }, artP(K().marker(L('endLast'), 4, 30, 28, { seed: 'el' }), K().markerWidth(L('endLast'), 28) + 12, 40)),
               h('p', { class: 'cb-typed cb-small', text: L('endLastHelp') }),
               D().tabs({ label: L('endLast'), size: 11, items: [{ text: L('endLastGo'), fk: 'end-last', onClick: function () { confirming = { how: 'LAST_SHOW' }; render(); } }] })
             ]),
@@ -738,6 +761,27 @@
         ]);
       }
 
+      /* the moves (js/ui/finish.js): a part of the box shows for the first time and its papers slap down one after another;
+         moving to another part tears the page across; the newest flyer is stamped on when it is a new one; every button gets
+         the highlighter, and what scrolls inside gets the drawn scrollbar */
+      function dress() {
+        var F = SB.Finish, body, list, hero, key;
+        Array.prototype.forEach.call(root.querySelectorAll('button, a[href], [role="button"]'), function (b) { b.classList.add('pz-hl'); });
+        if (!F) return;
+        Array.prototype.forEach.call(root.querySelectorAll('.p2-flyerback, .p2-endpeople'), function (el) { F.scrollbar(el); });
+        body = root.querySelector('.p2-pilebody');
+        if (view !== lastView) {
+          if (lastView !== null && body) F.move(body, 'wipe');
+          list = Array.prototype.slice.call(root.querySelectorAll('.bx-piled:not(.is-hero), .bx-clipwrap, .bx-card, .bx-room, .bx-pcard, .bx-tapes, .p2-bandstrip, .p2-zine, .bx-yeartab'));
+          F.stagger(list, lastView === null ? 3 : 0);
+          list.forEach(function (el) { el.classList.add('mv-slap'); });
+        }
+        hero = root.querySelector('.bx-piled.is-hero');
+        key = hero ? hero.getAttribute('data-hero') : null;
+        if (hero && key !== lastHero) F.move(hero, 'stamp', { delay: lastView === null ? 300 : 0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: hero } });
+        lastHero = key; lastView = view;
+      }
+
       function render() {
         var s = game(), body;
         SB.UI.clear(root);
@@ -750,6 +794,7 @@
           h('div', { class: 'p2-pilebody bx-body' }, view === 'wall' ? body : h('div', { class: 'bx-tray bx-tray--open' }, body)),
           SB.UI.calKit && SB.UI.calKit.grainEl ? SB.UI.calKit.grainEl() : null
         ]));
+        safe(dress);
       }
 
       render();

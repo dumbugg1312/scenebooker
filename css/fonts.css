@@ -1,0 +1,15 @@
+/* Scene Booker — css/fonts.css: the three typefaces the game ships, so it reads the same on every machine.
+ * The same three diypensacola.com uses for its own type (its DESIGN.md): a distressed typewriter for words, a heavy
+ * condensed gothic for headlines and label tape, and a clean mono for numbers (money, counts, dates).
+ * Hand lettering is not a font: it is drawn by js/art/skeleton.js and js/desk/kit.js (marker, ransom).
+ * Licences: assets/fonts/LICENSES.md. Each face is registered across every weight so the browser never fakes a bold:
+ * hierarchy comes from size, case, ink and paper, as on the flyers. */
+@font-face { font-family: 'SB Type'; src: url('../assets/fonts/special-elite.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: block; }
+@font-face { font-family: 'SB Gothic'; src: url('../assets/fonts/anton.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: block; }
+@font-face { font-family: 'SB Mono'; src: url('../assets/fonts/plex-mono-bold.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: block; }
+
+:root {
+  --f-type: 'SB Type', 'Courier New', monospace;
+  --f-gothic: 'SB Gothic', Impact, sans-serif;
+  --f-mono: 'SB Mono', ui-monospace, monospace;
+}

@@ -142,7 +142,7 @@
   /** Button({ label, onClick, kind: 'primary' | 'quiet' | 'danger' | 'hl', disabled, title, small, aria }) */
   C.Button = function (p) {
     p = p || {};
-    return h('button', { type: 'button', class: ['sb-btn', p.kind ? 'sb-btn--' + p.kind : '', p.small ? 'sb-btn--small' : '', p.cls || ''],
+    return h('button', { type: 'button', class: ['sb-btn', 'pz-paper', 'pz-hl', p.kind ? 'sb-btn--' + p.kind : '', p.small ? 'sb-btn--small' : '', p.cls || ''],
                          disabled: !!p.disabled, title: p.title || null, aria: p.aria || null,
                          on: { click: function (e) { if (!p.disabled && fn(p.onClick)) p.onClick(e); } } },
              p.children || p.label || '');
@@ -199,7 +199,7 @@
       } } },
       tabs.map(function (t) {
         var on = t.key === p.active;
-        return h('button', { type: 'button', role: 'tab', class: 'sb-tab' + (on ? ' is-active' : ''), tabindex: on ? '0' : '-1',
+        return h('button', { type: 'button', role: 'tab', class: 'sb-tab pz-hl' + (on ? ' is-active' : ''), tabindex: on ? '0' : '-1',
                              aria: { selected: on ? 'true' : 'false' }, on: { click: function () { pick(t.key); } } }, [
           t.label, (t.badge ? h('span', { class: 'sb-badge', text: String(t.badge) }) : null)
         ]);
@@ -569,7 +569,7 @@
         ticked = riders.filter(function (r) { return r.status === 'PROMISED' || !!r.planned; }), st = (j.window && j.window.state) || 'NONE',
         lateish = st === 'LATE' || st === 'MISSED';
     ticked.forEach(function (r) { if (num(r.hours)) hours += r.hours; });
-    return h('button', { type: 'button', class: ['sb-token', 'is-' + lower(st), j.helper || (j.by && j.by !== 'player') ? 'has-helper' : ''],
+    return h('button', { type: 'button', class: ['sb-token', 'pz-hl', 'is-' + lower(st), j.helper || (j.by && j.by !== 'player') ? 'has-helper' : ''],
                          style: { '--h': String(Math.max(0.5, hours)) }, data: { job: j.id },
                          aria: { label: [j.label, U('hours', { n: hours }), j.window && j.window.label, lateish ? U('late') : null].filter(Boolean).join(', ') },
                          on: { click: function () { if (fn(p.onPick)) p.onPick(j); } } }, [
@@ -612,7 +612,7 @@
     function choose(o) { if (o && o.enabled !== false && fn(p.onChoose)) p.onChoose(o.id); }
     buttons = opts.map(function (o, i) {
       return h('li', { class: 'sb-decision-opt' + (o.enabled === false ? ' is-disabled' : '') }, [
-        h('button', { type: 'button', class: 'sb-btn sb-decision-btn', disabled: o.enabled === false, data: { option: o.id },
+        h('button', { type: 'button', class: 'sb-btn pz-paper pz-hl sb-decision-btn', disabled: o.enabled === false, data: { option: o.id },
                       on: { click: function () { choose(o); } } }, [
           h('span', { class: 'sb-key', text: String(i + 1) }), h('span', { class: 'sb-decision-label', text: o.label || '' })
         ]),
@@ -640,7 +640,7 @@
       h('footer', { class: 'sb-comment-by' }, [
         h('span', { class: 'sb-comment-who', text: c.byName || '' }),
         cause ? (fn(p.onNote) && c.noteKey
-          ? h('button', { type: 'button', class: 'sb-chip sb-chip--cause sb-link', on: { click: function () { p.onNote(c.noteKey, c); } } }, cause)
+          ? h('button', { type: 'button', class: 'sb-chip sb-chip--cause sb-link pz-hl', on: { click: function () { p.onNote(c.noteKey, c); } } }, cause)
           : h('span', { class: 'sb-chip sb-chip--cause', text: cause })) : null
       ])
     ]);
@@ -787,7 +787,7 @@
             dt = SB.time.date(day), monthTag = day === start || dt.d === 1;
         cells.push(h(inRange && fn(p.onPick) ? 'button' : 'span', {
           type: inRange && fn(p.onPick) ? 'button' : null,
-          class: ['sb-mm-day', inRange ? '' : 'is-out', p.selected === day ? 'is-selected' : '', monthTag ? 'is-month-start' : ''].concat(marks.map(function (m) { return 'is-' + lower(typeof m === 'string' ? m : m.k); })),
+          class: ['sb-mm-day', inRange && fn(p.onPick) ? 'pz-hl' : '', inRange ? '' : 'is-out', p.selected === day ? 'is-selected' : '', monthTag ? 'is-month-start' : ''].concat(marks.map(function (m) { return 'is-' + lower(typeof m === 'string' ? m : m.k); })),
           aria: { label: SB.time.fmt(day, 'long') + ', ' + dt.y + (words.length ? ': ' + words.join(', ') : ''), pressed: inRange && fn(p.onPick) ? (p.selected === day ? 'true' : 'false') : null },
           on: inRange && fn(p.onPick) ? { click: function () { p.onPick(day); } } : null
         }, [monthTag ? h('span', { class: 'sb-mm-mon', aria: { hidden: 'true' }, text: SB.time.fmt(day, 'md').split(' ')[0] }) : null,
@@ -847,7 +847,7 @@
     return SB.time.fmt(r.day, 'dow3') + (r.half ? ' ' + word('half.' + r.half, lower(r.half)) : '');
   }
   function go(name, params) { return function () { if (SB.UI.go) SB.UI.go(name, params); }; }
-  function link(label, name, params) { return h('button', { type: 'button', class: 'sb-link', on: { click: go(name, params) } }, label); }
+  function link(label, name, params) { return h('button', { type: 'button', class: 'sb-link pz-hl', on: { click: go(name, params) } }, label); }
   function thumbFor(t) {
     var x, s;
     if (!t || !t.id) return null;

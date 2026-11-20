@@ -80,6 +80,8 @@
   function money(a, signed) { return num(a) ? (signed && a > 0 ? '+' : (a < 0 ? '-' : '')) + SB.text.money(Math.abs(a)) : '?'; }
   function signed(d) { return num(d) ? (d > 0 ? '+' : (d < 0 ? '-' : '')) + Math.abs(Math.round(d)) : '?'; }
   var GENS = ['KIDS', 'MIDDLE', 'OLD'], TONER = '#141413';
+  /* how fine the copier rasters have to be to stay sharp: px per --p times the device's (js/ui/finish.js), kept off the memory cliff */
+  function res() { return Math.max(1, Math.min(3, SB.Finish && SB.Finish.res ? SB.Finish.res() : 1)); }
 
   /* ---------------- the paste-up: real cut-out photos and things run through the cutscenes' copier ---------------- */
   function cnv(w, ht, cls) { var c = document.createElement('canvas'); c.width = w; c.height = ht; if (cls) c.className = cls; c.setAttribute('aria-hidden', 'true'); return c; }
@@ -91,12 +93,13 @@
   }
 
   /** The cork board the week is pinned to: dark cork in toner, pin holes, corners of old flyers torn down under their staples. */
-  var BOARD = null;
+  var BOARD = null, BOARDRES = 0;
   function boardTex() {
-    if (BOARD !== null) return BOARD;
-    BOARD = '';
+    if (BOARD !== null && BOARDRES === Math.min(2, res())) return BOARD;
+    BOARD = ''; BOARDRES = Math.min(2, res());
     try {
-      var S = 600, c = cnv(S, S), x = c.getContext('2d'), r = SB.rng.make('close:board'), i, k, px, py;
+      var S = 600, f = Math.min(2, res()), c = cnv(Math.round(S * f), Math.round(S * f)), x = c.getContext('2d'), r = SB.rng.make('close:board'), i, k, px, py;
+      x.scale(f, f);
       x.fillStyle = '#1e1b17'; x.fillRect(0, 0, S, S);
       for (i = 0; i < 11000; i++) { x.globalAlpha = r.range(0.2, 0.7); x.fillStyle = r.next() < 0.55 ? '#3a3229' : '#0b0a09'; k = r.range(0.6, 2.3); x.fillRect(r.range(0, S), r.range(0, S), k, k); }
       for (i = 0; i < 7; i++) {           /* a staple left behind, a crumb of the flyer still under it */
@@ -175,9 +178,10 @@
       root.appendChild(h('div', { class: 'cc-close', style: { '--hot': HOT, '--board': tex ? 'url(' + tex + ')' : null } }, [
         kt.defsEl(),
         head(s, rep),
+        /* the week's show: its photo is the one loud thing, so it has the room and no label (the page already says it is the shows) */
+        (rep.shows || []).length ? h('section', { class: 'cc-hero-row', id: 'sb-close-shows', tabindex: '-1', aria: { label: L('idx.shows') } }, [h('h2', { class: 'sb-vh', text: L('idx.shows') }), shows(s, rep)]) : null,
         h('div', { class: 'cc-board' }, [
           h('div', { class: 'cc-col cc-col--main' }, [
-            (rep.shows || []).length ? sec('shows', L('idx.shows'), shows(s, rep)) : null,
             /* month's end: the bills go up where they can't be missed, right under the week's show */
             rep.bills ? sec('bills', L('idx.bills'), bills(s, rep), !billRecords(s).length) : null,
             sec('coming', L('coming'), coming(s, rep)),
@@ -195,8 +199,38 @@
         kt.grainEl()
       ]));
       if (sc) sc.scrollTop = top;
+      safe(function () { moves(); }, null);
       /* the money, the cup and the next week stay in view while the shows scroll, when they fit */
       safe(function () { if (sc && side.offsetHeight && side.offsetHeight + 40 < sc.clientHeight) side.classList.add('is-pinned'); }, null);
+    }
+
+    /* the moves (js/ui/finish.js): the photo is stamped on, the piles slap down one after another, and money and heads count up
+       (each number is lettering drawn by the kit, so each frame of the count swaps in the drawing of that number) */
+    var counts = {}, firstShow = true, shown = null;
+    function moves() {
+      var F = SB.Finish, kt = k(), ph, list, key, d0 = firstShow ? 220 : 0;
+      if (!F || !kt || !root) return;
+      ph = root.querySelector('.cc-photo');
+      key = ph ? ph.getAttribute('data-sid') : null;
+      if (ph && key !== shown) F.move(ph, 'stamp', { delay: d0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: ph } });
+      shown = key;
+      list = Array.prototype.slice.call(root.querySelectorAll('.cc-close-head, .cc-sec, .cc-hero-row .cc-show-side > *, .cc-hero-row .cc-verdict-line, .cc-hero-row .cc-crowdcard, .cc-hero-row .cc-ledger > *'));
+      if (firstShow) { F.stagger(list, 3); list.forEach(function (el) { el.classList.add('mv-slap'); }); }
+      Array.prototype.forEach.call(root.querySelectorAll('[data-ct]'), function (el) {
+        var id = el.getAttribute('data-ct'), to = parseFloat(el.getAttribute('data-to')), size = parseFloat(el.getAttribute('data-size')), fmt = el.getAttribute('data-fmt'),
+            prev = counts[id], fake;
+        if (!isFinite(to) || prev === to) return;
+        counts[id] = to;
+        fake = { set textContent(v) { v = parseFloat(v); var m = kt.mk(fmt === 'money' ? money(v) : (fmt === 'moneys' ? money(v, true) : String(v)), size, { say: false }); if (m) el.innerHTML = m.innerHTML; } };
+        F.countUp(fake, to, { from: prev === undefined ? 0 : prev, delay: d0 + 83, cue: 'tick', cueOpts: { gain: -14 } });
+      });
+      firstShow = false;
+    }
+    /** A drawn number that counts up when it first shows or changes: kt.mk plus what moves() needs to redraw it. */
+    function counted(id, v, size, fmt) {
+      var m = k().mk(fmt === 'money' ? money(v) : (fmt === 'moneys' ? money(v, true) : String(v)), size, { say: false });
+      if (m && num(v)) { m.setAttribute('data-ct', id); m.setAttribute('data-to', String(v)); m.setAttribute('data-size', String(size)); m.setAttribute('data-fmt', fmt); }
+      return m;
     }
 
     /* the page itself, torn off: the week in marker capitals */
@@ -245,32 +279,32 @@
       if (!sh || !sh.result) return null;
       r = sh.result;
       room = sh.roomId && s.rooms ? s.rooms[sh.roomId] : null;
-      if (SB.UI.parts && SB.UI.parts.flyerThumb) thumb = safe(function () { return SB.UI.parts.flyerThumb({ recipe: (sh.flyer && sh.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, id) }, 110); }, null);
+      if (SB.UI.parts && SB.UI.parts.flyerThumb) thumb = safe(function () { return SB.UI.parts.flyerThumb({ recipe: (sh.flyer && sh.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, id) }, 150); }, null);
       vword = r.verdict ? word('verdict.word.' + r.verdict, String(r.verdict).toLowerCase()) : (r.vsPar ? word('vsPar.' + r.vsPar, '') : '');
       stamps = (r.memory && r.memory.stamps) || [];
       return h('div', { class: 'cc-show' }, [
-        h('figure', { class: 'cc-photo', role: 'img', aria: { label: L('photo', { band: bandNames(s, sh).join(', ') }) }, style: { margin: 0 } }, [
+        h('figure', { class: 'cc-photo pz-paper', data: { sid: String(id) }, role: 'img', aria: { label: L('photo', { band: bandNames(s, sh).join(', ') }) }, style: { margin: 0 } }, [
           photo(s, sh, id),
           h('span', { class: 'cc-tape cc-tape--a', aria: { hidden: 'true' } }), h('span', { class: 'cc-tape cc-tape--b', aria: { hidden: 'true' } }),
           h('span', { class: 'cc-photo-lbl', aria: { hidden: 'true' }, text: (SB.time.fmt(sh.day, 'short') + (room ? ' · ' + room.name : '')).toUpperCase() })
         ]),
         h('div', { class: 'cc-show-side' }, [
-          h('button', { type: 'button', class: 'cc-flyer fx', aria: { label: SB.text.label('ui.week.openShow') + ', ' + SB.time.fmt(sh.day, 'short') },
+          h('button', { type: 'button', class: 'cc-flyer pz-hl', aria: { label: SB.text.label('ui.week.openShow') + ', ' + SB.time.fmt(sh.day, 'short') },
                         on: { click: function () { SB.UI.go('show', { showId: id }); } } }, [
-            h('span', { class: 'cc-flyer-img' }, thumb || C().ShowBadge({ show: sh, size: 32 })), kt.strip(SB.text.label('ui.week.showStrip'))
+            h('span', { class: 'cc-flyer-img' }, thumb || C().ShowBadge({ show: sh, size: 32 }))
           ]),
           h('span', { class: 'cc-show-room', text: SB.time.fmt(sh.day, 'short') + (room ? ' · ' + room.name : '') }),
-          vword ? h('span', { class: 'cc-verdict', role: 'img', aria: { label: vword } }, kt.pic(150, 56, kt.stampArt(vword.toUpperCase(), 150, 56, 'v' + id, TONER))) : null,
+          vword ? h('span', { class: 'cc-verdict', role: 'img', aria: { label: vword } }, kt.pic(210, 78, kt.stampArt(vword.toUpperCase(), 210, 78, 'v' + id, TONER))) : null,
           stamps.map(function (x) { var t = word('stamp.' + x, String(x)); return h('span', { class: 'cc-verdict', role: 'img', aria: { label: t } }, kt.pic(120, 40, kt.stampArt(t, 120, 40, 'ms' + id + x, TONER))); })
         ]),
         h('div', { class: 'cc-show-main', data: { tut: 'closeout-read', 'tut-ref': id } }, [
-          r.verdictLine ? h('p', { class: 'cc-verdict-line', text: r.verdictLine }) : null,
+          r.verdictLine ? h('p', { class: 'cc-verdict-line pz-paper', text: r.verdictLine }) : null,
           h('div', { class: 'cc-crowdcard' }, [kt.sheet('white', 'crowd' + id), crowd(r)]),
           ledger(r),
           r.comments && r.comments.length ? h('div', { class: 'cc-quotes', role: 'group', aria: { label: L('idx.said') } }, r.comments.map(function (c) { return quote(s, c); })) : null,
           h('div', { class: 'cc-crowd-legend' }, [
             r.door && num(r.door.gross) ? h('span', { text: L('door', { paid: r.paid, price: SB.text.money(r.door.price || 0), gross: SB.text.money(r.door.gross) }) }) : null,
-            h('span', null, [L('yourCut') + ' ', kt.mk(money(r.playerNet, true), 18, { say: true })])
+            h('span', null, [L('yourCut') + ' ', kt.mk(money(r.playerNet, true), 18, { say: true, fill: '#f4f2ea' })])
           ])
         ])
       ]);
@@ -290,7 +324,7 @@
         return h('div', { class: 'cc-crowd-row', role: 'img', aria: { label: say } }, [
           h('span', { class: 'cc-crowd-k', text: label }),
           h('span', { class: 'cc-crowd-heads' }, kt.pic(Math.max(10, x), 32, out)),
-          h('span', { class: 'cc-crowd-n' }, kt.mk(num(total) ? String(Math.round(total)) : '?', 26, { say: false }))
+          h('span', { class: 'cc-crowd-n' }, num(total) ? counted('heads:' + label, Math.round(total), 26, 'n') : kt.mk('?', 26, { say: false }))
         ]);
       }
       function sayGens(gens, total) {
@@ -342,7 +376,7 @@
         h('figcaption', { class: 'cc-quote-by' }, [
           p ? C().PersonStamp({ person: p, size: 28 }) : (b ? C().BandMark({ band: b, size: 28 }) : null),
           h('span', { class: 'cc-quote-who', text: c.byName || '' }),
-          cause ? (c.noteKey ? h('button', { type: 'button', class: 'cc-cause fx', aria: { label: L('openNote', { cause: cause }) },
+          cause ? (c.noteKey ? h('button', { type: 'button', class: 'cc-cause pz-hl', aria: { label: L('openNote', { cause: cause }) },
                                              on: { click: function () { SB.UI.go('notebook', { key: c.noteKey }); } } }, kt.strip(cause))
                              : h('span', { class: 'cc-cause' }, kt.strip(cause))) : null
         ])
@@ -352,9 +386,9 @@
     /** The photo of the night: the cutscenes' stage picture (real cut-outs, the band's name on the kick), on the paper
      *  the night was printed on. Painted once a show; the same canvas goes back up on every redraw. */
     function photo(s, sh, id) {
-      var c = photos[id], names, ctx;
+      var w = Math.min(2000, Math.round(720 * res())), key = id + '@' + w, c = photos[key], names, ctx;
       if (c) return c;
-      c = photos[id] = cnv(960, 600, 'cc-photo-cv');
+      c = photos[key] = cnv(w, Math.round(w * 0.625), 'cc-photo-cv');
       names = bandNames(s, sh);
       ctx = { seed: String(s.seed || '') + ':close:' + id, band: names[names.length - 1] || '', bands: names, paper: paperOf(sh.roomId || id) };
       function paint() { try { SB.Scenes.draw(c, 'STAGE_BAND', ctx); } catch (e) { SB.log('warn', 'close', 'photo: ' + String(e && e.message)); } }
@@ -370,7 +404,7 @@
       if (!list.length) return thing('white', 'nocoming', 'cc-nocoming', h('span', { text: L('nothingComing') }), { torn: true });
       return h('div', { class: 'cc-coming' }, list.map(function (sh, i) {
         var thumb = SB.UI.parts && SB.UI.parts.flyerThumb ? safe(function () { return SB.UI.parts.flyerThumb({ recipe: (sh.flyer && sh.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, sh.id) }, 112); }, null) : null;
-        return h('button', { type: 'button', class: 'cc-flyer cc-coming-f fx', aria: { label: SB.text.label('ui.week.openShow') + ', ' + SB.time.fmt(sh.day, 'short') },
+        return h('button', { type: 'button', class: 'cc-flyer cc-coming-f pz-hl', aria: { label: SB.text.label('ui.week.openShow') + ', ' + SB.time.fmt(sh.day, 'short') },
                              on: { click: function () { SB.UI.go('show', { showId: sh.id }); } } }, [
           h('span', { class: 'cc-pin', aria: { hidden: 'true' } }, kt.pic(30, 32, pinArt(i % 2 ? '#ECD668' : '#e7ddc4'))),
           h('span', { class: 'cc-flyer-img' }, thumb || C().ShowBadge({ show: sh, size: 40 })),
@@ -394,7 +428,7 @@
       return h('div', { class: 'cc-learned' }, list.map(function (l, i) {
         return thing('white', 'learn' + i, '', [
           h('p', { class: 'cc-learned-l', text: l.text || l.label || '' }),
-          l.key ? h('button', { type: 'button', class: 'fx', aria: { label: L('openNote', { cause: l.text || l.label || '' }) },
+          l.key ? h('button', { type: 'button', class: 'pz-hl', aria: { label: L('openNote', { cause: l.text || l.label || '' }) },
                                 on: { click: function () { SB.UI.go('notebook', { key: l.key }); } } }, kt.strip(L('notebook'))) : null
         ], { torn: true });
       }));
@@ -412,10 +446,12 @@
     }
     /** The cash box: a pay envelope on kraft, the bills sticking out of the top, through the copier. */
     function envelope() {
-      if (art.env) return art.env;
-      var c = cnv(260, 176, 'cc-env-cv'), x;
+      var f = Math.max(1, res() * 0.85), key = 'env@' + f, c, x;
+      if (art[key]) return art[key];
+      c = cnv(Math.round(260 * f), Math.round(176 * f), 'cc-env-cv');
       try {
         x = c.getContext('2d');
+        x.scale(f, f);
         x.save(); x.translate(130, 44); x.rotate(-0.07); x.fillStyle = gv(0.9); x.fillRect(-92, -34, 184, 66);
         x.strokeStyle = gv(0.35); x.lineWidth = 2; x.strokeRect(-85, -28, 170, 54); x.beginPath(); x.ellipse(0, -8, 15, 18, 0, 0, 6.3); x.fillStyle = gv(0.55); x.fill(); x.restore();
         x.fillStyle = gv(0.74); x.fillRect(8, 46, 244, 124);
@@ -423,15 +459,15 @@
         x.strokeStyle = gv(0.18); x.lineWidth = 3; x.strokeRect(8, 46, 244, 124);
         x.lineWidth = 2; x.beginPath(); x.moveTo(8, 170); x.lineTo(116, 100); x.moveTo(252, 170); x.lineTo(144, 100); x.stroke();
       } catch (e) { /* a plain canvas is fine */ }
-      art.env = xerox(c, { paper: '#B8925C', cell: 3.2, contrast: 1.3, alpha: true, seed: 'close-env' });
-      return art.env;
+      art[key] = xerox(c, { paper: '#B8925C', cell: 3.2 * f, contrast: 1.3, alpha: true, seed: 'close-env' });
+      return art[key];
     }
     function moneyPart(s, rep) {
       var kt = k(), m = rep.money || {}, owed = m.owedAhead || { total: null, lines: [] };
       function rline(a, b, cls) { return h('span', { class: 'cc-rc-l' + (cls ? ' ' + cls : '') }, [h('span', { text: a }), h('b', { text: b })]); }
       return h('div', { class: 'cc-money' }, [
         h('div', { class: 'cc-figure cc-env', role: 'img', aria: { label: word('pot.FUND', 'fund') + ' ' + money(m.fund) } }, [
-          envelope(), h('span', { class: 'cc-env-amt' }, kt.mk(money(m.fund), 34, { say: false })), h('span', { class: 'cc-env-k', text: word('pot.FUND', 'fund') })
+          envelope(), h('span', { class: 'cc-env-amt' }, counted('fund', m.fund, 34, 'money')), h('span', { class: 'cc-env-k', text: word('pot.FUND', 'fund') })
         ]),
         m.bank === null || m.bank === undefined ? null : h('div', { class: 'cc-receipt', role: 'img', aria: { label: word('pot.BANK', 'bank') + ' ' + money(m.bank) } }, [
           h('span', { class: 'cc-rc-h', text: '* ' + L('receipt').toUpperCase() + ' *' }),
@@ -442,7 +478,7 @@
         ]),
         h('div', { class: 'cc-figure cc-net', role: 'img', aria: { label: L('net') + ' ' + money(m.net, true) + ', ' + L('moneyIn') + ' ' + money(m.in) + ', ' + L('moneyOut') + ' ' + money(m.out) } }, [
           num(m.net) && m.net > 0 && SB.NightScene && SB.NightScene.object ? safe(function () { return SB.NightScene.object('pile', { n: Math.max(1, Math.min(6, Math.round(m.net / 90))), bill: '20', seed: 'close', size: 0.85 }); }, null) : kt.pic(80, 84, cashArt(m.net)),
-          h('span', { class: 'cc-net-tape' }, [kt.mk(money(m.net, true), 30, { say: false }), h('span', { text: L('net') })])
+          h('span', { class: 'cc-net-tape' }, [counted('net', m.net, 30, 'moneys'), h('span', { text: L('net') })])
         ]),
         thing('pink', 'owed', 'cc-owed', [
           h('span', { class: 'cc-ledger-k', text: L('owed') }),
@@ -469,7 +505,7 @@
             r.stageChanged && r.stage ? h('span', { text: word('stage.' + r.stage, String(r.stage).toLowerCase()) }) : null
           ]);
         }),
-        regs.length ? thing('bone', 'regs', '', [h('span', { class: 'cc-ledger-k', text: L('regulars') }), regs.map(function (r) { return h('p', { style: { margin: '4px 0 0' }, text: r.text || '' }); })]) : null
+        regs.length ? thing('bone', 'regs', '', [h('span', { class: 'cc-ledger-k', text: L('regulars') }), regs.map(function (r) { return h('p', { style: { margin: 'calc(var(--p) * 4) 0 0' }, text: r.text || '' }); })]) : null
       ]);
     }
 
@@ -513,7 +549,7 @@
       if (paid.length) {
         return h('div', { class: 'cc-bills' }, [
           thing('white', 'paid', '', [h('span', { class: 'cc-verdict', role: 'img', aria: { label: L('paid') } }, kt.pic(120, 46, kt.stampArt(L('paid').toUpperCase(), 120, 46, 'paid', TONER))),
-            paid.map(function (r) { return h('p', { style: { margin: '4px 0 0' }, text: r.text || '' }); })])
+            paid.map(function (r) { return h('p', { style: { margin: 'calc(var(--p) * 4) 0 0' }, text: r.text || '' }); })])
         ]);
       }
       bv = safe(function () { return SB.Money.billsView(s); }, null) || rep.bills;
@@ -526,7 +562,7 @@
             h('span', { class: 'cc-bill-top', text: name }),
             h('div', { class: 'cc-bill-body' }, [h('span', { class: 'cc-bill-due', text: L('due') }), kt.mk(money(l.amount), 30, { say: false })]),
             h('div', { class: 'cc-bill-stub' }, [
-              h('button', { type: 'button', role: 'checkbox', class: 'cc-tick fx', aria: { checked: on ? 'true' : 'false', label: L('paySay', { bill: name, amount: money(l.amount) }) },
+              h('button', { type: 'button', role: 'checkbox', class: 'cc-tick pz-hl', aria: { checked: on ? 'true' : 'false', label: L('paySay', { bill: name, amount: money(l.amount) }) },
                             on: { click: function () { choice.pay = choice.pay.filter(function (q) { return q !== l.k; }); if (!on) choice.pay.push(l.k); render(); } } }, [
                 kt.pic(24, 22, kt.boxArt(on, 'bp' + l.k)), h('span', { text: L('pay') })
               ])
@@ -550,7 +586,7 @@
           h('p', { class: 'cc-ladder-k', text: L('short') }),
           bv.ladder.map(function (r) {
             var on = choice.ladder.indexOf(r.k) >= 0, name = r.label || word('ladder.' + r.k + '.name', r.k);
-            return h('button', { type: 'button', role: 'checkbox', class: 'cc-tick fx', disabled: !r.available, aria: { checked: on ? 'true' : 'false', label: name + (r.available ? '' : ', ' + (r.why || '')) },
+            return h('button', { type: 'button', role: 'checkbox', class: 'cc-tick pz-hl', disabled: !r.available, aria: { checked: on ? 'true' : 'false', label: name + (r.available ? '' : ', ' + (r.why || '')) },
                                  on: { click: function () { choice.ladder = choice.ladder.filter(function (q) { return q !== r.k; }); if (!on) choice.ladder.push(r.k); render(); } } }, [
               kt.pic(24, 22, kt.boxArt(on, 'ld' + r.k)), h('span', { text: name }),
               h('span', { class: 'cc-tick-says', text: r.available ? word('ladder.' + r.k + '.says', '') : (r.why || '') })

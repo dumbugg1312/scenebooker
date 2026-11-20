@@ -25,35 +25,36 @@
   --fam-fast: #3B3B3B;  --fam-melodic: #2F7FBF;  --fam-crust: #6E5A3C;  --fam-garage: #B3471E;
   --fam-emo: #6A5BA8;  --fam-metal: #3F5145;  --fam-art: #8A6C00;  --fam-party: #2E7D74;
 
-  /* type */
-  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-num: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  --font-type: "Courier New", Courier, ui-monospace, monospace;
-  --font-serif: Georgia, "Times New Roman", Times, serif;
-  --font-heavy: Impact, "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  /* type: the three shipped faces (css/fonts.css); sizes in stage units with the text-size setting (--fs, css/finish.css),
+     never under 12 (16px at 1920 x 1080) */
+  --font-ui: var(--f-type);
+  --font-num: var(--f-mono);
+  --font-type: var(--f-type);
+  --font-serif: var(--f-type);
+  --font-heavy: var(--f-gothic);
   --scale: 1;                                    /* text size setting, 1 to 1.5 */
-  --t-micro: calc(11px * var(--scale));  --lh-micro: calc(14px * var(--scale));
-  --t-small: calc(12px * var(--scale));  --lh-small: calc(16px * var(--scale));
-  --t-dense: calc(13px * var(--scale));  --lh-dense: calc(18px * var(--scale));
-  --t-body: calc(14px * var(--scale));   --lh-body: calc(20px * var(--scale));
-  --t-h3: calc(16px * var(--scale));     --lh-h3: calc(22px * var(--scale));
-  --t-h2: calc(20px * var(--scale));     --lh-h2: calc(26px * var(--scale));
-  --t-h1: calc(26px * var(--scale));     --lh-h1: calc(32px * var(--scale));
-  --t-display: calc(40px * var(--scale));  --lh-display: calc(44px * var(--scale));
+  --t-micro: calc(var(--fs) * 12);  --lh-micro: calc(var(--fs) * 15);
+  --t-small: calc(var(--fs) * 12);  --lh-small: calc(var(--fs) * 16);
+  --t-dense: calc(var(--fs) * 13);  --lh-dense: calc(var(--fs) * 18);
+  --t-body: calc(var(--fs) * 14);   --lh-body: calc(var(--fs) * 20);
+  --t-h3: calc(var(--fs) * 16);     --lh-h3: calc(var(--fs) * 22);
+  --t-h2: calc(var(--fs) * 20);     --lh-h2: calc(var(--fs) * 26);
+  --t-h1: calc(var(--fs) * 26);     --lh-h1: calc(var(--fs) * 32);
+  --t-display: calc(var(--fs) * 40);  --lh-display: calc(var(--fs) * 44);
 
-  /* space, size, borders, depth */
-  --s-1: 2px;  --s0: 4px;  --s1: 8px;  --s2: 12px;  --s3: 16px;  --s4: 24px;  --s5: 32px;  --s6: 48px;
-  --row-dense: 28px;  --row: 36px;  --row-touch: 44px;
-  --strip-h: 48px;  --rail-w: 72px;  --tray-w: 300px;
-  --r0: 0;  --r1: 2px;  --r-pill: 999px;
-  --b-hair: 1px solid var(--rule);  --b-strong: 1px solid var(--rule-strong);  --b-ink: 2px solid var(--ink);
-  --shadow-paper: 1px 2px 0 rgba(0, 0, 0, .18), 0 0 0 1px rgba(0, 0, 0, .06);
-  --shadow-lift: 3px 6px 0 rgba(0, 0, 0, .22);
+  /* space, size, borders, depth: stage units (--p, one px of the old 1280 x 800 layout); one light, shadows fall down and right */
+  --s-1: calc(var(--p) * 2);  --s0: calc(var(--p) * 4);  --s1: calc(var(--p) * 8);  --s2: calc(var(--p) * 12);  --s3: calc(var(--p) * 16);  --s4: calc(var(--p) * 24);  --s5: calc(var(--p) * 32);  --s6: calc(var(--p) * 48);
+  --row-dense: calc(var(--p) * 28);  --row: calc(var(--p) * 36);  --row-touch: calc(var(--p) * 44);
+  --strip-h: calc(var(--p) * 48);  --rail-w: calc(var(--p) * 72);  --tray-w: calc(var(--p) * 300);
+  --r0: 0;  --r1: calc(var(--p) * 2);  --r-pill: 999px;
+  --b-hair: calc(var(--p) * 1) solid var(--rule);  --b-strong: calc(var(--p) * 1) solid var(--rule-strong);  --b-ink: calc(var(--p) * 2) solid var(--ink);
+  --shadow-paper: calc(var(--p) * 1.6) calc(var(--p) * 2) 0 rgba(0, 0, 0, .18), 0 0 0 calc(var(--p) * 1) rgba(0, 0, 0, .06);
+  --shadow-lift: calc(var(--p) * 4) calc(var(--p) * 5) 0 rgba(0, 0, 0, .22);
   --tilt: 1deg;                                  /* paper objects; 0 in reduced motion */
 
-  /* motion */
+  /* motion: everything steps (cut paper at about 12 frames a second); the four moves are in css/finish.css */
   --m-micro: 120ms;  --m-ui: 200ms;  --m-reveal: 400ms;  --m-paper: 240ms;  --m-stamp: 90ms;  --m-day: 700ms;
-  --ease-ui: cubic-bezier(.2, .7, .2, 1);  --ease-paper: cubic-bezier(.3, 1.3, .5, 1);
+  --ease-ui: steps(2, end);  --ease-paper: steps(3, end);
 }
 
 :root[data-theme="dark"] {                       /* After hours */
@@ -65,7 +66,7 @@
   --gen-kids: #56B4E9;  --gen-middle: #E69F00;  --gen-old: #CC79A7;
   --fam-fast: #C9C4B8;  --fam-melodic: #6CB3EB;  --fam-crust: #BFA27A;  --fam-garage: #F08A5D;
   --fam-emo: #A99AE6;  --fam-metal: #8FB39A;  --fam-art: #E0BF3C;  --fam-party: #5FC6B8;
-  --shadow-paper: 1px 2px 0 rgba(0, 0, 0, .6);
+  --shadow-paper: calc(var(--p) * 1.6) calc(var(--p) * 2) 0 rgba(0, 0, 0, .6);
   --scrim: rgba(0, 0, 0, .55);
 }
 @media (prefers-color-scheme: dark) {
@@ -78,7 +79,7 @@
     --gen-kids: #56B4E9;  --gen-middle: #E69F00;  --gen-old: #CC79A7;
     --fam-fast: #C9C4B8;  --fam-melodic: #6CB3EB;  --fam-crust: #BFA27A;  --fam-garage: #F08A5D;
     --fam-emo: #A99AE6;  --fam-metal: #8FB39A;  --fam-art: #E0BF3C;  --fam-party: #5FC6B8;
-    --shadow-paper: 1px 2px 0 rgba(0, 0, 0, .6);
+    --shadow-paper: calc(var(--p) * 1.6) calc(var(--p) * 2) 0 rgba(0, 0, 0, .6);
     --scrim: rgba(0, 0, 0, .55);
   }
 }

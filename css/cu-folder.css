@@ -1,79 +1,73 @@
 /* Scene Booker: css/cu-folder.css (js/ui/screens/settings.js, prefix sf-)
- * The manila folder opened on the desk: torn tabs along its top; inside the front cover a masking-tape label in sharpie,
- * a photo through the copier and an index card; on the right a typed form ticked in pen; the saves are flyer stubs on
- * coloured copy paper. Every piece and control is a css/kit.css part; only the layout lives here.
- */
-.cu-obj.cu--drawer .cu-in { padding: 0 16px 16px; overflow-x: hidden; }
-.sf { position: relative; min-height: 100%; color: #141312; }
-.sf-tabs { position: relative; z-index: 2; min-height: 46px; padding-left: 22px; }
-.sf-page { position: relative; padding: 16px 14px 20px 18px; }
-.sf-spread { display: grid; grid-template-columns: 268px minmax(0, 1fr); gap: 26px 34px; align-items: start; }
+ * The manila folder opened on the desk: torn tabs along its top; inside the front cover a photo through the copier and an
+ * index card; on the right a typed form ticked in pen; the saves are flyer stubs on coloured copy paper. Every piece and
+ * control is a css/kit.css part; only the layout lives here.
+ * Polish brief (css/finish.css): sized in --p, the shipped faces, the copy stock, one light. Settings is quiet utility: the
+ * form's own pasted headline names the tab, and a pause/options menu will replace it later. */
+.cu-obj.cu--drawer .cu-in { background: transparent; padding: 0 calc(var(--p) * 16) calc(var(--p) * 16); overflow-x: hidden; }
+.sf { position: relative; min-height: 100%; color: var(--toner); }
+.sf-tabs { position: relative; z-index: 2; min-height: calc(var(--p) * 46); padding-left: calc(var(--p) * 22); }
+.sf-page { position: relative; padding: calc(var(--p) * 16) calc(var(--p) * 14) calc(var(--p) * 20) calc(var(--p) * 18); }
+.sf-spread { display: grid; grid-template-columns: calc(var(--p) * 268) minmax(0, 1fr); gap: calc(var(--p) * 26) calc(var(--p) * 34); align-items: start; }
 
 /* inside the front cover */
-.sf-cover { display: flex; flex-direction: column; align-items: flex-start; gap: 26px; padding-top: 6px; }
-.sf-coverlabel { margin-left: 4px; }
-.sf-photo { margin-left: 10px; }
-.sf-index { width: 240px; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; }
-.sf-owner { margin: 2px 0 2px; }
+.sf-cover { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 26); padding-top: calc(var(--p) * 6); }
+.sf-photo { margin-left: calc(var(--p) * 10); }
+.sf-index { width: calc(var(--p) * 240); padding: calc(var(--p) * 14) calc(var(--p) * 16) calc(var(--p) * 16); display: flex; flex-direction: column; gap: calc(var(--p) * 6); }
+.sf-owner { margin: calc(var(--p) * 2) 0 calc(var(--p) * 2); }
 
 /* the typed form */
-.sf-main { min-width: 0; display: flex; flex-direction: column; gap: 18px; }
-.sf-main .sf-form:only-child { padding-top: 26px; padding-bottom: 34px; gap: 22px; }
-.sf-form { width: 100%; padding: 18px 26px 22px; display: flex; flex-direction: column; gap: 14px;
+.sf-main { min-width: 0; display: flex; flex-direction: column; gap: calc(var(--p) * 18); }
+.sf-main .sf-form:only-child { padding-top: calc(var(--p) * 26); padding-bottom: calc(var(--p) * 34); gap: calc(var(--p) * 22); }
+.sf-form { width: 100%; padding: calc(var(--p) * 18) calc(var(--p) * 26) calc(var(--p) * 22); display: flex; flex-direction: column; gap: calc(var(--p) * 14);
   background-image: none; }
-.sf-formno { margin: 0; color: #4f4b43; }
-.sf-head { margin: 0 0 4px; }
-.sf-line { --kt-pick-w: 6em; padding: 4px 0 9px; border-bottom: 1px solid rgba(90, 127, 166, .4); row-gap: 8px; }
-.sf-line .kt-pick__opts { flex-basis: 100%; padding-left: 16px; }
+.sf-formno { margin: 0; color: var(--toner-mid); }
+.sf-head { margin: 0 0 calc(var(--p) * 4); }
+.sf-line { --kt-pick-w: 6em; padding: calc(var(--p) * 4) 0 calc(var(--p) * 9); border-bottom: calc(var(--p) * 1) solid color-mix(in srgb, var(--pp-sky) 55%, transparent); row-gap: calc(var(--p) * 8); }
+.sf-line .kt-pick__opts { flex-basis: 100%; padding-left: calc(var(--p) * 16); }
 /* the second cut-out sits in the right half, overlapping the form's lower edge */
-.sf-cut2 { align-self: flex-end; margin: -34px 90px 0 0; }
-.sf-cut { margin: -4px 0 0 56px; }
-.sf-savesec .sf-form { padding: 12px 24px 14px; gap: 8px; }
-.sf-savesec .sf-import { padding-top: 10px; }
-.sf-savesec .sf-acts { margin-top: 2px; }
-.sf-tick { padding: 4px 0; }
-.sf-ticks { display: flex; flex-wrap: wrap; gap: 6px 34px; padding-top: 4px; }
-.sf-acts { display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: center; margin-top: 6px; }
-.sf-slot { max-width: 380px; }
-.sf-export { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.sf-cut2 { align-self: flex-end; margin: calc(var(--p) * -34) calc(var(--p) * 90) 0 0; }
+.sf-cut { margin: calc(var(--p) * -4) 0 0 calc(var(--p) * 56); }
+.sf-savesec .sf-form { padding: calc(var(--p) * 12) calc(var(--p) * 24) calc(var(--p) * 14); gap: calc(var(--p) * 8); }
+.sf-savesec .sf-import { padding-top: calc(var(--p) * 10); }
+.sf-savesec .sf-acts { margin-top: calc(var(--p) * 2); }
+.sf-tick { padding: calc(var(--p) * 4) 0; }
+.sf-ticks { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 6) calc(var(--p) * 34); padding-top: calc(var(--p) * 4); }
+.sf-acts { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 14) calc(var(--p) * 20); align-items: center; margin-top: calc(var(--p) * 6); }
+.sf-slot { max-width: calc(var(--p) * 380); }
+.sf-export { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 12); }
 .sf-export .kt-field { width: 100%; }
 
 /* the saves: flyer stubs in the pocket */
-.sf-savesec { display: flex; flex-direction: column; gap: 14px; }
-.sf-listhead { margin: 6px 0 0; font-size: inherit; line-height: 1; }
-.sf-saves { list-style: none; margin: 0; padding: 0 0 6px; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px 24px; }
+.sf-savesec { display: flex; flex-direction: column; gap: calc(var(--p) * 14); }
+.sf-listhead { margin: calc(var(--p) * 6) 0 0; font-size: inherit; line-height: 1; }
+.sf-saves { list-style: none; margin: 0; padding: 0 0 calc(var(--p) * 6); display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--p) * 230), 1fr)); gap: calc(var(--p) * 16) calc(var(--p) * 24); }
 .sf-save { margin: 0; }
-.sf-stub { height: 100%; display: flex; gap: 14px; align-items: flex-start; padding: 12px 16px 12px; }
-.sf-stubphoto { flex: none; padding: 4px; margin-top: 2px; }
-.sf-stubtext { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.sf-stubname { margin: 2px 0; }
-.sf-stubcity { font-size: calc(14px * var(--scale, 1)); }
-.sf-del { align-self: flex-start; margin-top: 8px; }
-.sf-import { gap: 10px; }
+.sf-stub { height: 100%; display: flex; gap: calc(var(--p) * 14); align-items: flex-start; padding: calc(var(--p) * 12) calc(var(--p) * 16) calc(var(--p) * 12); }
+.sf-stubphoto { flex: none; padding: calc(var(--p) * 4); margin-top: calc(var(--p) * 2); }
+.sf-stubtext { min-width: 0; display: flex; flex-direction: column; gap: calc(var(--p) * 3); }
+.sf-stubname { margin: calc(var(--p) * 2) 0; }
+.sf-stubcity { font-size: calc(var(--fs) * 14); }
+.sf-del { align-self: flex-start; margin-top: calc(var(--p) * 8); }
+.sf-import { gap: calc(var(--p) * 10); }
 .sf-end { display: flex; justify-content: flex-end; }
 
-.sf-msg { position: absolute; right: 18px; bottom: 10px; z-index: 6; }
-.sf-back { margin: 0 0 20px; }
-.sf-confirm { max-width: 440px; padding: 24px 26px 22px; }
+.sf-msg { position: absolute; right: calc(var(--p) * 18); bottom: calc(var(--p) * 10); z-index: 6; }
+.sf-back { margin: 0 0 calc(var(--p) * 20); }
+.sf-confirm { max-width: calc(var(--p) * 440); padding: calc(var(--p) * 24) calc(var(--p) * 26) calc(var(--p) * 22); }
 
-/* without a game (from the start screen) the folder is not held: the same spread on the black table */
-.sf.is-loose { max-width: 1040px; margin: 24px auto; padding: 0 16px 24px; }
-.sf.is-loose .sf-page { background: #d9c288; box-shadow: 5px 7px 0 rgba(0, 0, 0, .6); }
-
-@media (max-width: 860px) {
-  .sf-spread { grid-template-columns: minmax(0, 1fr); }
-  .sf-cover { flex-direction: row; flex-wrap: wrap; }
-  .sf-photo { display: none; }
-}
+/* without a game (from the start screen) the folder is not held: the same spread on the stage, on the black table */
+.sb-stage > .sf.is-loose { height: 100%; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; max-width: calc(var(--p) * 1040); margin: 0 auto; padding: calc(var(--p) * 24) calc(var(--p) * 16) calc(var(--p) * 24); }
+.sf.is-loose .sf-page { --paper: var(--pp-kraft); background: var(--pp-kraft); clip-path: var(--edge-cut-2); }
 
 /* the credits: a typed list in a scrolling pocket, grouped by sound */
 .sf-crednote { margin: 0; max-width: 62ch; }
-.sf-credscroll { max-height: max(180px, calc(100vh - 560px)); overflow: auto; padding: 4px 10px 6px 2px; border-top: 1px solid rgba(90, 127, 166, .4); }
-.sf-credscroll:focus-visible { outline: 3px solid var(--kt-hl, #F2D93B); outline-offset: 3px; }
-.sf-credgroup { margin: 10px 0 0; }
-.sf-credstyle { margin: 0 0 4px; }
-.sf-credlist { list-style: none; margin: 0; padding: 0 0 0 12px; font: 400 calc(14px * var(--scale, 1))/1.45 var(--kt-type, "Courier New", monospace); }
-.sf-cred { padding: 1px 0; }
-.sf-credby { font-weight: 700; }
-.sf-credlink { color: var(--kt-pen, #2F4F9B); text-decoration: underline; text-underline-offset: 2px; }
-.sf-credlink:focus-visible { outline: 2px solid var(--kt-hl, #F2D93B); outline-offset: 2px; }
+.sf-credpad { position: relative; }
+.sf-credscroll { max-height: calc(var(--p) * 220); overflow: auto; padding: calc(var(--p) * 4) calc(var(--p) * 20) calc(var(--p) * 6) calc(var(--p) * 2); border-top: calc(var(--p) * 1) solid color-mix(in srgb, var(--pp-sky) 55%, transparent); }
+.sf-credscroll:focus-visible { background: linear-gradient(176deg, transparent 2%, var(--hl-swipe) 3%, var(--hl-swipe) 97%, transparent 98%); }
+.sf-credgroup { margin: calc(var(--p) * 10) 0 0; }
+.sf-credstyle { margin: 0 0 calc(var(--p) * 4); }
+.sf-credlist { list-style: none; margin: 0; padding: 0 0 0 calc(var(--p) * 12); font: 400 calc(var(--fs) * 14)/1.4 var(--f-type); }
+.sf-cred { padding: calc(var(--p) * 1) 0; }
+.sf-credby { color: var(--toner-mid); }
+.sf-credlink { color: var(--ink-ball); text-decoration: underline; text-underline-offset: calc(var(--p) * 2); }

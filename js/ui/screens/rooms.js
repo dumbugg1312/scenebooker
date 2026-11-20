@@ -72,7 +72,9 @@
     askNobody: 'You do not know who is holding it.',
     ownT: 'OWN',
     me: 'ME',
-    unknown: '?'
+    unknown: '?',
+    heroNext: 'NEXT SHOW',
+    heroL: 'Your next show is at {name} on {d}. Pick up the key.'
   };
 
   function L(key, ctx) { return SB.text.label('ui.rooms.' + key, ctx); }
@@ -93,6 +95,39 @@
     o = o || {};
     return h(o.tag || 'section', { class: 'cb-piece cb-stock-' + (stock || 'white') + (cls ? ' ' + cls : ''), role: o.role || null, aria: o.label ? { label: o.label } : null }, kids);
   }
+  /** words(label, items, cls): quiet typed filter words; the one you are on is a strip of black tape (css .rm-word) */
+  function words(label, items, cls) {
+    return h('div', { class: 'rm-words' + (cls ? ' ' + cls : ''), role: 'group', aria: { label: label } }, items.map(function (it) {
+      return h('button', { type: 'button', class: 'rm-word pz-hl' + (it.on ? ' is-on' : ''), data: { fk: it.fk }, aria: { pressed: it.on ? 'true' : 'false', label: it.label || it.text },
+                           on: { click: it.onClick } }, String(it.text).toUpperCase());
+    }));
+  }
+  /** nameArt(dd, name, seed, maxW): the name in marker, as big as fits, broken over up to three lines at its words */
+  function nameArt(dd, name, seed, maxW) {
+    var t = String(name).toUpperCase().split(/\s+/), size, lines, cur, i, w, ok, lh, out = '', wide = 0, art;
+    for (size = 64; size >= 26; size -= 4) {
+      lines = []; cur = ''; ok = true;
+      for (i = 0; i < t.length && ok; i++) {
+        w = cur ? cur + ' ' + t[i] : t[i];
+        if (dd.mw(w, size) <= maxW) cur = w;
+        else if (!cur) ok = false;
+        else { lines.push(cur); cur = t[i]; if (dd.mw(cur, size) > maxW) ok = false; }
+      }
+      if (ok) { lines.push(cur); if (lines.length <= 3) break; }
+      lines = null;
+    }
+    if (!lines) { size = 26; lines = [t.join(' ')]; }
+    lh = size * 1.22;
+    lines.forEach(function (ln, k) { out += dd.marker(ln, 6, size * 1.1 + k * lh, size, { seed: seed + k, maxWidth: maxW }); wide = Math.max(wide, Math.min(maxW, dd.mw(ln, size))); });
+    art = dd.art(out, Math.ceil(wide) + 16, Math.ceil(lh * lines.length) + 10);
+    art.nh = Math.ceil(lh * lines.length) + 10;
+    return art;
+  }
+  /* how finely a canvas is rastered: css/finish.css's stage unit at this screen (js/ui/finish.js) */
+  function res() { return SB.Finish && SB.Finish.res ? SB.Finish.res() : Math.min(2, Math.max(1, (typeof window !== 'undefined' && window.devicePixelRatio) || 1)); }
+  function pu(n) { return 'calc(var(--p) * ' + n + ')'; }
+  /* the copy stock the pictures are run onto (css/finish.css --pp-*): canary becomes bond, the pastels the flyers' papers */
+  var PAPER_OF = { HOUSE: '#eadbc7', OUTDOORS: '#cde3bd', DIY: '#e4b49b', HALL: '#c2d0dc', BAR: '#e4b49b', CLUB: '#d3d4da', SHOP: '#ddba9b', BIG: '#c2d0dc' };
   function keepFocus(root, fn) {
     var a = (typeof document !== 'undefined') ? document.activeElement : null, key = a && a.getAttribute ? a.getAttribute('data-fk') : null, el;
     fn();
@@ -114,48 +149,48 @@
   /* the picture of a room: a drawn scene for its kind, run through the photocopier onto coloured copy paper, taped down, with a
      typed strip for a caption. A room that closed is a grey copy with GONE on it. */
   var SCENE_OF = { HOUSE: 'CARPORT_EMPTY', OUTDOORS: 'BRIDGE', DIY: 'EMPTY_ROOM', HALL: 'EMPTY_ROOM', BAR: 'BAR_DOOR', CLUB: 'BAR_DOOR', SHOP: 'STOREFRONT', BIG: 'EMPTY_ROOM' };
-  var PAPER_OF = { HOUSE: 'canary', OUTDOORS: 'green', DIY: 'pink', HALL: 'blue', BAR: 'salmon', CLUB: 'lilac', SHOP: 'goldenrod', BIG: 'blue' };
-  function roomPhoto(card, w, hh, sk) {
-    var dpr = Math.min(2, Math.max(1, (typeof window !== 'undefined' && window.devicePixelRatio) || 1)), gone = card.open === false,
-        cv = h('canvas', { class: 'rm-photo__c', width: String(Math.round(w * dpr)), height: String(Math.round(hh * dpr)), style: { width: w + 'px', height: hh + 'px' }, aria: { hidden: 'true' } }),
-        kit = SB.UI.Kit, paper = gone ? 'white' : (PAPER_OF[card.kind] || 'canary'), key = SCENE_OF[card.kind] || 'EMPTY_ROOM';
+  function roomPhoto(card, w, hh, sk, dd) {
+    var r = res(), na, gone = card.open === false,
+        cv = h('canvas', { class: 'rm-photo__c', width: String(Math.round(w * r)), height: String(Math.round(hh * r)), style: { width: pu(w), height: pu(hh) }, aria: { hidden: 'true' } }),
+        kit = SB.UI.Kit, paper = gone ? '#d3d4da' : (PAPER_OF[card.kind] || '#eadbc7'), key = SCENE_OF[card.kind] || 'EMPTY_ROOM';
     safe(function () { SB.Scenes.draw(cv, key, { empty: true, seed: String(card.id), paper: paper, index: 0 }); return 1; }, 0);
-    return h('figure', { class: 'rm-photo' + (gone ? ' is-gone' : ''), role: 'img',
+    na = nameArt(dd, card.name, 'rn' + card.id, 310);
+    return h('figure', { class: 'rm-photo pz-paper' + (gone ? ' is-gone' : ''), role: 'img', style: { '--nh': String(na.nh) },
       aria: { label: card.name + ', ' + kindName(card.kind) + (sk ? ', ' + L('sketch', { n: Math.round(sk) }) : '') } }, [
-      kit ? kit.tape({ at: 'tl' }) : null, kit ? kit.tape({ at: 'tr' }) : null, cv,
-      h('figcaption', { class: 'rm-photo__cap kt-strip', text: kindName(card.kind) + (sk >= 40 ? ' / ' + L('sketch', { n: Math.round(sk) }) : '') }),
+      kit ? kit.tape({ at: 'tl' }) : null, cv,
+      /* the one loud thing: the name across the foot of the photo, big and at an angle, stamped on */
+      h('h1', { class: 'rm-nameplate pz-paper', aria: { label: card.name } }, na),
+      sk >= 40 ? h('figcaption', { class: 'rm-photo__cap', text: L('sketch', { n: Math.round(sk) }) }) : null,
       gone ? h('span', { class: 'rm-gone', text: L('gone') }) : null]);
   }
 
   /* a room on the pegboard: a manila card taped up, its name on black tape (wrapping, never cut), what it is and how big in
      typewriter type, and a small key tag (a flat drawing put through the photocopier onto bone paper, a padlock on it when
      you cannot ask yet). Rust-grey and GONE when it closed. */
-  function keyTagCanvas(r, locked, gone) {
-    var W = 84, H = 34, dpr = 2, cv = h('canvas', { class: 'rm-keytag', width: String(W * dpr), height: String(H * dpr), style: { width: W + 'px', height: H + 'px' }, aria: { hidden: 'true' } }), c;
+  /* the key drawn on the card itself, in toner: at sc times its small size on the hero */
+  function keyTagCanvas(r, locked, gone, sc) {
+    var W = 84, H = 34, dpr = res() * (sc || 1), cv = h('canvas', { class: 'rm-keytag', width: String(Math.round(W * dpr)), height: String(Math.round(H * dpr)), style: { width: pu(W * (sc || 1)), height: pu(H * (sc || 1)) }, aria: { hidden: 'true' } }), c;
     try {
       c = cv.getContext('2d'); c.scale(dpr, dpr);
-      c.fillStyle = gone ? '#e4e2da' : '#f2f0e6'; c.fillRect(0, 0, W, H);
       c.strokeStyle = '#141413'; c.fillStyle = '#141413'; c.lineWidth = 5; c.lineCap = 'butt';
       c.beginPath(); c.arc(13, 17, 8.5, 0, Math.PI * 2); c.stroke();
       c.beginPath(); c.moveTo(22, 17); c.lineTo(56, 17); c.stroke();
       c.fillRect(44, 17, 5, 11); c.fillRect(53, 17, 5, 8);
       if (locked) {
         c.fillRect(63, 18, 18, 14); c.lineWidth = 3.5; c.beginPath(); c.arc(72, 18, 5.5, Math.PI, 0); c.stroke();
-        c.fillStyle = gone ? '#e4e2da' : '#f2f0e6'; c.fillRect(70.5, 23, 3, 5);
       }
     } catch (e) { /* the card still reads without the drawing */ }
     return cv;
   }
   function keyCard(r, lab, mine) {
-    var gone = r.open === false, locked = !gone && !(r.canHold && r.canHold.ok), gl = safe(function () { return SB.Identity.roomGlyph(r.kind, 24); }, ''),
-        size = r.capRange && r.capRange.text ? r.capRange.text : String(r.cap || ''), kit = SB.UI.Kit, rot = SB.rng.make('kt:' + r.id).range(-1.4, 1.4);
-    return h('button', { type: 'button', class: 'cb-key rm-key' + (gone ? ' is-gone' : '') + (locked ? ' is-locked' : ''), aria: { label: lab }, data: { fk: 'room-' + r.id },
+    var gone = r.open === false, locked = !gone && !(r.canHold && r.canHold.ok),
+        size = r.capRange && r.capRange.text ? r.capRange.text : String(r.cap || ''), rot = SB.rng.make('kt:' + r.id).range(-1.4, 1.4);
+    return h('button', { type: 'button', class: 'cb-key rm-key pz-paper pz-hl' + (gone ? ' is-gone' : '') + (locked ? ' is-locked' : ''), aria: { label: lab }, data: { fk: 'room-' + r.id },
       style: { '--rm-rot': rot.toFixed(2) + 'deg' }, on: { click: function () { SB.UI.go('room', { roomId: r.id }); } } }, [
-      kit ? kit.tape({ at: 'top' }) : null,
-      h('span', { class: 'rm-key__top', aria: { hidden: 'true' } }, [keyTagCanvas(r, locked, gone), gl ? h('span', { class: 'rm-key__gl' }, D().art('<g style="color:#141413">' + D().place(gl, 0, 0) + '</g>', 24, 26)) : null]),
+      keyTagCanvas(r, locked, gone, 1),
       h('span', { class: 'rm-key__name', aria: { hidden: 'true' }, text: String(r.name).toUpperCase() }),
       h('span', { class: 'rm-key__line', aria: { hidden: 'true' }, text: kindName(r.kind).toUpperCase() }),
-      h('span', { class: 'rm-key__line', aria: { hidden: 'true' }, text: size }),
+      h('span', { class: 'rm-key__size', aria: { hidden: 'true' }, text: size }),
       mine ? h('span', { class: 'rm-key__me', aria: { hidden: 'true' }, text: L('me') }) : null,
       gone ? h('span', { class: 'rm-key__gone', aria: { hidden: 'true' }, text: L('gone') }) : null]);
   }
@@ -167,37 +202,62 @@
   SB.UI.screen('rooms', {
     rail: 'rooms', title: 'ui.rooms.title', full: false,
     mount: function (root, params) {
-      var zoneId = params && params.zoneId ? params.zoneId : '', kind = '', wrap = h('section', { class: 'cb-rooms' });
+      var zoneId = params && params.zoneId ? params.zoneId : '', kind = '', wrap = h('section', { class: 'cb-rooms' }), heroKey = null, listKey = null;
+
       root.appendChild(wrap);
 
+      /* the room your next show is in: the earliest show you have booked that is yet to come */
+      function nextShow(s) {
+        var list = safe(function () { return SB.Shows.list(s, { status: ['DRAFT', 'CONFIRMED'] }); }, []), day = s.clock && num(s.clock.day) ? s.clock.day : 0, best = null;
+        list.forEach(function (x) { if (x.roomId && s.rooms && s.rooms[x.roomId] && x.day >= day && (!best || x.day < best.day)) best = x; });
+        return best;
+      }
+
       function render() {
-        var s = game(), ids = [], cards, zones = {}, kinds = {}, order = [], dd = D();
+        var s = game(), ids = [], cards, zones = {}, kinds = {}, order = [], dd = D(), nx, hero = null, heroZone = '', F = SB.Finish, key, first;
         SB.UI.clear(wrap);
         if (!s) { wrap.appendChild(C().Empty({})); return; }
         try { ids = SB.Rooms.list(s, {}); } catch (e) { ids = []; }
         cards = ids.map(function (id) { return SB.Rooms.card(s, id); });
         cards.forEach(function (c) { zones[c.zoneId] = zoneName(s, c.zoneId); kinds[c.kind] = kindName(c.kind); });
+        Object.keys(zones).forEach(function (z) { if (order.indexOf(z) < 0) order.push(z); });
+        nx = nextShow(s);
+        if (nx) {
+          /* the one loud thing: the key tag of the room your next show is in, big, on a tag, at an angle */
+          var rc = SB.Rooms.card(s, nx.roomId), rname = s.rooms[nx.roomId].name, dtxt = SB.time.fmt(nx.day, 'short');
+          hero = h('button', { type: 'button', class: 'rm-hero pz-paper pz-hl', data: { fk: 'hero-key' }, aria: { label: L('heroL', { name: rname, d: dtxt }) }, on: { click: function () { SB.UI.go('room', { roomId: nx.roomId }); } } }, [
+            keyTagCanvas(rc, !(rc.canHold && rc.canHold.ok), rc.open === false, 3),
+            h('span', { class: 'rm-hero-k', text: L('heroNext') }),
+            h('span', { class: 'rm-hero-name', text: String(rname).toUpperCase() }),
+            h('span', { class: 'rm-hero-d', text: dtxt.toUpperCase() })]);
+        } else {
+          /* else the town: its name as a big pasted headline */
+          heroZone = zoneId && zones[zoneId] ? zoneId : order[0];
+          if (heroZone) hero = h('h2', { class: 'rm-hero rm-hero--town pz-paper' }, String(zones[heroZone]).toUpperCase());
+        }
         wrap.appendChild(h('h1', { class: 'cb-sr', text: L('title') }));
-        wrap.appendChild(h('div', { class: 'cb-sheethead' }, [
-          dd.tabs({ size: 13, label: L('allKinds'), items: Object.keys(kinds).map(function (k) {
-            var on = kind === k, gl = safe(function () { return SB.Identity.roomGlyph(k, 20); }, '');
-            return { text: kinds[k], label: on ? L('allKinds') : L('kindL', { kind: kinds[k] }), on: on, fk: 'kind-' + k, art: gl ? '<g style="color:' + (on ? '#f4f2ea' : '#141413') + '">' + dd.place(gl, 0, 0) + '</g>' : '', w: 20, ah: 22,
-                     onClick: function () { kind = on ? '' : k; render(); } };
-          }) }),
-          Object.keys(zones).length > 1 ? dd.tabs({ size: 13, label: L('allZones'), items: Object.keys(zones).map(function (z) {
-            var on = zoneId === z;
-            return { text: zones[z], label: on ? L('allZones') : L('zoneL', { zone: zones[z] }), on: on, fk: 'zone-' + z, onClick: function () { zoneId = on ? '' : z; render(); } };
-          }) }) : null
+        wrap.appendChild(h('div', { class: 'cb-sheethead rm-top' }, [
+          hero ? h('div', { class: 'rm-herobox' }, hero) : null,
+          h('div', { class: 'rm-slip pz-paper' }, [
+            words(L('allKinds'), Object.keys(kinds).map(function (k) {
+              var on = kind === k;
+              return { text: kinds[k], label: on ? L('allKinds') : L('kindL', { kind: kinds[k] }), on: on, fk: 'kind-' + k, onClick: function () { kind = on ? '' : k; render(); } };
+            })),
+            Object.keys(zones).length > 1 ? words(L('allZones'), Object.keys(zones).map(function (z) {
+              var on = zoneId === z;
+              return { text: zones[z], label: on ? L('allZones') : L('zoneL', { zone: zones[z] }), on: on, fk: 'zone-' + z, onClick: function () { zoneId = on ? '' : z; render(); } };
+            }), 'rm-words--zones') : null
+          ])
         ]));
         cards = cards.filter(function (c) { return (!zoneId || c.zoneId === zoneId) && (!kind || c.kind === kind); });
         if (!cards.length) { wrap.appendChild(piece('cb-hintslip', 'white', [h('p', { class: 'cb-typed', text: L('none') })])); }
-        Object.keys(zones).forEach(function (z) { if (order.indexOf(z) < 0) order.push(z); });
         order.forEach(function (z) {
           var rows = cards.filter(function (c) { return c.zoneId === z; }).sort(function (a, b) { return (b.open !== false ? 1 : 0) - (a.open !== false ? 1 : 0); }), zn = String(zones[z] || '').toUpperCase();
           if (zoneId && zoneId !== z) return;
           if (!rows.length) return;
           wrap.appendChild(h('div', { class: 'cb-hookrow' }, [
-            dd.art(dd.marker(zn, 6, 28, 22, { fill: '#f4f2ea', seed: 'zn' + z }), dd.mw(zn, 22) + 16, 38, 'cb-zonename'),
+            /* the town is the headline when there is no next show; every other part of town is a quiet typed line */
+            nx || z !== heroZone ? h('h2', { class: 'rm-zone', text: zn }) : null,
             h('div', { class: 'cb-hooks' }, rows.map(function (r) {
               var mine = hasMine(s, r.id), d = r.open === false ? lastShowDay(s, r.id) : null;
               var lab = L('key', { name: r.name, kind: kindName(r.kind), cap: r.capRange && r.capRange.text ? r.capRange.text : r.cap, ages: agesText(r.ages),
@@ -208,6 +268,17 @@
             }))
           ]));
         });
+        /* the hero is stamped on when it first shows or changes; the keys slap down one after another when the list is new */
+        key = (nx ? nx.roomId + ':' + nx.day : 'town:' + heroZone);
+        if (F && hero && key !== heroKey) F.move(hero, 'stamp', { delay: heroKey === null ? 220 : 0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: hero } });
+        heroKey = key;
+        key = zoneId + '|' + kind;
+        if (F && key !== listKey) {
+          first = Array.prototype.slice.call(wrap.querySelectorAll('.rm-key')).slice(0, 8);
+          F.stagger(first, 3);
+          first.forEach(function (el) { el.classList.add('mv-slap'); });
+        }
+        listKey = key;
       }
       render();
       return { update: function () { keepFocus(root, render); }, unmount: function () {} };
@@ -221,7 +292,7 @@
   SB.UI.screen('room', {
     rail: 'rooms', title: 'ui.rooms.roomTitle', full: false,
     mount: function (root, params) {
-      var roomId = params && params.roomId, selected = params && num(params.day) ? params.day : null, forShow = '', wrap = h('section', { class: 'cb-room' });
+      var roomId = params && params.roomId, selected = params && num(params.day) ? params.day : null, forShow = '', wrap = h('section', { class: 'cb-room' }), shown = false;
       root.appendChild(wrap);
 
       function drafts(s) { return safe(function () { return SB.Shows.list(s, { status: ['DRAFT', 'CONFIRMED'] }); }, []); }
@@ -252,8 +323,7 @@
       function cardSide(s, card, rel) {
         var dd = D(), drawing = '', cap = card.capRange && card.capRange.hi90 ? card.capRange : null, capN = card.cap || 0, kids = [], out, i, n, unit,
             t = card.terms || {}, bills = [], sk = Math.max(0, Math.min(100, card.sketch || 0)), inner = '';
-        kids.push(roomPhoto(card, 360, 225, sk));
-        kids.push(h('h1', { class: 'cb-roomname', aria: { label: card.name } }, dd.art(dd.marker(String(card.name).toUpperCase(), 4, 36, 32, { maxWidth: 330, seed: 'rn' + card.id }), 340, 46)));
+        kids.push(roomPhoto(card, 360, 225, sk, dd));
         kids.push(h('p', { class: 'cb-typed', text: kindName(card.kind) + ' / ' + L('zoneOf', { zone: zoneName(s, card.zoneId) }) }));
         /* how many it holds */
         /* how many it holds, and what it costs: a typed spec sheet (real text, black tape labels) */
@@ -271,7 +341,6 @@
         if (num(card.curfew)) sts.push(L('curfew', { t: SB.time.clock(card.curfew) }));
         sts.forEach(function (w, wi) { out += dd.stamp(String(w).toUpperCase(), x, 6, 12, { rot: (wi % 2 ? 4 : -4) }); x += dd.stampW(String(w).toUpperCase(), 12) + 12; });
         kids.push(h('div', { role: 'img', aria: { label: sts.join(', ') } }, dd.art(out, Math.max(40, x), 40)));
-        if (card.open === false) kids.push(dd.art(dd.stamp(L('gone'), 4, 4, 22, { rot: -8 }), dd.stampW(L('gone'), 22) + 14, 52));
         /* the owner */
         kids.push(h('div', { class: 'cb-owner', role: 'img', aria: { label: (card.ownerName || '') + (rel ? ', ' + SB.text.label('stage.' + rel.stage) : '') } }, [
           card.ownerId ? dd.art(dd.face(card.ownerId, 50), 52, 52) : null,
@@ -320,7 +389,7 @@
         }
         start = from - SB.time.dow(from);
         rowsN = 0; for (i = 0; i < 8 && start + i * 7 < from + 56; i++) rowsN++;
-        kids.push(h('div', { class: 'cb-month' }, [h('div', { class: 'cb-monthpage rm-page', aria: { hidden: 'true' } }, [
+        kids.push(h('div', { class: 'cb-month' }, [h('div', { class: 'cb-monthpage rm-page pz-paper', aria: { hidden: 'true' } }, [
             h('div', { class: 'rm-page__head', text: SB.time.fmt(from, 'month').toUpperCase() + ' / ' + SB.time.fmt(from + 55, 'month').toUpperCase() }),
             h('div', { class: 'rm-page__dow' }, ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(function (c) { return h('span', { text: c }); }))]),
           h('div', { class: 'cb-monthgrid', role: 'grid', aria: { label: L('roomTitle') } }, (function () {
@@ -389,6 +458,14 @@
         if (!card) { wrap.appendChild(C().Empty({ text: L('none') })); return; }
         wrap.appendChild(h('div', { class: 'cb-bandtop' }, [dd.act('<', L('backToRooms'), 'back', function () { SB.UI.go('rooms'); }, { size: 14 })]));
         wrap.appendChild(h('div', { class: 'cb-roomcols' }, [cardSide(s, card, rel), calendarSide(s, card)]));
+        /* first time on the page: the name is stamped on, the card and the month slap down (js/ui/finish.js) */
+        if (SB.Finish && !shown) {
+          shown = true;
+          SB.Finish.move(wrap.querySelector('.rm-nameplate'), 'stamp', { delay: 220, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: wrap.querySelector('.rm-nameplate') } });
+          var pcs = Array.prototype.slice.call(wrap.querySelectorAll('.cb-roomcard, .cb-month, .cb-holdpanel, .cb-calside > .cb-piece'));
+          SB.Finish.stagger(pcs, 3);
+          pcs.forEach(function (el) { el.classList.add('mv-slap'); });
+        }
       }
 
       render();

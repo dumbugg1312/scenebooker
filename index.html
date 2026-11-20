@@ -1,9 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="pz is-booting">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Scene Booker</title>
+<link rel="preload" href="assets/fonts/special-elite.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/anton.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/plex-mono-bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/kit.css">
 <link rel="stylesheet" href="css/desk.css">
@@ -27,17 +31,16 @@
 <link rel="stylesheet" href="css/cutscene.css">
 <link rel="stylesheet" href="css/story.css">
 <link rel="stylesheet" href="css/musicbar.css">
-<link rel="stylesheet" href="css/r-clip.css">
-<link rel="stylesheet" href="css/r-week.css">
-<link rel="stylesheet" href="css/r-inbox.css">
-<link rel="stylesheet" href="css/r-bands.css">
-<link rel="stylesheet" href="css/r-people.css">
-<link rel="stylesheet" href="css/r-rooms.css">
-<link rel="stylesheet" href="css/r-money.css">
-<link rel="stylesheet" href="css/r-notebook.css">
-<link rel="stylesheet" href="css/r-polish.css">
+<link rel="stylesheet" href="css/cu-sheet.css">
+<link rel="stylesheet" href="css/cu-keys.css">
+<link rel="stylesheet" href="css/finish.css">
+<link rel="stylesheet" href="css/shell.css">
 </head>
-<body class="sb-body">
+<body class="sb-body pz-grain">
+<!-- the loading screen: painted before any script runs, lifted by js/ui/boot.js once the first screen is all in -->
+<div id="boot" role="progressbar" aria-busy="true" aria-label="Loading Scene Booker" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <div class="bt-stage"><h1 class="bt-title"><span>Scene</span><span>Booker</span></h1><div class="bt-tape"><span class="bt-fill"></span></div><p class="bt-word">the game</p></div>
+</div>
 <div id="desk" class="dk-desk" hidden></div>
 <main id="main" class="sb-main" tabindex="-1"></main>
 <div id="overlay" class="sb-overlay"></div>
@@ -116,6 +119,8 @@
 <script src="js/ui/musicbar.js"></script>
 
 <script src="js/ui/dom.js"></script>
+<script src="js/ui/finish.js"></script>
+<script src="js/ui/boot.js"></script>
 <script src="js/ui/components.js"></script>
 <script src="js/ui/kit.js"></script>
 <script src="js/ui/cutscene.js"></script>
@@ -140,6 +145,7 @@
 <script src="js/desk/scene.js"></script>
 <script src="js/desk/closeup.js"></script>
 <script src="js/ui/story.js"></script>
+<script src="js/ui/pause.js"></script>
 <script src="js/ui/app.js"></script>
 <!-- 11. sound (loads its clips, assets/sfx/sfx-data.js, on its own after boot) -->
 <script src="js/audio/sfx.js"></script>

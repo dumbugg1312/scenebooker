@@ -34,6 +34,7 @@
   var CUES = {
     tap:        [['tap', -15, 0, 0.06]],
     hover:      [['slide', -33, 0, 0.1, 1.2]],
+    'hover.ui': [['slide', -30, 0, 0.12, 1.55]],
     nope:       [['wood', -17, 0, 0.03, 0.72], ['thudSoft', -26, 0, 0.04, 0.8]],
     switch:     [['switch', -13, 0, 0.04]],
     key:        [['key', -22, 0, 0.0]],
@@ -210,7 +211,9 @@
     } catch (e) { ctx = null; }
     return !!ctx;
   }
-  function setLevel() { if (master) master.gain.value = 0.9 * LEVEL[pref()]; }
+  /* the level: the sound preference (full, low, off) times the quick menu's sound fader (pref 'sfxVol', 0 to 1) */
+  function faderVol() { var v = NaN; try { v = Number(SB.UI && SB.UI.prefs ? SB.UI.prefs.get('sfxVol') : NaN); } catch (e) { v = NaN; } return v >= 0 && v <= 1 ? v : 1; }
+  function setLevel() { if (master) master.gain.value = 0.9 * LEVEL[pref()] * faderVol(); }
 
   function b64ToBuf(s) {
     var bin = W.atob(s), n = bin.length, u = new Uint8Array(n), i;
@@ -360,10 +363,13 @@
     if (fam && fam === prevFam) play(fam === 'notebook' || fam === 'calendar' ? 'flip' : 'slide', { gain: -3 });
   }
 
-  var hoverObj = null;
+  var hoverObj = null, hoverCtl = null;
   function onOver(e) {
-    var el = e.target && e.target.closest ? e.target.closest('.dk-hit') : null, id;
+    var el = e.target && e.target.closest ? e.target.closest('.dk-hit') : null, id, ctl;
     if (e.pointerType && e.pointerType !== 'mouse') return;
+    /* on a finished screen (.pz, the polish brief) every control has a hover sound too: a quick brush of paper */
+    ctl = !el && e.target.closest ? e.target.closest('.pz button:not(:disabled), .pz [role="button"], .pz a[href]') : null;
+    if (ctl !== hoverCtl) { hoverCtl = ctl; if (ctl) play('hover.ui', { el: ctl, gap: 70 }); }
     id = el ? el.getAttribute('data-obj') : null;
     if (id === hoverObj) return;
     hoverObj = id;
@@ -495,7 +501,7 @@
   /** audio(): the one AudioContext and where to plug in, for js/audio/cutscene-audio.js: { ctx, master, bus, verb } or null */
   function audio() { if (!D || !build()) return null; wake(); return { ctx: ctx, master: master, bus: bus, verb: verb }; }
   /** level(): 1, 0.4 or 0 from the 'sound' preference (and the master follows it) */
-  function level() { setLevel(); return LEVEL[pref()]; }
+  function level() { setLevel(); return LEVEL[pref()] * faderVol(); }
 
   SB.Sfx = { play: play, night: night, noteIn: noteIn, ready: function () { return ready; }, cues: function () { return Object.keys(CUES); },
              has: has, audio: audio, level: level };

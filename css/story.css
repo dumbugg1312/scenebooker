@@ -2,150 +2,149 @@
  * Act I on the desk (js/ui/story.js): the strip of masking tape with a sharpie arrow on the thing to pick up next,
  * the outgoing booker's texts (on the phone, and as a typed strip on the desk while the phone is down), the card a
  * new patch lands on, the jacket laid flat, and the box of chapters in the notebook.
- * Toner on paper: hard shadows, crooked, nothing glows. Everything stops moving under reduced motion.
+ * Toner on paper: hard shadows (down and right), crooked, nothing glows. The moves are css/finish.css's; everything
+ * stops moving under reduced motion.
  */
 
 /* ---------- the tape: one strip on <body>, pointing at the thing to press next (js/ui/story.js places it) ---------- */
 .sy-tape {
   position: fixed; left: 0; top: 0; z-index: 40; pointer-events: none; display: block;
-  width: 134px; height: 55px;
+  width: calc(var(--p) * 134); height: calc(var(--p) * 55);
   transform: rotate(var(--tr, 150deg)); transform-origin: 50% 50%;
-  filter: drop-shadow(2px 4px 0 rgba(0, 0, 0, .78));
-  animation: sy-stick 420ms cubic-bezier(.3, 1.4, .5, 1) both;
+  filter: drop-shadow(var(--sh-s) 0 rgba(0, 0, 0, .78));
+  animation: sy-stick 250ms steps(3, end) both;
 }
 .sy-tape > svg { display: block; width: 100%; height: 100%; overflow: visible; }
-@keyframes sy-stick { from { opacity: 0; transform: rotate(calc(var(--tr, 150deg) - 16deg)) scale(1.5); } to { opacity: 1; transform: rotate(var(--tr, 150deg)) scale(1); } }
-.sy-bub--how { font-weight: 700; }
+@keyframes sy-stick {
+  0%   { opacity: 0; transform: rotate(calc(var(--tr, 150deg) - 14deg)) scale(1.5); }
+  34%  { opacity: 1; transform: rotate(calc(var(--tr, 150deg) - 8deg)) scale(1.25); }
+  67%  { opacity: 1; transform: rotate(calc(var(--tr, 150deg) - 3deg)) scale(1.08); }
+  100% { opacity: 1; transform: rotate(var(--tr, 150deg)) scale(1); }
+}
 
 /* ---------- the strip's own band: what is under it moves up out of its way (body.sy-guiding, --sy-band set by js/ui/story.js) ---------- */
-body.sy-guiding .cu-back { padding-bottom: calc(var(--sy-band, 90px) + 2px); }
-body.sy-guiding .cu-obj { height: min(860px, calc(92vh - var(--sy-band, 90px))); }
-body.sy-guiding .nt { padding-bottom: var(--sy-band, 90px); box-sizing: border-box; }
-body.sy-guiding .sb-toasts { bottom: calc(var(--sy-band, 90px) + 6px); }
+/* (close-ups are held on the stage and make room for the strip themselves: css/finish.css) */
+body.sy-guiding .nt { padding-bottom: var(--sy-band, calc(var(--p) * 90)); box-sizing: border-box; }
+body.sy-guiding .sb-toasts { bottom: calc((100vh - var(--u) * 1000) / 2 + var(--sy-band, calc(var(--p) * 90)) + calc(var(--p) * 6)); }
 
 /* ---------- the texts: on the phone ---------- */
-.sy-dana { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin: 4px 0 16px; padding: 8px 4px 14px; border-bottom: 3px dashed var(--t, #141413); }
+.sy-dana { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 12); margin: calc(var(--p) * 4) 0 calc(var(--p) * 16); padding: calc(var(--p) * 8) calc(var(--p) * 4) calc(var(--p) * 14); border-bottom: calc(var(--p) * 3) dashed var(--toner); }
 .sy-dana-from { margin: 0; }
 .sy-dana .ph-bub { max-width: 94%; }
-.sy-bub--nudge, .sy-bub--wrong { font-weight: 700; }
-.sy-bub--wrong { box-shadow: 0 0 0 2px var(--t, #141413), 4px 4px 0 2px var(--t, #141413), inset 6px 0 0 var(--t, #141413); padding-left: 16px; }
+/* a wrong turn is marked with a toner bar down the bubble's edge */
+.sy-bub--wrong { --paper: linear-gradient(90deg, var(--toner) 0 calc(var(--p) * 6), transparent calc(var(--p) * 6)), var(--pp-white); padding-left: calc(var(--p) * 16); }
 .sy-bub--intro { opacity: .78; }
 
-/* ---------- the texts: a typed strip on the desk ---------- */
-.sy-strip {
-  /* bottom left on every screen: clear of the music player (bottom right) and the desk's settings folder */
-  position: fixed; left: 26px; bottom: 14px; z-index: 45; transform: rotate(-.7deg);
-  display: flex; align-items: stretch; max-width: min(760px, calc(100vw - 290px));
-  background: #e7ddc4; color: #141413; box-shadow: 5px 6px 0 #000;
-  font: 700 14px/1.4 'Courier New', Courier, monospace;
-  animation: sy-slip 300ms cubic-bezier(.3, 1.3, .5, 1) both;
+/* ---------- the texts: a typed strip on the desk (its place on the stage is css/finish.css's) ---------- */
+.sy-strip.sy-strip {
+  position: fixed; z-index: 45; display: flex; align-items: stretch; transform: rotate(-.7deg);
+  --paper: var(--pp-buff); --edge: var(--edge-torn-b); --ring: calc(var(--p) * 2); --drop: calc(var(--p) * 5);
+  background: none; box-shadow: none; color: var(--toner);
+  font: 400 calc(var(--fs) * 14)/1.4 var(--f-type);
+  animation: mv-slap 250ms steps(1, end) backwards;
 }
-/* a bit of masking tape holds one end down */
-.sy-strip::before { content: ""; position: absolute; left: -26px; top: -9px; width: 64px; height: 20px; background: rgba(230, 220, 184, .92); transform: rotate(-24deg); box-shadow: 1px 2px 0 rgba(0, 0, 0, .5); pointer-events: none; }
-@keyframes sy-slip { from { opacity: 0; transform: translateY(24px) rotate(-3deg); } to { opacity: 1; transform: rotate(-.7deg); } }
-.sy-strip-open { all: unset; box-sizing: border-box; display: flex; align-items: baseline; gap: 10px; padding: 10px 12px 9px 16px; cursor: pointer; font: inherit; color: inherit; }
-.sy-strip-from { flex: none; font: 800 12px/1 'Arial Black', 'Helvetica Neue', Arial, sans-serif; letter-spacing: .12em; color: #f4f2ea; background: #141413; padding: 5px 7px 4px; transform: rotate(-1.5deg); }
+.sy-strip-open { all: unset; box-sizing: border-box; display: flex; align-items: baseline; gap: calc(var(--p) * 10); padding: calc(var(--p) * 10) calc(var(--p) * 12) calc(var(--p) * 9) calc(var(--p) * 16); font: inherit; color: inherit; }
+.sy-strip-from { flex: none; font: 400 calc(var(--fs) * 12)/1 var(--f-gothic); letter-spacing: .12em; color: var(--pp-bond); background: var(--toner); clip-path: var(--edge-cut-3); padding: calc(var(--p) * 5) calc(var(--p) * 7) calc(var(--p) * 4); transform: rotate(-1.5deg); }
 .sy-strip-text { min-width: 0; }
-.sy-strip--nudge .sy-strip-text, .sy-strip--wrong .sy-strip-text { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
-.sy-strip-x { all: unset; box-sizing: border-box; flex: none; width: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font: 800 20px/1 'Arial Black', Arial, sans-serif; border-left: 2px dashed #141413; }
-.sy-strip-say { margin: 0; cursor: default; }
-.sy-strip-open:not(.sy-strip-say):hover, .sy-strip-open:focus-visible, .sy-strip-x:hover, .sy-strip-x:focus-visible { background: #141413; color: #f4f2ea; }
-.sy-strip-open:not(.sy-strip-say):hover .sy-strip-from, .sy-strip-open:focus-visible .sy-strip-from { background: #f4f2ea; color: #141413; }
-.sy-strip-open:focus-visible, .sy-strip-x:focus-visible { outline: 3px solid #f4f2ea; outline-offset: 2px; }
+.sy-strip--nudge .sy-strip-text, .sy-strip--wrong .sy-strip-text { text-decoration: underline; text-decoration-thickness: calc(var(--p) * 2); text-underline-offset: calc(var(--p) * 3); }
+.sy-strip-x { all: unset; box-sizing: border-box; flex: none; width: calc(var(--p) * 40); display: flex; align-items: center; justify-content: center; font: 400 calc(var(--fs) * 20)/1 var(--f-gothic); border-left: calc(var(--p) * 2) dashed var(--toner); }
+.sy-strip-say { margin: 0; }
+.sy-strip-open:not(.sy-strip-say):hover, .sy-strip-x:hover { background: var(--toner); color: var(--pp-bond); }
+.sy-strip-open:not(.sy-strip-say):hover .sy-strip-from { background: var(--pp-bond); color: var(--toner); }
 
-/* ---------- the card a new patch lands on (the cutscene DROP: css/cutscene.css .cs-obj and cs-drop) ---------- */
-.sy-card {
-  position: fixed; z-index: 45; display: flex; align-items: center; gap: 16px; width: min(440px, calc(100vw - 32px)); box-sizing: border-box;
-  padding: 16px 18px 16px 16px; color: #141312;
-  background: #F4F2EA repeating-linear-gradient(transparent 0 25px, rgba(60, 90, 150, .28) 25px 26px);
-  border-top: 3px solid #C8554B; box-shadow: 5px 8px 0 rgba(0, 0, 0, .7);
+/* ---------- the card a new patch lands on: slapped down on the desk, its patch stamped ---------- */
+.sy-card.pz-paper, .sy-card-leaving.pz-paper {
+  position: fixed; z-index: 45; left: 50%; top: 50%; display: flex; align-items: center; gap: calc(var(--p) * 16); width: calc(var(--p) * 440); box-sizing: border-box;
+  --paper: repeating-linear-gradient(transparent 0 calc(var(--p) * 25), var(--pp-blue) calc(var(--p) * 25) calc(var(--p) * 26)), var(--pp-white); --edge: var(--edge-cut-1); --ring: calc(var(--p) * 2); --drop: calc(var(--p) * 5);
+  padding: calc(var(--p) * 16) calc(var(--p) * 18) calc(var(--p) * 16) calc(var(--p) * 16); color: var(--toner);
+  transform: translate(calc(-50% + var(--dx, 0)), calc(-50% + var(--dy, 0))) rotate(var(--tilt, 0deg));
 }
-.sy-card-pic { flex: none; display: block; transform: rotate(-4deg); box-shadow: 3px 4px 0 rgba(0, 0, 0, .55); }
+.sy-card-pic { flex: none; display: block; transform: rotate(-4deg); filter: drop-shadow(var(--sh-s) 0 rgba(0, 0, 0, .55)); }
 .sy-card-pic canvas { display: block; }
-.sy-card-words { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
-.sy-card-name { margin: 0; font: 900 22px/1.05 'Arial Black', 'Helvetica Neue', Arial, sans-serif; letter-spacing: .02em; text-transform: uppercase; transform: rotate(-1deg); }
-.sy-card-line { margin: 0; font: 700 13.5px/1.42 'Courier New', Courier, monospace; }
+.sy-card-words { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 6); min-width: 0; }
+.sy-card-name { margin: 0; font: 400 calc(var(--fs) * 22)/1.05 var(--f-gothic); letter-spacing: .02em; text-transform: uppercase; transform: rotate(-1deg); }
+.sy-card-line { margin: 0; font: 400 calc(var(--fs) * 13.5)/1.42 var(--f-type); color: var(--toner-mid); }
 .sy-card-go {
-  margin-top: 6px; border: 0; cursor: pointer; background: #141312; color: #F4F2EA; padding: 8px 12px 7px;
-  font: 800 13px/1 'Arial Black', 'Helvetica Neue', Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase;
-  box-shadow: 3px 4px 0 rgba(0, 0, 0, .45); transform: rotate(-1.2deg);
+  --paper: var(--toner); --edge: var(--edge-cut-3); --ring: calc(var(--p) * 1.5); --drop: calc(var(--p) * 3);
+  margin-top: calc(var(--p) * 6); border: 0; color: var(--pp-white); padding: calc(var(--p) * 8) calc(var(--p) * 12) calc(var(--p) * 7);
+  font: 400 calc(var(--fs) * 13)/1 var(--f-gothic); letter-spacing: .12em; text-transform: uppercase; transform: rotate(-1.2deg);
 }
-.sy-card-go:hover, .sy-card-go:focus-visible { background: #F4F2EA; color: #141312; box-shadow: inset 0 0 0 3px #141312, 3px 4px 0 rgba(0, 0, 0, .45); outline: none; }
+.sy-card-go:hover { --paper: var(--toner-mid); }
 
 /* ---------- the jacket on the desk ---------- */
 .dk-live > canvas.dk-jacket { position: absolute; display: block; pointer-events: none; }
 
 /* ---------- the jacket, laid flat ---------- */
-.cu--jacket { width: min(1080px, 96vw); height: min(880px, 94vh); }
+.cu--jacket { width: calc(var(--p) * 1080); height: calc(var(--p) * 752); }
 .cu-obj.cu--jacket .cu-in { background: transparent; padding: 0; overflow: hidden; }
-/* the jacket back on the black table: collar, shoulders, yoke and waistband stitching; patches sewn on crooked */
+/* the jacket back on the black table: collar, shoulders, yoke and waistband stitching; patches sewn on crooked.
+   The denim is the --wait blue darkened (no denim token); the stitching is kraft thread. */
 .sy-jacket {
-  position: absolute; inset: 14px 22px 18px; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box;
-  scrollbar-width: thin; scrollbar-color: #F4F2EA transparent; padding: 0 0 8px;
-  background: #1B1A18; box-shadow: 0 0 0 4px #141312, 7px 9px 0 #000;
+  --denim: color-mix(in srgb, var(--wait) 92%, black); --denim-lo: color-mix(in srgb, var(--wait) 70%, black); --denim-hi: color-mix(in srgb, var(--wait) 100%, white 6%);
+  position: absolute; inset: calc(var(--p) * 14) calc(var(--p) * 22) calc(var(--p) * 18); overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; padding: 0 0 calc(var(--p) * 8);
+  background: var(--toner); box-shadow: 0 0 0 calc(var(--p) * 4) var(--toner), var(--sh-m) 0 var(--pitch);
 }
 .sy-back {
-  position: relative; box-sizing: border-box; min-height: 100%; margin: 0 auto; width: min(100%, 980px); padding: 66px 56px 84px; color: #F4F2EA;
-  clip-path: polygon(33% 0, 50% 44px, 67% 0, calc(100% - 70px) 36px, 100% 120px, 99.2% 100%, 0.8% 100%, 0 120px, 70px 36px);
+  position: relative; box-sizing: border-box; min-height: 100%; margin: 0 auto; width: min(100%, calc(var(--p) * 980)); padding: calc(var(--p) * 66) calc(var(--p) * 56) calc(var(--p) * 84); color: var(--pp-white);
+  clip-path: polygon(33% 0, 50% calc(var(--p) * 44), 67% 0, calc(100% - calc(var(--p) * 70)) calc(var(--p) * 36), 100% calc(var(--p) * 120), 99.2% 100%, 0.8% 100%, 0 calc(var(--p) * 120), calc(var(--p) * 70) calc(var(--p) * 36));
   background:
-    linear-gradient(#C98A3A, #C98A3A) 0 122px / 100% 2px no-repeat, linear-gradient(#C98A3A, #C98A3A) 0 129px / 100% 2px no-repeat,
-    linear-gradient(#C98A3A, #C98A3A) 0 calc(100% - 66px) / 100% 2px no-repeat,
-    linear-gradient(rgba(10, 18, 34, .35), rgba(10, 18, 34, .35)) 0 calc(100% - 62px) / 100% 62px no-repeat,
-    repeating-linear-gradient(135deg, rgba(255, 255, 255, .07) 0 2px, rgba(0, 0, 0, .07) 2px 4px),
-    radial-gradient(ellipse at 50% 40%, #5B7396 0%, #4A6285 55%, #3B4F6F 100%);
+    linear-gradient(var(--pp-kraft), var(--pp-kraft)) 0 calc(var(--p) * 122) / 100% calc(var(--p) * 2) no-repeat, linear-gradient(var(--pp-kraft), var(--pp-kraft)) 0 calc(var(--p) * 129) / 100% calc(var(--p) * 2) no-repeat,
+    linear-gradient(var(--pp-kraft), var(--pp-kraft)) 0 calc(100% - calc(var(--p) * 66)) / 100% calc(var(--p) * 2) no-repeat,
+    linear-gradient(rgba(10, 18, 34, .35), rgba(10, 18, 34, .35)) 0 calc(100% - calc(var(--p) * 62)) / 100% calc(var(--p) * 62) no-repeat,
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .07) 0 calc(var(--p) * 2), rgba(0, 0, 0, .07) calc(var(--p) * 2) calc(var(--p) * 4)),
+    radial-gradient(ellipse at 50% 40%, var(--denim-hi) 0%, var(--denim) 55%, var(--denim-lo) 100%);
 }
 .sy-back::before { /* the collar */
-  content: ""; position: absolute; left: 33%; width: 34%; top: 0; height: 44px; background: #26364F; clip-path: polygon(0 0, 100% 0, 50% 100%);
+  content: ""; position: absolute; left: 33%; width: 34%; top: 0; height: calc(var(--p) * 44); background: var(--denim-lo); clip-path: polygon(0 0, 100% 0, 50% 100%);
 }
-.sy-jacket-title { margin: 0 0 44px; line-height: 1; position: relative; text-align: center; }
+.sy-jacket-title { margin: 0 0 calc(var(--p) * 44); line-height: 1; position: relative; text-align: center; }
 .sy-jacket-title svg { display: inline-block; filter: invert(1); }
-.sy-jacket-none { margin: 0 0 16px; font: 700 14px/1.4 'Courier New', Courier, monospace; color: #F4F2EA; text-align: center; }
-.sy-patches { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px 6px; position: relative; }
-.sy-patch { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; transform: rotate(var(--r, 0deg)) translate(var(--x, 0), var(--y, 0)); }
-.sy-patch:nth-child(7n+1) { --r: -3.5deg; --x: -4px; --y: 3px; }
-.sy-patch:nth-child(7n+2) { --r: 2.5deg; --x: 5px; --y: -4px; }
-.sy-patch:nth-child(7n+3) { --r: -1.2deg; --x: 2px; --y: 6px; }
-.sy-patch:nth-child(7n+4) { --r: 4deg; --x: -6px; --y: 0; }
-.sy-patch:nth-child(7n+5) { --r: -2.4deg; --x: 3px; --y: -3px; }
-.sy-patch:nth-child(7n+6) { --r: 1.6deg; --x: -2px; --y: 5px; }
-.sy-patch:nth-child(7n) { --r: -4deg; --x: 6px; --y: -2px; }
-.sy-patch-pic { display: block; line-height: 0; margin: -16px 0 -8px; }
+.sy-jacket-none { margin: 0 0 calc(var(--p) * 16); font: 400 calc(var(--fs) * 14)/1.4 var(--f-type); color: var(--pp-white); text-align: center; }
+.sy-patches { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: calc(var(--p) * 6) calc(var(--p) * 6); position: relative; }
+.sy-patch { display: flex; flex-direction: column; align-items: center; gap: calc(var(--p) * 4); text-align: center; transform: rotate(var(--r, 0deg)) translate(var(--x, 0), var(--y, 0)); }
+.sy-patch:nth-child(7n+1) { --r: -3.5deg; --x: calc(var(--p) * -4); --y: calc(var(--p) * 3); }
+.sy-patch:nth-child(7n+2) { --r: 2.5deg; --x: calc(var(--p) * 5); --y: calc(var(--p) * -4); }
+.sy-patch:nth-child(7n+3) { --r: -1.2deg; --x: calc(var(--p) * 2); --y: calc(var(--p) * 6); }
+.sy-patch:nth-child(7n+4) { --r: 4deg; --x: calc(var(--p) * -6); --y: 0; }
+.sy-patch:nth-child(7n+5) { --r: -2.4deg; --x: calc(var(--p) * 3); --y: calc(var(--p) * -3); }
+.sy-patch:nth-child(7n+6) { --r: 1.6deg; --x: calc(var(--p) * -2); --y: calc(var(--p) * 5); }
+.sy-patch:nth-child(7n) { --r: -4deg; --x: calc(var(--p) * 6); --y: calc(var(--p) * -2); }
+.sy-patch-pic { display: block; line-height: 0; margin: calc(var(--p) * -16) 0 calc(var(--p) * -8); }
 .sy-patch-pic canvas { display: block; }
-.sy-patch.is-earned .sy-patch-pic { filter: drop-shadow(3px 4px 0 rgba(0, 0, 0, .55)); }
+.sy-patch.is-earned .sy-patch-pic { filter: drop-shadow(var(--sh-s) 0 rgba(0, 0, 0, .45)); }
 /* the blank squares: unfaded denim, a shade deeper than the faded back */
-.sy-patch.is-faint .sy-patch-pic, .sy-patch.is-blank .sy-patch-pic { filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, .4)); }
-/* black tape label, cream bold Courier caps */
+.sy-patch.is-faint .sy-patch-pic, .sy-patch.is-blank .sy-patch-pic { filter: drop-shadow(calc(var(--p) * 1.5) calc(var(--p) * 2) 0 rgba(0, 0, 0, .3)); }
+/* a quiet name under each patch: typed on a scrap, no box and no shadow */
 .sy-patch-name {
-  font: 700 13px/1.2 'Courier New', Courier, monospace; letter-spacing: .06em; text-transform: uppercase; color: #F4F2EA; background: #141312;
-  padding: 4px 8px 3px; max-width: 150px; box-sizing: border-box; overflow-wrap: break-word; box-shadow: 2px 3px 0 rgba(0, 0, 0, .5); transform: rotate(-1.2deg);
+  font: 400 calc(var(--fs) * 12)/1.2 var(--f-type); letter-spacing: .06em; text-transform: uppercase; color: var(--pp-gray);
+  padding: calc(var(--p) * 2) calc(var(--p) * 4); max-width: calc(var(--p) * 150); box-sizing: border-box; overflow-wrap: break-word;
 }
-/* words ride on cream slips, never straight on the twill */
+/* the card line rides on a cream slip, shown on the newest patch and when you look at one; the hint stays for the patches not earned yet */
 .sy-patch-card, .sy-patch-hint {
-  position: relative; font: 700 13px/1.35 'Courier New', Courier, monospace; font-style: normal; color: #141312; background: #F4F2EA;
-  padding: 5px 8px 4px; max-width: 156px; box-sizing: border-box; box-shadow: 2px 3px 0 rgba(0, 0, 0, .45); transform: rotate(.8deg);
+  position: relative; font: 400 calc(var(--fs) * 12)/1.35 var(--f-type); font-style: normal; color: var(--toner); background: var(--pp-white); clip-path: var(--edge-cut-2);
+  padding: calc(var(--p) * 5) calc(var(--p) * 8) calc(var(--p) * 4); max-width: calc(var(--p) * 156); box-sizing: border-box; transform: rotate(.8deg);
 }
-.sy-patch-hint { margin-top: -4px; transform: rotate(-1deg); }
-.sy-patch-hint::before { /* the safety pin */
-  content: ""; position: absolute; left: 50%; top: -7px; width: 22px; height: 7px; margin-left: -11px; border: 2px solid #8C8C86; border-radius: 4px; background: transparent;
-}
-@media (max-width: 760px) { .sy-patches { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sy-back { padding: 78px 16px 84px; } }
+.sy-patch:not(.is-newest) .sy-patch-card { display: none; }
+.sy-patch:not(.is-newest):hover .sy-patch-card { display: block; position: absolute; z-index: 3; top: 100%; }
+.sy-patch-hint { margin-top: calc(var(--p) * -4); transform: rotate(-1deg); background: var(--pp-bond); }
+/* the one loud thing: the newest patch, two and a half times the size, crooked, stamped on */
+.sy-patch.is-newest { grid-column: span 2; grid-row: span 2; --r: 6deg; --x: 0; --y: calc(var(--p) * 6); z-index: 2; gap: calc(var(--p) * 10); }
+.sy-patch.is-newest .sy-patch-pic { margin: calc(var(--p) * -6) 0 0; filter: drop-shadow(var(--sh-m) 0 rgba(0, 0, 0, .55)); }
+.sy-patch.is-newest .sy-patch-name { font-family: var(--f-gothic); font-size: calc(var(--fs) * 22); color: var(--pp-white); max-width: calc(var(--p) * 300); }
+.sy-patch.is-newest .sy-patch-card { max-width: calc(var(--p) * 280); font-size: calc(var(--fs) * 13); }
 
 /* ---------- the box: chapters, in the notebook ---------- */
-.sy-box { margin-top: 30px; }
-.sy-chapters { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
-.sy-chapter-title { margin: 0; font: 800 14px/1.25 'Courier New', Courier, monospace; text-transform: uppercase; letter-spacing: .04em; }
+.sy-box { margin-top: calc(var(--p) * 30); }
+.sy-chapters { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: calc(var(--p) * 18); }
+.sy-chapter-title { margin: 0; font: 400 calc(var(--fs) * 14)/1.25 var(--f-type); text-transform: uppercase; letter-spacing: .04em; }
 /* twelve index tabs share the page edge the eleven had */
 .nb-ptabs .nb-ptab { flex: 1 1 0; min-height: 0; }
-.sy-chapter-line { margin: 2px 0 0; font: 600 13px/1.42 'Courier New', Courier, monospace; }
+.sy-chapter-line { margin: calc(var(--p) * 2) 0 0; font: 400 calc(var(--fs) * 13)/1.42 var(--f-type); color: var(--toner-mid); }
 .sy-chapter-when { margin: 0; }
-.sy-chapter-watch { display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 6px; }
-.sy-kept { margin-top: 18px; }
-.sy-watch { border: 0; background: transparent; padding: 0; cursor: pointer; }
+.sy-chapter-watch { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 8) calc(var(--p) * 10); margin-top: calc(var(--p) * 6); }
+.sy-kept { margin-top: calc(var(--p) * 18); }
+.sy-watch { border: 0; background: transparent; padding: 0; }
 
-@media (max-width: 620px) {
-  .sy-strip { font-size: 12.5px; left: 8px; bottom: 64px; max-width: calc(100vw - 16px); }   /* above the music player */
-  .sy-card { flex-direction: column; align-items: flex-start; }
-}
-@media (prefers-reduced-motion: reduce) { .sy-tape, .sy-strip, .sy-card { animation: none !important; } }
-.reduce-motion .sy-tape, .reduce-motion .sy-strip, .reduce-motion .sy-card,
-[data-motion="reduce"] .sy-tape, [data-motion="reduce"] .sy-strip, [data-motion="reduce"] .sy-card { animation: none !important; }
+/* ---------- reduced motion ---------- */
+:root[data-motion="reduce"] :is(.sy-tape, .sy-strip, .sy-card, .sy-card-leaving) { animation: none; }
+@media (prefers-reduced-motion: reduce) { :root:not([data-motion="full"]) :is(.sy-tape, .sy-strip, .sy-card, .sy-card-leaving) { animation: none; } }

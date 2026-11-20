@@ -138,6 +138,13 @@
   var TONER = '#141413', PAPER = '#f4f2ea', BONE = '#e7ddc4';
 
   function h(t, a, k) { return SB.UI.h(t, a, k); }
+  /* sizes are stage units: one --p is one px of the old 1280 x 800 layout. A drawing made w by h of them is shown that
+   * size on the stage whatever the window; canvases are rastered as finely as the screen shows them. */
+  function pu(n) { return 'calc(var(--p) * ' + (Math.round(n * 10) / 10) + ')'; }
+  function pxPerP() { return (SB.UI.unit ? SB.UI.unit() : 0.8) * 1.25; }
+  function dpr() { return Math.min(2, (typeof window !== 'undefined' && window.devicePixelRatio) || 1); }
+  /* a drawn piece shown w units wide, keeping its proportions */
+  function fit(el, w) { if (el && el.style) { el.style.width = pu(w); el.style.height = 'auto'; } return el; }
   function C() { return SB.UI.C; }
   function K() { return SB.DeskKit; }
   function D() { return SB.UI.cuDraw; }
@@ -171,7 +178,7 @@
     var G = SB.Content.ui.guide, lines = (G[route] || []).slice(), st = route === 'start' ? null : stepOf(route, slug);
     if (!guideOn() || !lines.length) return null;
     if (extra) lines.push(extra);
-    return h('aside', { class: 'st-guide', role: 'note', aria: { label: st ? SB.text.render(G.label, st, null) : G.k } }, [
+    return h('aside', { class: 'st-guide pz-paper', role: 'note', aria: { label: st ? SB.text.render(G.label, st, null) : G.k } }, [
       h('p', { class: 'st-guide-k' }, [
         h('span', { class: 'st-guide-tag', text: G.k.toUpperCase() }),
         st ? h('span', { class: 'st-guide-n', text: SB.text.render(G.step, st, null).toUpperCase() }) : null
@@ -181,7 +188,7 @@
   }
   function reduced() { try { return SB.UI.prefs.reduced(); } catch (e) { return true; } }
   function drawn() { return !!(SB.DeskKit && SB.UI.cuDraw); }
-  function svgOf(inner, w, ht, vb) {
+  function svgOf(inner, w, ht, vb) {   // attribute sizes only: the box that holds it sets the shown size (width 100% in css)
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + (vb || ('0 0 ' + f(w) + ' ' + f(ht))) + '" width="' + f(w) + '" height="' + f(ht) + '" aria-hidden="true" focusable="false">' + inner + '</svg>';
   }
   /* a drawn piece through the copier, or a plain span when the kit is missing */
@@ -197,12 +204,17 @@
       stop: function () { ids.forEach(function (id) { clearTimeout(id); }); ids = []; }
     };
   }
-  /* replay a CSS hit (slap, thump, land) on an element */
-  function hit(el, cls) {
-    if (!el || !el.classList || reduced()) return;
-    el.classList.remove(cls);
-    try { void el.offsetWidth; } catch (e) { /* fine */ }
-    el.classList.add(cls);
+  /* play one of the shared moves (js/ui/finish.js: 'slap', 'stamp') on an element; they switch themselves off under reduced motion */
+  function hit(el, name, o) {
+    if (!el || !el.classList) return;
+    if (SB.Finish && SB.Finish.move) SB.Finish.move(el, name, o);
+  }
+  /* the pieces of a screen slap down one after another when it opens (the first at stagger place `from`) */
+  function slapIn(list, from) {
+    var F = SB.Finish, els = (list || []).filter(Boolean);
+    if (!F) return;
+    F.stagger(els, from || 0);
+    els.forEach(function (el) { el.classList.add('mv-slap'); });
   }
   /* run fn (which redraws inside box) and put the focus back on the control with the same data-fk */
   function keepFocus(fn) {
@@ -213,7 +225,7 @@
   }
   function strip(text, label, fk, onClick, o) {
     o = o || {};
-    if (!drawn()) return h('button', { type: 'button', class: 'st-plain', data: { fk: fk }, disabled: !!o.disabled, on: { click: onClick }, text: text });
+    if (!drawn()) return h('button', { type: 'button', class: 'st-plain pz-hl', data: { fk: fk }, disabled: !!o.disabled, on: { click: onClick }, text: text });
     return D().act(text, label || text, fk, onClick, o);
   }
 
@@ -263,13 +275,14 @@
       try { s = SB.Flyer.sample(day + ':' + n); } catch (e) { return; }
       var slot = n <= BOTTOM.length ? BOTTOM[n - 1] : null;
       w = slot ? slot.w : r.int(190, 260); ht = Math.round(w * 1100 / 850);
-      try { cv = SB.Flyer.thumb(s.recipe, s.spec, w); } catch (e) { cv = null; }
+      try { cv = SB.Flyer.thumb(s.recipe, s.spec, Math.round(w * pxPerP())); } catch (e) { cv = null; }
       if (!cv) return;
-      el = h('div', { class: 'st-fly' + (still ? '' : ' is-slap'), style: {
-        left: slot ? slot.x + '%' : f(r.range(-4, 90)) + '%', top: slot ? slot.y + '%' : f(r.range(58, 82)) + '%', width: w + 'px', height: ht + 'px',
-        '--rot': slot ? slot.rot + 'deg' : f(r.range(-9, 9)) + 'deg', '--dim': '1' } }, [cv]);
-      if (drawn()) { fx = h('span', { class: 'st-fly-fx', html: fastener(r, w, ht) }); el.appendChild(fx); }
-      if (burst && !still) el.style.animationDelay = (700 + (n - 1) * 90) + 'ms';
+      cv.style.width = '100%'; cv.style.height = '100%';
+      el = h('div', { class: 'st-fly' + (still ? '' : ' mv-slap'), style: {
+        left: slot ? slot.x + '%' : f(r.range(-4, 90)) + '%', top: slot ? slot.y + '%' : f(r.range(58, 82)) + '%', width: pu(w), height: pu(ht),
+        '--rot': slot ? slot.rot + 'deg' : f(r.range(-9, 9)) + 'deg' } }, [cv]);
+      if (drawn()) { fx = h('span', { class: 'st-fly-fx', html: fastener(r, w, ht), style: { width: pu(w + 40) } }); el.appendChild(fx); }
+      if (burst && !still) el.style.setProperty('--mv-d', (700 + (n - 1) * 90) + 'ms');
       pile.appendChild(el);
       while (pile.childNodes.length > WALL_CAP) pile.removeChild(pile.childNodes[0]);
     }
@@ -298,16 +311,7 @@
       inner: k.marker('BOOKER', 250, 302, 124, { seed: 'st-bkr3', fill: PAPER, maxWidth: bw - 64, weight: 1.15, vary: 0.1, tilt: 4 }) });
     out += k.tape(70, 26, 92, 26, { seed: 'st-t1', rot: -24 }) + k.tape(612, 40, 70, 22, { seed: 'st-t3', rot: 12 });
     two += k.tape(808, 206, 90, 26, { seed: 'st-t2', rot: 34 });
-    /* the glass the copier's light bar is clipped to: the two sheets, their cut edges, no shadows */
-    var glass = k.paper(14, 8, 610, 222, { seed: 'st-title', stock: '#fff', rot: -2.4, burn: 0, shadow: false }) +
-                k.paper(213, 183, bw + 14, 154, { seed: 'st-bar0', stock: '#fff', rot: 1.6, burn: 0, shadow: false, cut: 2 });
-    return { svg: out, svg2: two, w: W, h: H, glass: svgOf(glass, W, H) };
-  }
-
-  /* the copier's light bar, now and then, across the title only: clipped to the two sheets as if they lay on the glass */
-  function glassBar(glass) {
-    var url = 'url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(glass) + '")';
-    return h('span', { class: 'st-sweep', aria: { hidden: 'true' }, style: { maskImage: url, webkitMaskImage: url } });
+    return { svg: out, svg2: two, w: W, h: H };
   }
 
   function wayArt() {
@@ -353,11 +357,11 @@
       if (!r || !r.ok || !r.state) { fail(L('start', 'loadBad')); return; }
       openState(r.state, s.slot, fail);
     }
-    function tape(s, i) {
+    function tape(s, i, wide) {
       var a = drawn() ? tapeArt(s, i) : null, label = L('start', 'cont') + ': ' + (s.bookingName || '') + ', ' + (s.cityName || s.city || '') + ', ' + L('start', 'contWeek', { n: (s.week || 0) + 1 });
       return h('li', { class: 'st-tape', style: { '--rot': f(SB.rng.make('tr:' + s.slot).range(-5, 5)) + 'deg' } },
         h('button', { type: 'button', class: 'cb-thing st-tape-btn', aria: { label: label }, data: { fk: 'tape-' + s.slot }, on: { click: function () { cont(s); } } },
-          a ? art(a.svg, a.w, a.h) : h('span', { text: label })));
+          a ? fit(art(a.svg, a.w, a.h), wide ? 150 : 200) : h('span', { text: label })));
     }
     function tapes() {
       var few = list.slice(0, 3), rest = list.slice(3);
@@ -367,7 +371,11 @@
       if (rest.length) {
         keepFocus(function () {
           tapesBox.appendChild(slipBtn(showAll ? L('start', 'fewTapes') : L('start', 'allTapes', { n: list.length }), 'tapes-all', function () { showAll = !showAll; keepFocus(tapes); }));
-          if (showAll) tapesBox.appendChild(h('ul', { class: 'st-tapes st-tapes--all', aria: { label: L('start', 'tapes') } }, rest.map(function (s, i) { return tape(s, i + 3); })));
+          if (showAll) {
+            var all = h('ul', { class: 'st-tapes st-tapes--all', aria: { label: L('start', 'tapes') } }, rest.map(function (s, i) { return tape(s, i + 3, true); }));
+            tapesBox.appendChild(all);
+            if (SB.Finish && SB.Finish.scrollbar) SB.Finish.scrollbar(all);
+          }
         });
       }
     }
@@ -375,7 +383,7 @@
       SB.UI.clear(importBox);
       importBox.appendChild(slipBtn(L('start', 'importStrip'), 'import', function () { showImport = !showImport; keepFocus(imp); if (showImport && ta) try { ta.focus(); } catch (e) { /* fine */ } }));
       if (!showImport) return;
-      ta = ta || h('textarea', { class: 'st-import-ta', rows: '4', aria: { label: L('start', 'importK') } });
+      ta = ta || h('textarea', { class: 'st-import-ta pz-hl', rows: '4', aria: { label: L('start', 'importK') } });
       importBox.appendChild(h('div', { class: 'st-icard st-import' }, [
         h('p', { class: 'st-typed', text: L('start', 'importHelp') }), ta,
         slipBtn(L('start', 'importGo'), 'import-go', function () {
@@ -386,30 +394,33 @@
         })
       ]));
     }
-    var t = drawn() ? titleArt() : null, w = drawn() ? wayArt() : null;
+    var t = drawn() ? titleArt() : null, w = drawn() ? wayArt() : null, F = SB.Finish, el, way, titleEl, subEl, guideEl, smallEl, wallEl;
     tapesBox = h('div', { class: 'st-tapebox' });
     importBox = h('div', { class: 'st-importbox' });
-    root.appendChild(h('div', { class: 'st st-start' }, [
-      wall(tm),
+    wallEl = wall(tm);
+    titleEl = h('h1', { class: 'st-title', aria: { label: L('start', 'title') } }, t ? [fit(art(t.svg, t.w, t.h, 'st-title-art st-title-a'), 640), fit(art(t.svg2, t.w, t.h, 'st-title-art st-title-b'), 640)] : L('start', 'title'));
+    subEl = h('p', { class: 'st-sub' }, h('span', { class: 'pz-paper', text: L('start', 'sub') }));
+    guideEl = guide('start', null, list.length ? SB.Content.ui.guide.startTapes : null);
+    smallEl = h('div', { class: 'st-small' }, [importBox, slipBtn(L('start', 'settings'), 'settings', function () { SB.UI.go('settings'); })]);
+    /* the one loud thing: your show goes here, big and crooked, stamped on after the title lands */
+    way = h('button', { type: 'button', class: 'cb-thing st-way pz-hl', aria: { label: L('start', 'newLabel') }, data: { fk: 'new' }, on: { click: function () { SB.UI.go('city'); } } }, [
+      w ? fit(art(w.svg, w.w, w.h), 400) : h('span', { text: L('start', 'newScene') })
+    ]);
+    el = h('div', { class: 'sb-stage st st-start' }, [
+      wallEl,
       h('div', { class: 'st-front' }, [
-        h('div', { class: 'st-left' }, [
-          h('h1', { class: 'st-title' + (reduced() ? '' : ' is-slap'), aria: { label: L('start', 'title') } }, t ? [art(t.svg, t.w, t.h, 'st-title-art st-title-a'), art(t.svg2, t.w, t.h, 'st-title-art st-title-b'), glassBar(t.glass)] : L('start', 'title')),
-          h('p', { class: 'st-sub' }, h('span', { text: L('start', 'sub') })),
-          guide('start', null, list.length ? SB.Content.ui.guide.startTapes : null),
-          tapesBox,
-          h('div', { class: 'st-small' }, [importBox, slipBtn(L('start', 'settings'), 'settings', function () { SB.UI.go('settings'); })]),
-          msg
+        h('div', { class: 'st-left' }, [titleEl, subEl, guideEl, tapesBox, smallEl, msg
           /* what is playing is on the pocket player (js/ui/musicbar.js), on every screen */
         ]),
-        h('div', { class: 'st-right' }, [
-          h('button', { type: 'button', class: 'cb-thing has-strip st-way is-slap', aria: { label: L('start', 'newLabel') }, data: { fk: 'new' }, on: { click: function () { SB.UI.go('city'); } } }, [
-            w ? art(w.svg, w.w, w.h) : h('span', { text: L('start', 'newScene') }),
-            drawn() ? D().stripArt(L('start', 'newScene'), 15) : null
-          ])
-        ])
+        h('div', { class: 'st-right' }, [way])
       ])
-    ]));
+    ]);
+    root.appendChild(el);
     tapes(); imp();
+    if (F) {
+      slapIn([titleEl, subEl, guideEl, tapesBox, smallEl], 0);
+      F.move(way, 'stamp', { delay: 520, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: way } });
+    }
     point(function () { return byFk(root, 'new'); });
     return { unmount: function () { tm.stop(); point(null); } };
   }
@@ -519,7 +530,7 @@
   var POST_PAPER = { goldenrod: 'goldenrod', kraft: '#C8A77A', newsprint: '#E6E1D3' };
 
   function mountCity(root) {
-    var sel = draft.slug || 'pensacola', q = '', status = null, guideBox = h('div', { class: 'st-guidebox' }), mapBox, over, rackBox, cardBox, search, alive = true, pts = [];
+    var sel = draft.slug || 'pensacola', stage, mapWrap, mapHead, rackCol, q = '', status = null, guideBox = h('div', { class: 'st-guidebox' }), mapBox, over, rackBox, rackBar, cardBox, search, alive = true, pts = [], shown = false;
     function probed(slug) { if (!alive) return; if (slug === sel) drawCard(false); drawRack(); }
     function drawOver() {
       if (!over) return;
@@ -533,9 +544,10 @@
       SB.UI.clear(cardBox);
       var c = card();
       cardBox.appendChild(c);
-      if (land) hit(c, 'is-land');
+      /* the postcard is the hero: stamped on when a town is picked, and when the screen opens */
+      if (land) { hit(c, 'stamp', shown ? { cue: 'stamp', cueAt: 83, cueOpts: { gain: -7, el: c } } : { delay: 260, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: c } }); shown = true; }
     }
-    function drawRack() { if (!rackBox) return; keepFocus(function () { SB.UI.clear(rackBox); rackBox.appendChild(rack()); }); }
+    function drawRack() { if (!rackBox) return; keepFocus(function () { SB.UI.clear(rackBox); rackBox.appendChild(rack()); if (rackBar) rackBar.place(); }); }
     function choose(slug) {
       if (slug === sel) return;
       sel = slug; status = null; probe(slug, probed);
@@ -592,10 +604,10 @@
     function card() {
       var e = entry(sel), ps = packState(sel), ready = ps === 'yes';
       if (!e) return h('div');
-      return h('article', { class: 'st-post', aria: { label: e.name + ', ' + e.state } }, [
+      return h('article', { class: 'st-post pz-paper', aria: { label: e.name + ', ' + e.state } }, [
         Kt().photo({ id: 'crowd-02', w: 330, h: 112, paper: POST_PAPER[e.paper] || 'canary', tape: [{ at: 'top', w: 70 }], rot: 1, seed: 'city-post', cls: 'st-postphoto' }),
         h('div', { class: 'st-post-head' }, [
-          drawn() ? head(e.name, 30, 290) : h('b', { text: e.name }),
+          drawn() ? head(e.name, 54, 280) : h('b', { text: e.name }),
           h('span', { class: 'st-typed st-post-st', text: e.state })
         ]),
         h('h2', { class: 'cb-sr', text: e.name + ', ' + e.state }),
@@ -632,7 +644,7 @@
       } catch (e) { status = L('start', 'packBad'); drawCard(false); }
     }
     var findField = Kt().input({ label: L('city', 'search'), type: 'search', placeholder: L('city', 'search') + '…', fk: 'city-find', cls: 'st-findfield',
-                                 onInput: function (v) { q = v; SB.UI.clear(rackBox); rackBox.appendChild(rack()); },
+                                 onInput: function (v) { q = v; SB.UI.clear(rackBox); rackBox.appendChild(rack()); rackBox.scrollTop = 0; if (rackBar) rackBar.place(); },
                                  onKey: function (ev) {
                                    var first = rackBox.querySelector('.st-rackcard');
                                    if (ev.key === 'ArrowDown' && first) { ev.preventDefault(); first.focus(); }
@@ -643,7 +655,7 @@
     mapBox = h('div', { class: 'st-map', role: 'img', aria: { label: L('city', 'map') } });
     if (drawn()) {
       var m = mapArt();
-      mapBox.appendChild(art(m.svg, m.w, m.h, 'st-map-art'));
+      mapBox.appendChild(fit(art(m.svg, m.w, m.h, 'st-map-art'), 540));
       if (mapBox.insertAdjacentHTML) mapBox.insertAdjacentHTML('beforeend', '<svg class="st-map-over" viewBox="0 0 ' + MAP.w + ' ' + MAP.h + '" aria-hidden="true" focusable="false">' + K().defs() + '</svg>');
       over = mapBox.querySelector ? mapBox.querySelector('.st-map-over') : null;
       if (over && over.addEventListener) {
@@ -651,7 +663,6 @@
         over.addEventListener('mousemove', function (ev) {
           var p = nearest(ev), g = over.querySelector('.st-hover');
           if (!g) return;
-          over.style.cursor = p ? 'pointer' : 'default';
           g.innerHTML = p ? '<path d="M' + f(p.x + 12) + ' ' + f(p.y - 30) + 'h' + f(K().typeWidth(p.e.name.toUpperCase(), 14) + 16) + 'v24h' + f(-(K().typeWidth(p.e.name.toUpperCase(), 14) + 16)) + 'Z" fill="' + TONER + '"/>' +
             K().type(p.e.name.toUpperCase(), p.x + 20, p.y - 13, 14, { fill: PAPER, bold: true }) : '';
         });
@@ -660,22 +671,23 @@
     }
     rackBox = h('div', { class: 'st-rackbox' });
     cardBox = h('div', { class: 'st-cardbox' });
-    root.appendChild(h('div', { class: 'st st-city' }, [
-      h('div', { class: 'st-grit', aria: { hidden: 'true' } }),
+    mapWrap = h('div', { class: 'st-mapwrap' }, [mapBox]);
+    mapHead = h('h1', { class: 'st-head', aria: { label: L('city', 'title') } }, drawn() ? D().word(L('city', 'title'), 40, { halo: PAPER }) : L('city', 'title'));
+    rackCol = h('div', { class: 'st-rackcol' }, [
+      Kt().card({ paper: 'white', seed: 'st-find', rot: 0.8, tape: [{ at: 'tl', w: 64 }], cls: 'st-findcard' }, [findField]),
+      Kt().label(L('city', 'count', { n: (SB.CityIndex || []).length }), null, { cls: 'st-count' }),
+      rackBox
+    ]);
+    stage = h('div', { class: 'sb-stage st st-city' }, [
       h('div', { class: 'st-citygrid' }, [
-        h('div', { class: 'st-mapcol' }, [
-          h('h1', { class: 'st-head', aria: { label: L('city', 'title') } }, drawn() ? D().word(L('city', 'title'), 46, { halo: PAPER }) : L('city', 'title')),
-          guideBox,
-          h('div', { class: 'st-mapwrap' }, [mapBox]),
-          h('div', { class: 'st-findrow' }, [
-            Kt().card({ paper: 'white', seed: 'st-find', rot: 0.8, tape: [{ at: 'tl', w: 64 }], cls: 'st-findcard' }, [findField]),
-            Kt().label(L('city', 'count', { n: (SB.CityIndex || []).length }), null, { cls: 'st-count' })
-          ]),
-          rackBox
-        ]),
+        h('div', { class: 'st-mapcol' }, [mapHead, guideBox, mapWrap]),
+        rackCol,
         h('div', { class: 'st-cardcol' }, [cardBox])
       ])
-    ]));
+    ]);
+    root.appendChild(stage);
+    rackBar = SB.Finish && SB.Finish.scrollbar ? SB.Finish.scrollbar(rackBox) : null;
+    slapIn([mapHead, guideBox, mapWrap, rackCol], 0);
     probe(sel, probed);
     drawOver(); drawCard(true); rackBox.appendChild(rack());
     try { search.focus(); } catch (e) { /* fine */ }
@@ -688,12 +700,12 @@
   /* ---------------------------------------------------------------- */
 
   function tickBox(o) {
-    if (!drawn()) return h('button', { type: 'button', class: 'st-plain', aria: { pressed: String(!!o.on) }, data: { fk: o.fk }, on: { click: o.onClick }, text: (o.on ? '[x] ' : '[ ] ') + o.text });
+    if (!drawn()) return h('button', { type: 'button', class: 'st-plain pz-hl', aria: { pressed: String(!!o.on) }, data: { fk: o.fk }, on: { click: o.onClick }, text: (o.on ? '[x] ' : '[ ] ') + o.text });
     return D().tickThing(o);
   }
 
   function mountTune(root, params) {
-    var slug = (params && params.slug) || draft.slug, qs = [], ans = {}, form, e = entry(slug);
+    var slug = (params && params.slug) || draft.slug, qs = [], ans = {}, form, body, stage, e = entry(slug);
     try { qs = SB.Cities.questions(slug); } catch (err) { qs = []; }
     if (draft.tune && draft.slug === slug) ans = SB.util.copy(draft.tune);
     function optLabel(q, o) {
@@ -733,14 +745,16 @@
     }
     function rerender() { SB.UI.clear(form); form.appendChild(h('div', null, qs.map(group))); }
     form = h('div', { class: 'st-tune-form' });
-    root.appendChild(h('div', { class: 'st st-tune' }, [
-      h('div', { class: 'st-grit', aria: { hidden: 'true' } }),
+    body = h('div', { class: 'st-scrollbody' }, [
+      guide('tune', slug),
+      word('tune.intro', '') && !guideOn() ? h('p', { class: 'kt-pencil st-help', text: word('tune.intro', '') }) : null,
+      form
+    ]);
+    stage = h('div', { class: 'sb-stage st st-tune' }, [
       h('div', { class: 'st-namegrid' }, [
         Kt().card({ tag: 'section', paper: 'white', tape: ['tl', 'tr'], rot: -0.6, cls: 'st-form st-tunesheet' }, [
           Kt().headline(L('tune', 'title') + (e ? ': ' + e.name : ''), { size: 34, max: 560, tag: 'h1', cls: 'st-head' }),
-          guide('tune', slug),
-          word('tune.intro', '') && !guideOn() ? h('p', { class: 'kt-pencil st-help', text: word('tune.intro', '') }) : null,
-          form,
+          body,
           h('div', { class: 'st-acts' }, [
             Kt().button({ label: SB.text.label('ui.tune.use') + ' →', kind: 'primary', big: 24, fk: 'tune-use', on: function () {
               var t = {}, k;
@@ -753,10 +767,13 @@
           ])
         ]),
         h('div', { class: 'st-tunepic' }, [
-          Kt().photo({ ids: ['crowd-02'], w: 430, h: 560, paper: 'canary', tape: ['tl', 'tr'], rot: 1.8, seed: 'tune-pic' })
+          Kt().photo({ ids: ['crowd-02'], w: 330, h: 430, paper: 'canary', tape: ['tl'], rot: 1.8, seed: 'tune-pic' })
         ])
       ])
-    ]));
+    ]);
+    root.appendChild(stage);
+    if (SB.Finish && SB.Finish.scrollbar) SB.Finish.scrollbar(body);
+    slapIn([stage.querySelector('.st-tunesheet'), stage.querySelector('.st-tunepic')], 0);
     rerender();
     /* answered something: use these; nothing ticked: skip */
     point(function () {
@@ -771,7 +788,7 @@
   /* the player's first flyer: a real one, "<name> presents"          */
   /* ---------------------------------------------------------------- */
 
-  var FLY_W = 400, FLY_H = Math.round(400 * 1100 / 850);
+  var FLY_W = 420, FLY_H = Math.round(FLY_W * 1100 / 850);
   function myFlyer(name, width) {
     var s, spec, rec, k, i, cv, e = entry(draft.slug);
     if (!draft.flyerBase) draft.flyerBase = Date.now().toString(36);
@@ -785,7 +802,8 @@
       k = Math.floor(String(name).replace(/\s+/g, '').length / 3);
       for (i = 0; i < k; i++) rec = SB.Flyer.roll(rec, spec, ['layout', 'type', 'ink', 'paper', 'picture']);
       cv = document.createElement('canvas');
-      SB.Flyer.render(cv, rec, spec, { width: width, dpr: Math.min(2, (typeof window !== 'undefined' && window.devicePixelRatio) || 1) });
+      SB.Flyer.render(cv, rec, spec, { width: Math.round(width * pxPerP()), dpr: dpr() });
+      cv.style.width = pu(width); cv.style.height = 'auto';
       cv.setAttribute('role', 'img');
       cv.setAttribute('aria-label', SB.Flyer.text(spec));
       return { canvas: cv, k: k };
@@ -797,7 +815,7 @@
     if (!drawn()) return null;
     var k = K(), out = '';
     out += k.tape(30, 14, 90, 26, { seed: 'mf1', rot: -30 }) + k.tape(FLY_W, 14, 90, 26, { seed: 'mf2', rot: 26 });
-    return h('span', { class: 'st-fly-fx', html: svgOf(out, FLY_W + 30, FLY_H + 30) });
+    return h('span', { class: 'st-fly-fx', html: svgOf(out, FLY_W + 30, FLY_H + 30), style: { width: pu(FLY_W + 30) } });
   }
 
   /* ---------------------------------------------------------------- */
@@ -815,7 +833,7 @@
   }
 
   function mountName(root) {
-    var tm = clock(), input, msg, marksBox, ideasBox, flyBox, sugg = ideas(), lastK = -1, redraw = null, thumped = null;
+    var tm = clock(), input, msg, marksBox, ideasBox, flyBox, body, stage, sugg = ideas(), lastK = -1, redraw = null, thumped = null;
     if (!draft.markSeeds) draft.markSeeds = rollMarks();
     if (!draft.mark) draft.mark = { v: 1, seed: draft.markSeeds[0] };
     function shown() { var n = String((input && input.value) || '').trim(); return n || L('name', 'markBlank'); }
@@ -825,18 +843,20 @@
       if (!r) return;
       el = h('div', { class: 'st-myfly' }, [r.canvas, flyerFx(shown())]);
       flyBox.appendChild(el);
-      if (r.k !== lastK && lastK !== -1) hit(el, 'is-slap');
+      /* the hero: stamped on when the screen opens, slapped again when the letters have re-rolled its art */
+      if (lastK === -1) hit(el, 'stamp', { delay: 260, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: el } });
+      else if (r.k !== lastK) hit(el, 'slap');
       lastK = r.k;
     }
     function marks() {
       keepFocus(function () {
         SB.UI.clear(marksBox);
         marksBox.appendChild(h('div', { class: 'st-stamps', role: 'radiogroup', aria: { label: L('name', 'marks') } }, draft.markSeeds.map(function (s, i) {
-          var on = draft.mark && draft.mark.seed === s, b = h('button', { type: 'button', role: 'radio', class: 'cb-thing st-stamp' + (on ? ' is-on' : ''), aria: { checked: on ? 'true' : 'false' },
+          var on = draft.mark && draft.mark.seed === s, b = h('button', { type: 'button', role: 'radio', class: 'cb-thing st-stamp pz-hl' + (on ? ' is-on' : ''), aria: { checked: on ? 'true' : 'false' },
                                style: { '--rot': f(SB.rng.make('sr' + s).range(-6, 6)) + 'deg' },
                                data: { fk: 'mark-' + i }, on: { click: function () { draft.mark = { v: 1, seed: s }; thumped = s; marks(); flyer(); } } },
             C().BookerMark({ name: shown(), mark: { v: 1, seed: s }, size: 84 }));
-          if (thumped === s) hit(b, 'is-thump');
+          if (thumped === s) hit(b, 'stamp');
           return b;
         })));
         thumped = null;
@@ -869,19 +889,21 @@
         return Kt().button({ label: s, fk: 'idea-' + i, paper: 'white', cls: 'st-idea', on: function () { input.value = s; draft.bookingName = s; marks(); flyer(); } });
       }))
     ]);
-    root.appendChild(h('div', { class: 'st st-name' }, [
-      h('div', { class: 'st-grit', aria: { hidden: 'true' } }),
+    body = h('div', { class: 'st-scrollbody' }, [
+      guide('name', draft.slug),
+      nameField,
+      h('p', { class: 'kt-pencil st-help', text: L('name', 'help') }),
+      ideasBox,
+      h('p', { class: 'kt-small st-k', text: L('name', 'marks') }),
+      h('p', { class: 'kt-pencil st-help', text: L('name', 'markHelp') }), marksBox,
+      Kt().button({ label: L('name', 'reroll'), fk: 'reroll', on: function () { draft.markSeeds = rollMarks(); draft.mark = { v: 1, seed: draft.markSeeds[0] }; thumped = draft.markSeeds[0]; marks(); flyer(); } }),
+      msg
+    ]);
+    stage = h('div', { class: 'sb-stage st st-name' }, [
       h('div', { class: 'st-namegrid' }, [
-        Kt().card({ tag: 'section', paper: 'white', tape: ['tl', 'tr'], rot: -0.6, cls: 'st-form st-namesheet' }, [
+        Kt().card({ tag: 'section', paper: 'white', tape: ['tl'], rot: -0.6, cls: 'st-form st-namesheet' }, [
           Kt().headline(L('name', 'title'), { size: 34, max: 560, tag: 'h1', cls: 'st-head' }),
-          guide('name', draft.slug),
-          nameField,
-          h('p', { class: 'kt-pencil st-help', text: L('name', 'help') }),
-          ideasBox,
-          h('p', { class: 'kt-small st-k', text: L('name', 'marks') }),
-          h('p', { class: 'kt-pencil st-help', text: L('name', 'markHelp') }), marksBox,
-          Kt().button({ label: L('name', 'reroll'), fk: 'reroll', on: function () { draft.markSeeds = rollMarks(); draft.mark = { v: 1, seed: draft.markSeeds[0] }; thumped = draft.markSeeds[0]; marks(); flyer(); } }),
-          msg,
+          body,
           h('div', { class: 'st-acts' }, [
             Kt().button({ label: L('name', 'next'), kind: 'primary', big: 24, fk: 'name-next', on: next }),
             Kt().button({ label: L('name', 'back'), fk: 'name-back', on: function () { SB.UI.go('city'); } })
@@ -889,7 +911,10 @@
         ]),
         flyBox
       ])
-    ]));
+    ]);
+    root.appendChild(stage);
+    if (SB.Finish && SB.Finish.scrollbar) SB.Finish.scrollbar(body);
+    slapIn([stage.querySelector('.st-namesheet')], 0);
     marks(); flyer();
     try { input.focus(); } catch (e) { /* fine */ }
     /* no name yet: the box to type it in; a name: next */
@@ -916,7 +941,7 @@
   }
 
   function mountSetup(root) {
-    var tm = clock(), S = draft.settings, msg = h('div', { aria: { live: 'polite' } }), body = h('div', { class: 'st-setlines' }), flyBox, going = false, guided = true;
+    var tm = clock(), S = draft.settings, msg = h('div', { aria: { live: 'polite' } }), body = h('div', { class: 'st-setlines' }), flyBox, sbody, stage, hitBtn, going = false, guided = true;
     function line(key, values, helpKey) {
       return h('div', { class: 'st-setline' }, [
         Kt().pick({ label: L('setup', key), name: 'st-set-' + key, value: S[key], fk: 'set-' + key,
@@ -972,36 +997,37 @@
       if (going) return;
       going = true;
       if (reduced() || !el || !drawn()) { begin(); return; }
-      el.appendChild(h('span', { class: 'st-staples', html: svgOf(k.staple(70, 26, { rot: -8 }) + k.staple(FLY_W - 70, 24, { rot: 6 }) + k.staple(70, FLY_H - 22, { rot: 4 }) + k.staple(FLY_W - 70, FLY_H - 20, { rot: -5 }), FLY_W, FLY_H) }));
-      hit(el, 'is-staple');
-      tm.later(begin, 520);
+      el.appendChild(h('span', { class: 'st-staples', html: svgOf(k.staple(70, 26, { rot: -8 }) + k.staple(FLY_W - 70, 24, { rot: 6 }) + k.staple(70, FLY_H - 22, { rot: 4 }) + k.staple(FLY_W - 70, FLY_H - 20, { rot: -5 }), FLY_W, FLY_H), style: { width: pu(FLY_W) } }));
+      hit(el, 'stamp');
+      tm.later(begin, 420);
     }
     var r = myFlyer(draft.bookingName || L('name', 'markBlank'), FLY_W);
     flyBox = h('div', { class: 'st-flybox' }, r ? h('div', { class: 'st-myfly' }, [r.canvas, flyerFx(draft.bookingName || L('name', 'markBlank'))]) : null);
-    root.appendChild(h('div', { class: 'st st-setup' }, [
-      h('div', { class: 'st-grit', aria: { hidden: 'true' } }),
+    sbody = h('div', { class: 'st-scrollbody' }, [guide('setup', draft.slug), body, msg]);
+    hitBtn = h('button', { type: 'button', class: 'cb-thing is-strip st-staple pz-hl', aria: { label: L('setup', 'stapleLabel') }, data: { fk: 'staple' }, on: { click: staple } },
+      drawn() ? fit(art(stapleArt(), 430, 104), 400) : h('span', { text: L('setup', 'start') }));
+    stage = h('div', { class: 'sb-stage st st-setup' }, [
       h('div', { class: 'st-namegrid' }, [
-        h('div', { class: 'st-setcol' }, [
-        Kt().card({ tag: 'section', paper: 'white', tape: ['tl', 'tr'], rot: -0.6, cls: 'st-form st-setsheet' }, [
+        Kt().card({ tag: 'section', paper: 'white', tape: ['tl'], rot: -0.6, cls: 'st-form st-setsheet' }, [
           Kt().headline(L('setup', 'title'), { size: 38, max: 560, tag: 'h1', cls: 'st-head' }),
-          guide('setup', draft.slug),
-          body, msg,
+          sbody,
           h('div', { class: 'st-acts' }, [
             Kt().button({ label: L('setup', 'back'), fk: 'setup-back', on: function () { SB.UI.go('name'); } }),
             /* skip the walkthrough: the same start, with the first show left to you */
             skipWords() ? Kt().button({ label: skipWords(), fk: 'skip-tutorial', paper: 'white', on: function () { guided = false; staple(); } }) : null
           ])
         ]),
-        Kt().photo({ ids: ['crowd-03'], w: 560, h: 170, paper: 'pink', tape: ['tl', 'tr'], rot: -1.2, seed: 'set-pic', cls: 'st-setpic' })
-        ]),
         h('div', { class: 'st-hitcol' }, [
           flyBox,
-          h('button', { type: 'button', class: 'cb-thing is-strip st-staple', aria: { label: L('setup', 'stapleLabel') }, data: { fk: 'staple' }, on: { click: staple } },
-            drawn() ? art(stapleArt(), 430, 104) : h('span', { text: L('setup', 'start') })),
+          hitBtn,
           h('p', { class: 'kt-pencil st-help st-staplehelp', text: L('setup', 'stapleHelp') })
         ])
       ])
-    ]));
+    ]);
+    root.appendChild(stage);
+    if (SB.Finish && SB.Finish.scrollbar) SB.Finish.scrollbar(sbody);
+    slapIn([stage.querySelector('.st-setsheet')], 0);
+    if (SB.Finish && flyBox.firstChild) hit(flyBox.firstChild, 'stamp', { delay: 260, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: flyBox.firstChild } });
     draw();
     point(function () { return going ? null : byFk(root, 'staple'); });
     return { unmount: function () { tm.stop(); point(null); } };

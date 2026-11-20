@@ -68,6 +68,54 @@
       jacket: [292, 716, 172, 200, 4]
     };
     var CLIP = { x: 452, y: 440, w: 142, h: 206, step: 144, dy: [0, 18, 4, 22], rot: [-3, 2.4, -1.5, 3.2] };
+
+    /* Where each thing lies on the table (polish brief job 7): [centre x, centre y, zoom, crooked degrees]. BOX above is
+       what each drawing is drawn in; this is where it is put and how big it is shown, so a bigger calendar is the same
+       calendar seen closer (its type and toner scale with it). Things overlap like papers piled on a real desk: later
+       in the list lies on top. The table is laid out full; whatever is out (a guided start puts things out show by show,
+       SB.Rungs) is then zoomed to fill the table, so a week-one desk is a few big things in the lamp's light, not islands
+       in the dark. The folder is pinned over the table's front edge, and the bottom right corner is left to the
+       pocket player (js/ui/musicbar.js). */
+    var LAYOUT = {
+      calendar: [280, 262, 1.08, -2.6], lamp: [290, 541, 1.1, 2], mug: [250, 790, 1, -1.5],
+      paper: [760, 268, 1.08, 1.2], notebook: [700, 820, 1.12, -3], flyers: [990, 800, 1.12, 2.5],
+      map: [1290, 150, 1.0, 2.4], keys: [1482, 178, 0.95, -2], phone: [1150, 362, 1.22, -4],
+      stickers: [1405, 458, 1.08, 1.6], book: [1185, 652, 1.2, 3], tin: [1405, 708, 1.1, -2],
+      drawer: [1180, 925, 0.8, -1], jacket: [450, 830, 1, 4]
+    };
+    var CLIPLAY = { x: 540, y: 590, step: 156, z: 1.12 };
+    var PINNED = { drawer: 1 };
+    var TABLE = { x: 34, y: 20, w: 1532, h: 920, lip: 34 };          // the table top; its front edge drops lip units to the floor
+    var AREA = { x: 60, y: 34, w: 1480, h: 850 }, AREA_GUIDED = { x: 60, y: 34, w: 1480, h: 786 };   // the walkthrough's strip takes the bottom band
+    var LIGHT = { x: 760, y: 420 };                                   // the lamp's pool on the table
+    function layoutOf(id) {
+      var m = /^clip(\d)$/.exec(id), i;
+      if (id === 'clips') m = [0, '0'];
+      if (m) { i = +m[1]; return [CLIPLAY.x + i * CLIPLAY.step, CLIPLAY.y + CLIP.dy[i % 4] * CLIPLAY.z, CLIPLAY.z, CLIP.rot[i % 4]]; }
+      return LAYOUT[id] || null;
+    }
+    /* each object's place on the stage: disp = { x0, y0, scale, rot }, the top left of its drawing box (with its margin of
+       bare table) in desk units, and desk units per drawing unit */
+    function fit(list) {
+      var guided = typeof document !== 'undefined' && document.body && document.body.classList.contains('sy-guiding'),
+          area = guided ? AREA_GUIDED : AREA, x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, sc, tx, ty;
+      list.forEach(function (o) {
+        var l = layoutOf(o.id), hw, hh;
+        if (!l || PINNED[o.id]) return;
+        hw = o.box[2] * l[2] / 2; hh = o.box[3] * l[2] / 2;
+        x0 = Math.min(x0, l[0] - hw); x1 = Math.max(x1, l[0] + hw); y0 = Math.min(y0, l[1] - hh); y1 = Math.max(y1, l[1] + hh);
+      });
+      if (x1 <= x0) { x0 = 0; y0 = 0; x1 = W; y1 = H; }
+      x0 -= 14; y0 -= 14; x1 += 14; y1 += 14;
+      sc = Math.max(0.8, Math.min(1.32, area.w / (x1 - x0), area.h / (y1 - y0)));
+      tx = area.x + area.w / 2 - (x0 + x1) / 2 * sc; ty = area.y + area.h / 2 - (y0 + y1) / 2 * sc;
+      list.forEach(function (o) {
+        var l = layoutOf(o.id) || [o.box[0] + o.box[2] / 2, o.box[1] + o.box[3] / 2, 1, o.box[4] || 0], pin = !!PINNED[o.id],
+            z = pin ? l[2] : l[2] * sc, cx = pin ? l[0] : l[0] * sc + tx, cy = pin ? l[1] : l[1] * sc + ty;
+        o.disp = { x0: cx - (o.box[2] / 2 + M) * z, y0: cy - (o.box[3] / 2 + M) * z, scale: z, rot: l[3] };
+      });
+      return list;
+    }
     var host = null, stage = null, bgCv = null, bgArt = null, hits = null, memo = {}, built = {}, hitKey = '', lastV = null,
         lastLearned = null, seenLearned = null, resizeOn = false, resizeT = null, gens = {};
     var thumbs = {};
@@ -176,20 +224,47 @@
     /* ---------------------------------------------------------------- */
 
     function drawTable(v) {
-      var k = K(), out = '', r = k.rng(v.seed + 'table'), i, x, y;
-      out += '<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="' + k.mat('table') + '"/>';
-      for (i = 0; i < 18; i++) {
-        x = r.range(0, W); y = r.range(0, H);
-        out += '<path d="M' + f(x) + ' ' + f(y) + 'l' + f(r.range(-160, 160)) + ' ' + f(r.range(-40, 40)) + '" stroke="#232321" stroke-width="' + f(r.range(0.8, 1.8)) + '"/>';
+      var k = K(), out = '', r = k.rng(v.seed + 'table'), i, x, y, t = TABLE, bx = t.x, by = t.y, bw = t.w, bh = t.h, front = by + bh,
+          top = '#1e1c19', grain = '#272520', dark = '#121110', floor = '#050505';
+      /* the floor, and the table's shadow on it */
+      out += '<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="' + floor + '"/>';
+      out += '<defs><radialGradient id="dkPool" cx="' + f(LIGHT.x) + '" cy="' + f(LIGHT.y) + '" r="900" gradientUnits="userSpaceOnUse">' +
+             '<stop offset="0" stop-color="#fff4d6" stop-opacity=".17"/><stop offset=".45" stop-color="#fff4d6" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>' +
+             '<linearGradient id="dkLip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3833"/><stop offset=".18" stop-color="#151412"/><stop offset="1" stop-color="#0d0c0b"/></linearGradient>' +
+             '<linearGradient id="dkDrop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".9"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>' +
+             /* the copier's speckle, light flecks and dark, the same grain the old black table had */
+             '<filter id="dkSpeck" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="1" seed="7"/>' +
+             '<feColorMatrix values="0 0 0 0 .93  0 0 0 0 .91  0 0 0 0 .86  0 0 0 9 -7.4"/></filter>' +
+             '<filter id="dkSoot" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="2" seed="3"/>' +
+             '<feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 5 -3"/></filter></defs>';
+      out += '<rect x="' + (bx + 10) + '" y="' + (front + t.lip) + '" width="' + (bw - 20) + '" height="' + (H - front - t.lip) + '" fill="url(#dkLip)" opacity="0"/>';
+      out += '<rect x="' + bx + '" y="' + (front + t.lip - 4) + '" width="' + bw + '" height="44" fill="url(#dkDrop)"/>';
+      /* the top: a scuffed, xeroxed wood grain */
+      out += '<path d="M' + bx + ' ' + (by + 6) + 'L' + (bx + 6) + ' ' + by + 'H' + (bx + bw - 6) + 'L' + (bx + bw) + ' ' + (by + 6) + 'V' + front + 'H' + bx + 'Z" fill="' + top + '"/>';
+      for (i = 0; i < 46; i++) {
+        y = by + 10 + i * (bh - 20) / 46 + r.range(-6, 6);
+        x = bx + r.range(0, 120);
+        out += '<path d="M' + f(x) + ' ' + f(y) + 'C' + f(x + 380) + ' ' + f(y + r.range(-14, 14)) + ' ' + f(x + 760) + ' ' + f(y + r.range(-10, 10)) + ' ' + f(bx + bw - r.range(0, 120)) + ' ' + f(y + r.range(-12, 12)) +
+               '" stroke="' + (i % 3 ? grain : dark) + '" stroke-width="' + f(r.range(1.2, 3.6)) + '" fill="none" stroke-opacity="' + f(r.range(0.4, 0.9)) + '"/>';
       }
-      /* offcuts, grayed, at the edges and in the gutters */
-      [[6, 486, 26, 6, -4], [396, 14, 40, 5, 20], [1066, 470, 30, 6, -60], [1576, 340, 6, 30, 4], [770, 984, 60, 6, 3], [396, 740, 30, 5, -12]].forEach(function (q) {
+      for (i = 0; i < 18; i++) {
+        x = r.range(bx + 40, bx + bw - 40); y = r.range(by + 30, front - 30);
+        out += '<path d="M' + f(x) + ' ' + f(y) + 'l' + f(r.range(-160, 160)) + ' ' + f(r.range(-40, 40)) + '" stroke="#3a3833" stroke-opacity=".5" stroke-width="' + f(r.range(0.8, 1.8)) + '"/>';
+      }
+      /* toner soot and flecks, then the lamp's pool, falling off to the edges */
+      out += '<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh + '" filter="url(#dkSoot)" opacity=".55"/>';
+      out += '<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh + '" fill="url(#dkPool)"/>';
+      out += '<rect x="0" y="0" width="' + W + '" height="' + H + '" filter="url(#dkSpeck)" opacity=".7"/>';
+      /* the edges: the near edge catches the light and drops to the floor; the sides are a lit line */
+      out += '<rect x="' + bx + '" y="' + front + '" width="' + bw + '" height="' + t.lip + '" fill="url(#dkLip)"/>';
+      out += '<path d="M' + bx + ' ' + front + 'H' + (bx + bw) + '" stroke="#8a857a" stroke-width="3" stroke-opacity=".7"/>';
+      out += '<path d="M' + (bx + 1) + ' ' + (by + 6) + 'V' + front + 'M' + (bx + bw - 1) + ' ' + (by + 6) + 'V' + front + '" stroke="#55524b" stroke-width="2" stroke-opacity=".6"/>';
+      /* offcuts and a typed scrap, left lying about on the top */
+      [[60, 496, 26, 6, -4], [420, 30, 40, 5, 20], [1066, 520, 30, 6, -60], [1540, 340, 6, 30, 4], [770, 900, 60, 6, 3], [396, 700, 30, 5, -12]].forEach(function (q) {
         out += '<path d="M' + q[0] + ' ' + q[1] + 'h' + q[2] + 'v' + q[3] + 'h-' + q[2] + 'Z" fill="#4a4944" transform="rotate(' + q[4] + ' ' + q[0] + ' ' + q[1] + ')"/>';
       });
-      out += k.tape(14, 20, 40, 12, { seed: 'tt1', rot: -40, op: 0.35 }) + k.tape(1588, 980, 40, 12, { seed: 'tt2', rot: 30, op: 0.35 });
-      out += k.regmark(1588, 14, 10, { stroke: '#5a5a55' }) + k.regmark(14, 986, 10, { stroke: '#5a5a55' });
-      /* the soft side: a typed scrap at the very edge */
-      out += '<g transform="rotate(-3 20 984)"><path d="M14 972h150v20h-150Z" fill="#8f8b80"/>' + k.type(L('words.safe'), 22, 987, 13, { fill: '#1f1f1d' }) + '</g>';
+      out += k.tape(bx + 18, by + 22, 40, 12, { seed: 'tt1', rot: -40, op: 0.35 }) + k.tape(bx + bw - 22, front - 18, 40, 12, { seed: 'tt2', rot: 30, op: 0.35 });
+      out += '<g transform="rotate(-3 ' + (bx + 30) + ' ' + (front - 22) + ')"><path d="M' + (bx + 24) + ' ' + (front - 34) + 'h150v20h-150Z" fill="#8f8b80"/>' + k.type(L('words.safe'), bx + 32, front - 19, 13, { fill: '#1f1f1d' }) + '</g>';
       return out;
     }
 
@@ -581,7 +656,15 @@
       /* the jean jacket on the back of the chair (09 section 4): its patches and buttons */
       var worn = jacketItems(s0(v)).length;
       add('jacket', BOX.jacket, L('names.jacket'), worn ? L('tag.jacket', { n: worn }) : L('tag.jacketNone'), worn ? L('state.jacket', { n: worn }) : L('state.jacketNone'), false, 'jacket');
-      return ladder(list, s0(v));
+      return fit(quiet(ladder(list, s0(v))));
+    }
+
+    /* the second strip says what the drawing does not: drop it where the thing already shows it (the map's town, the
+       envelope's total, "nothing booked" on the empty set list...), unless it is the hot one that needs you */
+    function quiet(list) {
+      var SAYS = { drawer: 1, map: 1, notebook: 1, tin: 1, flyers: 1, paper: 1, clips: 1 };
+      list.forEach(function (o) { if (SAYS[o.id] && !o.hot && !/^(NEW|NEW PAGE)$/.test(o.state)) o.state = ''; });
+      return list;
     }
 
     /* A guided start fills the desk in show by show (SB.Rungs): what is not out yet is left off the table, and what
@@ -605,12 +688,12 @@
     }
     /* drawn by SB.Scenes.jacket (the art kit's own copier grit) onto a canvas in the object's live layer */
     function drawJacket(p, o, s) {
-      var items = jacketItems(s).slice(-6), key = items.map(function (i) { return i.id; }).join(',') + '|' + (stage ? stage.clientWidth : 0), cv, vb = vbOf(o.box), sc;
+      var items = jacketItems(s).slice(-6), key = items.map(function (i) { return i.id; }).join(',') + '|' + (stage ? stage.clientWidth : 0) + '|' + (o.disp ? o.disp.scale.toFixed(2) : 1), cv, vb = vbOf(o.box), sc;
       if (p.jacketKey === key || !SB.Scenes || !SB.Scenes.jacket) return;
       p.jacketKey = key;
       cv = canvasEl('dk-jacket');
       if (!cv) return;
-      sc = Math.max(1, Math.min(2, ((stage && stage.clientWidth) || W) / W * 2));
+      sc = Math.max(1, Math.min(3, ((stage && stage.clientWidth) || W) / W * 2 * (o.disp ? o.disp.scale : 1)));
       cv.width = Math.round(o.box[2] * sc * 1.6); cv.height = Math.round(o.box[3] * sc * 1.6);
       cv.style.left = pct(M, vb[2]); cv.style.top = pct(M, vb[3]); cv.style.width = pct(o.box[2], vb[2]); cv.style.height = pct(o.box[3], vb[3]);
       try { SB.Scenes.jacket(cv, items, { seed: String(s && s.seed || '') }); } catch (e) { SB.log('warn', 'SB.Desk', 'jacket: ' + (e && e.message)); }
@@ -697,15 +780,17 @@
     function sizeUnit() { if (stage && stage.style && stage.style.setProperty) stage.style.setProperty('--u', ((stage.clientWidth || W) / W) + 'px'); }
 
     /* draw svg onto canvas cv at the stage's scale, run the copier and the lamp; vb is the drawing's place on the desk */
-    function raster(key, cv, svg, vb, seed, done) {
-      var gen, url, im, cw, ch, scale, wd;
+    function raster(key, cv, svg, vb, seed, done, disp) {
+      var gen, url, im, cw, ch, scale, wd, pxu;
       if (!cv || !stage || typeof Image === 'undefined' || typeof Blob === 'undefined' || typeof URL === 'undefined' || !URL.createObjectURL) return;
       wd = stage.clientWidth || 0;
       if (wd < 10) return;
-      scale = wd / W * Math.min(1.5, (typeof window !== 'undefined' && window.devicePixelRatio) || 1);
+      disp = disp || { x0: vb[0], y0: vb[1], scale: 1 };
+      pxu = wd / W * Math.min(2, (typeof window !== 'undefined' && window.devicePixelRatio) || 1);   // canvas px per desk unit
+      scale = pxu * disp.scale;                                                                     // canvas px per drawing unit
       cw = Math.max(2, Math.round(vb[2] * scale)); ch = Math.max(2, Math.round(vb[3] * scale));
       gen = gens[key] = (gens[key] || 0) + 1;
-      try { url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' })); } catch (e) { return; }
+      try { url = URL.createObjectURL(new Blob([SB.Finish && SB.Finish.withFonts ? SB.Finish.withFonts(svg) : svg], { type: 'image/svg+xml' })); } catch (e) { return; }
       im = new Image();
       im.onload = function () {
         var ctx, g, lx, ly;
@@ -716,9 +801,10 @@
           ctx = cv.getContext('2d');
           ctx.clearRect(0, 0, cw, ch);
           ctx.drawImage(im, 0, 0, cw, ch);
-          K().photocopy(ctx, cw, ch, seed, { px: scale, floor: key === 'table' ? 11 : 0 });
-          lx = (W * 0.47 - vb[0]) * scale; ly = (H * 0.48 - vb[1]) * scale;
-          g = ctx.createRadialGradient(lx, ly, H * 0.3 * scale, lx, ly, H * 1.02 * scale);
+          /* the table is not put through the copier (it would crush its lit wood to toner black): it carries its own speckle */
+          if (key !== 'table') K().photocopy(ctx, cw, ch, seed, { px: pxu, floor: 0 });
+          lx = (LIGHT.x - disp.x0) * pxu; ly = (LIGHT.y - disp.y0) * pxu;
+          g = ctx.createRadialGradient(lx, ly, H * 0.3 * pxu, lx, ly, H * 1.02 * pxu);
           g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.7, 'rgba(0,0,0,0.12)'); g.addColorStop(1, 'rgba(0,0,0,0.5)');
           ctx.globalCompositeOperation = 'source-atop';
           ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
@@ -741,11 +827,16 @@
           pad = h('span', { class: 'dk-pad', aria: { hidden: 'true' } }),
           b = h('button', { type: 'button', class: 'dk-hit ' + (o.cls || ''), data: { obj: o.id }, on: { click: function () { open(o.id); } } }, [pad, obj]);
       pad.style.left = pct(M, vb[2]); pad.style.top = pct(M, vb[3]); pad.style.width = pct(o.box[2], vb[2]); pad.style.height = pct(o.box[3], vb[3]);
-      b.style.left = pct(vb[0], W); b.style.top = pct(vb[1], H); b.style.width = pct(vb[2], W); b.style.height = pct(vb[3], H);
+      put(b, o);
       strips.style.left = pct(M - 12, vb[2]); strips.style.top = pct(M - 27, vb[3]);
-      if (obj.style && obj.style.setProperty) obj.style.setProperty('--r', (o.box[4] || 0) + 'deg');
       built[o.id] = { b: b, art: art, cv: cv, live: live, state: state, obj: obj };
       return b;
+    }
+    /* where a thing sits and how big it is shown (fit): its button covers its drawing box, scaled */
+    function put(b, o) {
+      var vb = vbOf(o.box), d = o.disp || { x0: vb[0], y0: vb[1], scale: 1, rot: o.box[4] || 0 }, obj = b.querySelector ? b.querySelector('.dk-obj') : null;
+      b.style.left = pct(d.x0, W); b.style.top = pct(d.y0, H); b.style.width = pct(vb[2] * d.scale, W); b.style.height = pct(vb[3] * d.scale, H);
+      if (obj && obj.style && obj.style.setProperty) obj.style.setProperty('--r', (d.rot || 0) + 'deg');
     }
 
     var current = [];
@@ -769,14 +860,15 @@
         p.b.classList.toggle('is-hot', o.hot);
         p.b.hidden = !!o.hidden;
         if (p.b.style && p.b.style.setProperty) p.b.style.setProperty('--hl', hexA(v.hot, 0.72));
-        k2 = layerKey(o.id, v) + '|' + o.box.join(',');
+        put(p.b, o);
+        k2 = layerKey(o.id, v) + '|' + o.box.join(',') + '|' + (o.disp ? o.disp.scale.toFixed(3) + ',' + Math.round(o.disp.x0) + ',' + Math.round(o.disp.y0) : '');
         if (memo[o.id] !== k2) {
           memo[o.id] = k2;
           vb = vbOf(o.box);
           svg = svgDoc(vb, layerHtml(o.id, v, s, o.box));
           p.art.innerHTML = svg;
           p.obj.classList.remove('is-copied');
-          raster(o.id, p.cv, svg, vb, v.seed + o.id, (function (obj) { return function () { obj.classList.add('is-copied'); }; })(p.obj));
+          raster(o.id, p.cv, svg, vb, v.seed + o.id, (function (obj) { return function () { obj.classList.add('is-copied'); }; })(p.obj), o.disp);
         }
         if (o.id === 'lamp') drawLive(p, v, o);
         if (o.id === 'jacket') drawJacket(p, o, s);

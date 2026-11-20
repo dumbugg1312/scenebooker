@@ -163,7 +163,7 @@
     if (m.once) mem.onPhone = m.once;
     return h('div', { class: 'sy-dana', role: 'log', aria: { label: L('texts', { outgoing: m.from }) } }, [
       h('p', { class: 'sy-dana-from' }, h('span', { class: 'ph-strip', text: String(m.from || '').toUpperCase() })),
-      m.list.map(function (x) { return h('div', { class: 'ph-bub ph-bub--them sy-bub sy-bub--' + x.kind }, h('p', { text: x.text })); })
+      m.list.map(function (x) { return h('div', { class: 'ph-bub ph-bub--them pz-paper sy-bub sy-bub--' + x.kind }, h('p', { text: x.text })); })
     ]);
   }
 
@@ -253,7 +253,7 @@
   }
 
   var tapeEl = null, tapeFor = null, tapedEl = null, queued = false;
-  var TW = 134, TH = 55;                    // the tape, in px (css/story.css .sy-tape)
+  var TW = 134, TH = 55;                    // the tape, in phone units (css/story.css .sy-tape; x SB.UI.unit() * 1.25 for px)
 
   function untape() {
     if (tapedEl && tapedEl.removeAttribute) tapedEl.removeAttribute('data-taped');
@@ -276,34 +276,37 @@
   /* put the tape by the element: over its top right corner, the arrow pointing down into it; on the other corner
    * when that would leave the window; flat against the edge of a scrolling page when the element is off it */
   function position(el, fresh) {
-    var W = (typeof window !== 'undefined' && window.innerWidth) || 1280, H = (typeof window !== 'undefined' && window.innerHeight) || 800,
-        r = safe(function () { return el.getBoundingClientRect(); }, null), sc, c, x, y, rot, top = 0, bot = H, pad = 6, hw = TW / 2 + 4, hh = TW / 2 * 0.5 + TH / 2;
+    /* the tape is 134 x 55 phone units (css/story.css .sy-tape): every distance here is in those units, times k px */
+    var k = SB.UI.unit ? SB.UI.unit() * 1.25 : 1, tw = TW * k, th = TH * k,
+        W = (typeof window !== 'undefined' && window.innerWidth) || 1280, H = (typeof window !== 'undefined' && window.innerHeight) || 800,
+        r = safe(function () { return el.getBoundingClientRect(); }, null), sc, c, x, y, rot, top = 0, bot = H, pad = 6 * k, hw = tw / 2 + 4 * k, hh = tw / 2 * 0.5 + th / 2;
     if (!r || !tapeEl) return;
     sc = scroller(el);
     c = sc ? safe(function () { return sc.getBoundingClientRect(); }, null) : null;
     if (c) { top = Math.max(0, c.top); bot = Math.min(H, c.bottom); }
     /* newly pointed at and off the page: bring it up, once */
-    if (fresh && sc && (r.bottom < top + 10 || r.top > bot - 10) && el.scrollIntoView) {
+    if (fresh && sc && (r.bottom < top + 10 * k || r.top > bot - 10 * k) && el.scrollIntoView) {
       safe(function () { el.scrollIntoView({ block: 'center', inline: 'nearest' }); }, null);
       r = safe(function () { return el.getBoundingClientRect(); }, r) || r;
     }
     x = r.left + r.width / 2;
-    if (r.bottom < top + 10) { y = top + 36; rot = -90; hw = TH / 2 + 4; hh = TW / 2; }
-    else if (r.top > bot - 10) { y = bot - 40; rot = 90; hw = TH / 2 + 4; hh = TW / 2; }
+    if (r.bottom < top + 10 * k) { y = top + 36 * k; rot = -90; hw = th / 2 + 4 * k; hh = tw / 2; }
+    else if (r.top > bot - 10 * k) { y = bot - 40 * k; rot = 90; hw = th / 2 + 4 * k; hh = tw / 2; }
     else {
-      x = r.right + 30; y = r.top - 16; rot = 150;
-      if (r.width > 260) x = r.right - 40;                          // a wide thing: sit on it, not past it
-      if (x + hw > W - pad) { x = (r.width > 260 ? r.left + 40 : r.left - 30); rot = 30; }
-      if (y - hh < pad) { y = r.bottom + 16; rot = rot === 150 ? 210 : -30; }
+      x = r.right + 30 * k; y = r.top - 16 * k; rot = 150;
+      if (r.width > 260 * k) x = r.right - 40 * k;                  // a wide thing: sit on it, not past it
+      if (x + hw > W - pad) { x = (r.width > 260 * k ? r.left + 40 * k : r.left - 30 * k); rot = 30; }
+      if (y - hh < pad) { y = r.bottom + 16 * k; rot = rot === 150 ? 210 : -30; }
     }
     x = Math.max(pad + hw, Math.min(W - pad - hw, x));
     y = Math.max(pad + hh, Math.min(H - pad - hh, y));
-    tapeEl.style.left = Math.round(x - TW / 2) + 'px';
-    tapeEl.style.top = Math.round(y - TH / 2) + 'px';
+    tapeEl.style.left = Math.round(x - tw / 2) + 'px';
+    tapeEl.style.top = Math.round(y - th / 2) + 'px';
     if (tapeEl.style.setProperty) tapeEl.style.setProperty('--tr', rot + 'deg');
   }
 
-  function clear_() { var d = doc(); return !busy && !playingCut() && !(d && d.querySelector && d.querySelector('.sb-scrim')); }
+  /* a card's dim that is peeling off (SB.Finish, .is-leaving) is already gone as far as the tape is concerned */
+  function clear_() { var d = doc(); return !busy && !playingCut() && !(d && d.querySelector && d.querySelector('.sb-scrim:not(.is-leaving)')); }
 
   /* point the tape at what spot() finds (or take it away) */
   function placeTape(cur, r) {
@@ -393,7 +396,7 @@
     if (b.classList.contains('sy-guiding') === !!on && b.getAttribute('data-sy-band') === String(hgt)) return;
     b.classList.toggle('sy-guiding', !!on);
     b.setAttribute('data-sy-band', String(hgt));
-    if (b.style && b.style.setProperty) b.style.setProperty('--sy-band', hgt + 'px');
+    if (b.style && b.style.setProperty) b.style.setProperty('--sy-band', 'calc(var(--u) * ' + (hgt / ((SB.UI.unit && SB.UI.unit()) || 1)).toFixed(1) + ')');
     if (typeof window !== 'undefined' && window.dispatchEvent) safe(function () { window.dispatchEvent(new Event('resize')); }, null);
   }
   function showStrip(s, m, onDesk) {
@@ -403,11 +406,11 @@
     hideStrip();
     kids = [h('span', { class: 'sy-strip-from', text: String(m.from || '').toUpperCase() }), h('span', { class: 'sy-strip-text', text: w.text })];
     /* on the desk it is a button that picks up the phone; anywhere else it is only read */
-    open = onDesk ? h('button', { type: 'button', class: 'sy-strip-open', aria: { label: L('stripOpen', { outgoing: m.from, text: w.text }) },
+    open = onDesk ? h('button', { type: 'button', class: 'sy-strip-open pz-hl', aria: { label: L('stripOpen', { outgoing: m.from, text: w.text }) },
                                   on: { click: function () { SB.UI.go('inbox'); } } }, kids)
                   : h('p', { class: 'sy-strip-open sy-strip-say', aria: { label: L('stripSay', { outgoing: m.from, text: w.text }) } }, kids);
-    x = h('button', { type: 'button', class: 'sy-strip-x', aria: { label: L('dismiss') }, text: '×', on: { click: function () { putAway(s, m); } } });
-    stripEl = h('div', { class: 'sy-strip sy-strip--' + w.kind + (onDesk ? ' sy-strip--desk' : ''), role: 'status', data: { sig: sig } }, [open, x]);
+    x = h('button', { type: 'button', class: 'sy-strip-x pz-hl', aria: { label: L('dismiss') }, text: '×', on: { click: function () { putAway(s, m); } } });
+    stripEl = h('div', { class: 'sy-strip pz-paper sy-strip--' + w.kind + (onDesk ? ' sy-strip--desk' : ''), role: 'status', data: { sig: sig } }, [open, x]);
     d.body.appendChild(stripEl);
     band(true);
   }
@@ -458,11 +461,23 @@
     for (i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
     return { id: id, kind: 'patch', hidden: false, earned: true };
   }
+  /* the patch is drawn twice as large as its box: re-rastered finer on a big screen, always shown size --p wide */
+  function sharp(cv, size) {
+    if (cv && cv.style) { cv.style.width = 'calc(var(--p) * ' + size + ')'; cv.style.height = 'calc(var(--p) * ' + size + ')'; }
+    return cv;
+  }
+  function patchRes() { var F = SB.Finish; return Math.max(1, F && F.res ? F.res() / 2 : 1); }
   function patchCanvas(p, w, size, flat) {
-    return safe(function () { return SB.Scenes.patch(p.id, { name: w.name, kind: p.kind, earned: p.earned, hidden: p.hidden, size: size, denim: flat ? false : undefined }); }, null);
+    return safe(function () { return SB.Scenes.patch(p.id, { name: w.name, kind: p.kind, earned: p.earned, hidden: p.hidden, size: Math.round(size * patchRes()), denim: flat ? false : undefined }); }, null);
   }
 
-  function hideCard() { if (cardEl && cardEl.parentNode) cardEl.parentNode.removeChild(cardEl); cardEl = null; cardId = null; }
+  function hideCard(peel) {
+    var gone = cardEl, F = SB.Finish;
+    cardEl = null; cardId = null;
+    if (!gone || !gone.parentNode) return;
+    if (peel && F && F.move && !(F.reduced && F.reduced())) { gone.inert = true; gone.classList.remove('sy-card'); gone.classList.add('sy-card-leaving', 'is-leaving'); F.move(gone, 'peel', { cue: 'tear', cueOpts: { gain: -12 }, done: function () { if (gone.parentNode) gone.parentNode.removeChild(gone); } }); }
+    else gone.parentNode.removeChild(gone);
+  }
 
   /* -> true when a card is on the desk */
   function showCard(s) {
@@ -473,13 +488,13 @@
     if (!d || !d.body) return false;
     p = patchInfo(s, id); w = patchWords(id);
     p = { id: id, kind: p.kind, hidden: false, earned: true };
-    cv = patchCanvas(p, w, 150);
+    cv = patchCanvas(p, w, 150); sharp(cv, 150);
     r = SB.rng && SB.rng.make ? SB.rng.make('sy-card:' + id) : null;
-    btn = h('button', { type: 'button', class: 'sy-card-go', text: L(p.kind === 'button' ? 'pin' : 'sew'), on: { click: function () {
-      hideCard();
+    btn = h('button', { type: 'button', class: 'sy-card-go pz-paper pz-hl', text: L(p.kind === 'button' ? 'pin' : 'sew'), on: { click: function () {
+      hideCard(true);
       if (SB.UI.game() === s) SB.UI.act(function (st) { return SB.Patches.toastShown(st, id); });
     } } });
-    cardEl = h('div', { class: 'sy-card cs-obj', role: 'dialog', aria: { label: L('cardLabel', { name: w.name }) }, data: { patch: id } }, [
+    cardEl = h('div', { class: 'sy-card pz-paper', role: 'dialog', aria: { label: L('cardLabel', { name: w.name }) }, data: { patch: id } }, [
       h('span', { class: 'sy-card-pic' }, cv),
       h('div', { class: 'sy-card-words' }, [
         h('p', { class: 'sy-card-name', text: w.name }),
@@ -490,24 +505,29 @@
     if (cardEl.style && cardEl.style.setProperty) {
       cardEl.style.setProperty('--tilt', (r ? r.range(-5, 5) : -3).toFixed(1) + 'deg');
       /* lands down by the jacket (where it gets sewn), clear of the phone, the shows and the money */
-      cardEl.style.setProperty('--dx', 'max(-26vw, calc(236px - 50vw))'); cardEl.style.setProperty('--dy', 'min(22vh, calc(50vh - 120px))');
+      cardEl.style.setProperty('--dx', 'calc(var(--u) * -416)'); cardEl.style.setProperty('--dy', 'calc(var(--u) * 220)');
     }
     cardId = id;
     d.body.appendChild(cardEl);
+    if (SB.Finish && SB.Finish.move) {
+      SB.Finish.move(cardEl, 'slap', { cue: 'scrap', cueOpts: { gain: -6 } });
+      SB.Finish.move(cardEl.querySelector('.sy-card-pic'), 'stamp', { delay: 260, cue: 'stamp', cueAt: 83, cueOpts: { gain: -6 } });
+    }
     return true;
   }
 
   function mountJacket(root) {
     var s = SB.UI.game(), all = safe(function () { return SB.Patches.all(s); }, []) || [], n = all.filter(function (p) { return p.earned; }).length, Kc = SB.UI.calKit,
-        title = L('jacketTitle');
-    root.appendChild(h('section', { class: 'sy-jacket', aria: { label: L('jacketLabel', { n: n, of: all.length }) } }, [
+        title = L('jacketTitle'), newest = null, sec, F = SB.Finish;
+    all.forEach(function (p) { if (p.earned && (!newest || (p.week || 0) >= (newest.week || 0))) newest = p; });   // the patch sewn on last
+    root.appendChild(sec = h('section', { class: 'sy-jacket', aria: { label: L('jacketLabel', { n: n, of: all.length }) } }, [
       h('div', { class: 'sy-back' }, [
         h('h2', { class: 'sy-jacket-title', aria: { label: title } }, Kc && Kc.mk ? safe(function () { return Kc.mk(title.toUpperCase(), 30, { max: 420, say: false }); }, title) : title),
         n ? null : h('p', { class: 'sy-jacket-none', text: L('jacketNone') }),
         h('ul', { class: 'sy-patches' }, all.map(function (p) {
-          var w = patchWords(p.id), cls = 'sy-patch sy-patch--' + p.kind + (p.earned ? ' is-earned' : (p.hidden ? ' is-blank' : ' is-faint')),
+          var w = patchWords(p.id), hero = !!newest && p.id === newest.id, cls = 'sy-patch sy-patch--' + p.kind + (p.earned ? ' is-earned' : (p.hidden ? ' is-blank' : ' is-faint')) + (hero ? ' is-newest' : ''),
               /* a patch not yet earned is a blank square of unfaded denim; its hint rides on a slip under it */
-              cv = patchCanvas({ id: p.id, kind: p.kind, earned: p.earned, hidden: p.earned ? p.hidden : true }, w, 128, true),
+              cv = sharp(patchCanvas({ id: p.id, kind: p.kind, earned: p.earned, hidden: p.earned ? p.hidden : true }, w, hero ? 300 : 128, true), hero ? 300 : 128),
               label = p.earned ? L('earned', { name: w.name, card: w.card }) : (p.hidden ? L('blank') : L('notYet', { name: w.name, hint: w.hint }));
           if (cv && cv.setAttribute) cv.setAttribute('aria-hidden', 'true');
           return h('li', { class: cls, aria: { label: label }, data: { patch: p.id } }, [
@@ -519,6 +539,12 @@
         }))
       ])
     ]));
+    if (F && F.scrollbar) safe(function () { F.scrollbar(sec); }, null);
+    if (F && F.move && newest) {
+      var hp = sec.querySelector('.sy-patch.is-newest .sy-patch-pic');
+      if (hp) F.move(hp, 'stamp', { delay: 300, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5 } });
+      F.stagger([].slice.call(sec.querySelectorAll('.sy-patch:not(.is-newest)')), 2).forEach(function (li) { li.classList.add('mv-slap'); });
+    }
     return { update: function () {}, unmount: function () {} };
   }
 

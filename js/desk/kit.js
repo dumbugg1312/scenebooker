@@ -28,10 +28,11 @@
                 sky: STOCK.blue, night: '#1b2233', cactus: '#4f7a40', manila: STOCK.manila, table: STOCK.table, olive: STOCK.olive,
                 bone: STOCK.bone, blue: STOCK.blue, mint: STOCK.mint, goldenrod: STOCK.goldenrod, newsprint: STOCK.newsprint };
     var FONT = {
-      type: "'Courier New', Courier, 'Nimbus Mono PS', monospace",
-      ransom: ["Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif", "Georgia, 'Times New Roman', serif", "'Courier New', Courier, monospace",
-               "'Arial Black', 'Helvetica Neue', Arial, sans-serif", "'Times New Roman', Times, serif", "'Trebuchet MS', Verdana, sans-serif",
-               "'American Typewriter', 'Rockwell', serif"]
+      /* the shipped faces (css/fonts.css); a drawing rastered as an image gets them through SB.Finish.withFonts */
+      type: "'SB Type', 'Courier New', monospace",
+      ransom: ["'SB Gothic', Impact, sans-serif", "Georgia, 'Times New Roman', serif", "'SB Type', 'Courier New', monospace",
+               "'SB Mono', monospace", "'Times New Roman', Times, serif", "'SB Gothic', Impact, sans-serif",
+               "'SB Type', 'Courier New', monospace"]
     };
     var uid = 0;
 

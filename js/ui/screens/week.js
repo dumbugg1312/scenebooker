@@ -108,12 +108,16 @@
     me: 'me',
     noteSay: '{job}, {h} hours. {win}',
     halfSay: '{dow} {half}: {used} of {cap} hours',
-    likely: 'likely:'
+    likely: 'likely:',
+    heroDays: 'days to go',
+    heroDay: 'day to go',
+    heroTonight: 'tonight',
+    heroSay: '{what}: {room}, {day}'
   };
 
   var STAGES_SHOWN = {};            // stage cards already shown (display memory)
   var LT = {};                      // lettering already drawn (display memory)
-  var GRAIN = null;                 // the copier's grit for the page, drawn once
+  var GRAIN = null, GRAINRES = 0;   // the copier's grit for the page, drawn once per raster scale
   var HALVES = ['DAY', 'NIGHT'];
   var TONER = '#141413', PENCIL = '#6d6a62';
 
@@ -126,15 +130,18 @@
   function safe(f, fb) { try { var v = f(); return v === undefined ? fb : v; } catch (e) { SB.log('warn', 'week', String(e && e.message)); return fb; } }
   function K() { return SB.DeskKit; }
   function r1(n) { return Math.round(n * 10) / 10; }
-  function stock(name) { return K().stock(name); }
+  /* the pastel sticky-note names are the copy stock now (css/finish.css --pp-*) */
+  var STOCK = { white: 'white', bone: 'buff', canary: 'buff', goldenrod: 'kraft', blue: 'blue', mint: 'green', pink: 'salmon', newsprint: 'news' };
+  function stock(name) { return 'var(--pp-' + (STOCK[name] || 'white') + ')'; }
 
   /* ---------------- the paste-up kit, as small pictures in the page ---------------- */
 
+  /* every picture is drawn in page units and shown in --p (one px of the old 1280 x 800 layout): it keeps its place on the stage */
   function svg(w, ht, inner, extra) {
-    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + r1(w) + '" height="' + r1(ht) + '" viewBox="0 0 ' + r1(w) + ' ' + r1(ht) +
-           '" aria-hidden="true" focusable="false"' + (extra || '') + '>' + inner + '</svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + r1(w) + ' ' + r1(ht) + '" style="' +
+           (extra && extra.indexOf('none') >= 0 ? 'width:100%;height:100%' : 'width:calc(var(--p) * ' + r1(w) + ')') + '" aria-hidden="true" focusable="false"' + (extra || '') + '>' + inner + '</svg>';
   }
-  function pic(w, ht, inner, cls) { return h('span', { class: 'cc-pic' + (cls ? ' ' + cls : ''), aria: { hidden: 'true' }, html: svg(w, ht, inner) }); }
+  function pic(w, ht, inner, cls) { return h('span', { class: 'cc-pic' + (cls ? ' ' + cls : ''), aria: { hidden: 'true' }, html: svg(w, ht, inner, cls === 'cc-pastx' ? ' preserveAspectRatio="none"' : '') }); }
   /** Jagged marker capitals (the flyers' headline hand) as an inline picture. o: { fill, max, say, cls } */
   function mk(text, size, o) {
     o = o || {};
@@ -161,31 +168,23 @@
     }
     return h('span', { class: 'cc-lt' + (o.cls ? ' ' + o.cls : ''), role: o.say === false ? null : 'img', aria: o.say === false ? { hidden: 'true' } : { label: t }, html: d });
   }
-  /** A scissor-cut outline as a CSS clip-path; torn: the top edge is ripped off the pad. */
+  /** A scissor cut or a torn edge, from the shared set (css/finish.css --edge-*); torn: ripped off the pad. The seed picks the cut. */
   function cut(seed, torn) {
-    var r = K().rng('cut' + seed), pts = [], i, n;
-    function j(a) { return (r.next() * 2 - 1) * a; }
-    if (torn) { n = 22; for (i = 0; i <= n; i++) pts.push(r1(i / n * 100) + '% ' + r1(1 + r.next() * 6) + 'px'); }
-    else { pts.push(r1(r.next() * 2) + 'px ' + r1(r.next() * 2) + 'px'); pts.push('calc(55% + ' + r1(j(3)) + 'px) ' + r1(r.next() * 2.5) + 'px'); pts.push('calc(100% - ' + r1(r.next() * 2) + 'px) ' + r1(r.next() * 2) + 'px'); }
-    pts.push('calc(100% - ' + r1(r.next() * 2.5) + 'px) 45%');
-    pts.push('calc(100% - ' + r1(r.next() * 2) + 'px) calc(100% - ' + r1(r.next() * 2) + 'px)');
-    pts.push('calc(40% + ' + r1(j(4)) + 'px) calc(100% - ' + r1(r.next() * 3) + 'px)');
-    pts.push(r1(r.next() * 2) + 'px calc(100% - ' + r1(r.next() * 2) + 'px)');
-    pts.push(r1(r.next() * 2.5) + 'px 55%');
-    return 'polygon(' + pts.join(', ') + ')';
+    var r = K().rng('cut' + seed);
+    return torn ? 'var(--edge-torn-t)' : 'var(--edge-cut-' + (1 + Math.floor(r.next() * 3)) + ')';
   }
   /** The same with the bottom-right corner folded up: the sign that a note can be picked up and moved. */
   function cutEar(seed, ear) {
-    var r = K().rng('ear' + seed), e = ear || 15;
-    function q(a) { return r1(r.next() * a); }
-    return 'polygon(' + q(2) + 'px ' + q(2) + 'px, calc(60% + ' + q(3) + 'px) ' + q(2) + 'px, calc(100% - ' + q(2) + 'px) ' + q(2) + 'px, calc(100% - ' + q(2) + 'px) calc(100% - ' + e + 'px), ' +
-           'calc(100% - ' + e + 'px) 100%, calc(35% + ' + q(4) + 'px) calc(100% - ' + q(2) + 'px), ' + q(2) + 'px calc(100% - ' + q(2) + 'px))';
+    var r = K().rng('ear' + seed), e = 'calc(var(--p) * ' + (ear || 15) + ')';
+    function q(a) { return 'calc(var(--p) * ' + r1(r.next() * a) + ')'; }
+    return 'polygon(' + q(2) + ' ' + q(2) + ', calc(60% + ' + q(3) + ') ' + q(2) + ', calc(100% - ' + q(2) + ') ' + q(2) + ', calc(100% - ' + q(2) + ') calc(100% - ' + e + '), ' +
+           'calc(100% - ' + e + ') 100%, calc(35% + ' + q(4) + ') calc(100% - ' + q(2) + '), ' + q(2) + ' calc(100% - ' + q(2) + '))';
   }
   /** A piece of copy paper behind a thing: the stock, cut; the parent carries the hard paste-up shadow. */
   function sheet(stk, seed, o) {
     o = o || {};
     return h('span', { class: 'cc-paper' + (o.cls ? ' ' + o.cls : ''), aria: { hidden: 'true' },
-                       style: { background: o.bg || stock(stk), clipPath: o.ear ? cutEar(seed, o.ear) : cut(seed, o.torn) } });
+                       style: { '--stk': stock(stk), '--edge': o.ear ? cutEar(seed, o.ear) : cut(seed, o.torn) } });
   }
   /** The lifted corner: the back of the paper turned up. */
   function ear(stk, size) {
@@ -198,7 +197,7 @@
   /** The choose sign: a tear-off tab. o: { label, cost, likely, why, disabled, on, n, hot, fk, id, say } */
   function tab(o) {
     var say = (o.n ? o.n + '. ' : '') + (o.say || o.label) + (o.cost ? ', ' + o.cost : '') + (o.likely ? ', ' + L('likely') + ' ' + o.likely : '') + (o.disabled && o.why ? ', ' + o.why : '');
-    return h('button', { type: 'button', class: 'cc-tab fx' + (o.hot ? ' is-hot' : '') + (o.on2 ? ' is-on' : '') + (o.cls ? ' ' + o.cls : ''), disabled: !!o.disabled,
+    return h('button', { type: 'button', class: 'cc-tab pz-hl' + (o.hot ? ' is-hot' : '') + (o.on2 ? ' is-on' : '') + (o.cls ? ' ' + o.cls : ''), disabled: !!o.disabled,
                          role: o.role || null, data: { fk: o.fk || null, option: o.id || null, tut: o.tut || null }, title: o.disabled && o.why ? o.why : null,
                          aria: { label: say, checked: o.role === 'radio' ? (o.on2 ? 'true' : 'false') : null },
                          on: { click: function (e) { e.stopPropagation(); if (!o.disabled) o.on(e); } } }, [
@@ -207,7 +206,9 @@
       h('span', { class: 'cc-tab-l', text: o.label }),
       o.cost ? h('span', { class: 'cc-tab-cost', text: o.cost }) : null,
       o.likely ? h('span', { class: 'cc-tab-likely', text: L('likely') + ' ' + o.likely }) : null,
-      o.disabled && o.why ? h('span', { class: 'cc-tab-why', text: o.why }) : null
+      o.disabled && o.why ? h('span', { class: 'cc-tab-why', text: o.why }) : null,
+      h('span', { class: 'cc-tab-foot', aria: { hidden: 'true' } }),
+      o.cls && o.cls.indexOf('cc-tab--sign') >= 0 ? h('span', { class: 'cc-tab-tape', aria: { hidden: 'true' } }) : null
     ]);
   }
   function tabsRow(list) { return h('div', { class: 'cc-tabs' }, list.map(function (t, i) { t.n = t.n === false ? null : i + 1; return tab(t); })); }
@@ -277,20 +278,20 @@
   }
   /** The copier's grit, laid over the page: the same toner pass the desk and the flyers get, on blank paper. */
   function grain() {
-    var c, x, img, d, i, a;
-    if (GRAIN !== null) return GRAIN;
-    GRAIN = '';
+    var c, x, img, d, i, a, GR = Math.min(2, SB.Finish && SB.Finish.res ? SB.Finish.res() : 1);
+    if (GRAIN !== null && GRAINRES === GR) return GRAIN;
+    GRAIN = ''; GRAINRES = GR;
     try {
       if (typeof document === 'undefined' || !document.createElement) return GRAIN;
       c = document.createElement('canvas');
       if (!c || !c.getContext) return GRAIN;
-      c.width = 760; c.height = 620;
+      c.width = Math.round(760 * GR); c.height = Math.round(620 * GR);
       x = c.getContext('2d');
       if (!x) return GRAIN;
-      x.fillStyle = '#ffffff'; x.fillRect(0, 0, 760, 620);
-      if (K().photocopy(x, 760, 620, 'calendar', { streaks: 6 })) {
+      x.fillStyle = '#ffffff'; x.fillRect(0, 0, c.width, c.height);
+      if (K().photocopy(x, c.width, c.height, 'calendar', { streaks: 6 })) {
         /* keep only what the copier added (toner specks, streaks, grit) as dark ink over clear: it lies over paper and table alike */
-        img = x.getImageData(0, 0, 760, 620); d = img.data;
+        img = x.getImageData(0, 0, c.width, c.height); d = img.data;
         for (i = 0; i < d.length; i += 4) { a = 255 - (d[i] + d[i + 1] + d[i + 2]) / 3; d[i] = 20; d[i + 1] = 20; d[i + 2] = 19; d[i + 3] = a < 4 ? 0 : Math.min(255, a * 1.4); }
         x.putImageData(img, 0, 0);
         GRAIN = c.toDataURL('image/png');
@@ -337,10 +338,37 @@
         bottom(s, v)
       ]));
       if (sc) sc.scrollTop = top;
+      safe(function () { moves(); }, null);
       if (key) {
         el = safe(function () { return root.querySelector('[data-fk="' + key + '"]'); }, null);
         if (el && el.focus) { try { el.focus({ preventScroll: true }); } catch (e) { /* fine */ } }
       }
+    }
+
+    /* the moves (js/ui/finish.js): the notes and sheets slap down one after another when the pad is new or its list changes, the
+       next-show card (or, with no show booked, the week's heading) is stamped on, and the days to go are counted up */
+    var lastHero = null, lastDays = 0, padKey = null, titled = false, firstShow = true;
+    function moves() {
+      var F = SB.Finish, hr, n, sid, list, key, ti, delay0 = firstShow ? 220 : 0;
+      if (!F || !root) return;
+      hr = root.querySelector('.cc-hero');
+      if (hr) {
+        n = parseInt(hr.getAttribute('data-n'), 10) || 0; sid = hr.getAttribute('data-sid');
+        if (sid !== lastHero) F.move(hr, 'stamp', { delay: delay0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: hr } });
+        if (sid !== lastHero || n !== lastDays) F.countUp(hr.querySelector('.cc-hero-n'), n, { from: sid === lastHero ? lastDays : 0, delay: delay0 + 83 });
+        lastHero = sid; lastDays = n;
+      } else lastHero = null;
+      ti = root.querySelector('.cc-title.is-hero');
+      if (ti && !titled) { F.move(ti, 'stamp', { delay: delay0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: ti } }); titled = true; }
+      if (!ti) titled = false;
+      list = Array.prototype.slice.call(root.querySelectorAll('.cc-pad .cc-note, .cc-pad .cc-vet, .cc-pad .cc-pile-top, .cc-below .cc-scrap'));
+      key = list.map(function (el) { return el.getAttribute('data-fk') || el.className; }).join('|');
+      if (key !== padKey) {
+        F.stagger(list, firstShow ? 3 : 0);
+        list.forEach(function (el) { el.classList.add('mv-slap'); });
+        padKey = key;
+      }
+      firstShow = false;
     }
 
     function focusCell() {
@@ -363,25 +391,50 @@
       var stop = s.clock.stop, endOfWeek = stop && stop.kind === 'END_OF_WEEK', k = K(), planning = v.phase === 'PLAN' || v.phase === 'PLAY',
           from = s.clock.week * 7, to = from + 6, same = SB.time.month(from) === SB.time.month(to),
           range = SB.time.fmt(from, 'md') + '-' + (same ? SB.time.date(to).d : SB.time.fmt(to, 'md'));
+      var nx = nextShow(s);
       return h('header', { class: 'cc-head' }, [
-        h('h1', { class: 'cc-title' }, [
+        h('h1', { class: 'cc-title' + (nx ? '' : ' is-hero') }, [
           h('span', { class: 'cc-weekn', text: L('weekN', { n: s.clock.week + 1 }) }),
-          mk(range.toUpperCase(), 40, { say: false }),
+          mk(range.toUpperCase(), nx ? 34 : 92, { say: false }),
           h('span', { class: 'sb-vh', text: SB.time.fmt(from, 'week') })
         ]),
+        nx ? hero(s, nx) : null,
         v.risks && v.risks.length ? h('div', { class: 'cc-risks', role: 'note', aria: { label: L('risks') } }, [
           h('span', { class: 'cc-risks-k' }, [mk('!!', 20, { fill: HOT, say: false }), h('span', { text: L('risks') })]),
           h('ul', null, v.risks.slice(0, 3).map(function (r) { return r.text ? h('li', { text: r.text }) : null; }))
         ]) : null,
         running ? h('p', { class: 'cc-run', text: L('running') }) : null,
         planning && !endOfWeek && !running ? h('div', { class: 'cc-usual' }, [
-          h('button', { type: 'button', class: 'cc-stamp fx', data: { fk: 'usual' }, aria: { label: L('usualSay') },
+          h('button', { type: 'button', class: 'cc-stamp pz-hl', data: { fk: 'usual' }, aria: { label: L('usualSay') },
                         on: { click: function (e) { thunk(e.currentTarget); usual(); } } }, [
             pic(124, 104, usualArt(), 'cc-stamp-art')
           ]),
           h('span', { class: 'cc-usual-line', text: L('usualLine') })
         ]) : null,
         endOfWeek && v.phase === 'PLAY' ? tab({ label: L('closeWeek'), hot: true, fk: 'closeweek', tut: 'week-play', cls: 'cc-tab--big', on: closeWeek }) : null
+      ]);
+    }
+    /** The next show after today: { show, days } (days 0 is tonight), or null when none is booked. */
+    function nextShow(s) {
+      var today = s.clock.week * 7 + (s.clock.phase === 'PLAY' && s.clock.cursor ? s.clock.cursor.dayIdx || 0 : 0), best = null, id, sh;
+      for (id in (s.shows || {})) {
+        sh = s.shows[id];
+        if (!sh || sh.cancelled || sh.status === 'PLAYED' || sh.status === 'CANCELLED' || !num(sh.day) || sh.day < today) continue;
+        if (!best || sh.day < best.day) best = sh;
+      }
+      return best ? { show: best, days: best.day - today } : null;
+    }
+    /** The one loud thing: how many days to the next show, on a torn card stamped on the page. Pressing it opens the show. */
+    function hero(s, nx) {
+      var sh = nx.show, room = sh.roomId && s.rooms ? s.rooms[sh.roomId] : null, n = nx.days, day = SB.time.fmt(sh.day, 'short'),
+          what = n === 0 ? L('heroTonight') : n + ' ' + L(n === 1 ? 'heroDay' : 'heroDays');
+      return h('button', { type: 'button', class: 'cc-hero pz-paper pz-hl', data: { fk: 'hero-show', sid: String(sh.id), n: String(n) },
+                           aria: { label: L('heroSay', { what: what, room: (room && room.name) || '', day: day }) + '. ' + L('openShow') },
+                           on: { click: function () { SB.UI.go('show', { showId: sh.id }); } } }, [
+        n === 0 ? null : h('span', { class: 'cc-hero-n', text: String(n) }),
+        h('span', { class: 'cc-hero-t', text: n === 0 ? L('heroTonight') : L(n === 1 ? 'heroDay' : 'heroDays') }),
+        h('span', { class: 'cc-hero-d', text: day }),
+        room && room.name ? h('span', { class: 'cc-hero-r', text: room.name }) : null
       ]);
     }
     /** The rubber stamp, a xeroxed cut-out, over the impression it leaves. */
@@ -392,13 +445,16 @@
                       k.dotsRect(44, 8, 14, 16, 2, { white: true }) + '<rect x="30" y="44" width="64" height="5" fill="#f4f2ea" fill-opacity=".5"/>', { seed: 'stampc', edge: 5 });
     }
     function thunk(el) {
-      if (!el || !el.classList || (SB.UI.prefs && SB.UI.prefs.reduced && SB.UI.prefs.reduced())) return;
-      el.classList.remove('is-thunk'); void el.offsetWidth; el.classList.add('is-thunk');
+      if (!el || !el.classList || !SB.Finish) return;
+      SB.Finish.move(el, 'stamp', { cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: el } });
     }
 
     function burnt(s) { return safe(function () { return SB.Game.strip(s).stress.zone === 'BURNT_OUT'; }, false); }
     function cellPos(i, half) { return i * 2 + (half === 'NIGHT' ? 1 : 0); }
     function nowPos(s) { var c = s.clock.cursor || { dayIdx: 0, half: 'DAY' }; return cellPos(c.dayIdx, c.half); }
+    /* real pixels per stage unit and per --p, for the pointer: the dragged note's place is written in stage units */
+    function unitPx() { return (SB.UI.unit ? SB.UI.unit() : 1) || 1; }
+    function pxp() { return unitPx() * 1.25; }
     function heldId() { return picked ? (picked.jobId || null) : null; }
 
     function grid(s, v) {
@@ -433,7 +489,7 @@
           mk(String(SB.time.date(d.day).d), 26, { cls: 'cc-date', say: false }),
           h('span', { class: 'sb-vh', text: SB.time.fmt(d.day, 'long') }),
           w ? h('span', { class: 'cc-weather' + (real ? ' is-actual' : ''), role: 'img', title: wt, aria: { label: wt } }, pic(28, 28, weatherArt(w))) : null,
-          planPhase ? h('button', { type: 'button', role: 'checkbox', class: 'cc-phone fx' + (d.phoneOff ? ' is-off' : ''), title: L('phone'),
+          planPhase ? h('button', { type: 'button', role: 'checkbox', class: 'cc-phone pz-hl' + (d.phoneOff ? ' is-off' : ''), title: L('phone'),
                                     aria: { checked: d.phoneOff ? 'true' : 'false', label: L(d.phoneOff ? 'phoneTurnOn' : 'phoneTurnOff', { dow: dow }) }, data: { fk: 'phone-' + i },
                                     on: { click: function () { act(function (x) { return SB.Week.phoneOff(x, i, !d.phoneOff); }); } } }, pic(24, 24, phoneArt(d.phoneOff)))
                     : (d.phoneOff ? h('span', { class: 'cc-phone is-off', role: 'img', aria: { label: L('phone') } }, pic(24, 24, phoneArt(true))) : null)
@@ -476,7 +532,7 @@
       label = L('halfSay', { dow: SB.time.fmt(d.day, 'dow'), half: L(half === 'DAY' ? 'day' : 'night').toLowerCase(), used: used, cap: cap }) +
               (shiftOn && half === 'DAY' ? ', ' + L('shift') : '') + (prev ? ', ' + prev.text : '');
       return h('div', { role: 'gridcell', tabindex: isCur ? '0' : '-1', data: { fk: 'cell-' + i + '-' + half, cell: i + '-' + half },
-                        class: ['cc-half fx', 'cc-half--' + half.toLowerCase(), past ? 'is-past' : '', now ? 'is-now' : '',
+                        class: ['cc-half pz-hl', 'cc-half--' + half.toLowerCase(), past ? 'is-past' : '', now ? 'is-now' : '',
                                 isCur && picked ? 'is-cursor' : '', prev ? (prev.ok ? 'is-ok' : 'is-no') : ''],
                         aria: { label: label },
                         on: { click: function (e) { if (picked && !(e.target && e.target.closest && e.target.closest('.cc-tok, .cc-tab, .cc-flyer'))) { cur = { dayIdx: i, half: half }; drop(); } },
@@ -487,7 +543,7 @@
         ]),
         shiftOn && half === 'DAY' ? h('div', { class: 'cc-work' }, [
           h('span', { class: 'cc-work-stamp', role: 'img', aria: { label: L('shift') } }, pic(86, 34, stampArt(L('shift').toUpperCase(), 86, 34, 'wk' + i, TONER))),
-          bills && planPhase && !past && !now ? h('button', { type: 'button', class: 'cc-tab cc-tab--mini fx', data: { fk: 'tear-' + i },
+          bills && planPhase && !past && !now ? h('button', { type: 'button', class: 'cc-tab cc-tab--mini pz-hl', data: { fk: 'tear-' + i },
                                                               aria: { label: L('dropShift') + ', ' + SB.time.fmt(d.day, 'dow') },
                                                               on: { click: function (e) { e.stopPropagation(); askDropShift(s, d); } } }, h('span', { class: 'cc-tab-l', text: L('tear') })) : null
         ]) : null,
@@ -515,11 +571,9 @@
       var sh = s.shows[id], thumb = null;
       if (!sh) return null;
       if (SB.UI.parts && SB.UI.parts.flyerThumb) thumb = safe(function () { return SB.UI.parts.flyerThumb({ recipe: (sh.flyer && sh.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, id) }, width); }, null);
-      return h('button', { type: 'button', class: 'cc-flyer fx', data: { fk: 'show-' + id, tut: 'week-showday', 'tut-ref': id }, aria: { label: L('openShow') + ', ' + SB.time.fmt(sh.day, 'short') },
+      return h('button', { type: 'button', class: 'cc-flyer pz-hl', data: { fk: 'show-' + id, tut: 'week-showday', 'tut-ref': id }, aria: { label: L('openShow') + ', ' + SB.time.fmt(sh.day, 'short') },
                            on: { click: function (e) { e.stopPropagation(); SB.UI.go('show', { showId: id }); } } }, [
-        h('span', { class: 'cc-flyer-img' }, thumb || C().ShowBadge({ show: sh, size: 20 })),
-        h('span', { class: 'cc-flyer-tape', aria: { hidden: 'true' } }),
-        strip(L('showStrip'))
+        h('span', { class: 'cc-flyer-img' }, thumb || C().ShowBadge({ show: sh, size: 20 }))
       ]);
     }
 
@@ -528,14 +582,14 @@
       if (!recs.length) return null;
       return h('div', { class: 'cc-jots' }, [
         show.map(function (r) { return h('p', { class: 'cc-jot', text: recText(r) }); }),
-        h('button', { type: 'button', class: 'cc-jot-more fx', data: { fk: 'jot-' + d.dayIdx }, aria: { label: L('dayLog', { day: SB.time.fmt(d.day, 'dow') }) },
+        h('button', { type: 'button', class: 'cc-jot-more pz-hl', data: { fk: 'jot-' + d.dayIdx }, aria: { label: L('dayLog', { day: SB.time.fmt(d.day, 'dow') }) },
                       on: { click: function () { dayLogCard(s, d); } } }, strip(more > 0 ? L('moreLines', { n: more }) : L('logStrip')))
       ]);
     }
     function recText(r) { var t = r.text || ''; if (!t && SB.Content.ui.c && SB.Content.ui.c.rec && SB.Content.ui.c.rec[r.t] !== undefined) t = SB.Content.ui.c.rec[r.t]; return t; }
     function dayLogCard(s, d) {
       var recs = ((s.week && s.week.log) || []).filter(function (r) { return inLog(r) && r.day === d.day; }), close;
-      close = SB.UI.card(h('div', { class: 'cc-slap cc-slap--lined', style: { '--hot': HOT } }, [
+      close = SB.UI.card(h('div', { class: 'mv-slap cc-slap cc-slap--lined', style: { '--hot': HOT } }, [
         mk(SB.time.fmt(d.day, 'dow').toUpperCase(), 26),
         h('ul', { class: 'cc-loglines' }, recs.map(function (r) { return h('li', { text: recText(r) }); })),
         tabsRow([{ label: L('close'), on: function () { close(); } }])
@@ -548,7 +602,7 @@
       sub = subjectOf(s, jv);
       stt = (it.window && it.window.state) || 'NONE'; late = stt === 'LATE' || stt === 'MISSED';
       stk = it.by && it.by !== 'player' ? 'mint' : 'goldenrod';
-      el = h('button', { type: 'button', class: 'cc-tok cc-lift fx' + (heldId() === it.jobId ? ' is-held' : '') + (late ? ' is-late' : ''), data: { fk: 'tok-' + it.jobId, job: it.jobId },
+      el = h('button', { type: 'button', class: 'cc-tok cc-lift pz-hl' + (heldId() === it.jobId ? ' is-held' : '') + (late ? ' is-late' : ''), data: { fk: 'tok-' + it.jobId, job: it.jobId },
                          aria: { label: L('noteSay', { job: (jv.label || '') + (sub ? ': ' + sub : ''), h: it.hours, win: (it.window && it.window.label) || '' }) },
                          on: { click: function (e) { e.stopPropagation(); if (justDragged || running) return; pick(it.jobId, it.dayIdx, it.half); } } }, [
         sheet(stk, 'tok' + it.jobId, { ear: 10 }), ear(stk, 10),
@@ -684,7 +738,7 @@
       drag.on = true;
       g.className += ' cc-ghost';
       g.removeAttribute('data-fk');
-      g.style.width = r.width + 'px'; g.style.height = r.height + 'px';
+      g.style.width = 'calc(var(--p) * ' + r.width / pxp() + ')'; g.style.height = 'calc(var(--p) * ' + r.height / pxp() + ')';
       g.style.setProperty('--hot', HOT);
       drag.dx = e.clientX - r.left; drag.dy = e.clientY - r.top;
       document.body.appendChild(g);
@@ -692,7 +746,7 @@
       moveGhost(e);
       if (w.free) pickFree(w.free, true); else pick(w.jobId, undefined, undefined, true);
     }
-    function moveGhost(e) { if (drag && drag.ghost) { drag.ghost.style.left = (e.clientX - drag.dx) + 'px'; drag.ghost.style.top = (e.clientY - drag.dy) + 'px'; } }
+    function moveGhost(e) { if (drag && drag.ghost) { drag.ghost.style.left = 'calc(var(--u) * ' + (e.clientX - drag.dx) / unitPx() + ')'; drag.ghost.style.top = 'calc(var(--u) * ' + (e.clientY - drag.dy) / unitPx() + ')'; } }
     function cellAt(e) {
       var t = null, c;
       if (drag && drag.ghost) drag.ghost.style.display = 'none';
@@ -750,11 +804,11 @@
     function askDropShift(s, d) {
       var p = safe(function () { return SB.Cities.pack(s); }, null), pay = p && p.money && num(p.money.shiftPay) ? p.money.shiftPay : null,
           left = num(SB.Config.SHIFT_DROPS_PER_MONTH) && s.player ? SB.Config.SHIFT_DROPS_PER_MONTH - (s.player.shiftDrops || 0) : null, close;
-      close = SB.UI.card(h('div', { class: 'cc-slap', style: { '--hot': HOT } }, [
+      close = SB.UI.card(h('div', { class: 'mv-slap cc-slap', style: { '--hot': HOT } }, [
         pic(96, 40, stampArt(L('shift').toUpperCase(), 96, 40, 'askwk', TONER), 'cc-slap-doodle'),
-        h('h2', { class: 'cc-slap-title' }, mk(L('dropShiftQ', { dow: SB.time.fmt(d.day, 'dow') }).toUpperCase(), 22, { max: 300 })),
-        h('p', { class: 'cc-slap-body', text: pay !== null ? L('dropShiftCost', { pay: SB.text.money(pay) }) : L('dropShiftCostNo') }),
-        left !== null ? h('p', { class: 'cc-slap-body', text: L('dropsLeft', { n: Math.max(0, left) }) }) : null,
+        h('h2', { class: 'mv-slap cc-slap-title' }, mk(L('dropShiftQ', { dow: SB.time.fmt(d.day, 'dow') }).toUpperCase(), 22, { max: 300 })),
+        h('p', { class: 'mv-slap cc-slap-body', text: pay !== null ? L('dropShiftCost', { pay: SB.text.money(pay) }) : L('dropShiftCostNo') }),
+        left !== null ? h('p', { class: 'mv-slap cc-slap-body', text: L('dropsLeft', { n: Math.max(0, left) }) }) : null,
         tabsRow([
           { label: L('tearIt'), cost: pay !== null ? '-' + SB.text.money(pay) : null, on: function () { close(); act(function (x) { return SB.Week.dropShift(x, d.dayIdx); }); } },
           { label: L('keepIt'), on: function () { close(); } }
@@ -866,7 +920,7 @@
     function pile(key, n, notes, stk, title) {
       var open = !!openFolds[key];
       return h('div', { class: 'cc-pile' + (open ? ' is-open' : '') }, [
-        h('button', { type: 'button', class: 'cc-pile-top fx', aria: { expanded: open ? 'true' : 'false', label: L('pile', { n: n }) }, data: { fk: 'pile-' + key },
+        h('button', { type: 'button', class: 'cc-pile-top pz-hl', aria: { expanded: open ? 'true' : 'false', label: L('pile', { n: n }) }, data: { fk: 'pile-' + key },
                       on: { click: function () { openFolds[key] = !openFolds[key]; render(); } } }, [
           h('span', { class: 'cc-pile-stack', aria: { hidden: 'true' } }, [sheet(stk, 'pl3' + key), sheet(stk, 'pl2' + key), sheet(stk, 'pl1' + key),
             title ? h('span', { class: 'cc-pile-title', text: String(title) }) : null]),
@@ -880,7 +934,7 @@
       var sub = subjectOf(s, j), sh = j.showId && s.shows ? s.shows[j.showId] : null, isHeld = heldId() === j.id, el, stt = (j.window && j.window.state) || 'NONE',
           hours = num(j.hours) ? j.hours : 0, canPlan = j.mode === 'HOURS';
       (j.riders || []).forEach(function (r) { if ((r.status === 'PROMISED' || r.planned) && num(r.hours)) hours += r.hours; });
-      el = h('button', { type: 'button', class: 'cc-note fx' + (canPlan ? ' cc-lift' : ' is-show-only') + (isHeld ? ' is-held' : '') + (j.planned ? ' is-planned' : '') + (stack > 1 ? ' is-stacked' : ''),
+      el = h('button', { type: 'button', class: 'cc-note pz-hl' + (canPlan ? ' cc-lift' : ' is-show-only') + (isHeld ? ' is-held' : '') + (j.planned ? ' is-planned' : '') + (stack > 1 ? ' is-stacked' : ''),
                          data: { fk: 'note-' + j.id, job: j.id },
                          aria: { label: L('noteSay', { job: (j.label || '') + (sub ? ': ' + sub : ''), h: hours, win: (j.window && j.window.label) || '' }), pressed: isHeld ? 'true' : 'false' },
                          on: { click: function () { if (justDragged) return; if (canPlan) pick(j.id); else if (j.showId) SB.UI.go('show', { showId: j.showId }); } } }, [
@@ -891,7 +945,7 @@
           hand(j.label || '', 13, { max: 150, say: false }),
           sub ? h('span', { class: 'cc-note-who', text: sub }) : null
         ]),
-        h('span', { class: 'cc-note-foot' }, [canPlan ? ticks(hours) : strip(L('showStrip')),
+        h('span', { class: 'cc-note-foot' }, [canPlan ? ticks(hours) : null,
           stack > 1 ? h('span', { class: 'cc-note-x', text: 'x' + stack }) : null,
           j.planned ? h('span', { class: 'cc-note-on', text: '> ' + SB.time.fmt(s.clock.week * 7 + j.planned.dayIdx, 'dow3') }) : null,
           j.opt ? h('span', { class: 'cc-note-cash', text: '$' }) : null]),
@@ -923,7 +977,7 @@
           sheet('blue', 'v' + row.id),
           h('span', { class: 'cc-vet-head' }, [hand(L('vetFor', { band: who }), 13, { max: 210 }), h('span', { class: 'cc-note-who', text: L('vetHelp') })]),
           h('span', { class: 'cc-vet-tabs' }, row.jobs.map(function (f, i) {
-            var isHeld = picked && picked.free === f, el = h('button', { type: 'button', class: 'cc-mini cc-lift fx' + (isHeld ? ' is-held' : ''), data: { fk: 'free-' + row.id + '-' + i },
+            var isHeld = picked && picked.free === f, el = h('button', { type: 'button', class: 'cc-mini cc-lift pz-hl' + (isHeld ? ' is-held' : ''), data: { fk: 'free-' + row.id + '-' + i },
                                     aria: { label: L('addOne', { job: f.label, who: who }) + ', ' + SB.text.label('ui.c.hours', { n: f.hours }), pressed: isHeld ? 'true' : 'false' },
                                     on: { click: function () { if (!justDragged) pickFree(f); } } }, [
               sheet('white', 'vt' + i + row.id, { ear: 9 }), ear('white', 9),
@@ -935,7 +989,7 @@
         ]);
       }
       return h('div', { class: 'cc-freewrap' }, row.jobs.map(function (f, i) {
-        var isHeld = picked && picked.free === f, el = h('button', { type: 'button', class: 'cc-note cc-lift fx' + (isHeld ? ' is-held' : ''), data: { fk: 'free-' + row.id + '-' + i },
+        var isHeld = picked && picked.free === f, el = h('button', { type: 'button', class: 'cc-note cc-lift pz-hl' + (isHeld ? ' is-held' : ''), data: { fk: 'free-' + row.id + '-' + i },
                          aria: { label: who ? L('addOne', { job: f.label, who: who }) + ', ' + SB.text.label('ui.c.hours', { n: f.hours }) : L('add') + ' ' + f.label, pressed: isHeld ? 'true' : 'false' },
                          on: { click: function () { if (!justDragged) pickFree(f); } } }, [
           sheet('mint', 'f' + row.id + i, { ear: 14 }), ear('mint', 14),
@@ -992,7 +1046,7 @@
         jv.riders && jv.riders.length ? h('ul', { class: 'cc-promises' }, jv.riders.map(function (r) {
           var on = r.status === 'PROMISED' || r.status === 'DONE' || !!r.planned;
           return h('li', null, [
-            h('button', { type: 'button', role: 'checkbox', class: 'cc-tick fx' + (on ? ' is-on' : ''), disabled: r.status === 'DONE', aria: { checked: on ? 'true' : 'false', label: r.label || '' },
+            h('button', { type: 'button', role: 'checkbox', class: 'cc-tick pz-hl' + (on ? ' is-on' : ''), disabled: r.status === 'DONE', aria: { checked: on ? 'true' : 'false', label: r.label || '' },
                           on: { click: function () { promise(r.id, !on); } } }, [
               pic(24, 22, boxArt(on, 'pb' + r.id)),
               h('span', { class: 'cc-tick-l', text: r.label || '' }),
@@ -1024,7 +1078,7 @@
     }
     function scrap(cls, stk, seed, title, kids, hot) {
       return h('section', { class: 'cc-scrap ' + cls, aria: { label: title } }, [
-        sheet(stk, seed), h('span', { class: 'cc-scrap-tape', aria: { hidden: 'true' } }),
+        sheet(stk, seed),
         h('h2', { class: 'cc-scrap-k' + (hot ? ' is-hot' : '') }, (SB.UI.Kit && SB.UI.Kit.label) ? SB.UI.Kit.label(title.toUpperCase(), null, { tag: 'span' }) : mk(title.toUpperCase(), 18, { fill: TONER })), kids
       ]);
     }
@@ -1089,7 +1143,7 @@
       var list = safe(function () { return SB.Mail.needsYou(s); }, []);
       return scrap('cc-needs', 'white', 'needs', L('needsYou'), list.length ? h('ul', { class: 'cc-calls' }, list.map(function (n) {
         var mid = messageFor(s, n);
-        return h('li', null, h('button', { type: 'button', class: 'cc-call fx', aria: { label: L('open') + ': ' + (n.text || '') + (num(n.by) ? ', ' + L('by', { day: SB.time.fmt(n.by, 'short') }) : '') },
+        return h('li', null, h('button', { type: 'button', class: 'cc-call pz-hl', aria: { label: L('open') + ': ' + (n.text || '') + (num(n.by) ? ', ' + L('by', { day: SB.time.fmt(n.by, 'short') }) : '') },
                                            on: { click: function () { SB.UI.go('inbox', mid ? { messageId: mid } : {}); } } }, [
           h('span', { class: 'cc-call-t', text: n.text || L('open') }),
           num(n.by) ? h('span', { class: 'cc-call-by', text: L('by', { day: SB.time.fmt(n.by, 'short') }) }) : null,
@@ -1190,11 +1244,11 @@
         if (r && r.stop && r.stop.kind !== 'DECISION' && running) { if (handleStop(r.stop) === 'wait') return; }
         after();
       }
-      box = h('div', { class: 'cc-slap cc-slap--decision sb-decision', role: 'group', tabindex: '-1', style: { '--hot': HOT }, aria: { live: 'assertive', label: dec.title || '' },
+      box = h('div', { class: 'mv-slap cc-slap cc-slap--decision sb-decision', role: 'group', tabindex: '-1', style: { '--hot': HOT }, aria: { live: 'assertive', label: dec.title || '' },
                        on: { keydown: function (e) { var n = parseInt(e.key, 10); if (n >= 1 && n <= opts.length) { e.preventDefault(); choose(opts[n - 1]); } } } }, [
         h('span', { class: 'cc-hotmark cc-hotmark--big', aria: { hidden: 'true' }, text: '!!' }),
-        dec.title ? h('h2', { class: 'cc-slap-title' }, mk(String(dec.title).toUpperCase(), 24, { max: 380 })) : null,
-        dec.body ? h('p', { class: 'cc-slap-body', text: dec.body }) : null,
+        dec.title ? h('h2', { class: 'mv-slap cc-slap-title' }, mk(String(dec.title).toUpperCase(), 24, { max: 380 })) : null,
+        dec.body ? h('p', { class: 'mv-slap cc-slap-body', text: dec.body }) : null,
         tabsRow(opts.map(function (o) {
           return { id: o.id, label: o.label || '', cost: (o.costs || []).map(chipText).join(', '), likely: o.likely || null,
                    disabled: o.enabled === false, why: o.why || null, on: function () { choose(o); } };
@@ -1206,9 +1260,9 @@
     function openReply(stop) {
       var s = st(), m = safe(function () { return SB.Mail.message(s, stop.messageId); }, null), close;
       cardOpen = true;
-      close = SB.UI.card(h('div', { class: 'cc-slap', style: { '--hot': HOT } }, [
-        h('h2', { class: 'cc-slap-title' }, mk(L('replyTitle').toUpperCase(), 22)),
-        m ? h('div', { class: 'cc-slap-msg' }, C().MessageBody({ message: m })) : null,
+      close = SB.UI.card(h('div', { class: 'mv-slap cc-slap', style: { '--hot': HOT } }, [
+        h('h2', { class: 'mv-slap cc-slap-title' }, mk(L('replyTitle').toUpperCase(), 22)),
+        m ? h('div', { class: 'mv-slap cc-slap-msg' }, C().MessageBody({ message: m })) : null,
         tabsRow([
           { label: L('answerNow'), on: function () { close(); cardOpen = false; SB.UI.go('inbox', { messageId: stop.messageId }); } },
           { label: L('later2'), on: function () { close(); } }
@@ -1221,9 +1275,9 @@
       safe(function () { (SB.Mail.waiting(s) || []).forEach(function (x) { if (x.id === stop.askId) a = x; }); }, null);
       cardOpen = true;
       function done(f) { close(); if (f) act(f); }
-      close = SB.UI.card(h('div', { class: 'cc-slap', style: { '--hot': HOT } }, [
-        h('h2', { class: 'cc-slap-title' }, mk(L('needByTitle').toUpperCase(), 22)),
-        a ? h('p', { class: 'cc-slap-body', text: (a.toName || '') + (a.what ? ': ' + a.what : '') }) : null,
+      close = SB.UI.card(h('div', { class: 'mv-slap cc-slap', style: { '--hot': HOT } }, [
+        h('h2', { class: 'mv-slap cc-slap-title' }, mk(L('needByTitle').toUpperCase(), 22)),
+        a ? h('p', { class: 'mv-slap cc-slap-body', text: (a.toName || '') + (a.what ? ': ' + a.what : '') }) : null,
         tabsRow([
           { label: L('keepWaiting'), on: function () { done(function (x) { return SB.Mail.setNeedBy(x, stop.askId, null); }); } },
           a && !a.chased ? { label: L('chase'), on: function () { done(function (x) { return SB.Mail.chase(x, stop.askId); }); } } : null,
@@ -1240,10 +1294,10 @@
         key = (r.day || 0) + ':' + (r.stage || '') + ':' + (r.text || '');
         if (STAGES_SHOWN[key]) return;
         STAGES_SHOWN[key] = true;
-        close = SB.UI.card(h('div', { class: 'cc-slap cc-slap--stage', style: { '--hot': HOT } }, [
+        close = SB.UI.card(h('div', { class: 'mv-slap cc-slap cc-slap--stage', style: { '--hot': HOT } }, [
           pic(40, 36, K().heart(20, 18, 30, { seed: 'stg' }), 'cc-slap-doodle'),
-          h('h2', { class: 'cc-slap-title' }, mk(L('stageTitle').toUpperCase(), 22)),
-          r.text ? h('p', { class: 'cc-slap-body', text: r.text }) : null,
+          h('h2', { class: 'mv-slap cc-slap-title' }, mk(L('stageTitle').toUpperCase(), 22)),
+          r.text ? h('p', { class: 'mv-slap cc-slap-body', text: r.text }) : null,
           r.opens && r.opens.length ? h('ul', { class: 'cc-loglines' }, r.opens.map(function (t) { return h('li', { text: t }); })) : null,
           tabsRow([{ label: L('close'), on: function () { close(); } }])
         ]), { label: L('stageTitle') });

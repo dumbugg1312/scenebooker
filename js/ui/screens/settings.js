@@ -124,7 +124,9 @@
       if (!TAB || tabs.indexOf(TAB) < 0) TAB = tabs[0];
       SB.UI.clear(root);
       body = TAB === 'game' ? gameSec(s) : (TAB === 'look' ? displaySec() : (TAB === 'credits' ? creditsSec() : saveSec(s)));
-      root.appendChild(h('div', { class: 'sf' + (s ? '' : ' is-loose') }, [
+      var loose = !s, folder;
+      /* without a game (from the start screen) the folder is a full screen: it sits on the stage and nothing scrolls the window */
+      folder = h('div', { class: 'sf' + (loose ? ' is-loose' : '') }, [
         h('h1', { class: 'kt-sr', text: L('title') }),
         Kt().tabs({ list: tabs.map(function (t) { return { id: t, label: L('tabs.' + t) }; }), value: TAB, label: L('title'), idPrefix: 'sf-tab-', panel: 'sf-panel', cls: 'sf-tabs',
                     on: function (t) { TAB = t; render(); } }),
@@ -133,7 +135,9 @@
           h('div', { class: 'sf-spread' }, [cover(s), h('div', { class: 'sf-main' }, body)]),
           msg ? h('p', { class: 'kt-strip sf-msg', role: 'status', style: { '--kt-rot': '-.8deg' }, text: msg }) : null
         ])
-      ]));
+      ]);
+      root.appendChild(loose ? h('div', { class: 'sb-stage' }, folder) : folder);
+      if (loose && SB.Finish && SB.Finish.scrollbar) safe(function () { SB.Finish.scrollbar(folder); });
       if (fk) focusFk(fk);
     }
     function focusFk(k) { var el = safe(function () { return root.querySelector('[data-fk="' + k + '"]'); }, null); if (el && el.focus) safe(function () { el.focus(); }); }
@@ -142,7 +146,6 @@
     function cover(s) {
       var ph = COVER[TAB] || COVER.game, who = s && s.player && s.player.bookingName ? s.player.bookingName : L('nobody');
       return h('div', { class: 'sf-cover' }, [
-        Kt().tapeLabel(L('cover'), { size: 24, max: 220, rot: -1.2, cls: 'sf-coverlabel' }),
         Kt().photo({ id: ph.id, w: ph.w, h: ph.h, paper: ph.paper, tape: [{ at: 'top', w: 70 }], rot: 1.3, seed: 'sf-' + TAB, cls: 'sf-photo' }),
         Kt().card({ paper: 'bone', rot: -0.9, cls: 'sf-index', seed: 'sf-index' }, [
           h('p', { class: 'kt-small', text: L('owner') }),
@@ -180,7 +183,7 @@
     function creditsSec() {
       var LP = (SB.Content && SB.Content.loops) || {}, styles = LP.styles || {}, keys = Object.keys(styles).sort(), groups = [],
           MX = (SB.Content && SB.Content.mixtape) || {}, songs = [];
-      function link(text, href) { return href ? h('a', { href: href, target: '_blank', rel: 'noopener noreferrer', class: 'sf-credlink', text: text }) : h('span', { text: text }); }
+      function link(text, href) { return href ? h('a', { href: href, target: '_blank', rel: 'noopener noreferrer', class: 'sf-credlink pz-hl', text: text }) : h('span', { text: text }); }
       function line(x) {
         return h('li', { class: 'sf-cred' }, [
           h('span', { class: 'sf-credwork', text: '"' + String(x.title || '?').replace(/\.(mp3|ogg|wav|flac)$/i, '') + '" ' }),
@@ -208,10 +211,16 @@
         h('p', { class: 'kt-pencil', text: L('creditsSfx') }),
         h('p', { class: 'kt-pencil', text: L('creditsPaper') }),
         h('h2', { class: 'kt-small sf-listhead', text: L('creditsList') }),
-        groups.length ? h('div', { class: 'sf-credscroll', tabindex: '0', role: 'region', aria: { label: L('creditsList') } }, groups) : h('p', { class: 'kt-pencil', text: L('creditsNone') })
+        groups.length ? credBox(groups) : h('p', { class: 'kt-pencil', text: L('creditsNone') })
       ]))];
     }
 
+    /* the credits' own pocket scrolls: it gets the drawn scrollbar once it is in its card */
+    function credBox(groups) {
+      var box = h('div', { class: 'sf-credscroll', tabindex: '0', role: 'region', aria: { label: L('creditsList') } }, groups), wrap = h('div', { class: 'sf-credpad' }, box);
+      if (SB.Finish && SB.Finish.scrollbar) safe(function () { SB.Finish.scrollbar(box); });
+      return wrap;
+    }
     function displaySec() {
       var p = P();
       function set(k, v) { p.set(k, v); render(); }

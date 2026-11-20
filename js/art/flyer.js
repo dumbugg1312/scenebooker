@@ -1645,12 +1645,14 @@ SB.module('Flyer', function (SB) {
   var CACHE = new Map(), CACHE_MAX = 80;
   function thumb(rec, spec, width) {
     width = width || 170;
-    var key = (spec && spec.showId) + '|' + SB.rng.hash(JSON.stringify(spec || {})) + '|' + JSON.stringify(rec || null) + '|' + width, src, out, ctx;
+    /* width is in stage units (--p): drawn as fine as the screen needs (SB.Finish.res), shown at that many --p */
+    var res = SB.Finish && SB.Finish.res ? SB.Finish.res() : ((typeof window !== 'undefined' && window.devicePixelRatio) || 1),
+        key = (spec && spec.showId) + '|' + SB.rng.hash(JSON.stringify(spec || {})) + '|' + JSON.stringify(rec || null) + '|' + width + '@' + res, src, out, ctx;
     src = CACHE.get(key);
     if (src) { CACHE.delete(key); CACHE.set(key, src); }
     else {
       src = document.createElement('canvas');
-      var whole = render(src, rec, spec, { width: width, dpr: (typeof window !== 'undefined' && window.devicePixelRatio) || 1,
+      var whole = render(src, rec, spec, { width: width, dpr: res,
                                            onRedraw: function () {
                                              CACHE.set(key, src);
                                              if (out && out.getContext) { var oc = out.getContext('2d'); oc.clearRect(0, 0, out.width, out.height); oc.drawImage(src, 0, 0); }
@@ -1660,7 +1662,7 @@ SB.module('Flyer', function (SB) {
     }
     out = document.createElement('canvas');
     out.width = src.width; out.height = src.height;
-    if (src.style && out.style) { out.style.width = src.style.width; out.style.height = src.style.height; }
+    if (out.style) { out.style.width = 'calc(var(--p, 1px) * ' + width + ')'; out.style.height = 'auto'; }
     ctx = out.getContext('2d');
     if (ctx && ctx.drawImage) ctx.drawImage(src, 0, 0);
     out.setAttribute('role', 'img');
@@ -1813,13 +1815,13 @@ SB.module('Flyer', function (SB) {
       width = width || 170;
       var wrap = document.createElement('div'), tilt, c, blank;
       wrap.className = 'sb-flyer-thumb';
-      wrap.style.width = width + 'px';
+      wrap.style.width = 'calc(var(--p, 1px) * ' + width + ')';
       tilt = flyer && flyer.spec ? SB.rng.make('tilt:' + flyer.spec.showId).range(-1.2, 1.2) : -0.6;
       wrap.style.transform = 'rotate(' + tilt.toFixed(2) + 'deg)';
       if (!flyer || !flyer.spec) {
         blank = document.createElement('div');
         blank.className = 'sb-flyer-blank';
-        blank.style.height = Math.round(width * H / W) + 'px';
+        blank.style.height = 'calc(var(--p, 1px) * ' + Math.round(width * H / W) + ')';
         blank.textContent = uiLabel('blank', 'no flyer yet');
         wrap.appendChild(blank);
         return wrap;

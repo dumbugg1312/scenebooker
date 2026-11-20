@@ -80,6 +80,15 @@
   function C() { return SB.UI.C; }
   function D() { return SB.UI.cuDraw; }
   function K() { return SB.DeskKit; }
+  /* a drawn piece, shown w by ht in --p (the stage's unit; or the whole width of its box when fluid) and photocopied fine
+     enough for the screen: drawn k times larger, scaled back down, so the copier's raster has the pixels --p needs */
+  function artP(inner, w, ht, cls, fluid) {
+    var res = SB.Finish && SB.Finish.res ? SB.Finish.res() : 1, dpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1,
+        k = Math.max(1, Math.min(3, Math.ceil(res / Math.max(1.5, Math.min(2, dpr))))), el;
+    el = D().art(k > 1 ? '<g transform="scale(' + k + ')">' + inner + '</g>' : inner, w * k, ht * k, cls);
+    el.style.width = fluid ? '100%' : 'calc(var(--p) * ' + w + ')'; el.style.height = 'auto'; el.style.aspectRatio = w + ' / ' + ht;
+    return el;
+  }
   function num(v) { return typeof v === 'number' && isFinite(v); }
   function game() { return SB.UI.game(); }
   function has(path) { return SB.text.has('strings.' + path); }
@@ -165,10 +174,22 @@
     if (e.ready) paint(dest); else e.waits.push(dest);
   }
 
-  /* pieces of paper from the night table's stock (NightScene.paperStyle: copy paper with toner specks, torn edges) */
+  /* pieces of paper cut from the copy stock: a cut or torn edge from the shared set (css/finish.css --edge-*); a note that
+     is not already a .cb-piece is a .pz-paper (toner edge, shadow down and right) on the stock's colour */
+  var STOCK = { white: 'var(--pp-white)', bone: 'var(--pp-buff)', canary: 'var(--pp-buff)', goldenrod: 'var(--pp-kraft)', pink: 'var(--pp-salmon)', blue: 'var(--pp-blue)', green: 'var(--pp-green)',
+                salmon: 'var(--pp-salmon)', lilac: 'var(--pp-gray)', kraft: 'var(--pp-kraft)', index: 'var(--pp-white)', tape: 'var(--pp-buff)' };
+  function edgeFor(edges, seed) {
+    var e = String(edges || ''), n = 0, i;
+    if (e === 'b') return 'var(--edge-torn-b)';
+    if (e === 't') return 'var(--edge-torn-t)';
+    if (e.indexOf('r') >= 0) return 'var(--edge-torn-r)';
+    for (i = 0; i < String(seed).length; i++) n += String(seed).charCodeAt(i);
+    return 'var(--edge-cut-' + (n % 3 + 1) + ')';
+  }
   function paperUp(el, stock, seed, edges) {
-    var ns = SB.NightScene, st = ns && ns.paperStyle ? safe(function () { return ns.paperStyle(stock, seed, edges); }, null) : null;
-    if (st) { el.classList.add('tw-paper'); Object.keys(st).forEach(function (k) { if (st[k] != null) safe(function () { el.style.setProperty(k, st[k]); }); }); }
+    el.classList.add('tw-paper');
+    el.style.setProperty('--edge', edgeFor(edges, seed));
+    if (!el.classList.contains('cb-piece')) { el.classList.add('pz-paper'); el.style.setProperty('--paper', STOCK[stock] || 'var(--pp-white)'); }
     return el;
   }
   function marker(text, size, o) {
@@ -202,6 +223,38 @@
                            onClick: function () { zoom = toNation ? 'nation' : 'region'; keepFocus(render); } });
       }
 
+      /* your town on the map: the pin (a ringed dot) and the name in ransom letters on a highlighter swipe, 2.4 times what
+         the other places get, askew, stamped on. Drawn on its own sheet laid over the map, centred on the pin, so it can be
+         stamped (mv-stamp, in moves()); the room marks and the click target stay in the map under it. */
+      function homeHero(W, H, cx, cy, name) {
+        var k = K(), one = k.ransomWidth(name, 22) || 1, right = (W - 40 - cx) > (cx - 40), room = Math.max(W - 40 - cx, cx - 40) - 90, size = Math.max(40, Math.min(54, 22 * room / one)),
+            nw = k.ransomWidth(name, size), w = Math.ceil(nw + 150), ht = 134, px = right ? 68 : w - 68, art = '', pct;
+        art += '<circle cx="' + px + '" cy="67" r="20" fill="' + TONER + '"/>' + k.circle3(px, 67, 62, 54, { seed: 'home', stroke: TONER, sw: 7 });
+        art += '<path d="M' + (right ? px + 74 : px - 74 - nw - 8) + ' 96L' + (right ? px + 74 + nw + 8 : px - 74) + ' 92" stroke="#F2D93B" stroke-opacity=".8" stroke-width="30"/>';
+        art += k.ransom(name, right ? px + 78 : px - 78, 100, size, { anchor: right ? 'start' : 'end', seed: 'hm' });
+        pct = px / w * 100;
+        return h('div', { class: 'tw-home', aria: { hidden: 'true' },
+          style: { left: f(cx / W * 100) + '%', top: f(cy / H * 100) + '%', width: f(w / W * 100) + '%', transform: 'translate(-' + f(pct) + '%, -50%) rotate(-6deg)', transformOrigin: f(pct) + '% 50%' } },
+          artP(art, w, ht, 'tw-homeart', true));
+      }
+
+      /* the moves (js/ui/finish.js): the notes and snapshots slap on one after another when the map first opens (and when
+         it is folded out or back), your town is stamped on; the buttons get the highlighter */
+      var moved = '';
+      function dress() {
+        var F = SB.Finish, key = zoom, first = moved !== key, hero, list;
+        Array.prototype.forEach.call(root.querySelectorAll('button, a[href], [role="button"]'), function (b) { b.classList.add('pz-hl'); });
+        if (!F) return;
+        if (first) {
+          list = Array.prototype.slice.call(root.querySelectorAll('.p2-mapside > *, .tw-pola'));
+          F.stagger(list, 3);
+          list.forEach(function (el) { el.classList.add('mv-slap'); });
+          hero = root.querySelector('.tw-home');
+          if (hero) F.move(hero, 'stamp', { delay: 260, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: hero } });
+        }
+        moved = key;
+      }
+
       /* ---------------- around town ---------------- */
       function regionView(s) {
         var k = K(), W = 860, H = 620, cx = 440, cy = 300, R = 250, zones = zonesOf(s), maxMin = 60, scale, reg = null, byZone = {}, pack = safe(function () { return SB.Cities.pack(s); }, null),
@@ -228,7 +281,7 @@
           if (dy > 1) scale = Math.min(scale, sy / dy);
         });
         if (!isFinite(scale)) scale = R / maxMin;
-        var rooms = roomsOf(s), roomsBy = {};
+        var rooms = roomsOf(s), roomsBy = {}, home = cityName(s);
         rooms.forEach(function (rm) { (roomsBy[rm.zoneId] = roomsBy[rm.zoneId] || []).push(rm); });
         Object.keys(roomsBy).forEach(function (zid) { roomsBy[zid].sort(function (a, b) { return DOORS.indexOf(a.door) - DOORS.indexOf(b.door); }); });
         reg = safe(function () { return SB.Crowd.regulars(s); }, null);
@@ -294,11 +347,9 @@
         zones.forEach(function (z) {
           var p = pos[z.id], n = byZone[z.id] || 0, rad, lx, ly, anchor, name = String(z.name || ''), hd = '', hn, j, hw, rm = roomsBy[z.id] || [], mk;
           if (z.kind === 'CITY') {
-            inner += '<circle cx="' + cx + '" cy="' + cy + '" r="11" fill="' + TONER + '"/>' + k.circle3(cx, cy, 30, 26, { seed: 'home', stroke: TONER, sw: 3.4 });
-            inner += '<path d="M' + f(cx - 40 - k.ransomWidth(name, 22)) + ' ' + f(cy + 46) + 'h' + f(k.ransomWidth(name, 22) + 12) + '" stroke="#F2D93B" stroke-opacity=".8" stroke-width="18"/>';
-            inner += k.ransom(name, cx - 34, cy + 52, 22, { anchor: 'end', seed: 'hm' });
-            if (rm.length) { mk = roomMarks(rm, cx - 34, cy + 64, 'end', 6); inner += mk.svg; }
-            hits.push({ z: z, x: cx - 34 - k.ransomWidth(name, 22) / 2 + 30, y: cy + 22 + (mk ? mk.h / 2 : 0), w: k.ransomWidth(name, 22) + 70, h: 84 + (mk ? mk.h : 0) });
+            /* the pin and the name are THE loud thing: drawn on their own sheet over the map (homeHero), not in the map */
+            if (rm.length) { mk = roomMarks(rm, cx - 34, cy + 74, 'end', 6); inner += mk.svg; }
+            hits.push({ z: z, x: cx, y: cy + 20 + (mk ? mk.h / 2 : 0), w: 300, h: 140 + (mk ? mk.h : 0) });
             return;
           }
           rad = Math.max(5, Math.min(18, 3 + Math.sqrt(Math.max(0, z.scene || 0)) * 0.5));
@@ -342,7 +393,8 @@
         inner += k.ransom(tt, W - 50, H - 66, 26, { anchor: 'end', seed: 'mt' }) + k.type(sub, W - 52, H - 38, 11, { anchor: 'end', bold: true });
         out = k.paper(10, 10, W - 20, H - 20, { seed: 'rmap', stock: 'white', burn: 0.6, inner: inner, cut: 2 }) + k.tape(70, 22, 90, 24, { seed: 'rmt1', rot: -30 }) + k.tape(W - 60, H - 20, 90, 24, { seed: 'rmt2', rot: -26 });
         var mapEl = h('div', { class: 'p2-map', role: 'group', aria: { label: L('regionLabel', { city: cityName(s) }) }, style: { aspectRatio: W + ' / ' + H } }, [
-          D().art(out, W, H, 'p2-mapart'),
+          artP(out, W, H, 'p2-mapart', true),
+          homeHero(W, H, cx, cy, home),
           hits.map(function (t) {
             var n = byZone[t.z.id] || 0, min = t.z.kind === 'CITY' ? '' : L('minShort', { n: t.z.minutes });
             return h('button', { type: 'button', class: 'p2-maphit fx' + (pickedZone === t.z.id ? ' is-on' : ''), data: { fk: 'z-' + t.z.id },
@@ -355,7 +407,7 @@
           h('div', { class: 'p2-mapwrap' }, [mapEl, roomPhotos(s, rooms)]),
           h('div', { class: 'p2-col p2-mapside' }, [standingNote(s), folder(true),
             taped(zoneNote(s, pickedZone ? zones.filter(function (z) { return z.id === pickedZone; })[0] : null, byZone, chokes, roomsBy), 0.8, ['top']),
-            taped(contactsScrap(s), -1.2, ['tl', 'br']),
+            taped(contactsScrap(s), -1.2, ['tl']),
             h('p', { class: 'cb-typed cb-small p2-quiet', text: L('legendArc') + ' ' + L('legendCut') + ' ' + L('roomsMapKey') })])
         ]);
       }
@@ -366,10 +418,10 @@
         if (!word) return null;
         tier = lbl('wordTier.' + word.tier + '.name', '');
         el = paperUp(h('div', { class: 'tw-note tw-standing', role: 'note', aria: { label: L('standing', { city: city, word: tier }) + (word.text ? '. ' + word.text : '') } }, [
-          h('span', { class: 'tw-mk', aria: { hidden: 'true' }, html: marker(L('standingHead', { city: city }).toUpperCase(), 20, { seed: 'stc', maxWidth: 240 }) }),
-          tier ? h('span', { class: 'tw-mk tw-mk--big', aria: { hidden: 'true' }, html: marker(tier.toUpperCase(), 30, { seed: 'stt', maxWidth: 250 }) }) : null,
+          h('span', { class: 'tw-mk', aria: { hidden: 'true' }, html: marker(L('standingHead', { city: city }).toUpperCase(), 16, { seed: 'stc', maxWidth: 240 }) }),
+          tier ? h('span', { class: 'tw-mk tw-mk--big', aria: { hidden: 'true' }, html: marker(tier.toUpperCase(), 22, { seed: 'stt', maxWidth: 250 }) }) : null,
           word.text ? h('p', { class: 'cb-typed cb-small', aria: { hidden: 'true' }, text: word.text }) : null
-        ]), 'canary', 'stand' + city, 'b');
+        ]), 'bone', 'stand' + city, 'b');
         return taped(el, -2.4, ['top']);
       }
 
@@ -381,17 +433,16 @@
         return h('div', { class: 'tw-pics', role: 'group', aria: { label: L('roomsKey') } }, DOORS.filter(function (d) { return by[d]; }).map(function (d) {
           var list = by[d], where = [], cv, kind = L('door' + d), cap;
           list.forEach(function (rm) { var n = zoneN(rm.zoneId); if (n && where.indexOf(n) < 0) where.push(n); });
-          cv = document.createElement('canvas'); cv.width = 360; cv.height = 270; cv.className = 'tw-piccv'; cv.setAttribute('aria-hidden', 'true');
+          cv = document.createElement('canvas'); cv.width = Math.round(Math.max(360, 134 * 1.5 * (SB.Finish && SB.Finish.res ? SB.Finish.res() : 1))); cv.height = Math.round(cv.width * 0.75); cv.className = 'tw-piccv'; cv.setAttribute('aria-hidden', 'true');
           snapshot(d, String(s.seed || ''), cv);
           cap = kind.toUpperCase() + ' ' + list.length;
-          return h('figure', { class: 'tw-pola', role: 'img', style: { '--rot': rots[i++ % 4] + 'deg' }, aria: { label: L('roomsPhoto', { kind: kind, n: roomsCount(list.length), where: where.join(', ') }) } }, [
+          return h('figure', { class: 'tw-pola pz-paper', role: 'img', style: { '--rot': rots[i++ % 4] + 'deg' }, aria: { label: L('roomsPhoto', { kind: kind, n: roomsCount(list.length), where: where.join(', ') }) } }, [
             h('div', { class: 'tw-pic' }, [cv]),
             h('figcaption', { class: 'tw-cap', aria: { hidden: 'true' } }, [
               h('span', { class: 'tw-capglyph', html: glyph(d, 22) }),
               h('span', { class: 'tw-mk', html: marker(cap, 21, { seed: 'pc' + d, maxWidth: 150 }) })
             ]),
-            h('p', { class: 'tw-label', aria: { hidden: 'true' }, text: L('roomsWhere', { where: where.join(', ') }) }),
-            h('span', { class: 'tw-tape tw-tape--top', aria: { hidden: 'true' } })
+            h('p', { class: 'tw-label', aria: { hidden: 'true' }, text: L('roomsWhere', { where: where.join(', ') }) })
           ]);
         }));
       }
@@ -407,13 +458,13 @@
         safe(function () { (SB.Territory.contacts(s) || []).forEach(function (c) { if (c.place && c.place.name === z.name) contact = c; }); }, null);
         range = safe(function () { key = SB.Notebook.key && SB.Notebook.key.zone ? SB.Notebook.key.zone(z.id) : 'zone:' + z.id; return SB.Notebook.range(s, key); }, null);
         art = k.marker(z.name, 6, 34, 28, { seed: 'zh' + z.id, maxWidth: 250 });
-        kids.push(h('h2', { role: 'img', aria: { label: z.name } }, D().art(art, 262, 44)));
+        kids.push(h('h2', { role: 'img', aria: { label: z.name } }, artP(art, 262, 44)));
         kids.push(h('p', { class: 'cb-typed cb-small', text: lbl('zone.' + z.kind, '') + (num(z.minutes) && z.minutes > 0 ? ' · ' + L('zoneDrive', { n: z.minutes }) : '') }));
         if (z.note) kids.push(h('p', { class: 'cb-typed cb-small', text: z.note }));
         if (rg > 0) {
           var hd = '', j;
           for (j = 0; j < Math.min(rg, 14); j++) hd += D().head(8 + j * 13, 22, 20, { mode: 'solid' });
-          kids.push(h('div', { role: 'img', aria: { label: L('zoneRegulars', { n: rg }) } }, D().art(hd + k.marker(String(rg), Math.min(rg, 14) * 13 + 10, 22, 22, { seed: 'zr' + rg }), Math.min(rg, 14) * 13 + 60, 30)));
+          kids.push(h('div', { role: 'img', aria: { label: L('zoneRegulars', { n: rg }) } }, artP(hd + k.marker(String(rg), Math.min(rg, 14) * 13 + 10, 22, 22, { seed: 'zr' + rg }), Math.min(rg, 14) * 13 + 60, 30)));
           kids.push(h('p', { class: 'cb-typed cb-small', text: L('zoneRegulars', { n: rg }) }));
         }
         if (z.scene) kids.push(h('p', { class: 'cb-typed cb-small', text: L('zoneScene', { n: z.scene }) }));
@@ -422,7 +473,7 @@
         if (here.length) kids.push(h('p', { class: 'cb-typed cb-small tw-roomsline', text: L('roomsHere', { list: here.map(function (rm) { return rm.name; }).join('; ') }) }));
         kids.push(h('h3', { class: 'cb-typed', text: L('zoneKnow').toUpperCase() }));
         if (range && range.conf > 0) {
-          kids.push(h('p', { class: 'p2-range', role: 'img', aria: { label: L('zoneKnow') + ': ' + range.text } }, D().art(D().swipe(4, 22, k.markerWidth(range.text, 24) + 10, 24) + k.marker(range.text, 8, 32, 24, { seed: 'rg' + z.id }), k.markerWidth(range.text, 24) + 24, 42)));
+          kids.push(h('p', { class: 'p2-range', role: 'img', aria: { label: L('zoneKnow') + ': ' + range.text } }, artP(D().swipe(4, 22, k.markerWidth(range.text, 24) + 10, 24) + k.marker(range.text, 8, 32, 24, { seed: 'rg' + z.id }), k.markerWidth(range.text, 24) + 24, 42)));
         } else kids.push(h('p', { class: 'cb-typed cb-small', text: L('zoneNoKnow') }));
         return h('div', { class: 'cb-piece cb-stock-bone p2-zonenote', aria: { live: 'polite' } }, kids);
       }
@@ -503,12 +554,12 @@
                    k.type(c.name, p.x + 12, p.y - 19 - (j % 3) * 10, 9, { bold: true });
         });
         if (here) {
-          inner += k.circle3(here.p.x, here.p.y, 14, 12, { seed: 'nh', stroke: TONER, sw: 3 }) + '<circle cx="' + f(here.p.x) + '" cy="' + f(here.p.y) + '" r="5" fill="' + TONER + '"/>';
-          inner += k.ransom(L('standing', { city: here.e.name, word: word ? lbl('wordTier.' + word.tier + '.name', '') : '' }), here.p.x - 30, here.p.y + 46, 14, { anchor: 'middle', seed: 'nst' });
+          inner += k.circle3(here.p.x, here.p.y, 30, 26, { seed: 'nh', stroke: TONER, sw: 4.4 }) + '<circle cx="' + f(here.p.x) + '" cy="' + f(here.p.y) + '" r="10" fill="' + TONER + '"/>';
+          inner += k.ransom(L('standing', { city: here.e.name, word: word ? lbl('wordTier.' + word.tier + '.name', '') : '' }), here.p.x - 30, here.p.y + 74, 30, { anchor: 'middle', seed: 'nst' });
         }
         out = k.paper(6, 6, box.w - 12, box.h - 12, { seed: 'nmap', stock: 'white', burn: 0.5, inner: inner, cut: 2 }) + k.tape(56, 18, 90, 24, { seed: 'nmt', rot: -28 });
         return h('div', { class: 'p2-mapcols p2-mapcols--nation' }, [
-          h('div', { class: 'p2-mapwrap' }, [h('div', { class: 'p2-map', role: 'img', aria: { label: L('nationLabel') + (here && word ? ' ' + L('standing', { city: here.e.name, word: lbl('wordTier.' + word.tier + '.name', '') }) : '') } }, D().art(out, box.w, box.h, 'p2-mapart'))]),
+          h('div', { class: 'p2-mapwrap' }, [h('div', { class: 'p2-map', role: 'img', aria: { label: L('nationLabel') + (here && word ? ' ' + L('standing', { city: here.e.name, word: lbl('wordTier.' + word.tier + '.name', '') }) : '') } }, artP(out, box.w, box.h, 'p2-mapart', true))]),
           h('div', { class: 'p2-col p2-mapside' }, [
             standingNote(s),
             folder(false),
@@ -528,7 +579,7 @@
         var cands = safe(function () { return SB.Territory.tourCandidates(s) || []; }, []), okList, notOk, stops = [], k, base, kids = [], weeks = [];
         okList = cands.filter(function (c) { return c.ok && c.ok.ok !== false; });
         notOk = cands.filter(function (c) { return !(c.ok && c.ok.ok !== false) && c.ok && c.ok.why; })[0];
-        kids.push(h('h3', { role: 'img', aria: { label: L('tourStart') } }, D().art(K().marker(L('tourStart'), 4, 28, 24, { seed: 'ts' }), K().markerWidth(L('tourStart'), 24) + 12, 36)));
+        kids.push(h('h3', { role: 'img', aria: { label: L('tourStart') } }, artP(K().marker(L('tourStart'), 4, 28, 24, { seed: 'ts' }), K().markerWidth(L('tourStart'), 24) + 12, 36)));
         if (!okList.length) { kids.push(h('p', { class: 'cb-typed cb-small', text: notOk ? notOk.ok.why : L('tourNone') })); return h('div', { class: 'cb-piece cb-stock-bone p2-toursheet' }, kids); }
         if (!tour.bandId || !okList.some(function (c) { return c.bandId === tour.bandId; })) { tour.bandId = okList[0].bandId; tour.stops = {}; }
         stops = safe(function () { return SB.Territory.tourStops(s, tour.bandId) || []; }, []);
@@ -567,6 +618,7 @@
           zoom === 'nation' ? nationView(s) : regionView(s),
           SB.UI.calKit && SB.UI.calKit.grainEl ? SB.UI.calKit.grainEl() : null
         ]));
+        safe(dress);
       }
 
       render();

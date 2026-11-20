@@ -111,7 +111,8 @@
           out += k.paper(8, 8, w - 16, h - 16, { seed: seed, stock: STOCK[kind] || 'white', inner: inner, cut: 2 });
       }
       if (kind !== 'jacket' && kind !== 'phone' && kind !== 'clipboard' && kind !== 'folder' && kind !== 'calendar' && kind !== 'tin' && kind !== 'window' && kind !== 'wall' && kind !== 'notebook' && kind !== 'book' && kind !== 'drawer') out += k.tape(28, 18, 80, 24, { seed: seed + 't1', rot: -32 }) + k.tape(w - 30, h - 18, 80, 24, { seed: seed + 't2', rot: -28 });
-      return '<svg xmlns="http://www.w3.org/2000/svg" width="' + f(w + 10) + '" height="' + f(h + 12) + '" viewBox="0 0 ' + f(w + 10) + ' ' + f(h + 12) + '" aria-hidden="true" focusable="false">' + k.defs() + out + '</svg>';
+      /* drawn in phone units (--p): shown at that many --p whatever the window, like everything on the stage */
+      return '<svg xmlns="http://www.w3.org/2000/svg" style="width:calc(var(--p, 1px) * ' + f(w + 10) + ');height:calc(var(--p, 1px) * ' + f(h + 12) + ')" viewBox="0 0 ' + f(w + 10) + ' ' + f(h + 12) + '" aria-hidden="true" focusable="false">' + k.defs() + out + '</svg>';
     }
 
     function cityInk() {
@@ -120,22 +121,28 @@
       return K().ink(p && p.style && p.style.cityInks ? p.style.cityInks[0] : 'fireRed');
     }
 
+    /* the body is drawn at the object's layout size in phone units (offsetWidth ignores the moves and the zoom the
+       walkthrough's strip asks for), so it lines up with the page inside at every window size */
     function draw(obj, artEl, kind) {
-      var r, w, ht;
-      try { r = obj.getBoundingClientRect(); } catch (e) { r = null; }
-      w = r && r.width ? r.width : 600; ht = r && r.height ? r.height : 500;
-      if (artEl.getAttribute('data-size') === Math.round(w) + 'x' + Math.round(ht)) return;
-      artEl.setAttribute('data-size', Math.round(w) + 'x' + Math.round(ht));
+      var k = SB.UI.unit ? SB.UI.unit() * 1.25 : 1, w = Math.round((obj.offsetWidth || 600 * k) / k), ht = Math.round((obj.offsetHeight || 500 * k) / k);
+      if (artEl.getAttribute('data-size') === w + 'x' + ht) return;
+      artEl.setAttribute('data-size', w + 'x' + ht);
       artEl.innerHTML = body(kind, w, ht, kind);
     }
 
     function putDown() { SB.UI.go('desk'); }
 
+    /* Held on the stage (polish brief job 3): every close-up is laid out on the same 16:10 stage as the desk, sized in
+       stage units and letterboxed (css/desk-scene.css). The phone leaves the stage's left column free, so the
+       walkthrough's strip goes there instead of along the bottom (css/finish.css). */
+    var COLUMN = { phone: 1 };
+
     /** frame(main, route): build the close-up for a route inside main; returns the element the screen mounts into. */
     function frame(main, route) {
       var kind = kindOf(route), p = PAD[kind] || PAD.paper, artEl, obj, inner, down, back;
       if (observer) { try { observer.disconnect(); } catch (e) { /* fine */ } observer = null; }
-      back = h('div', { class: 'cu-back', on: { mousedown: function (e) { if (e.target === back) putDown(); } } });
+      var stage = h('div', { class: 'cu-stage' });
+      back = h('div', { class: 'cu-back cu-back--staged' + (COLUMN[kind] ? ' cu-back--column' : ''), on: { mousedown: function (e) { if (e.target === back || e.target === stage) putDown(); } } });
       artEl = h('div', { class: 'cu-art', aria: { hidden: 'true' } });
       var mountAt = h('div', { class: 'cu-host' });   // screens may set their root's class, so they get a plain child
       inner = h('div', { class: 'cu-in' }, mountAt);
@@ -143,10 +150,14 @@
       var still = lastKind === kind && typeof document !== 'undefined' && document.body && document.body.classList.contains('is-closeup');
       lastKind = kind;
       obj = h('section', { class: 'cu-obj cu--' + kind + (still ? ' is-held' : ''), role: 'region', aria: { label: L('names.' + kind) },
-                           style: { '--cu-pt': p[0] + 'px', '--cu-pr': p[1] + 'px', '--cu-pb': p[2] + 'px', '--cu-pl': p[3] + 'px' } }, [artEl, inner, down]);
-      back.appendChild(obj);
+                           style: { '--cu-pt': 'calc(var(--p) * ' + p[0] + ')', '--cu-pr': 'calc(var(--p) * ' + p[1] + ')', '--cu-pb': 'calc(var(--p) * ' + p[2] + ')', '--cu-pl': 'calc(var(--p) * ' + p[3] + ')' } }, [artEl, inner, down]);
+      if (still) back.classList.add('is-held'); else obj.classList.add('mv-slap');
+      stage.appendChild(obj);
+      back.appendChild(stage);
       main.appendChild(back);
       draw(obj, artEl, kind);
+      /* anything held that scrolls gets the drawn scrollbar, never the browser's (js/ui/finish.js) */
+      if (SB.Finish && SB.Finish.scrollbar) { try { SB.Finish.scrollbar(inner); } catch (e) { /* fine */ } }
       if (typeof ResizeObserver === 'function') {
         observer = new ResizeObserver(function () { draw(obj, artEl, kind); });
         try { observer.observe(obj); } catch (e) { /* fine */ }

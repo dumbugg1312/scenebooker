@@ -157,7 +157,7 @@ SB.module('Scenes', function (SB) {
         { ink: opts.ink || '#000', maxWidth: opts.maxWidth, rng: SB.rng.make('mk:' + t + ':' + (opts.seed || '')) });
       return w;
     }
-    c.save(); c.font = '900 ' + size + 'px Impact, "Arial Black", sans-serif'; c.fillStyle = opts.ink || '#000';
+    c.save(); c.font = '900 ' + size + 'px "SB Gothic", Impact, sans-serif'; c.fillStyle = opts.ink || '#000';
     c.textAlign = opts.align === 'center' ? 'center' : 'left'; c.fillText(t, x, y, opts.maxWidth); c.restore();
     return opts.maxWidth || size * t.length * 0.6;
   }
@@ -842,7 +842,7 @@ SB.module('Scenes', function (SB) {
   }
   /* Typewriter words; y is the baseline. */
   function typed(c, text, x, y, size, v, align) {
-    c.save(); c.font = '700 ' + size + 'px "Courier New", Courier, monospace'; c.fillStyle = g(v == null ? 0 : v);
+    c.save(); c.font = '700 ' + size + 'px "SB Type", "Courier New", monospace'; c.fillStyle = g(v == null ? 0 : v);
     c.textAlign = align || 'left'; c.fillText(String(text), x, y); c.restore();
   }
   /* Scribbled lines standing in for small writing nobody can read at this size. */
@@ -1964,7 +1964,7 @@ SB.module('Scenes', function (SB) {
     var b = [[120, 130], [1080, 118], [1092, 620], [108, 632]];
     fillPoly(c, b, 0.04);
     hatch(c, polyClip(c, b), boxOf(b), 0.8, 18, 2, r, 0.3);
-    c.save(); c.font = '700 54px "Courier New", Courier, monospace'; c.fillStyle = g(0.96); c.textAlign = 'center';
+    c.save(); c.font = '700 54px "SB Type", "Courier New", monospace'; c.fillStyle = g(0.96); c.textAlign = 'center';
     c.fillText(key, 600, 395, 900); c.restore();
   }
 
@@ -2166,7 +2166,7 @@ SB.module('Scenes', function (SB) {
   /* Typewriter letters on an arc, reading left to right: along the top (bottom false) or along the bottom. */
   function ringText(c, text, R, span, size, color, bottom) {
     var t = upper(text), n = t.length, step = n > 1 ? span / (n - 1) : 0;
-    c.save(); c.fillStyle = color; c.font = '700 ' + size + 'px "Courier New", Courier, monospace'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.save(); c.fillStyle = color; c.font = '700 ' + size + 'px "SB Type", "Courier New", monospace'; c.textAlign = 'center'; c.textBaseline = 'middle';
     for (var i = 0; i < n; i++) {
       var a = bottom ? Math.PI / 2 + span / 2 - i * step : -Math.PI / 2 - span / 2 + i * step;
       c.save(); c.translate(Math.cos(a) * R, Math.sin(a) * R); c.rotate(bottom ? a - Math.PI / 2 : a + Math.PI / 2); c.fillText(t.charAt(i), 0, 0); c.restore();
@@ -2344,6 +2344,9 @@ SB.module('Scenes', function (SB) {
     paste: paste,
     /** loadCuts(ids, cb): load these SB.Cutouts photos, then cb() (at once if they are in already). */
     loadCuts: load,
+    /** need(artKey, ctx): the cut-out photos this picture would draw that are not in yet (load them first and the
+     *  picture never shows its stand-in: js/ui/cutscene.js, SB.Boot.hold) */
+    need: function (key, x) { x = x || {}; try { return plan(resolve(key, x), x).filter(function (id) { return !isSettled(id); }); } catch (e) { return []; } },
     /** img(id): the loaded Image of a cut-out photo, or null if it is not in yet (the flyer generator draws from it). */
     img: function (id) { return isIn(id) ? IMG[id].img : null; }
   };

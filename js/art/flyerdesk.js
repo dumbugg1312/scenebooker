@@ -9,7 +9,9 @@
  * the kits (picture, real photos from SB.Cutouts through SB.Scenes's copier), the copier's copy-count dial (copies),
  * an index card of tick boxes (extras). Scissors, a glue stick, an X-Acto, a steel rule and the paper trims lie
  * around. Every drawn thing is SB.DeskKit SVG or an SB.Scenes copier pass; no person is drawn, only pasted.
- * The board is a 1180 x 690 design box scaled to the close-up.
+ * The board is a 1180 x 690 box in stage units (--p), held on the mat as it is: nothing is scaled.
+ * Moves (js/ui/finish.js): the things on the table slap down staggered when the desk opens; the flyer is stamped on,
+ * and stamped again when it is rolled or an old roll is taken back (not on every little edit).
  */
 (function () {
   'use strict';
@@ -53,10 +55,17 @@
   /* the things on the table (drawing only; nothing here changes state)  */
   /* ------------------------------------------------------------------ */
 
-  var BW = 1180, BH = 690, TONER = '#141312', CREAM = '#F4F1E8';
+  var FLY_W = 450, TONER = '#141312', CREAM = '#F4F1E8';
   function K() { return SB.DeskKit || null; }
   function NS() { return SB.NightScene || null; }
   function f(n) { return Math.round(n * 10) / 10; }
+  /* a length in stage units: one --p is one px of the old 1280 x 800 layout */
+  function pu(n) { return 'calc(var(--p) * ' + f(n) + ')'; }
+  /* px on screen in one --p, and how finely a canvas must raster to stay sharp at that size */
+  function pxPerP() { return (SB.UI.unit ? SB.UI.unit() : 0.8) * 1.25; }
+  function res() { return SB.Finish && SB.Finish.res ? SB.Finish.res() : Math.max(1, Math.min(4, pxPerP() * ((typeof window !== 'undefined' && window.devicePixelRatio) || 1))); }
+  /* the copy stocks (css/finish.css --pp-*), for the paper pictures drawn here */
+  var PP = { white: '#fbfaf3', bond: '#f3f0e6', blue: '#c2d0dc', salmon: '#e4b49b', buff: '#eadbc7', kraft: '#ddba9b' };
   function hash(s) { var h = 2166136261; s = String(s); for (var i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return h >>> 0; }
   function rng(seed) { return SB.rng.make('fd:' + seed); }
   function safe(fn, dflt) { try { return fn(); } catch (e) { return dflt; } }
@@ -65,14 +74,7 @@
   function svgArt(h, w, ht, body, cls, style) {
     var k = K(), mark = '';
     if (k && body) mark = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + ht + '" viewBox="0 0 ' + w + ' ' + ht + '" focusable="false">' + k.defs() + body + '</svg>';
-    return h('span', { class: 'sb-fd-art ' + (cls || ''), aria: { hidden: 'true' }, html: mark, style: style || null });
-  }
-  /* a sheet of copy paper as a CSS background (the night's own paper, toner specks and all) */
-  function paperBg(stock, seed, edges) {
-    var ns = NS(), s = { 'background-color': stock };
-    if (ns && ns.paper) safe(function () { s['background-image'] = 'url(' + ns.paper(stock, seed) + ')'; });
-    if (edges && ns && ns.torn) safe(function () { s['clip-path'] = ns.torn(edges, seed, 3); });
-    return s;
+    return h('span', { class: 'sb-fd-art ' + (cls || ''), aria: { hidden: 'true' }, html: mark, style: Object.assign({ width: pu(w) }, style || {}) });
   }
   function markerSvg(text, size, o) { var ns = NS(); return ns && ns.marker ? safe(function () { return ns.marker(text, size, o || {}); }, '') : ''; }
 
@@ -81,7 +83,7 @@
     var k = K(), r = rng('ream:' + seed), out = '', others = list.filter(function (p) { return p !== cur; }).slice(0, 5), i;
     if (!k) return '';
     out += k.paper(14, 66, 132, 46, { seed: 'ream-box', stock: 'kraft', burn: 0.5, sop: 0.55, cut: 1.5,
-      inner: k.type('20 LB · 500 SH', 26, 98, 9, { fill: '#2a2620', bold: true }) });
+      inner: '' });
     for (i = others.length - 1; i >= 0; i--) {
       out += k.paper(18 + r.range(-4, 6), 14 + i * 7 + r.range(-2, 2), 122, 72, { seed: 'sh' + others[i], stock: papers[others[i]] || '#ddd', rot: r.range(-7, 7), burn: 0.25, sop: 0.35, sx: 2, sy: 3 });
     }
@@ -99,8 +101,7 @@
           pts = [[x + 20, y], [x + 46, y], [x + 46, y + 20], [x + 52, y + 20], [x + 60, y + 32], [x + 62, y + 108], [x + 4, y + 108], [x + 6, y + 32], [x + 14, y + 20], [x + 20, y + 20]];
       var inner = '<path d="' + k.polyD([[x + 18, y - 1], [x + 48, y - 1], [x + 48, y + 21], [x + 18, y + 21]]) + '" fill="#232220"/>' +
         k.hatch(x + 20, y + 2, 26, 16, { gap: 4, sw: 1.2, stroke: '#55534d', seed: 'cap' + n }) +
-        k.paper(x + 8, y + 48, 50, 40, { seed: 'lbl' + ink, stock: 'white', shadow: false, burn: 0.2, cut: 1,
-          inner: k.type(ink === 'toner' ? 'COPIER' : 'TONER', x + 33, y + 62, 8, { anchor: 'middle', bold: true }) + k.type(name, x + 33, y + 79, 8, { anchor: 'middle', bold: true, maxWidth: 44 }) }) +
+        k.paper(x + 8, y + 48, 50, 40, { seed: 'lbl' + ink, stock: 'white', shadow: false, burn: 0.2, cut: 1 }) +
         k.dots(k.polyD([[x + 46, y + 34], [x + 58, y + 34], [x + 60, y + 106], [x + 48, y + 106]]), 3, { op: 0.6 }) +
         '<path d="' + k.polyD([[x + 10, y + 34], [x + 15, y + 34], [x + 15, y + 104], [x + 10, y + 104]]) + '" fill="#fff" fill-opacity=".35"/>';
       out += k.cutout(pts, inner, { seed: 'bt' + ink + n, fill: hex, edge: 5, rot: n ? 6 : -4, cx: x + 33, cy: y + 60 });
@@ -124,7 +125,7 @@
       }
       return k.marker(text, x0, y0, size, { seed: text });
     }
-    var inner = '<path d="M8 22H152" stroke="#6d8fb5" stroke-width="1" stroke-dasharray="3 3"/>' + k.type('RUB-DOWN LETTERS', 66, 17, 8, { fill: '#2a2926', bold: true });
+    var inner = '<path d="M8 22H152" stroke="#6d8fb5" stroke-width="1" stroke-dasharray="3 3"/>';
     inner += glyphs(big, 14, 68, 40);
     for (i = 0; i < row.length; i++) {
       x = 14 + i * 19;
@@ -181,31 +182,15 @@
     return out;
   }
 
-  /* the tools: scissors, glue stick, X-Acto, steel rule, and the trims cut off the flyer in its own paper */
+  /* what is left on the mat: a few trims cut off the flyer, in its own paper, under everything. (The rule, the X-Acto,
+     the scissors and the glue stick are gone: the flyer is the thing on this table.) */
   function tools(paperHex, seed) {
     var k = K(), r = rng('tools:' + seed), out = '', i;
     if (!k) return '';
-    for (i = 0; i < 4; i++) {                                         // paper trims under everything
-      var tx = r.range(380, 700), ty = r.range(566, 612), tw = r.range(70, 150);
-      out += k.paper(tx, ty, tw, r.range(8, 14), { seed: 'trim' + i, stock: paperHex, rot: r.range(-25, 25), burn: 0.15, sop: 0.45, sx: 2, sy: 3, cut: 1 });
+    for (i = 0; i < 3; i++) {
+      var tx = r.range(400, 640), ty = r.range(630, 672), tw = r.range(70, 140);
+      out += k.paper(tx, ty, tw, r.range(8, 14), { seed: 'trim' + i, stock: paperHex, rot: r.range(-25, 25), burn: 0.15, sop: 0.45, sx: 2, sy: 3, cut: 1, shadow: false });
     }
-    out += k.glue(860, 560, 110, 40, { seed: 'gh1', op: 0.2 }) + k.glue(300, 70, 70, 30, { seed: 'gh2', op: 0.16 });
-    /* the steel rule down the flyer's left side */
-    var rule = '';
-    for (i = 0; i < 52; i++) rule += '<path d="M' + (352) + ' ' + (30 + i * 11) + 'h' + (i % 5 ? 6 : 12) + '" stroke="#141312" stroke-width="1.3"/>';
-    out += k.cutout([[344, 22], [372, 20], [374, 608], [346, 610]], rule + k.dotsRect(362, 22, 10, 586, 1, { white: true, op: 0.6 }), { seed: 'rule', fill: '#b9b8b0', edge: 4, rot: 0 });
-    /* the X-Acto, standing in the gap right of the flyer */
-    out += k.cutouts([
-      { d: k.polyD([[806, 150], [820, 148], [826, 330], [812, 332]]), fill: '#4a4945' },
-      { d: k.polyD([[812, 332], [826, 330], [824, 352], [814, 353]]), fill: '#9a9992' },
-      { d: k.polyD([[814, 353], [824, 352], [818, 382]]), fill: '#d8d6cc' }
-    ], { edge: 4, inner: k.hatch(808, 160, 14, 120, { gap: 3, sw: 1, stroke: '#141312', opacity: 0.5, seed: 'grip' }) });
-    /* the scissors, open, on the mat under the index card */
-    out += k.scissors(1010, 574, 150, 172, { seed: 'fdsc' });
-    /* the glue stick, lying under the letter sheets */
-    out += k.cutout([[40, 578], [170, 572], [172, 606], [42, 612]],
-      '<path d="' + k.polyD([[140, 573], [170, 572], [172, 606], [142, 607]]) + '" fill="#3a3a37"/>' + k.type('GLUE STICK', 52, 597, 11, { bold: true }),
-      { seed: 'fdglue', fill: '#d7d2c2', edge: 5, rot: -3, cx: 105, cy: 592 });
     return out;
   }
 
@@ -220,7 +205,7 @@
     return ids;
   }
   function paintPile(cv, pic, inks, paperHex, seed) {
-    var Sc = SB.Scenes, c = cv.getContext ? cv.getContext('2d') : null, ids = pileIds(pic, seed), s = 2;
+    var Sc = SB.Scenes, c = cv.getContext ? cv.getContext('2d') : null, ids = pileIds(pic, seed), s = cv.width / 165;
     if (!c || !Sc || !Sc.paste) return;
     function paint() {
       safe(function () {
@@ -240,7 +225,7 @@
         }
         c.restore();
         c.setTransform(1, 0, 0, 1, 0, 0);
-        if (Sc.copier) Sc.copier(cv, { paper: '#F2F0E6', alpha: true, cell: 3.2, contrast: 1.45, seed: 'pile' + pic });
+        if (Sc.copier) Sc.copier(cv, { paper: '#F2F0E6', alpha: true, cell: 1.6 * s, contrast: 1.45, seed: 'pile' + pic });
       });
     }
     paint();
@@ -250,19 +235,19 @@
   /* where things sit on the board: [left, top, turn] */
   var AT = {
     head: [14, 6, -0.6], win: [690, 8, 1], rolls: [16, 46, 0], roll: [22, 246, -2.2], rollPic: [228, 246, 2], rollType: [230, 294, -1.5],
-    layout: [14, 352, -1.2], type: [186, 356, 1.4], sheet: [392, 40, 0.6], note: [392, 584, -1], text: [650, 586, 1.2],
-    paper: [836, 44, -1], ink: [1006, 50, 1.4], picture: [834, 262, 1.2], copies: [1004, 266, -1], extras: [836, 474, -0.8],
-    check: [14, 622, -0.4], actions: [846, 596, 0]
+    layout: [14, 372, -1.2], type: [186, 376, 1.4], sheet: [378, 36, -3.2], note: [14, 574, -1], text: [250, 590, 1.2],
+    paper: [852, 56, -1], ink: [1012, 62, 1.4], picture: [850, 270, 1.2], copies: [1008, 274, -1], extras: [852, 480, -0.8],
+    check: [14, 636, -0.4], actions: [858, 590, 0]
   };
   function at(name, extra) {
-    var p = AT[name] || [0, 0, 0], s = { left: p[0] + 'px', top: p[1] + 'px', '--rot': p[2] + 'deg' }, k;
+    var p = AT[name] || [0, 0, 0], s = { left: pu(p[0]), top: pu(p[1]), '--rot': p[2] + 'deg' }, k;
     for (k in (extra || {})) s[k] = extra[k];
     return s;
   }
 
   function mount(root, params) {
     var showId = params && params.showId, rec = null, spec = null, rolls = [], offs = [], big = null, readOnly = false, closed = null, note = null;
-    var h = SB.UI.h, C = SB.UI.C || {}, stage = null, scale = 1;
+    var h = SB.UI.h, C = SB.UI.C || {}, stage = null, pending = { first: true, flyer: true }, lastRes = 0;
 
     function state() { return SB.UI.game(); }
 
@@ -287,6 +272,7 @@
     }
 
     function push(r) {
+      pending.flyer = true;
       rolls.unshift(rec);
       rolls = rolls.slice(0, 6);
       rec = r;
@@ -327,9 +313,9 @@
         h('span', { class: 'sb-fd-knob-label', text: label }),
         art || null,
         h('div', { class: 'sb-fd-st-row' }, [
-          h('button', { type: 'button', class: 'sb-fd-step', disabled: off || !prev, aria: { label: label + ' ◂' }, on: { click: prev || function () {} } }, '◂'),
-          h('span', { class: 'sb-fd-knob-value' }, [extra || null, h('span', { text: valueText })]),
-          h('button', { type: 'button', class: 'sb-fd-step', disabled: off || !next, aria: { label: label + ' ▸' }, on: { click: next || function () {} } }, '▸')
+          h('button', { type: 'button', class: 'sb-fd-step pz-hl', disabled: off || !prev, aria: { label: label + ' ◂' }, on: { click: prev || function () {} } }, '◂'),
+          h('span', { class: 'sb-fd-knob-value pz-paper' }, [extra || null, h('span', { text: valueText })]),
+          h('button', { type: 'button', class: 'sb-fd-step pz-hl', disabled: off || !next, aria: { label: label + ' ▸' }, on: { click: next || function () {} } }, '▸')
         ]),
         aspect ? h('label', { class: 'sb-fd-lock' }, [
           h('input', { type: 'checkbox', checked: locked, disabled: off, on: { change: function () { toggleLock(aspect); } } }),
@@ -368,7 +354,7 @@
       s = stepper(o.pictures, got.picture, function (p) { edit(function (r) { r.over.picture = p; }); });
       var pile = h('span', { class: 'sb-fd-art sb-fd-art--pile', aria: { hidden: 'true' } }), pcv = null;
       safe(function () {
-        pcv = document.createElement('canvas'); pcv.width = 330; pcv.height = 290;
+        pcv = document.createElement('canvas'); pcv.width = Math.round(165 * res()); pcv.height = Math.round(145 * res());
         pile.appendChild(pcv);
         paintPile(pcv, got.picture, got.inks, colors.papers[got.paper], seed);
       });
@@ -377,18 +363,17 @@
       out.push(h('div', { class: 'sb-fd-knob sb-fd-st sb-fd-st--copies' + (offG ? ' is-off' : ''), style: at('copies') }, [
         h('span', { class: 'sb-fd-knob-label', text: L('copies') }),
         svgArt(h, 168, 160, safe(function () { return dial(got.grit); }, ''), 'sb-fd-art--dial'),
-        h('span', { class: 'sb-fd-copyof', aria: { hidden: 'true' }, text: L('copyOf') }),
         h('span', { class: 'sb-fd-copies', role: 'group', aria: { label: L('copies') } }, [1, 2, 3, 4, 5].map(function (g) {
           var a = DIAL.a[g - 1] * Math.PI / 180;
-          return h('button', { type: 'button', class: 'sb-fd-gen' + (got.grit === g ? ' is-on' : ''), disabled: offG,
-                               style: { left: f(DIAL.cx + Math.cos(a) * DIAL.r - 17) + 'px', top: f(DIAL.cy + Math.sin(a) * DIAL.r - 11) + 'px' },
+          return h('button', { type: 'button', class: 'sb-fd-gen pz-hl' + (got.grit === g ? ' is-on' : ''), disabled: offG,
+                               style: { left: pu(DIAL.cx + Math.cos(a) * DIAL.r - 19), top: pu(DIAL.cy + Math.sin(a) * DIAL.r - 12) },
                                aria: { pressed: got.grit === g ? 'true' : 'false' }, on: { click: function () { edit(function (r) { r.over.grit = g; }); } } },
                    (SB.Content.ui.flyerdesk.gen || [])[g - 1] || String(g));
         }))
       ]));
       var ex = [];
       function tog(key, labelKey, on) {
-        return h('label', { class: 'sb-fd-tog' }, [
+        return h('label', { class: 'sb-fd-tog pz-hl' }, [
           h('input', { type: 'checkbox', checked: on, disabled: readOnly || spec.finish === 'ROUGH',
                        on: { change: function (e) { var v = !!e.target.checked; edit(function (r) { r.over.show = r.over.show || {}; r.over.show[key] = v; }); } } }),
           h('span', { text: L(labelKey) })
@@ -407,7 +392,7 @@
             h('span', { text: spec.tags.map(function (t) { return SB.text.label('flyer.tag.' + t); }).join(', ') })
           ])])]));
       }
-      if (card.length) out.push(h('div', { class: 'sb-fd-card', style: Object.assign(at('extras'), paperBg('#F7F5EE', 'idx')) }, card));
+      if (card.length) out.push(h('div', { class: 'sb-fd-card pz-paper', style: at('extras') }, card));
       return out;
     }
 
@@ -423,23 +408,9 @@
           return h('li', { class: ok ? 'is-ok' : 'is-bad' }, [h('span', { class: 'sb-fd-mark', aria: { hidden: 'true' }, text: ok ? '✓' : '✗' }), h('span', { text: it[1] })]);
         }).concat(c.soft.map(function (w) {
           return h('li', { class: 'is-warn' }, [h('span', { class: 'sb-fd-mark', aria: { hidden: 'true' }, text: '!' }), h('span', { text: w.text }),
-            w.fix && !readOnly ? h('button', { type: 'button', class: 'sb-fd-fix', on: { click: function () { push(SB.Flyer.settle(w.fix, spec)); } } }, L('fix')) : null]);
+            w.fix && !readOnly ? h('button', { type: 'button', class: 'sb-fd-fix pz-hl', on: { click: function () { push(SB.Flyer.settle(w.fix, spec)); } } }, L('fix')) : null]);
         })))
       ]);
-    }
-
-    /* fit the 1180 x 690 board to the close-up it is held in */
-    function fit() {
-      if (!stage) return;
-      var box = root.closest ? root.closest('.cu-in') : null, W = box ? box.clientWidth : root.clientWidth, H = box ? box.clientHeight : 0, s;
-      if (!(W > 0)) return;
-      s = W / BW;
-      if (H > 0) s = Math.min(s, H / BH);
-      s = Math.max(0.45, Math.min(1.6, s));
-      scale = s;
-      stage.style.transform = 'scale(' + s + ')';
-      root.style.width = Math.round(BW * s) + 'px';
-      root.style.height = Math.round(BH * s) + 'px';
     }
 
     function draw() {
@@ -449,63 +420,78 @@
       stage = h('div', { class: 'sb-fd-stage' });
       root.appendChild(stage);
       if (closed) {
-        stage.appendChild(h('div', { class: 'sb-fd-closed', style: paperBg('#F7F5EE', 'closed', 'b') }, [h('h1', { text: L('title') }), h('p', { text: closed }),
-          h('button', { type: 'button', class: 'sb-btn', on: { click: function () { if (SB.UI.back) SB.UI.back(); } } }, L('back'))]));
-        fit();
-        return;
+        stage.appendChild(h('div', { class: 'sb-fd-closed pz-paper' }, [h('h1', { text: L('title') }), h('p', { text: closed }),
+          h('button', { type: 'button', class: 'sb-fd-back pz-hl', on: { click: function () { if (SB.UI.back) SB.UI.back(); } } }, L('back'))]));
+          return;
       }
       got = rec.got || {}; colors = SB.Flyer.colors(); paperHex = colors.papers[got.paper] || '#F7F6F1';
       mj = makerJob();
       sub = [spec.billing && spec.billing[0] ? spec.billing[0].name : '', spec.date ? spec.date.dow + ' ' + spec.date.mon + ' ' + spec.date.d : '', spec.room ? spec.room.name : ''].filter(Boolean).join(' · ');
       head = h('header', { class: 'sb-fd-head', style: at('head') }, [
-        h('h1', { class: 'sb-fd-title' }, [h('b', { text: L('title') }), h('span', { class: 'sb-fd-sub', text: ' · ' + sub })]),
-        mj && mj.window && C.WindowBar ? h('span', { class: 'sb-fd-win', style: at('win') }, C.WindowBar({ window: mj.window, today: s && s.clock ? s.clock.day : null, planned: null, size: 16 })) : null
+        h('h1', { class: 'sb-fd-title' }, [h('span', { class: 'sb-fd-sr', text: L('title') + ': ' }), h('span', { class: 'sb-fd-sub pz-paper', text: sub })]),
+        mj && mj.window && C.WindowBar ? h('span', { class: 'sb-fd-win pz-paper', style: at('win') }, C.WindowBar({ window: mj.window, today: s && s.clock ? s.clock.day : null, planned: null, size: 16 })) : null
       ]);
       /* the old rolls, a loose pile of small flyers; the roll button is a big taped sheet */
       var R0 = rng('pile');
       left = h('section', { class: 'sb-fd-rolls', aria: { label: L('rolls') } }, [
-        h('h2', { class: 'sb-fd-h', style: at('rolls'), text: L('rolls') }),
+        h('h2', { class: 'sb-fd-sr', text: L('rolls') }),
         h('div', { class: 'sb-fd-stack', style: at('rolls') }, rolls.length ? rolls.map(function (r, i) {
-          var t = SB.Flyer.thumb(r, spec, 84);
-          return h('button', { type: 'button', class: 'sb-fd-roll', disabled: readOnly, aria: { label: L('rolls') + ' ' + (i + 1) },
-                               style: { left: (8 + (i % 3) * 98 + R0.range(-6, 6)) + 'px', top: (30 + Math.floor(i / 3) * 70 + R0.range(-6, 6)) + 'px', '--rot': R0.range(-9, 9).toFixed(1) + 'deg', 'z-index': String(10 - i) },
-                               on: { click: function () { var keep = rec; rec = r; rolls.splice(i, 1); rolls.unshift(keep); draw(); } } }, t);
+          var t = SB.Flyer.thumb(r, spec, Math.round(66 * pxPerP()));
+          if (t && t.style) { t.style.width = pu(66); t.style.height = 'auto'; }
+          return h('button', { type: 'button', class: 'sb-fd-roll pz-hl', disabled: readOnly, aria: { label: L('rolls') + ' ' + (i + 1) },
+                               style: { left: pu(8 + (i % 3) * 98 + R0.range(-6, 6)), top: pu(30 + Math.floor(i / 3) * 70 + R0.range(-6, 6)), '--rot': R0.range(-9, 9).toFixed(1) + 'deg', 'z-index': String(10 - i) },
+                               on: { click: function () { var keep = rec; rec = r; rolls.splice(i, 1); rolls.unshift(keep); pending.flyer = true; draw(); } } }, t);
         }) : [h('span', { class: 'sb-fd-empty', text: L('pileEmpty') })]),
-        h('button', { type: 'button', class: 'sb-btn sb-btn--primary sb-fd-rollbtn', disabled: readOnly, style: Object.assign(at('roll'), paperBg('#EBBA4E', 'roll', 'r')), on: { click: function () { doRoll(null); } } }, [
+        h('button', { type: 'button', class: 'sb-fd-rollbtn pz-paper pz-hl', disabled: readOnly, style: at('roll'), on: { click: function () { doRoll(null); } } }, [
           h('span', { class: 'sb-fd-mk', aria: { hidden: 'true' }, html: markerSvg('ROLL', 50, { seed: 'roll', maxWidth: 170 }) }),
           h('span', { class: 'sb-fd-sr', text: L('roll') }),
           h('span', { class: 'sb-fd-roll-sub', aria: { hidden: 'true' }, text: L('shuffle') }),
           h('kbd', { text: 'R' })]),
-        h('button', { type: 'button', class: 'sb-btn sb-btn--small sb-fd-reroll', disabled: readOnly || spec.finish === 'ROUGH', style: Object.assign(at('rollPic'), paperBg('#F0B2C0', 'rp')), on: { click: function () { doRoll(['picture']); } } }, [L('rollPicture'), h('kbd', { text: '⇧R' })]),
-        h('button', { type: 'button', class: 'sb-btn sb-btn--small sb-fd-reroll', disabled: readOnly || spec.finish === 'ROUGH', style: Object.assign(at('rollType'), paperBg('#B4CDE4', 'rt')), on: { click: function () { doRoll(['type']); } } }, [L('rollType'), h('kbd', { text: 'T' })])
+        h('button', { type: 'button', class: 'sb-fd-reroll pz-paper pz-hl', disabled: readOnly || spec.finish === 'ROUGH', style: at('rollPic'), on: { click: function () { doRoll(['picture']); } } }, [L('rollPicture'), h('kbd', { text: '⇧R' })]),
+        h('button', { type: 'button', class: 'sb-fd-reroll pz-paper pz-hl', data: { for: 'type' }, disabled: readOnly || spec.finish === 'ROUGH', style: at('rollType'), on: { click: function () { doRoll(['type']); } } }, [L('rollType'), h('kbd', { text: 'T' })])
       ]);
       big = document.createElement('canvas');
       big.className = 'sb-fd-canvas';
       big.setAttribute('role', 'img');
       big.setAttribute('aria-label', SB.Flyer.text(spec));
-      SB.Flyer.render(big, rec, spec, { width: 400, dpr: Math.min(3, (window.devicePixelRatio || 1) * Math.max(1, scale)) });
+      SB.Flyer.render(big, rec, spec, { width: Math.round(FLY_W * pxPerP()), dpr: Math.min(2, window.devicePixelRatio || 1) });
+      big.style.width = pu(FLY_W); big.style.height = 'auto';
       center = h('section', { class: 'sb-fd-sheet' }, [
-        svgArt(h, BW, BH, safe(function () { return tools(paperHex, (spec && spec.seed) || showId); }, ''), 'sb-fd-art--tools'),
+        svgArt(h, 1180, 690, safe(function () { return tools(paperHex, (spec && spec.seed) || showId); }, ''), 'sb-fd-art--tools'),
         h('div', { class: 'sb-fd-paper', style: at('sheet') }, [big,
           h('span', { class: 'sb-fd-tape sb-fd-tape--l', aria: { hidden: 'true' } }), h('span', { class: 'sb-fd-tape sb-fd-tape--r', aria: { hidden: 'true' } })]),
-        spec.maker && spec.maker.id !== 'player' && spec.maker.name || note ? h('div', { class: 'sb-fd-notes', style: Object.assign(at('note'), paperBg('#ECD668', 'note')) }, [
+        spec.maker && spec.maker.id !== 'player' && spec.maker.name || note ? h('div', { class: 'sb-fd-notes pz-paper', style: at('note') }, [
           spec.maker && spec.maker.id !== 'player' && spec.maker.name ? h('p', { class: 'sb-fd-note', text: L('madeBy', { name: spec.maker.name }) }) : null,
           note ? h('p', { class: 'sb-fd-note', text: note }) : null]) : null,
-        h('details', { class: 'sb-fd-text', style: at('text') }, [h('summary', { text: L('asText') }), h('p', { text: SB.Flyer.text(spec) })])
+        h('details', { class: 'sb-fd-text', style: at('text') }, [h('summary', { class: 'pz-paper pz-hl', text: L('asText') }), h('p', { text: SB.Flyer.text(spec) })])
       ]);
       right = h('section', { class: 'sb-fd-knobs', aria: { label: L('knobs') } }, [h('h2', { class: 'sb-fd-h sb-fd-sr', text: L('knobs') })].concat(knobs()));
       foot = h('footer', { class: 'sb-fd-foot' }, [
-        h('div', { class: 'sb-fd-checkwrap', style: Object.assign(at('check'), paperBg('#E6DCB8', 'chk', 'lr')) }, checkBar()),
+        h('div', { class: 'sb-fd-checkwrap pz-paper', style: at('check') }, checkBar()),
         readOnly ? null : h('div', { class: 'sb-fd-actions', style: at('actions') }, [
-          h('button', { type: 'button', class: 'sb-btn sb-btn--primary sb-fd-use', data: { tut: 'flyer-make', 'tut-ref': showId }, on: { click: function () { save(false); } } }, [
+          h('button', { type: 'button', class: 'sb-fd-use pz-paper pz-hl', data: { tut: 'flyer-make', 'tut-ref': showId }, on: { click: function () { save(false); } } }, [
             h('span', { class: 'sb-fd-mk', aria: { hidden: 'true' }, html: markerSvg(L('use'), 28, { seed: 'use', maxWidth: 206 }) }), h('span', { class: 'sb-fd-sr', text: L('use') })]),
-          h('button', { type: 'button', class: 'sb-btn sb-fd-let', style: paperBg('#F4F1E8', 'let'), on: { click: function () { save(true); } } }, L('letItBe'))
+          h('button', { type: 'button', class: 'sb-fd-let pz-paper pz-hl', on: { click: function () { save(true); } } }, L('letItBe'))
         ])
       ]);
       stage.appendChild(head);
       stage.appendChild(h('div', { class: 'sb-fd-body' }, [left, center, right]));
       stage.appendChild(foot);
-      fit();
+      lastRes = res();
+      moves();
+    }
+
+    /* the table's things slap down one after another when the desk opens; the flyer stamps on whenever a new one is rolled */
+    function moves() {
+      var F = SB.Finish, things, paper = stage.querySelector('.sb-fd-paper');
+      if (!F) { pending.first = false; pending.flyer = false; return; }
+      if (pending.first) {
+        things = Array.prototype.slice.call(stage.querySelectorAll('.sb-fd-rollbtn, .sb-fd-reroll, .sb-fd-stack, .sb-fd-st, .sb-fd-card, .sb-fd-notes, .sb-fd-checkwrap, .sb-fd-actions, .sb-fd-head'));
+        F.stagger(things, 4);
+        things.forEach(function (el) { el.classList.add('mv-slap'); });
+      }
+      if (pending.flyer && paper) F.move(paper, 'stamp', { delay: pending.first ? 120 : 0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: paper } });
+      pending.first = false; pending.flyer = false;
     }
 
     function redraw() { if (big && !closed) draw(); }
@@ -524,12 +510,12 @@
       offs.push(function () { document.removeEventListener('themechange', redraw); });
     }
     if (typeof window !== 'undefined' && window.addEventListener) {
-      var onResize = function () { fit(); };
+      var onResize = function () { if (!closed && res() !== lastRes) draw(); };
       window.addEventListener('resize', onResize);
       offs.push(function () { window.removeEventListener('resize', onResize); });
       /* the board settles once the close-up has landed (its entry animation moves it): tell the tutorial's tape,
          which follows scrolls, to look again */
-      var nudge = function () { fit(); try { root.dispatchEvent(new Event('scroll')); } catch (e) { /* no tape */ } };
+      var nudge = function () { try { root.dispatchEvent(new Event('scroll')); } catch (e) { /* no tape */ } };
       if (window.requestAnimationFrame) window.requestAnimationFrame(nudge);
       var held = root.closest ? root.closest('.cu-obj') : null, tmr = setTimeout(nudge, 320);
       if (held && held.addEventListener) { held.addEventListener('animationend', nudge); offs.push(function () { held.removeEventListener('animationend', nudge); }); }

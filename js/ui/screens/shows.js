@@ -180,6 +180,12 @@
     function h(t, a, k) { return SB.UI.h(t, a, k); }
     function f(n) { return Math.round(n * 10) / 10; }
     function num(v) { return typeof v === 'number' && isFinite(v); }
+    /* drawings are made in stage-scaled units (--p, one px of the old 1280 x 800 layout) and shown at w by h of them whatever the window;
+       the copier rasters them as finely as the screen shows them */
+    function pxPerP() { return (SB.UI.unit ? SB.UI.unit() : 0.8) * 1.25; }
+    function res() { return SB.Finish && SB.Finish.res ? SB.Finish.res() : Math.max(1, Math.min(4, pxPerP() * ((typeof window !== 'undefined' && window.devicePixelRatio) || 1))); }
+    function pu(n) { return 'calc(var(--p) * ' + f(n) + ')'; }
+    function fonts(m) { return SB.Finish && SB.Finish.withFonts ? SB.Finish.withFonts(m) : m; }
     var DEFS = null;
     function defs() { if (DEFS === null) { try { DEFS = K().defs(); } catch (e) { DEFS = ''; } } return DEFS; }
     function svg(inner, w, ht) {
@@ -203,7 +209,7 @@
     }
     function pump() {
       if (busy || !queue.length) return;
-      var job = queue.shift(), url, im, scale = Math.max(1.5, Math.min(2, (typeof window !== 'undefined' && window.devicePixelRatio) || 1));
+      var job = queue.shift(), url, im, scale = job.res;
       busy = true;
       function done(dataUrl) {
         var list = waiting[job.key] || [];
@@ -213,7 +219,7 @@
         busy = false;
         setTimeout(pump, 0);
       }
-      try { url = URL.createObjectURL(new Blob([job.markup], { type: 'image/svg+xml' })); } catch (e) { done(null); return; }
+      try { url = URL.createObjectURL(new Blob([fonts(job.markup)], { type: 'image/svg+xml' })); } catch (e) { done(null); return; }
       im = new Image();
       im.onload = function () {
         var cv, ctx, out = null, cw = Math.max(2, Math.round(job.w * scale)), ch = Math.max(2, Math.round(job.ht * scale));
@@ -232,15 +238,25 @@
     }
     /** art(inner, w, ht, cls): a drawn piece, w by ht px, as a span; it is photocopied when it can be. */
     function art(inner, w, ht, cls) {
-      var markup = svg(inner, w, ht), key, el = h('span', { class: 'cb-art' + (cls ? ' ' + cls : ''), aria: { hidden: 'true' }, style: { width: f(w) + 'px', height: f(ht) + 'px' } });
+      var markup = svg(inner, w, ht), key, r = res(), el = h('span', { class: 'cb-art' + (cls ? ' ' + cls : ''), aria: { hidden: 'true' }, style: { width: pu(w), height: pu(ht), aspectRatio: f(w) + ' / ' + f(ht) } });
       if (!canCopy()) { el.innerHTML = markup; return el; }
-      key = hash(norm(markup));
+      key = hash(norm(markup)) + '@' + r;
       el.setAttribute('data-copy', key);
       if (cache[key]) { el.innerHTML = imgHtml(cache[key], w, ht); el.classList.add('is-copied'); return el; }
       el.innerHTML = markup;
-      if (!waiting[key]) { waiting[key] = []; queue.push({ key: key, markup: markup, w: w, ht: ht }); }
+      if (!waiting[key]) { waiting[key] = []; queue.push({ key: key, markup: markup, w: w, ht: ht, res: r }); }
       waiting[key].push(el);
       pump();
+      return el;
+    }
+    /** thumb(flyer, wP, flat): the flyer thumbnail part, rastered as finely as the screen shows it and shown wP units wide (its tilt unless flat) */
+    function thumb(flyer, wP, flat) {
+      var el = SB.UI.parts.flyerThumb(flyer, Math.max(wP, Math.round(wP * res()))), bl;
+      if (!el) return el;
+      el.style.width = pu(wP);
+      if (flat) el.style.transform = 'none';
+      bl = el.querySelector ? el.querySelector('.sb-flyer-blank') : null;
+      if (bl) bl.style.height = pu(wP * 1.3);
       return el;
     }
     function strip0(m) { return String(m || '').replace(/<title>[\s\S]*?<\/title>/g, '').replace(/ role="img"/, '').replace(/ aria-label="[^"]*"/, ''); }
@@ -297,7 +313,7 @@
       if (o.svg) kids.push(art(o.svg, o.w, o.h));
       if (o.strip) kids.push(stripArt(o.strip, o.stripSize || (o.svg ? 11 : 13), o.stripOpts));
       if (o.kids) kids = kids.concat(o.kids);
-      return h('button', { type: 'button', class: 'cb-thing' + (o.svg && o.strip ? ' has-strip' : '') + (!o.svg && o.strip ? ' is-strip' : '') + (o.cls ? ' ' + o.cls : ''), title: o.title || null,
+      return h('button', { type: 'button', class: 'cb-thing pz-hl' + (o.svg && o.strip ? ' has-strip' : '') + (!o.svg && o.strip ? ' is-strip' : '') + (o.cls ? ' ' + o.cls : ''), title: o.title || null,
         aria: { label: o.label, pressed: o.pressed === undefined ? null : String(!!o.pressed) },
         data: { fk: o.fk || null, drop: o.drop || null, tut: o.tut || null, 'tut-ref': o.tutRef || null }, disabled: !!o.disabled,
         on: o.on || (typeof o.onClick === 'function' ? { click: o.onClick } : null) }, kids);
@@ -430,7 +446,7 @@
         r = y + k * 56;
         out += type(row.label, 4, r - 30, 12, { bold: true, fill: row.k === 'add' ? blue() : TONER });
         out += row.draw(r);
-        out += marker(row.fig, x0 + per * step + 12, r, 22, { fill: row.k === 'add' ? blue() : TONER, seed: 'cf' + row.k + row.fig });
+        if (!(o.noCallFig && row.k === 'call' && row.fig !== '?')) out += marker(row.fig, x0 + per * step + 12, r, 22, { fill: row.k === 'add' ? blue() : TONER, seed: 'cf' + row.k + row.fig });
       });
       var bot = y + rows.length * 56 - 34;
       if (num(o.cap) && o.cap > 0) {
@@ -660,13 +676,13 @@
           try { el.setPointerCapture(e.pointerId); } catch (x) { /* fine */ }
           var r = el.getBoundingClientRect();
           ghost = el.cloneNode(true); ghost.className += ' cb-ghost'; ghost.removeAttribute('data-drop');
-          ghost.style.width = r.width + 'px'; ghost.style.height = r.height + 'px';
+          ghost.style.width = pu(r.width / pxPerP()); ghost.style.height = pu(r.height / pxPerP());
           st.dx = st.x - r.left; st.dy = st.y - r.top;
           document.body.appendChild(ghost); document.body.classList.add('cb-dragging');
           el.classList.add('is-lifted');
         }
         if (st.on && ghost) {
-          ghost.style.left = (e.clientX - st.dx) + 'px'; ghost.style.top = (e.clientY - st.dy) + 'px';
+          ghost.style.left = pu((e.clientX - st.dx) / pxPerP()); ghost.style.top = pu((e.clientY - st.dy) / pxPerP());
           var t = targetAt(e.clientX, e.clientY);
           if (t === el) t = null;
           if (t !== over) { if (over) over.classList.remove('is-over'); over = t; if (over) over.classList.add('is-over'); }
@@ -700,7 +716,7 @@
     return { svg: svg, art: art, strip: strip, stripW: stripW, stripArt: stripArt, place: place, thing: thing, act: act, tabs: tabs, tickThing: tickThing, mark: mark,
              marker: marker, mw: mw, type: type, tw: tw, letter: letter, lw: lw, word: word, typed: typed, head: head, crowd: crowd,
              unknowns: unknowns, face: face, stamp: stamp, bang: bang, swipe: swipe, stampW: stampW, heartMeter: heartMeter, tick: tick, highlighter: highlighter,
-             clipboard: clipboard, masonite: masonite, topSheet: topSheet, steelClip: steelClip, typedLines: typedLines, peel: peel, draggable: draggable, listen: listen, bandSticker: bandSticker, cityInk: cityInk, hot: hot, blue: blue, f: f,
+             clipboard: clipboard, masonite: masonite, topSheet: topSheet, steelClip: steelClip, typedLines: typedLines, peel: peel, draggable: draggable, listen: listen, bandSticker: bandSticker, cityInk: cityInk, hot: hot, blue: blue, f: f, pu: pu, pxPerP: pxPerP, res: res, thumb: thumb,
              TONER: TONER, PAPER: PAPER, BONE: BONE, GRAY: GRAY };
   })();
 
@@ -730,6 +746,18 @@
     var a = (typeof document !== 'undefined') ? document.activeElement : null, key = a && a.getAttribute ? a.getAttribute('data-fk') : null, el;
     fn();
     if (key) { el = safe(function () { return root.querySelector('[data-fk="' + key + '"]'); }, null); if (el && el.focus) { try { el.focus(); } catch (e) { /* fine */ } } }
+  }
+
+  /* the moves (js/ui/finish.js): a screen's papers slap down one after another when it first shows or its list really changes */
+  function slap(root, sel, sig, from) {
+    var F = SB.Finish, key, els;
+    if (!F || !root || !root.querySelectorAll) return;
+    key = root.getAttribute ? root.getAttribute('data-mv-sig') : null;
+    if (key === sig) return;
+    if (root.setAttribute) root.setAttribute('data-mv-sig', sig);
+    els = Array.prototype.slice.call(root.querySelectorAll(sel));
+    F.stagger(els, from || 3);
+    els.forEach(function (el) { el.classList.add('mv-slap'); });
   }
 
   function confirmCard(text, yes, no, onYes) {
@@ -843,17 +871,18 @@
       if (k === 'clip' || !inner) obj.appendChild(layers[k]); else obj.insertBefore(layers[k], inner);
     });
     function draw() {
-      var w = Math.round(obj.offsetWidth || 0), ht = Math.round(obj.offsetHeight || 0), cw;
-      if (!w || !ht || last === w + 'x' + ht) return;
-      last = w + 'x' + ht;
+      var k = D.pxPerP(), w = Math.round((obj.offsetWidth || 0) / k), ht = Math.round((obj.offsetHeight || 0) / k), cw;
+      if (!w || !ht || last === w + 'x' + ht + '@' + D.res()) return;
+      last = w + 'x' + ht + '@' + D.res();
+      ['board', 'sheet'].forEach(function (n) { if (layers[n]) { layers[n].style.width = D.pu(w); layers[n].style.height = D.pu(ht); } });
       SB.UI.clear(layers.board);
       if (mode !== 'show') { layers.board.appendChild(D.art(heldTable(w, ht), w, ht)); return; }
       layers.board.appendChild(D.art(heldBoard(w, ht, bands), w, ht));
       layers.sheet.innerHTML = D.svg(topSheet(SHEET.l, SHEET.t, w - SHEET.l - SHEET.r, ht - SHEET.t - SHEET.b, 'held', { stock: TOPSTOCK, back: TOPBACK, curl: 30, burn: 0.35, sx: 4, sy: 6 }), w, ht);
       cw = Math.min(300, Math.max(200, w * 0.32));
       SB.UI.clear(layers.clip);
-      layers.clip.style.left = f(w / 2 - cw / 2 - 4) + 'px';
-      layers.clip.style.top = f(SHEET.t + 12 - cw * 0.34) + 'px';
+      layers.clip.style.left = D.pu(w / 2 - cw / 2 - 4);
+      layers.clip.style.top = D.pu(SHEET.t + 12 - cw * 0.34);
       layers.clip.appendChild(D.art(D.steelClip(4, 2, cw, 'held'), cw + 14, cw * 0.34 + 14));
     }
     function topSheet(x, y, w, ht, seed, o) { return D.topSheet(x, y, w, ht, seed, o); }
@@ -867,8 +896,19 @@
   /* ================================================================ */
 
   function mountShows(root) {
-    var showPast = false, ownDay = null;
-    function render() {
+    var showPast = false, ownDay = null, lastSig = null, firstDraw = true;
+    if (root && root.removeAttribute) root.removeAttribute('data-mv-sig');
+    function render() { draw(); settle(); }
+    /* the clipboards slap down when the table is new or its list really changes; the next show's is stamped on, hardest */
+    function settle() {
+      var F = SB.Finish, s = st(), sig, hero = root.querySelector('.cb-clipwrap.is-next');
+      if (!F || !s) return;
+      sig = (s.shows ? Object.keys(s.shows).length : 0) + ':' + (hero ? hero.getAttribute('data-show') : '') + ':' + showPast;
+      slap(root, '.cb-clips > .cb-clipwrap:not(.is-next), .cb-shelf .cb-clipwrap, .cb-pastrow > *', sig, 2);
+      if (hero && sig !== lastSig) F.move(hero, 'stamp', { delay: firstDraw ? 220 : 0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: hero } });
+      lastSig = sig; firstDraw = false;
+    }
+    function draw() {
       var s = st(), live, past, tomorrow, kids = [];
       SB.UI.clear(root);
       if (!s) { root.appendChild(C().Empty({})); return; }
@@ -880,7 +920,7 @@
       kids.push(blank(s, tomorrow));
       /* the clipboards fill the table: bigger when there are fewer of them; the shoebox and the last few played
          flyers lie along the foot (every played one with the box open) */
-      root.appendChild(h('div', { class: 'cb-shows', style: { '--cb-zoom': kids.length <= 2 ? '1.45' : kids.length === 3 ? '1.3' : '1.16' } }, [
+      root.appendChild(h('div', { class: 'cb-shows', style: { '--cb-zoom': kids.length <= 2 ? '1.15' : kids.length === 3 ? '1.05' : '.95', '--cb-zoom-next': kids.length <= 2 ? '1.9' : '1.6' } }, [
         h('h1', { class: 'cb-sr', text: T('shows', 'title') }),
         !live.length ? piece('cb-hintslip', 'white', [h('p', { class: 'cb-typed', text: T('shows', 'none') })]) : null,
         h('div', { class: 'cb-clips' }, kids),
@@ -889,7 +929,7 @@
             inner: D.marker(md(x.day), 50, 40, 20, { anchor: 'middle', seed: 'pfd' + x.id }) + (x.status === 'CANCELLED' ? K().xout(14, 14, 72, 56, { seed: 'pfx' + x.id, sw: 3 })
               : D.type((x.result && x.result.vsPar ? String(x.result.vsPar) : '').slice(0, 9).toUpperCase(), 50, 64, 11, { anchor: 'middle', bold: true, maxWidth: 84 })) });
           return D.thing({ cls: 'cb-pastflyer', label: SB.time.fmt(x.day, 'short') + ', ' + roomName(s, x.roomId) + ', ' + (x.result && x.result.verdictLine ? x.result.verdictLine : T('shows', 'status.' + x.status)),
-            svg: out, w: 100, h: 84, strip: md(x.day), onClick: function () { SB.UI.go('show', { showId: x.id }); } });
+            svg: out, w: 100, h: 84, onClick: function () { SB.UI.go('show', { showId: x.id }); } });
         }))]) : null
       ]));
     }
@@ -918,11 +958,11 @@
         if (late) out += D.bang(198, 178, 22);
       }
       if (counter) out += D.swipe(190, 202, 36, 16) + D.marker('$?', 196, 210, 18, { seed: 'ctr' + x.id });
-      if (SB.UI.parts.flyerThumb) thumb = safe(function () { return SB.UI.parts.flyerThumb({ recipe: (x.flyer && x.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, x.id) }, 70); }, null);
+      if (SB.UI.parts.flyerThumb) thumb = safe(function () { return D.thumb({ recipe: (x.flyer && x.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, x.id) }, 70); }, null);
       var label = T('shows', 'open', { d: SB.time.fmt(x.day, 'short') }) + ', ' + (x.roomId ? roomName(s, x.roomId) : T('shows', 'noRoom')) + ', ' + T('shows', 'status.' + x.status).toLowerCase() +
         (a.length ? ', ' + T('shows', 'asks', { yes: yes, wait: wait, no: no }) : '') + (nj ? ', ' + nj.label : '') + (fc && fc.guaranteePace ? ', ' + T('shows', 'pace.' + fc.guaranteePace).toLowerCase() : '');
-      return h('div', { class: 'cb-clipwrap', style: { transform: 'rotate(' + ((i % 3) - 1) * 1.4 + 'deg)' } }, [
-        D.thing({ cls: 'cb-clip', label: label, svg: out, w: w, h: ht, fk: 'clip-' + x.id, strip: SB.time.fmt(x.day, 'dow3') + ' ' + md(x.day), stripSize: 12,
+      return h('div', { class: 'cb-clipwrap' + (i === 0 ? ' is-next' : ''), data: { show: x.id }, style: i === 0 ? null : { transform: 'rotate(' + ((i % 3) - 1) * 1.4 + 'deg)' } }, [
+        D.thing({ cls: 'cb-clip', label: label, svg: out, w: w, h: ht, fk: 'clip-' + x.id,
           onClick: function () { SB.UI.go('show', { showId: x.id }); } }),
         thumb ? h('div', { class: 'cb-clip-flyer', aria: { hidden: 'true' } }, thumb) : null
       ]);
@@ -956,7 +996,7 @@
       out += D.marker(T('shows', 'pastBox'), w / 2, 120, 26, { anchor: 'middle', seed: 'pb', maxWidth: 128 });
       out += D.marker(String(past.length), w / 2, 152, 22, { anchor: 'middle', seed: 'pbn' });
       return h('div', { class: 'cb-clipwrap cb-box' }, D.thing({ cls: 'cb-shoebox', label: showPast ? T('shows', 'hidePast') : T('shows', 'past') + ' (' + past.length + ')', pressed: showPast, fk: 'box', svg: out, w: w, h: ht,
-        strip: T('shows', 'pastBox'), stripSize: 12, onClick: function () { showPast = !showPast; render(); } }));
+        onClick: function () { showPast = !showPast; render(); } }));
     }
     var undress = dress(root, 'list', st());
     render();
@@ -1092,14 +1132,17 @@
   function guard(locked, fn) { if (locked) confirmCard(T('bill', 'lockedWarn'), T('bill', 'yesGo'), T('bill', 'noGo'), fn); else fn(); }
 
   /* the header of a clipboard: the date in jagged marker, the room typed under it, the status stamped */
-  function showHead(s, show, room, backLabel, backFn, title) {
-    var tt = (title || SB.time.fmt(show.day, 'long')).toUpperCase(), stt = T('shows', 'status.' + show.status), sx = Math.min(412, D.mw(tt, 34) + 26), w = Math.ceil(sx + D.stampW(stt, 16) + 20), out = '';
+  function showHead(s, show, room, backLabel, backFn, title, big) {
+    var tt = (title || SB.time.fmt(show.day, 'long')).toUpperCase(), stt = T('shows', 'status.' + show.status), sx = Math.min(412, D.mw(tt, 34) + 26), w = Math.ceil(sx + D.stampW(stt, 16) + 20), out = '', sw = 0;
     out += D.marker(tt, 4, 40, 34, { maxWidth: 400, seed: 'hd' + show.id });
     if (room) out += D.type(String(room.name).toUpperCase(), 6, 65, 14, { bold: true, maxWidth: 400 });
-    out += D.stamp(stt, sx, 10, 16, { rot: -7 });
-    return h('header', { class: 'cb-showhead' }, [
+    /* the one loud thing on a show: its status, stamped big across the date line, a long way off level */
+    if (big) { w = Math.ceil(sx) + 10; sw = Math.ceil(D.stampW(stt, 32)) + 34; }
+    else out += D.stamp(stt, sx, 10, 16, { rot: -7 });
+    return h('header', { class: 'cb-showhead' + (big ? ' cb-showhead--big' : '') }, [
       D.act('<', backLabel, 'back', backFn, { size: 14 }),
-      h('h1', { class: 'cb-showtitle', aria: { label: SB.time.fmt(show.day, 'long') + (room ? ', ' + room.name : '') + ', ' + T('shows', 'status.' + show.status).toLowerCase() } }, D.art(out, w, 76))
+      h('h1', { class: 'cb-showtitle', aria: { label: SB.time.fmt(show.day, 'long') + (room ? ', ' + room.name : '') + ', ' + T('shows', 'status.' + show.status).toLowerCase() } },
+        [D.art(out, w, 76), big ? D.art(D.stamp(stt, 16, 18, 32, { rot: -8 }), sw, 96, 'cb-statstamp mv-stamp') : null])
     ]);
   }
 
@@ -1108,9 +1151,30 @@
   /* ================================================================ */
 
   function mountShow(root, params) {
-    var showId = params && params.showId, ui = { roomId: null, day: null, editPrice: false };
+    var showId = params && params.showId, ui = { roomId: null, day: null, editPrice: false }, lastStat = null, firstDraw = true;
+    if (root && root.removeAttribute) root.removeAttribute('data-mv-sig');
 
-    function render() {
+    function render() { draw(); settle(); }
+    /* the papers slap down when the page first shows; the status is stamped on whenever it changes (and sounds like it) */
+    function settle() {
+      var F = SB.Finish, el = root.querySelector('.cb-statstamp'), s = st(), sh = s && s.shows ? s.shows[showId] : null;
+      slap(root, '.cb-show .cb-piece, .rc-sheet .rc-piece:not(.rc-polaroid):not(.rc-tape)', 'show:' + showId, 2);
+      /* a played show: the night's photo is stamped on, and the ledger's figures count up */
+      var ph = root.querySelector('.rc-polaroid');
+      if (F && ph && firstDraw) {
+        F.move(ph, 'stamp', { delay: 260, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: ph } });
+        Array.prototype.forEach.call(root.querySelectorAll('.rc-lg-d'), function (d) {
+          var t = d.textContent, m = /^([+\u2212-]?)(\d+)$/.exec(t), sg;
+          if (!m) return;
+          sg = m[1];
+          F.countUp(d, parseInt(m[2], 10), { from: 0, delay: 420, fmt: function (n) { return sg + n; } });
+        });
+      }
+      if (F && el && sh && lastStat !== sh.status) { F.move(el, 'stamp', { delay: firstDraw ? 220 : 0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: el } }); }
+      if (sh) lastStat = sh.status;
+      firstDraw = false;
+    }
+    function draw() {
       var s = st(), v, show;
       SB.UI.clear(root);
       if (!s || !showId || !s.shows || !s.shows[showId]) { root.appendChild(C().Empty({})); return; }
@@ -1119,7 +1183,7 @@
       show = v.show;
       if (!LIVE[show.status]) { root.appendChild(after(s, v)); return; }
       root.appendChild(h('div', { class: 'cb-show' }, [
-        showHead(s, show, v.room, T('show', 'back'), function () { SB.UI.go('shows'); }),
+        showHead(s, show, v.room, T('show', 'back'), function () { SB.UI.go('shows'); }, null, true),
         h('div', { class: 'cb-cols' }, [
           h('div', { class: 'cb-main' }, [
             setList(s, v, {}),
@@ -1195,7 +1259,7 @@
             D.act(T('show', 'release'), T('show', 'releaseL'), 'release', function () { act(function (x) { return SB.Rooms.release(x, showId); }); }, { size: 11 })
           ]));
         }
-        kids.push(h('details', { class: 'cb-fold' }, [h('summary', null, [D.stripArt(T('show', 'holdOther'), 11)]), holdForm(s, v)]));
+        kids.push(h('details', { class: 'cb-fold' }, [h('summary', { class: 'pz-hl' }, [D.stripArt(T('show', 'holdOther'), 11)]), holdForm(s, v)]));
       }
       return piece('cb-roompiece', 'bone', kids, { label: T('show', 'room') });
     }
@@ -1262,9 +1326,9 @@
 
     function flyerSection(s, v) {
       var thumb = null;
-      if (SB.UI.parts.flyerThumb) thumb = safe(function () { return SB.UI.parts.flyerThumb({ recipe: (v.show.flyer && v.show.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, showId) }, 140); }, null);
+      if (SB.UI.parts.flyerThumb) thumb = safe(function () { return D.thumb({ recipe: (v.show.flyer && v.show.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, showId) }, 140); }, null);
       return h('div', { class: 'cb-flyerclip' }, [
-        h('button', { type: 'button', class: 'cb-thing has-strip cb-flyerbtn', aria: { label: T('show', 'flyerDesk') }, data: { fk: 'flyer', tut: 'show-flyer', 'tut-ref': showId }, on: { click: function () { SB.UI.go('flyerdesk', { showId: showId }); } } },
+        h('button', { type: 'button', class: 'cb-thing pz-hl has-strip cb-flyerbtn', aria: { label: T('show', 'flyerDesk') }, data: { fk: 'flyer', tut: 'show-flyer', 'tut-ref': showId }, on: { click: function () { SB.UI.go('flyerdesk', { showId: showId }); } } },
           [D.stripArt(T('show', 'flyerDeskT') || 'FLYER', 11), D.art(K().cutout([[46, 2], [96, 2], [100, 18], [42, 18]], '', { seed: 'bc', edge: 3 }) + K().path([[52, 16], [71, 34], [90, 16]], { seed: 'bcw', sw: 2.4, stroke: '#f4f2ea' }), 140, 36, 'cb-binder'), thumb])
       ]);
     }
@@ -1335,7 +1399,7 @@
         cov.length ? coveredNote(cov) : null,
         adv && adv.riders && adv.riders.length ? riders(adv.riders, 'advance', s.shows[showId] && s.shows[showId].status === 'PLAYED') : null,
         run && run.riders && run.riders.length ? riders(run.riders, 'night', s.shows[showId] && s.shows[showId].status === 'PLAYED') : null,
-        opt.length ? h('details', { class: 'cb-fold' }, [h('summary', null, [D.stripArt(T('show', 'ifYouWant'), 11)]), h('ul', { class: 'cb-notes is-optional' }, opt.map(function (j, i) { return jobNote(s, j, i); }))]) : null
+        opt.length ? h('details', { class: 'cb-fold' }, [h('summary', { class: 'pz-hl' }, [D.stripArt(T('show', 'ifYouWant'), 11)]), h('ul', { class: 'cb-notes is-optional' }, opt.map(function (j, i) { return jobNote(s, j, i); }))]) : null
       ]);
     }
 
@@ -1420,9 +1484,47 @@
   /* ================================================================ */
 
   function mountBill(root, params) {
-    var showId = params && params.showId, fl = { freeOnly: true, genre: '' }, ctx = { picked: null, ask: null }, preview = null, lastV = null, whatCache = {}, keyHandler;
+    var showId = params && params.showId, fl = { freeOnly: true, genre: '' }, ctx = { picked: null, ask: null }, preview = null, lastV = null, whatCache = {}, keyHandler,
+        lastCall = null, lastGenre = '', firstDraw = true, callFig = null;
+    if (root && root.removeAttribute) root.removeAttribute('data-mv-sig');
 
-    function render() {
+    function render() { draw(); settle(); }
+    /* the papers slap down when the bill first shows; the call is stamped on and counted up when it first shows or changes;
+       a different pile tears across the sheet */
+    function settle() {
+      var F = SB.Finish, el = root.querySelector('.cb-callhero'), sheet = root.querySelector('.cb-sheet'), key, from, d = firstDraw ? 220 : 0;
+      slap(root, '.cb-bill .cb-piece', 'bill:' + showId, 2);
+      if (F && sheet) F.scrollbar(sheet);
+      if (F && sheet && !firstDraw && lastGenre !== fl.genre) F.move(sheet, 'wipe');
+      lastGenre = fl.genre;
+      if (F && el && callFig) {
+        key = callFig.lo + '-' + callFig.hi;
+        if (key !== lastCall) {
+          from = lastCall ? lastCallFig : { lo: 0, hi: 0 };
+          F.move(el, 'stamp', { delay: d, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: el } });
+          F.countUp(document.createElement('span'), 100, { from: 0, delay: d + 83, fmt: function (n) { drawCall(el, from.lo + (callFig.lo - from.lo) * n / 100, from.hi + (callFig.hi - from.hi) * n / 100); return ''; } });
+          lastCall = key; lastCallFig = callFig;
+        }
+      }
+      firstDraw = false;
+    }
+    var lastCallFig = null;
+    /* the call, in marker, big and crooked, on a highlighter swipe: the one loud thing on the bill */
+    function callArt(lo, hi, W) {
+      var t = Math.round(lo) + '-' + Math.round(hi);
+      return D.art(D.swipe(8, 50, W - 16, 32) + D.marker(t, 18, 66, 50, { seed: 'callhero' + showId }), W, 86);
+    }
+    function drawCall(el, lo, hi) { var a = el.firstChild; if (a) el.replaceChild(callArt(lo, hi, el.getAttribute('data-w') * 1), a); }
+    function callHero(fc) {
+      var c = fc && fc.call, W, el;
+      if (!c || !num(c.lo) || !num(c.hi) || !(c.hi > 0)) { callFig = null; return null; }
+      callFig = { lo: Math.round(c.lo), hi: Math.round(c.hi) };
+      W = Math.ceil(D.mw(callFig.lo + '-' + callFig.hi, 50)) + 40;
+      el = h('div', { class: 'cb-callhero', role: 'img', aria: { label: SB.text.label('ui.show.call') + ' ' + callFig.lo + '-' + callFig.hi }, data: { w: String(W) } }, callArt(callFig.lo, callFig.hi, W));
+      return el;
+    }
+
+    function draw() {
       var s = st(), v, show;
       SB.UI.clear(root);
       whatCache = {};
@@ -1562,7 +1664,7 @@
     function crowdFor(s, v, add) {
       var fc = safe(function () { return SB.Forecast.card(s, showId); }, null) || {}, w = add ? what(s, add) : null;
       return D.crowd({ par: fc.par && fc.par.heads, lo: fc.call && fc.call.lo, hi: fc.call && fc.call.hi, cap: fc.cap || null, even: num(fc.breakEven) ? fc.breakEven : null,
-                       add: w && w.call ? { lo: w.call.lo, hi: w.call.hi } : null, per: 11 });
+                       add: w && w.call ? { lo: w.call.lo, hi: w.call.hi } : null, per: 11, noCallFig: !!(fc.call && num(fc.call.lo) && num(fc.call.hi) && fc.call.hi > 0) });
     }
     function showPreview(id) {
       var s = st(), box = root.querySelector('.cb-proj-crowd');
@@ -1574,6 +1676,7 @@
     function projection(s, v) {
       var fc = safe(function () { return SB.Forecast.card(s, showId); }, null) || {};
       return piece('cb-proj', 'bone', [
+        callHero(fc),
         h('div', { class: 'cb-proj-crowd', aria: { live: 'polite' } }, crowdFor(s, v, preview && !(s.bands[preview] && v.show.bill.slots.some(function (x) { return x.bandId === preview; })) ? preview : null)),
         D.unknowns(fc.call && fc.call.unknowns),
         v.show.deal && v.show.deal.guarantee > 0 && fc.guaranteePace ? D.art(D.stamp(T('bill', 'pace', { w: T('shows', 'pace.' + fc.guaranteePace) }), 4, 4, 13, { rot: -3, ink: fc.guaranteePace === 'OK' ? '#141413' : D.hot() }), D.stampW(T('bill', 'pace', { w: T('shows', 'pace.' + fc.guaranteePace) }), 13) + 14, 36) : null,

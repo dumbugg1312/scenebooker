@@ -35,7 +35,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       await send('Page.navigate', { url: BASE + '/index.html?t=' + Date.now() });
       for (let i = 0; i < 30 && !ok; i++) {
         await sleep(400);
-        ok = await ev("document.readyState === 'complete' && !!(window.SB && SB.UI && SB.UI.go && SB.verify && !SB.verify(['engine','cities','art','ui']).length && SB.Game && SB.Cutscene && SB.Scenes)").catch(() => false);
+        ok = await ev("document.readyState === 'complete' && !!(window.SB && SB.UI && SB.UI.go && SB.verify && !SB.verify(['engine','cities','art','ui']).length && (!SB.Boot || SB.Boot.done()) && SB.Game && SB.Cutscene && SB.Scenes)").catch(() => false);
       }
     }
     if (!ok) throw new Error('the game did not load from ' + BASE);

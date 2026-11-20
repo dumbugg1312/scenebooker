@@ -23,6 +23,14 @@ SB.module('NightScene', function (SB) {
   var TAU = Math.PI * 2, TONER = '#141312';
   var PAPERS = (SB.Scenes && SB.Scenes.papers) || { goldenrod: '#EBBA4E', white: '#F2F0E6', pink: '#F0B2C0', canary: '#ECD668', blue: '#B4CDE4', green: '#C0DCA4' };
   var STOCK = { white: '#F2F0E6', bone: '#E9DFC6', kraft: '#B8925C', tape: '#E6DCB8', index: '#F7F5EE' };
+  /* the copy stock on the paper pieces: the flyers' papers (css/finish.css), not the canvas hexes above */
+  var STOCKVAR = { white: 'var(--pp-white)', bone: 'var(--pp-buff)', kraft: 'var(--pp-kraft)', tape: 'var(--pp-buff)', index: 'var(--pp-bond)', goldenrod: 'var(--pp-kraft)',
+                   canary: 'var(--pp-buff)', pink: 'var(--pp-salmon)', salmon: 'var(--pp-salmon)', blue: 'var(--pp-blue)', green: 'var(--pp-green)' };
+  function stockVar(s) { return STOCKVAR[s] || 'var(--pp-white)'; }
+  /* css px in one --p unit: a size or a place on the 1280 x 800 board, held on the stage at any window size */
+  function P(n) { return 'calc(var(--p) * ' + (Math.round(n * 100) / 100) + ')'; }
+  /* how finely a canvas must raster to stay sharp at this size (js/ui/finish.js) */
+  function res() { return SB.Finish && SB.Finish.res ? SB.Finish.res() : 1; }
   function stockOf(s) { return PAPERS[s] || STOCK[s] || (String(s || '').charAt(0) === '#' ? s : STOCK.white); }
 
   /* ---------------- small helpers ---------------- */
@@ -38,7 +46,7 @@ SB.module('NightScene', function (SB) {
   function rrect(c, x, y, w, h, r, v) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); c.fillStyle = g(v); c.fill(); }
   function soft(c, px, fn) { c.save(); c.filter = 'blur(' + px + 'px)'; fn(); c.restore(); }
   function turned(c, x, y, a, fn) { c.save(); c.translate(x, y); c.rotate(a); fn(); c.restore(); }
-  function typed(c, t, x, y, size, v, align) { c.save(); c.font = '700 ' + size + 'px "Courier New", Courier, monospace'; c.fillStyle = g(v); c.textAlign = align || 'left'; c.fillText(t, x, y); c.restore(); }
+  function typed(c, t, x, y, size, v, align) { c.save(); c.font = '400 ' + size + 'px "SB Type", "Courier New", monospace'; c.fillStyle = g(v); c.textAlign = align || 'left'; c.fillText(t, x, y); c.restore(); }
 
   /* ---------------- the copier and the cut-outs: SB.Scenes's own ---------------- */
   function copier(cv, o) { return SB.Scenes && SB.Scenes.copier ? SB.Scenes.copier(cv, o) : cv; }
@@ -221,7 +229,7 @@ SB.module('NightScene', function (SB) {
   var OCACHE = {}, ON = 0;
   function object(kind, o) {
     o = o || {};
-    var key = kind + JSON.stringify(o), hit = OCACHE[key], cp;
+    var k = Math.max(2, Math.ceil(res())), key = kind + '@' + k + JSON.stringify(o), hit = OCACHE[key], cp;
     if (hit) {                                   /* drawn already: a copy of it (one canvas can't sit in two places) */
       cp = mk(hit.width, hit.height); cp.getContext('2d').drawImage(hit, 0, 0);
       cp.style.width = hit.style.width; cp.style.height = hit.style.height; cp.setAttribute('aria-hidden', 'true'); cp.className = 'nc-objart';
@@ -229,14 +237,14 @@ SB.module('NightScene', function (SB) {
     }
     if (++ON > 60) { OCACHE = {}; ON = 0; }
     var spec = OBJ[kind]; if (!spec) return mk(1, 1);
-    var k = 2, m = 8, w = spec[0], h = spec[1], cv = mk((w + m * 2) * k, (h + m * 2) * k), c = cv.getContext('2d');
+    var m = 8, w = spec[0], h = spec[1], cv = mk((w + m * 2) * k, (h + m * 2) * k), c = cv.getContext('2d');
     c.scale(k, k); c.translate(m, m);
     spec[2](c, o, R(kind + ':' + (o.seed || '')));
     copier(cv, { paper: PAPERS.white, cell: 3.4, contrast: 1.5, alpha: true, seed: kind + (o.seed || '') });
     c.setTransform(1, 0, 0, 1, 0, 0);
     var out = kind === 'rings' ? cv : margin(cv, 5 * k, kind + (o.seed || ''));
     var f = o.size || 1;
-    out.style.width = ((w + m * 2) * f) + 'px'; out.style.height = ((h + m * 2) * f) + 'px';
+    out.style.width = P((w + m * 2) * f); out.style.height = P((h + m * 2) * f);
     out.setAttribute('aria-hidden', 'true'); out.className = 'nc-objart';
     OCACHE[key] = out;
     return object(kind, o);
@@ -248,7 +256,7 @@ SB.module('NightScene', function (SB) {
     if (!SB.Skeleton) return '<span class="nc-mk-fb">' + esc(text) + '</span>';
     var p = SB.Skeleton.path(String(text).toUpperCase(), size, o.treatment || 'marker', { maxWidth: o.maxWidth, rng: SB.rng.make('nmk:' + text + (o.seed || '')) });
     var sw = p.strokeWidth * (o.weight || 1), pad = sw;
-    return '<svg class="nc-mk" aria-hidden="true" width="' + (p.width + pad * 2).toFixed(1) + '" height="' + (size + pad * 2).toFixed(1) + '" viewBox="' + (-pad) + ' ' + (-pad) + ' ' + (p.width + pad * 2).toFixed(1) + ' ' + (size + pad * 2).toFixed(1) + '">' +
+    return '<svg class="nc-mk" aria-hidden="true" style="width:' + P(p.width + pad * 2) + ';height:' + P(size + pad * 2) + '" width="' + (p.width + pad * 2).toFixed(1) + '" height="' + (size + pad * 2).toFixed(1) + '" viewBox="' + (-pad) + ' ' + (-pad) + ' ' + (p.width + pad * 2).toFixed(1) + ' ' + (size + pad * 2).toFixed(1) + '">' +
       '<path d="' + p.d + '" fill="none" stroke="currentColor" stroke-width="' + sw.toFixed(2) + '" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   }
   function tally(n, o) {
@@ -260,7 +268,7 @@ SB.module('NightScene', function (SB) {
       if (cnt === 5) d += 'M' + (x0 - 5) + ' ' + (y0 + hgt * 0.8).toFixed(1) + 'L' + (x0 + gap * 3 + 6) + ' ' + (y0 + hgt * 0.15).toFixed(1);
     }
     var W = per * gw + 8, H = rows * (hgt + 10) + 4;
-    return '<svg class="nc-tally" aria-hidden="true" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '"><path d="' + d + '" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+    return '<svg class="nc-tally" aria-hidden="true" style="width:' + P(W) + ';height:' + P(H) + '" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '"><path d="' + d + '" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
   }
 
   /* ---------------- copy paper ---------------- */
@@ -268,8 +276,7 @@ SB.module('NightScene', function (SB) {
   function paper(stock, seed) {
     var key = stock + ':' + (seed || ''); if (TEX[key]) return TEX[key];
     var S = 360, cv = mk(S, S), c = cv.getContext('2d'), r = R('tex:' + key), i;
-    c.fillStyle = stockOf(stock); c.fillRect(0, 0, S, S);
-    c.fillStyle = TONER;
+    c.fillStyle = TONER;     // specks only: the stock under them is a --pp- token
     for (i = 0; i < 260; i++) { c.globalAlpha = r.range(0.15, 0.7); c.beginPath(); c.arc(r.range(0, S), r.range(0, S), r.range(0.3, 1.2), 0, TAU); c.fill(); }
     for (i = 0; i < 6; i++) { var cx = r.range(0, S), cy = r.range(0, S); for (var k = 0; k < 14; k++) { c.globalAlpha = r.range(0.2, 0.6); c.beginPath(); c.arc(cx + r.range(-8, 8), cy + r.range(-8, 8), r.range(0.4, 1), 0, TAU); c.fill(); } }
     c.globalAlpha = 0.05; for (i = 0; i < 3; i++) c.fillRect(0, r.range(0, S), S, r.range(1, 3));
@@ -277,15 +284,13 @@ SB.module('NightScene', function (SB) {
     TEX[key] = cv.toDataURL('image/png');
     return TEX[key];
   }
-  /* a torn edge, as a CSS clip-path: sides is a string of t r b l */
-  function torn(sides, seed, depth) {
-    var r = R('torn:' + seed), d = depth || 3, pts = [], i, n = 18;
-    function j() { return r.range(0, d); }
-    for (i = 0; i <= n; i++) pts.push((i / n * 100).toFixed(1) + '% ' + (sides.indexOf('t') >= 0 ? j() : 0).toFixed(1) + 'px');
-    for (i = 1; i <= n; i++) pts.push('calc(100% - ' + (sides.indexOf('r') >= 0 ? j() : 0).toFixed(1) + 'px) ' + (i / n * 100).toFixed(1) + '%');
-    for (i = n - 1; i >= 0; i--) pts.push((i / n * 100).toFixed(1) + '% calc(100% - ' + (sides.indexOf('b') >= 0 ? j() : 0).toFixed(1) + 'px)');
-    for (i = n - 1; i > 0; i--) pts.push((sides.indexOf('l') >= 0 ? j() : 0).toFixed(1) + 'px ' + (i / n * 100).toFixed(1) + '%');
-    return 'polygon(' + pts.join(',') + ')';
+  /* an edge from the shared set (css/finish.css): sides is a string of t r b l; torn where a side is torn, else a scissor cut */
+  function torn(sides, seed) {
+    var n = (R('torn:' + seed).next() * 3 | 0) + 1;
+    if (sides.indexOf('b') >= 0 && sides.length < 4) return 'var(--edge-torn-b)';
+    if (sides.indexOf('t') >= 0 && sides.length < 4) return 'var(--edge-torn-t)';
+    if (sides.indexOf('r') >= 0 && sides.length < 4) return 'var(--edge-torn-r)';
+    return 'var(--edge-cut-' + n + ')';
   }
 
   /* ---------------- the pieces on the table ---------------- */
@@ -303,7 +308,7 @@ SB.module('NightScene', function (SB) {
     (kids || []).forEach(function (c) { if (c == null) return; el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
     return el;
   }
-  function at(x, y, rot, extra) { var s = { left: x + 'px', top: y + 'px', '--rot': (rot || 0) + 'deg' }; for (var k in (extra || {})) s[k] = extra[k]; return s; }
+  function at(x, y, rot, extra) { var s = { left: P(x), top: P(y), '--rot': (rot || 0) + 'deg' }; for (var k in (extra || {})) s[k] = extra[k]; return s; }
 
   /* where everything sits on the 1280 x 800 board: [left, top, turn]; the settle moves a few things to clear the
    * middle of the table for the cash */
@@ -312,7 +317,7 @@ SB.module('NightScene', function (SB) {
     setlist: [34, 404, -1.6], tally: [296, 414, 1.6], watch: [250, 616, 9], stamp: [396, 628, -6], marker: [560, 690, -24],
     stampChip: [470, 618, -3], clicker: [938, 412, -4], doorChip: [972, 398, -2], gens: [962, 588, 1.2], rings: [1112, 404, 0],
     can: [1146, 406, 12], card: [1100, 524, 4], tin: [936, 618, -2], cashChip: [1020, 640, 2], stop: [664, 762, -2.4],
-    now: [34, 768, -0.8], sign: [578, 432, -2.6], note: [566, 412, 1.2], skip: [1100, 762, -2], payout: [572, 400, -0.8],
+    now: [34, 768, -0.8], sign: [508, 392, -6], note: [566, 412, 1.2], skip: [1100, 762, -2], payout: [572, 400, -0.8],
     result: [30, 398, 0.6], leave: [1004, 232, 3], posts: [1142, 200, -4]
   };
   var LAY_SETTLE = { tally: [44, 150, -3], lineLbl: [330, 342, -1.4], watch: [226, 612, 9], stamp: [1150, 650, 84], marker: [1104, 748, -8] };
@@ -320,14 +325,14 @@ SB.module('NightScene', function (SB) {
   function pos(name, settle) { return (settle && LAY_SETTLE[name]) || LAY[name] || [0, 0, 0]; }
   function placed(name, settle, extra) { var p = pos(name, settle); return at(p[0], p[1], p[2], extra); }
   function paperStyle(stock, seed, edges, extra) {
-    var s = { 'background-color': stockOf(stock), 'background-image': 'url(' + paper(stock, seed) + ')', 'clip-path': edges ? torn(edges, seed) : null };
+    var s = { '--paper': 'url(' + paper(stock, seed) + ') 0 0 / ' + P(360) + ' ' + P(360) + ', ' + stockVar(stock), '--edge': torn(edges || 'lr', seed) };
     for (var k in (extra || {})) s[k] = extra[k];
     return s;
   }
-  function withPos(style, name, settle) { var p = pos(name, settle); style.left = p[0] + 'px'; style.top = p[1] + 'px'; style['--rot'] = p[2] + 'deg'; return style; }
-  function tape(x, y, w, rot, cls) { return h('span', { class: 'nc-piece nc-tape ' + (cls || ''), 'aria-hidden': 'true', style: at(x, y, rot, { width: w + 'px' }) }); }
+  function withPos(style, name, settle) { var p = pos(name, settle); style.left = P(p[0]); style.top = P(p[1]); style['--rot'] = p[2] + 'deg'; return style; }
+  function tape(x, y, w, rot, cls) { return h('span', { class: 'nc-piece nc-tape ' + (cls || ''), 'aria-hidden': 'true', style: at(x, y, rot, { width: P(w) }) }); }
   function chip(label, value, name, settle) {
-    return h('span', { class: 'nc-piece nc-chip', 'aria-hidden': 'true', style: placed(name, settle) }, [h('b', { text: label }), value != null && value !== '' ? h('span', { text: value }) : null]);
+    return h('span', { class: 'nc-piece nc-chip', 'aria-hidden': 'true', style: placed(name, settle) }, [label ? h('b', { text: label }) : null, value != null && value !== '' ? h('span', { text: value }) : null]);
   }
 
   /* the room's kind, as the doorway draws it */
@@ -342,9 +347,9 @@ SB.module('NightScene', function (SB) {
     title: function (room, day) { return h('h1', { class: 'nc-piece nc-title', style: placed('title') }, [h('b', { text: room || '' }), day ? h('span', { text: day }) : null]); },
     /* the doorway sheet: { el, canvas, paint(ctx) }; paints only when what it shows changes */
     photo: function (label) {
-      var cv = mk(PW * 1.5, PH * 1.5), key = null;
+      var cs = Math.min(3, Math.max(1.5, res())), cv = mk(PW * cs, PH * cs), key = null;
       cv.className = 'nc-doorcv'; cv.setAttribute('aria-hidden', 'true');
-      var el = h('div', { class: 'nc-piece nc-photo', role: 'img', 'aria-label': label || '', style: placed('photo') }, [cv, tape(-14, -6, 90, -32), tape(1150, -10, 96, 28), tape(560, -12, 80, 2)]);
+      var el = h('div', { class: 'nc-piece nc-photo', role: 'img', 'aria-label': label || '', style: placed('photo') }, [cv, tape(-14, -6, 90, -32), tape(1150, -10, 96, 28)]);
       return { el: el, canvas: cv, paint: function (ctx, label2) {
         var k = [ctx.room, ctx.phase, ctx.band, ctx.line, ctx.paper].join('|');
         if (label2 != null) el.setAttribute('aria-label', label2);
@@ -354,7 +359,7 @@ SB.module('NightScene', function (SB) {
     label: function (text, name, settle, dark) { return h('p', { class: 'nc-piece nc-lbl' + (dark ? ' nc-lbl--on' : ''), 'aria-hidden': 'true', style: placed(name, settle) }, [h('span', { text: text })]); },
     /* d: { title, doors, bands: [{ start, name, state: on|done|next, note }], stop } */
     setList: function (d, aria, onClick, settle) {
-      var el = h('button', { type: 'button', class: 'nc-piece nc-paper nc-setlist', 'aria-label': aria, style: withPos(paperStyle('white', 'sl', 'b'), 'setlist', settle), on: onClick ? { click: onClick } : null });
+      var el = h('button', { type: 'button', class: 'nc-piece nc-paper pz-paper pz-hl nc-setlist', 'aria-label': aria, style: withPos(paperStyle('white', 'sl', 'b'), 'setlist', settle), on: onClick ? { click: onClick } : null });
       el.appendChild(h('span', { class: 'nc-sl-h', html: marker(d.title || 'Set list', 30, { seed: 'sl', maxWidth: 196 }) }));
       if (d.doors) el.appendChild(h('span', { class: 'nc-type nc-sl-doors', text: d.doors }));
       var ol = h('ol', { class: 'nc-sl-list' });
@@ -362,17 +367,17 @@ SB.module('NightScene', function (SB) {
         ol.appendChild(h('li', { class: 'nc-sl-band is-' + b.state }, [
           h('span', { class: 'nc-type nc-sl-time', text: b.start || '' }),
           h('span', { class: 'nc-type nc-sl-name', text: String(b.name || '').toUpperCase() }),
-          b.state === 'on' ? h('span', { class: 'nc-sl-arrow', html: '<svg class="nc-mk" aria-hidden="true" width="34" height="22" viewBox="0 0 34 22"><path d="M2 12C10 10 18 12 28 10M20 3L30 10L21 18" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' }) : null,
+          b.state === 'on' ? h('span', { class: 'nc-sl-arrow', html: '<svg class="nc-mk" aria-hidden="true" style="width:' + P(34) + ';height:' + P(22) + '" width="34" height="22" viewBox="0 0 34 22"><path d="M2 12C10 10 18 12 28 10M20 3L30 10L21 18" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' }) : null,
           b.note ? h('span', { class: 'nc-type nc-sl-heat', text: b.note }) : null
         ]));
       });
       el.appendChild(ol);
       if (d.stop) el.appendChild(h('span', { class: 'nc-type nc-sl-stop', text: d.stop }));
-      return [el, tape(118, 394, 86, -5)];
+      return [el];
     },
     /* d: { parLabel, par, callLabel, lo, hi, cap, away, aria } */
     tally: function (d, settle) {
-      var el = h('div', { class: 'nc-piece nc-paper nc-tallyscrap', role: 'group', 'aria-label': d.aria || '', style: withPos(paperStyle('pink', 'ts', 'rb'), 'tally', settle) });
+      var el = h('div', { class: 'nc-piece nc-paper pz-paper nc-tallyscrap', role: 'group', 'aria-label': d.aria || '', style: withPos(paperStyle('pink', 'ts', 'rb'), 'tally', settle) });
       if (d.par != null) {
         el.appendChild(h('span', { class: 'nc-type nc-ts-k', text: d.parLabel }));
         el.appendChild(h('span', { class: 'nc-ts-row' }, [h('span', { html: tally(d.par, { h: 20, per: 5, gap: 7 }) }), h('span', { class: 'nc-ts-n', html: marker(String(d.par), 30, { seed: 'par' }) })]));
@@ -387,33 +392,33 @@ SB.module('NightScene', function (SB) {
     },
     /* a table object as a control: o = { kind, art (object() opts), name, label, onClick, cls, size } */
     thing: function (o, settle) {
-      var art = object(o.kind, o.art || {}), el = h(o.onClick ? 'button' : 'span', { type: o.onClick ? 'button' : null, class: 'nc-piece ' + (o.onClick ? 'nc-obj ' : 'nc-objwrap ') + (o.cls || ''),
+      var art = object(o.kind, o.art || {}), el = h(o.onClick ? 'button' : 'span', { type: o.onClick ? 'button' : null, class: 'nc-piece ' + (o.onClick ? 'nc-obj pz-hl ' : 'nc-objwrap ') + (o.cls || ''),
         'aria-label': o.onClick ? o.label : null, 'aria-hidden': o.onClick ? null : 'true', style: placed(o.name, settle), on: o.onClick ? { click: o.onClick } : null }, [art]);
       return el;
     },
     chip: chip,
-    strip: function (text, name, settle) { return h('p', { class: 'nc-piece nc-paper nc-gens', 'aria-hidden': 'true', style: withPos(paperStyle('tape', 'gen'), name, settle) }, [h('span', { class: 'nc-type', text: text })]); },
+    strip: function (text, name, settle) { return h('p', { class: 'nc-piece nc-paper pz-paper nc-gens', 'aria-hidden': 'true', style: withPos(paperStyle('tape', 'gen'), name, settle) }, [h('span', { class: 'nc-type', text: text })]); },
     /* the drink's card: its title in marker, the room's rules typed under it */
     card: function (title, lines, settle) {
-      var el = h('div', { class: 'nc-piece nc-paper nc-drinkcard', role: 'note', 'aria-label': [title].concat(lines || []).join('. '), style: withPos(paperStyle('index', 'dc'), 'card', settle) });
+      var el = h('div', { class: 'nc-piece nc-paper pz-paper nc-drinkcard', role: 'note', 'aria-label': [title].concat(lines || []).join('. '), style: withPos(paperStyle('index', 'dc'), 'card', settle) });
       el.appendChild(h('span', { class: 'nc-dc-h', html: marker(title, 22, { seed: 'dc', maxWidth: 140 }) }));
       (lines || []).forEach(function (t) { el.appendChild(h('span', { class: 'nc-type', text: t })); });
       return el;
     },
-    stopTape: function (text) { return h('div', { class: 'nc-piece nc-paper nc-stoptape', 'aria-hidden': 'true', style: withPos(paperStyle('tape', 'hs', 'lr'), 'stop'), html: marker(text, 21, { seed: 'hs', maxWidth: 250 }) }); },
+    stopTape: function (text) { return h('div', { class: 'nc-piece nc-paper pz-paper nc-stoptape', 'aria-hidden': 'true', style: withPos(paperStyle('tape', 'hs', 'lr'), 'stop'), html: marker(text, 21, { seed: 'hs', maxWidth: 250 }) }); },
     /* the cardboard sign: a real button (data-fk for the tutorial's tape and the keyboard) */
     sign: function (l1, l2, sub, label, fk, onClick, name) {
-      var small = name === 'leave', el = h('button', { type: 'button', class: 'nc-piece nc-paper nc-sign' + (small ? ' nc-sign--small' : ''), 'aria-label': label, 'data-fk': fk || null, style: withPos(paperStyle('kraft', 'sign' + fk, 'trbl'), name || 'sign'), on: { click: onClick } });
-      el.appendChild(h('span', { class: 'nc-sign-l1', html: marker(l1, small ? 24 : 30, { seed: 'o1', weight: 1.5, maxWidth: small ? 180 : 300 }) }));
-      el.appendChild(h('span', { class: 'nc-sign-l2', html: marker(l2, small ? 40 : 62, { seed: 'o2', weight: 1.7, maxWidth: small ? 170 : 236 }) +
-        '<svg class="nc-mk" aria-hidden="true" width="' + (small ? 34 : 54) + '" height="' + (small ? 26 : 40) + '" viewBox="0 0 54 40"><path d="M3 22C16 19 30 22 46 19M33 6L49 19L35 33" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>' }));
+      /* the hero before the doors: "open the doors" is big, angled and stamped on; "back to the desk" stays small */
+      var small = name === 'leave', k = small ? 1 : 2.3, el = h('button', { type: 'button', class: 'nc-piece nc-paper pz-paper pz-hl nc-sign' + (small ? ' nc-sign--small' : ' nc-sign--hero'), 'aria-label': label, 'data-fk': fk || null, style: withPos(paperStyle('kraft', 'sign' + fk, 'trbl'), name || 'sign'), on: { click: onClick } });
+      el.appendChild(h('span', { class: 'nc-sign-l1', html: marker(l1, small ? 24 : 30 * k, { seed: 'o1', weight: 1.5, maxWidth: small ? 180 : 300 * k }) }));
+      el.appendChild(h('span', { class: 'nc-sign-l2', html: marker(l2, small ? 40 : 62 * k, { seed: 'o2', weight: 1.7, maxWidth: small ? 170 : 236 * k }) +
+        '<svg class="nc-mk" aria-hidden="true" style="width:' + P(small ? 34 : 54 * k) + ';height:' + P(small ? 26 : 40 * k) + '" width="' + (small ? 34 : 54) + '" height="' + (small ? 26 : 40) + '" viewBox="0 0 54 40"><path d="M3 22C16 19 30 22 46 19M33 6L49 19L35 33" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>' }));
       if (sub) el.appendChild(h('span', { class: 'nc-type nc-sign-sub', text: sub }));
-      var p = pos(name || 'sign');
-      return [el, tape(p[0] + 22, p[1] - 8, 70, -20), tape(p[0] + 282, p[1] - 4, 70, 24)];
+      return [el];
     },
     scrap: function (text, kind, i) {
       var p = pos('posts');
-      return h('div', { class: 'nc-piece nc-paper nc-scrap nc-scrap--' + kind, role: 'note', 'aria-label': text, style: at(p[0] - i * 10, p[1] + i * 74, i % 2 ? 3 : p[2], paperStyle(kind === 'inc' ? 'bone' : 'white', 'post' + i + kind, 'tb')) }, [h('span', { class: 'nc-type', text: text })]);
+      return h('div', { class: 'nc-piece nc-paper pz-paper nc-scrap nc-scrap--' + kind, role: 'note', 'aria-label': text, style: at(p[0] - i * 10, p[1] + i * 74, i % 2 ? 3 : p[2], paperStyle(kind === 'inc' ? 'bone' : 'white', 'post' + i + kind, 'tb')) }, [h('span', { class: 'nc-type', text: text })]);
     },
     /* the cash counted out on the table: a pile and a scrap with its figure for every line of the envelope */
     piles: function (list) {
@@ -421,7 +426,7 @@ SB.module('NightScene', function (SB) {
       (list || []).slice(0, PILES.length).forEach(function (p, i) {
         var q = PILES[i];
         out.push(h('span', { class: 'nc-piece nc-objwrap nc-pile', 'aria-hidden': 'true', style: at(q[0], q[1], i % 2 ? 6 : -5) }, [object('pile', { n: p.n || 3, bill: p.bill || '5', seed: 'p' + i, size: 0.7 })]));
-        out.push(h('span', { class: 'nc-piece nc-paper nc-pilelabel', 'aria-hidden': 'true', style: at(q[0] + 4, q[1] + 52, i % 2 ? -3 : 2, paperStyle(i === list.length - 1 ? 'canary' : 'white', 'pl' + i, 'lr')) },
+        out.push(h('span', { class: 'nc-piece nc-paper pz-paper nc-pilelabel', 'aria-hidden': 'true', style: at(q[0] + 4, q[1] + 52, i % 2 ? -3 : 2, paperStyle(i === list.length - 1 ? 'canary' : 'white', 'pl' + i, 'lr')) },
           [h('span', { class: 'nc-pl-amt', html: marker(p.amount || '', 15, { seed: 'pa' + i }) }), h('span', { class: 'nc-type nc-pl-who', text: p.who || p.label || '' })]));
       });
       return out;
@@ -469,14 +474,14 @@ SB.module('NightScene', function (SB) {
     (st.posts || []).forEach(function (p, i) { add(parts.scrap(p, 'post', i)); });
     if (st.phase === 'doors') add(parts.sign('Open the', 'doors', 'doors ' + st.doors + ' · ' + st.bands.length + ' on the bill · ' + st.price + ' at the door', 'Open the doors', 'open', function () { if (on.open) on.open(); }));
     if (st.decision) {
-      var dec = st.decision, note = add(h('section', { class: 'nc-piece nc-paper nc-note', role: 'group', 'aria-label': dec.title + ' needs you', style: withPos(paperStyle('white', 'note', 'tb'), 'note') }));
+      var dec = st.decision, note = add(h('section', { class: 'nc-piece nc-paper pz-paper nc-note', role: 'group', 'aria-label': dec.title + ' needs you', style: withPos(paperStyle('white', 'note', 'tb'), 'note') }));
       note.appendChild(h('h2', { class: 'nc-note-h', html: marker('!', 30, { seed: 'bang', weight: 1.6 }) + '<span>' + esc(dec.title) + '</span>' }));
       note.appendChild(h('p', { class: 'nc-type nc-note-b', text: dec.body }));
       note.appendChild(tabs(dec.options, function (i) { if (on.choose) on.choose(i); }, dec.title));
     }
-    if (st.phase === 'set' && on.skip) add(h('button', { class: 'nc-piece nc-btn', type: 'button', 'data-fk': 'skip', style: placed('skip'), 'aria-label': 'Skip to settle', on: { click: on.skip } }, [h('span', { text: 'skip to settle' })]));
+    if (st.phase === 'set' && on.skip) add(h('button', { class: 'nc-piece nc-btn pz-hl', type: 'button', 'data-fk': 'skip', style: placed('skip'), 'aria-label': 'Skip to settle', on: { click: on.skip } }, [h('span', { text: 'skip to settle' })]));
     if (settle && st.envelope) {
-      var env = st.envelope, pay = add(h('section', { class: 'nc-piece nc-paper nc-payout', role: 'group', 'aria-label': 'The envelope', style: withPos(paperStyle('white', 'pay', 'b'), 'payout') }));
+      var env = st.envelope, pay = add(h('section', { class: 'nc-piece nc-paper pz-paper nc-payout', role: 'group', 'aria-label': 'The envelope', style: withPos(paperStyle('white', 'pay', 'b'), 'payout') }));
       pay.appendChild(h('h2', { class: 'nc-pay-h', html: marker('The envelope', 28, { seed: 'env' }) }));
       pay.appendChild(h('p', { class: 'nc-type nc-pay-door', text: env.paid + ' paid x ' + env.price + ' = ' + env.gross + (env.hat ? '   + hat ' + env.hat : '') }));
       var tb = h('ol', { class: 'nc-pay-lines' });
@@ -487,7 +492,7 @@ SB.module('NightScene', function (SB) {
       add(parts.piles((st.piles || []).map(function (p) { var m = /^(.*?)\s*(\$\d+)$/.exec(p.label) || [p.label, p.label, '']; return { who: m[1], amount: m[2], n: p.n, bill: p.bill }; })));
     }
     if (after && st.result) {
-      var res = st.result, rc = add(h('section', { class: 'nc-piece nc-paper nc-result', role: 'group', 'aria-label': 'How it went', style: withPos(paperStyle('bone', 'res', 'b'), 'result') }));
+      var res = st.result, rc = add(h('section', { class: 'nc-piece nc-paper pz-paper nc-result', role: 'group', 'aria-label': 'How it went', style: withPos(paperStyle('bone', 'res', 'b'), 'result') }));
       rc.appendChild(h('h2', { class: 'nc-pay-h', html: marker('How it went', 26, { seed: 'res' }) }));
       rc.appendChild(h('p', { class: 'nc-type', text: res.verdict }));
       (res.lines || []).forEach(function (t) { rc.appendChild(h('p', { class: 'nc-type nc-res-l', text: t })); });

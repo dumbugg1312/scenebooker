@@ -19,7 +19,17 @@
     function cur() { return SB.Tutorial.current(S()) || {}; }
     function at() { var c = cur(); return (c.step || 'OFF') + ':' + (c.stage || ''); }
     function q(sel) { return d.querySelector(sel); }
-    function fail(msg) { throw new Error('tutorial walk [' + at() + ', ' + SB.UI.route() + ']: ' + msg); }
+    /* the first match that is not on a card already peeling off (SB.Finish removes it on a timer the fake DOM never runs) */
+    function live(sel) {
+      var all = d.querySelectorAll(sel), i, e, gone;
+      for (i = 0; i < all.length; i++) {
+        for (e = all[i], gone = false; e; e = e.parentNode) if (e.classList && e.classList.contains('is-leaving')) { gone = true; break; }
+        if (!gone) return all[i];
+      }
+      return null;
+    }
+    function day() { var c = S() && S().clock; return c ? 'day ' + c.day + ' ' + c.phase + (c.stop && c.stop.kind ? '/' + c.stop.kind : '') : 'no clock'; }
+    function fail(msg) { throw new Error('tutorial walk [' + at() + ', ' + SB.UI.route() + ', ' + day() + ']: ' + msg); }
     function flush() { if (env.flush) env.flush(); }
     function tapedEl() { return q('[data-taped]'); }
     function describe(e) { return e ? ((e.getAttribute('data-fk') || e.getAttribute('data-obj') || e.getAttribute('data-tut') || e.className || e.tagName) + '') : 'nothing'; }
@@ -30,8 +40,9 @@
       if (tapes.length !== 1) fail(tapes.length + ' tapes on the page, wanted one on ' + sel);
       if (got !== want) fail('the tape is on ' + describe(got) + ', not on ' + sel);
       /* where it comes to rest (it is 134 x 55 and turned; the sticking-on animation is not counted) */
-      var cx = parseFloat(tapes[0].style.left) + 67, cy = parseFloat(tapes[0].style.top) + 27.5, W = root.innerWidth || 1280, H = root.innerHeight || 800;
-      var flat = /(^|[^0-9])-?90deg/.test(String(tapes[0].style.getPropertyValue ? tapes[0].style.getPropertyValue('--tr') : '')), hw = flat ? 28 : 72, hh = flat ? 67 : 58;
+      var k = (tapes[0].offsetWidth || 134) / 134;     // it is sized in stage units: 134 x 55 at 1280 x 800
+      var cx = parseFloat(tapes[0].style.left) + 67 * k, cy = parseFloat(tapes[0].style.top) + 27.5 * k, W = root.innerWidth || 1280, H = root.innerHeight || 800;
+      var flat = /(^|[^0-9])-?90deg/.test(String(tapes[0].style.getPropertyValue ? tapes[0].style.getPropertyValue('--tr') : '')), hw = (flat ? 28 : 72) * k, hh = (flat ? 67 : 58) * k;
       if (!(cx - hw >= 0 && cy - hh >= 0 && cx + hw <= W && cy + hh <= H)) fail('the tape on ' + sel + ' hangs off the window: centre ' + Math.round(cx) + ',' + Math.round(cy));
       return want;
     }
@@ -61,13 +72,13 @@
         if (done()) return;
         if (q('.cs-root')) { c = SB.Chapters.nextCutscene(s); if (c) seenCuts.push(c.key); q('.cs-root .cs-skip').click(); continue; }
         if (q('.sy-card')) { cards.push(q('.sy-card').getAttribute('data-patch')); q('.sy-card .sy-card-go').click(); continue; }
-        e = q('#overlay .sb-check');
+        e = live('#overlay .sb-check');
         if (e) { bs = e.querySelectorAll('button'); bs[bs.length - 1].click(); continue; }
-        e = q('#overlay .sb-decision') || q('#overlay .cc-slap');
+        e = live('#overlay .sb-decision') || live('#overlay .cc-slap');
         if (e) {
           bs = Array.prototype.filter.call(e.querySelectorAll('button'), function (b) { return !b.disabled; });
           if (!bs.length) fail('a card with nothing to press: ' + e.textContent.slice(0, 80));
-          c = bs.filter(function (b) { return /later|keep waiting|close/i.test(b.textContent); })[0] || bs[0];
+          c = bs.filter(function (b) { return /^\s*\d*\s*(later|keep waiting|close)\b/i.test(b.textContent); })[0] || bs[0];
           c.click(); continue;
         }
         if (SB.UI.route() === 'night') { if (done()) return; fail('the night opened while waiting for ' + what); }
@@ -87,13 +98,14 @@
         }
         SB.UI.fire('sb-play', { cmd: 'next' });
       }
-      fail('time ran out waiting for ' + what);
+      e = q('#overlay');
+      fail('time ran out waiting for ' + what + (e && /\S/.test(e.textContent || '') ? '; on the overlay: "' + String(e.textContent).replace(/\s+/g, ' ').slice(0, 200) + '"' : ''));
     }
     function until(key, what) { time(function () { return at() !== key; }, what); }
 
     var P = [];
     /* need: a selector that must be on the page before the phase runs (the host waits for it: the night plays out in real time) */
-    function phase(name, shot, run, need) { P.push({ name: name, shot: shot, need: need || null, run: function () { run(); log.push(name + ' -> ' + at()); } }); }
+    function phase(name, shot, run, need) { P.push({ name: name, shot: shot, need: need || null, run: function () { run(); log.push(name + ' -> ' + at() + ' (' + day() + ')'); } }); }
 
     /* 1 ANSWER */
     phase('answer: the phone, the request row', '01-ANSWER', function () {
@@ -248,7 +260,7 @@
     phase('close-out: back to the desk, the cutscene, the patch', '10-CLOSEOUT', function () {
       flush();
       tap(fk('leave'));
-      time(function () { return !q('.cs-root') && !q('.sy-card') && !q('#overlay .cc-slap') && SB.UI.route() === 'desk'; }, 'the desk');
+      time(function () { return !q('.cs-root') && !q('.sy-card') && !live('#overlay .cc-slap') && SB.UI.route() === 'desk'; }, 'the desk');
       if (seenCuts.indexOf('DOORS_AT_8_close') < 0) fail('DOORS_AT_8_close did not play (played: ' + seenCuts.join(', ') + ')');
       if (!S().patches.DOORS_AT_8) fail('the DOORS_AT_8 patch was not earned');
       if (cards.indexOf('DOORS_AT_8') < 0) fail('the DOORS_AT_8 card did not land on the desk');

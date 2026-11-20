@@ -87,6 +87,18 @@
   function game() { return SB.UI.game(); }
   function safe(f, fb) { try { var v = f(); return v === undefined ? fb : v; } catch (e) { return fb; } }
   function f(n) { return Math.round(n * 10) / 10; }
+  /* a length in phone units: --p is one px of the old 1280 x 800 layout, so everything keeps its place on the stage */
+  function pu(n) { return 'calc(var(--p) * ' + n + ')'; }
+  function up(t) { return String(t == null ? '' : t).toUpperCase(); }
+  /* hero lettering: the title in marker, in two lines when one would have to shrink */
+  function bigTitle(text, size, max, say) {
+    var t = up(text), k = K(), w = k.markerWidth ? k.markerWidth(t, size) : 0, i, best = -1, parts = [t];
+    if (w > max && t.indexOf(' ') > 0) {
+      for (i = 1; i < t.length - 1; i++) if (t.charAt(i) === ' ' && (best < 0 || Math.abs(i - t.length / 2) < Math.abs(best - t.length / 2))) best = i;
+      if (best > 0) parts = [t.slice(0, best), t.slice(best + 1)];
+    }
+    return parts.map(function (x) { return Kc().mk(x, size, { max: max, say: false }); });
+  }
 
   var PAGES = ['CROWDS', 'BANDS', 'ROOMS', 'NIGHTS', 'HEAR', 'DOOR', 'TOWNS', 'MOVING', 'PEOPLE', 'HOW', 'LIST', 'CHAPTERS'];
   /* CHAPTERS is the box (09 section 3): every chapter that has opened, each cutscene seen can be watched again (js/ui/story.js) */
@@ -176,7 +188,7 @@
       root.appendChild(wrap);
       wrap.appendChild(h('h1', { class: 'cb-sr', text: L('title') }));
       wrap.appendChild(h('div', { class: 'nb-spread' }, [left, h('div', { class: 'nb-gutter', aria: { hidden: 'true' } }), right, tabs]));
-      wrap.appendChild(h('span', { class: 'nb-grain', aria: { hidden: 'true' } }));
+      function F0(el) { if (SB.Finish && SB.Finish.scrollbar) safe(function () { SB.Finish.scrollbar(el); }); }
 
       function isNew(seen) { return num(seen) && seen > since; }
       function pageOf(p) { return safe(function () { return SB.Notebook.pages(game(), p); }, null); }
@@ -187,7 +199,7 @@
         pg = pageOf(p);
         return !!(pg && pg.rows.some(function (r) { return r.conf > 0 && isNew(r.seen); }));
       }
-      function pick(p) { page = p; openKey = null; focusCell = null; render(); keepTab(); }
+      function pick(p) { page = p; openKey = null; focusCell = null; render('pick'); keepTab(); }
       function keepTab() { var el = safe(function () { return tabs.querySelector('[data-page="' + page + '"]'); }, null); if (el && el.focus) safe(function () { el.focus(); }); }
 
       /* index tabs cut into the page edge */
@@ -195,7 +207,7 @@
         SB.UI.clear(tabs);
         PAGES.forEach(function (p, i) {
           var on = p === page, nw = !on && pageNew(p), name = pageName(p);
-          tabs.appendChild(h('button', { type: 'button', class: 'nb-ptab fx' + (on ? ' is-on' : '') + (nw ? ' is-new' : '') + (i % 2 ? ' is-alt' : ''), data: { page: p },
+          tabs.appendChild(h('button', { type: 'button', class: 'nb-ptab pz-paper pz-hl' + (on ? ' is-on' : '') + (nw ? ' is-new' : '') + (i % 2 ? ' is-alt' : ''), data: { page: p },
             aria: { pressed: on ? 'true' : 'false', label: L('tabSay', { page: name }) + (nw ? ', ' + L('newSince') : '') },
             on: { click: function () { pick(p); },
                   keydown: function (e) {
@@ -206,18 +218,28 @@
         });
       }
 
+      /* the hero stamps on when it is new: the first time the book opens, or when a different thing is read (never on a plain redraw) */
+      var heroKey = null, firstDraw = true;
+      function stampHero() {
+        var F = SB.Finish, el = safe(function () { return wrap.querySelector('.nb-hero, .nb-ptitle.is-hero'); }, null), k;
+        if (!F || !el) { heroKey = null; return; }
+        k = (el.getAttribute('data-key') || 'title') + ':' + page;
+        if (k === heroKey) return;
+        heroKey = k;
+        F.move(el, 'stamp', { delay: firstDraw ? 220 : 0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: el } });
+      }
+
       /* the right page: the entry you are reading */
       var SCRAP = { CROWDS: 'crowd-02', BANDS: 'singer-03', ROOMS: 'amp-02', NIGHTS: 'crowd-04', HEAR: 'mic-01', DOOR: 'boots-01', TOWNS: 'stand-04',
                     MOVING: 'line-01', PEOPLE: 'crowd-03', HOW: 'guitar-02', LIST: 'back-02', CHAPTERS: 'drums-02' },
-          PAPERS = ['canary', 'pink', 'blue', 'goldenrod'];
+          PAPERS = ['canary', 'pink', 'blue', 'goldenrod'];   // the copy stock the photos are run on
       /* a pasted-in scrap: a copied photo taped down, and a typed strip beside it */
       function scrapBlock(big) {
         var id = SCRAP[page] || 'crowd-01', kit = SB.UI.Kit, frame = /^(crowd|stand)/.test(id), els = [];
         if (!kit || !kit.photo) return null;
         safe(function () {
-          els.push(kit.photo({ id: id, w: big ? 250 : (frame ? 150 : 130), h: big ? 190 : (frame ? 108 : 150), paper: PAPERS[PAGES.indexOf(page) % PAPERS.length], cut: !frame, tape: ['tl', 'tr'], seed: 'nb' + page }));
-          els.push(kit.card({ paper: PAPERS[(PAGES.indexOf(page) + 1) % PAPERS.length], tape: ['top'], cls: 'nb-scrapcard', seed: 'nc' + page },
-            [h('p', { class: 'nb-scraptext', text: L('scrap.' + page) })]));
+          els.push(kit.photo({ id: id, w: big ? 250 : (frame ? 150 : 130), h: big ? 190 : (frame ? 108 : 150), paper: PAPERS[PAGES.indexOf(page) % PAPERS.length], cut: !frame, tape: ['tr'], seed: 'nb' + page }));
+          els.push(h('p', { class: 'nb-scraptext', text: L('scrap.' + page) }));
         });
         return els.length ? h('div', { class: 'nb-pasted' + (big ? ' is-big' : '') }, els) : null;
       }
@@ -231,24 +253,21 @@
         return best;
       }
 
-      function scrapBlockLeft() {
-        var kit = SB.UI.Kit, el = null;
-        if (!kit || !kit.photo) return null;
-        safe(function () { el = h('div', { class: 'nb-pasted nb-pasted--left' }, [kit.photo({ id: 'crowd-0' + (1 + PAGES.indexOf(page) % 4), w: 280, h: 150, paper: 'canary', tape: ['tr'], seed: 'nl' + page })]); });
-        return el;
-      }
       function showEntry(key) {
         var s = game(), e = null, kids = [], rg;
         openKey = key;
         SB.UI.clear(right);
         safe(function () { left.querySelectorAll('.is-open').forEach(function (x) { x.classList.remove('is-open'); }); });
         safe(function () { var el = left.querySelector('[data-key="' + String(key).replace(/"/g, '') + '"]'); if (el) el.classList.add('is-open'); });
-        if (!key) { right.appendChild(h('p', { class: 'nb-pencil nb-pick', text: L('scrapOpen') })); var sb = scrapBlock(true); if (sb) right.appendChild(sb); return; }
+        if (!key) { right.appendChild(h('p', { class: 'nb-pencil nb-pick', text: L('scrapOpen') })); var sb = scrapBlock(true); if (sb) right.appendChild(sb); stampHero(); return; }
         e = safe(function () { return SB.Notebook.entry(s, key); }, null);
         if (!e) { right.appendChild(h('p', { class: 'nb-pencil', text: L('empty.' + page) })); return; }
-        kids.push(h('h2', { class: 'nb-etitle', aria: { label: e.title || '' } }, Kc().mk(String(e.title || '').toUpperCase(), 24, { max: 380, say: false })));
-        if (e.contested) kids.push(h('p', { class: 'nb-scrawl' }, Kc().hand(L('contested'), 17, { stroke: TONER })));
-        if (e.finding) kids.push(h('p', { class: 'nb-finding' + confCls(e.conf), text: e.finding }));
+        /* the hero: what you learned, pulled out of the page as a big torn note and stamped on at an angle */
+        kids.push(h('div', { class: 'nb-hero pz-paper', data: { key: String(key) } }, [
+          h('h2', { class: 'nb-etitle', aria: { label: e.title || '' } }, bigTitle(e.title, 50, 360)),
+          e.contested ? h('p', { class: 'nb-scrawl' }, Kc().hand(L('contested'), 17, { stroke: TONER })) : null,
+          e.finding ? h('p', { class: 'nb-finding' + confCls(e.conf), text: e.finding }) : null
+        ]));
         rg = e.range;
         if (rg && num(rg.lo90) && num(rg.hi90)) {
           var br = bracketArt(rg, rg.hi90 * 1.25, e.conf, 300, true);
@@ -266,18 +285,20 @@
           kids.push(h('h3', { class: 'nb-sub', text: L('related') }));
           kids.push(h('div', { class: 'nb-related' }, e.related.map(function (k) {
             var t = safe(function () { return SB.Notebook.entry(s, k).title || k; }, k);
-            return h('button', { type: 'button', class: 'nb-open fx', aria: { label: t }, on: { click: function () { showEntry(k); } } }, Kc().strip(String(t).slice(0, 34)));
+            return h('button', { type: 'button', class: 'nb-open pz-hl', aria: { label: t }, on: { click: function () { showEntry(k); } } }, Kc().strip(String(t).slice(0, 34)));
           })));
         }
         right.appendChild(h('article', { class: 'nb-entry' }, kids));
         var sb2 = scrapBlock(false); if (sb2) right.appendChild(sb2);
+        stampHero();
       }
 
       /* a hand-ruled grid of squares (CROWDS, NIGHTS, HEAR); arrows move between squares, Enter reads one */
       function gridView(grid, cs, lw) {
         var n = grid.colLabels.length, m = grid.rowsLabels.length, cells = [], btns = [], el, start = null, i, j;
+        cs = Math.max(20, Math.min(cs, Math.floor((400 - lw) / n)));   /* the left page holds about 400p of grid: the squares give way, never the page's width */
         el = h('div', { class: 'nb-grid', role: 'grid', aria: { label: pageName(page) },
-                         style: { gridTemplateColumns: lw + 'px repeat(' + n + ', ' + cs + 'px)', gridTemplateRows: '78px repeat(' + m + ', ' + cs + 'px)' } });
+                         style: { gridTemplateColumns: pu(lw) + ' repeat(' + n + ', ' + pu(cs) + ')', gridTemplateRows: pu(78) + ' repeat(' + m + ', ' + pu(cs) + ')' } });
         el.appendChild(h('span', { class: 'nb-gcorner', aria: { hidden: 'true' } }));
         grid.colLabels.forEach(function (c) { el.appendChild(h('span', { class: 'nb-colh', role: 'columnheader', text: c })); });
         for (i = 0; i < m; i++) {
@@ -286,7 +307,7 @@
             var cell = grid.cells[i][j], nw = cell.key && cell.conf > 0 && isNew(safe(function () { return SB.Notebook.range(game(), cell.key).seen; }, null)),
                 word = !cell.key ? L('marks.SELF') : (!cell.conf ? L('marks.NONE') : L('marks.' + (cell.dir === 'WORKS' || cell.dir === 'DOESNT' ? cell.dir : 'DEPENDS'))), b;
             if (!cell.key) { el.appendChild(h('span', { class: 'nb-cell is-self', role: 'gridcell', aria: { label: word } }, D().art(cellMark(cell, cs, false), cs, cs))); continue; }
-            b = h('button', { type: 'button', class: 'nb-cell fx' + (cell.key === openKey ? ' is-open' : ''), role: 'gridcell', tabindex: '-1', data: { key: cell.key, r: i, c: j },
+            b = h('button', { type: 'button', class: 'nb-cell pz-hl' + (cell.key === openKey ? ' is-open' : ''), role: 'gridcell', tabindex: '-1', data: { key: cell.key, r: i, c: j },
               aria: { label: L('cellLabel', { a: grid.rowsLabels[i], b: grid.colLabels[j] }) + ', ' + word + (cell.conf ? ', ' + confName(cell.conf) : '') + (nw ? ', ' + L('newSince') : '') },
               on: { click: (function (k, r, c) { return function () { focusCell = [r, c]; showEntry(k); }; })(cell.key, i, j), keydown: gridKey } },
               D().art(cellMark(cell, cs, nw), cs, cs));
@@ -308,7 +329,7 @@
           nx.setAttribute('tabindex', '0'); focusCell = [r, c];
           try { nx.focus(); } catch (x) { /* fine */ }
         }
-        var wrapG = h('div', { class: 'nb-gridwrap' }, [h('span', { class: 'nb-ruling', aria: { hidden: 'true' }, style: { left: lw + 'px', top: '78px' } }, D().art(ruling(n, m, cs), n * cs + 3, m * cs + 3)), el]);
+        var wrapG = h('div', { class: 'nb-gridwrap' }, [h('span', { class: 'nb-ruling', aria: { hidden: 'true' }, style: { left: pu(lw), top: pu(78) } }, D().art(ruling(n, m, cs), n * cs + 3, m * cs + 3)), el]);
         return wrapG;
       }
 
@@ -320,7 +341,7 @@
         return h('ul', { class: 'nb-notes' }, rows.map(function (r) {
           var ago = weeksAgo(s, r.seen), nw = r.conf > 0 && isNew(r.seen), br = r.range ? bracketArt(r.range, axis[famOf(r.key)], r.conf, 132, false) : null;
           return h('li', { class: 'nb-note' + confCls(r.conf) + (nw ? ' is-new' : '') }, [
-            h('button', { type: 'button', class: 'nb-open fx' + (r.key === openKey ? ' is-open' : ''), data: { key: r.key },
+            h('button', { type: 'button', class: 'nb-open pz-hl' + (r.key === openKey ? ' is-open' : ''), data: { key: r.key },
               aria: { label: (r.label || '') + (r.range ? ', ' + r.range.text : '') + ', ' + confName(r.conf) + (nw ? ', ' + L('newSince') : '') },
               on: { click: function () { showEntry(r.key); } } }, Kc().strip(String(r.label || '').slice(0, 40))),
             br ? h('span', { class: 'nb-range', aria: { hidden: 'true' } }, [D().art(br.svg, br.w, br.h), h('span', { class: 'nb-fig', text: r.range.text })]) : null,
@@ -374,7 +395,7 @@
             add = SB.UI.parts && SB.UI.parts.listDialog, heads = '', i;
         if (cur) {
           for (i = 0; i < Math.min(12, cur.asksLeft || 0); i++) heads += D().head(10 + i * 16, 26, 22, { mode: 'open' });
-          out.push(h('section', { class: 'nb-matter', role: 'group', aria: { label: L('openMatter') } }, [
+          out.push(h('section', { class: 'nb-matter pz-paper', role: 'group', aria: { label: L('openMatter') } }, [
             h('p', { class: 'nb-mattertop' }, [D().art(D().bang(4, 26, 24), 40, 30), Kc().mk(String(L('openMatter')).toUpperCase(), 15, { max: 300 })]),
             h('p', { class: 'nb-finding nb-c3', text: cur.weightText || '' }),
             cur.personName ? h('p', { class: 'nb-who', text: cur.personName + (cur.bandName ? ' / ' + cur.bandName : '') }) : null,
@@ -389,7 +410,7 @@
         }
         if (!list.length) out.push(emptyNote('LIST'));
         else out.push(h('ul', { class: 'nb-scraps' }, list.map(function (x, i) {
-          return h('li', { class: 'nb-scrap', style: { '--r': ((i % 3) - 1) * 1.4 + 'deg' } }, [
+          return h('li', { class: 'nb-scrap pz-paper', style: { '--r': ((i % 3) - 1) * 1.4 + 'deg' } }, [
             h('p', { class: 'nb-scrapname', aria: { label: x.name } }, Kc().mk(String(x.name || '').toUpperCase(), 18, { max: 260, say: false })),
             x.wasIn && x.wasIn.length ? h('p', { class: 'nb-pencil', text: L('listWas') + ' ' + x.wasIn.join(', ') }) : null,
             h('p', { class: 'nb-line', text: SB.text.label('listCondition.' + x.condition) + ' / ' + L('listSince', { n: (x.since || 0) + 1 }) }),
@@ -398,19 +419,19 @@
             Kc().tab({ label: L('listRemove'), say: L('listRemoveSay', { name: x.name }), hot: !!x.conditionMet, on: function () { SB.UI.act(function (st) { return SB.Harm.remove(st, x.personId); }); render(); } })
           ]);
         })));
-        if (typeof add === 'function') out.push(h('button', { type: 'button', class: 'nb-open nb-add fx', aria: { label: L('listAdd') },
+        if (typeof add === 'function') out.push(h('button', { type: 'button', class: 'nb-open nb-add pz-hl', aria: { label: L('listAdd') },
           on: { click: function () { var close = function () {}; close = SB.UI.card(add({ onDone: function () { close(); render(); } }), {}); } } }, Kc().strip(L('listAdd'))));
         return h('div', null, out);
       }
 
       function anyKnown(grid) { return grid.cells.some(function (row) { return row.some(function (c) { return c.key && c.conf > 0; }); }); }
 
-      function render() {
+      function render(how) {
         var s = game(), pg = null, kids = [], name = pageName(page);
         paintTabs();
         SB.UI.clear(left);
         if (!s) { left.appendChild(emptyNote(page)); return; }
-        kids.push(h('h2', { class: 'nb-ptitle', aria: { label: name } }, Kc().mk(String(name).toUpperCase(), 30, { max: 420, say: false })));
+        /* the page title is the hero only while nothing on the page is known yet; once there is an entry, the entry is */
         if (page === 'CHAPTERS') kids.push(SB.UI.story && SB.UI.story.chapters ? SB.UI.story.chapters(s) : emptyNote(page));
         else if (page === 'MOVING') kids.push(movingView());
         else if (page === 'HOW') kids.push(howView());
@@ -423,7 +444,7 @@
               pg.grid.colLabels = SB.Enums.GENRES.map(function (g) { return SB.text.label('genre.' + g + '.name'); });
               pg.grid.rowsLabels = pg.grid.colLabels.slice();
             }
-            if (pg.grid) kids.push(gridView(pg.grid, pg.grid.colLabels.length > 7 ? 28 : 40, page === 'HEAR' ? 120 : 100));
+            if (pg.grid) kids.push(gridView(pg.grid, pg.grid.colLabels.length > 7 ? 28 : 40, page === 'HEAR' ? 110 : (pg.grid.colLabels.length > 7 ? 88 : 100)));
             /* the squares open their own entries; what else the page holds (causes, notes) stays as margin notes */
             var inGrid = {}, rest;
             if (pg.grid) pg.grid.cells.forEach(function (row) { row.forEach(function (c) { if (c.key) inGrid[c.key] = 1; }); });
@@ -431,12 +452,30 @@
             if (rest.length) kids.push(rowsView(rest));
           }
         }
-        if (pg && (pg.grid || (pg.rows && pg.rows.length <= 6))) kids.push(scrapBlockLeft());
+        showTitle = !(openKey || bestKey(pg));
+        kids.unshift(showTitle ? h('h2', { class: 'nb-ptitle is-hero', aria: { label: name } }, bigTitle(name, 84, 400))
+                               : h('h2', { class: 'nb-ptitle', aria: { label: name } }, Kc().mk(up(name), 20, { max: 300, say: false })));
         kids.forEach(function (k) { if (k) left.appendChild(k); });
         showEntry(openKey || bestKey(pg));
+        moves(how);
       }
 
-      render();
+      var showTitle = false, animKey = null;
+      /* the moves (js/ui/finish.js): a new page tears across, the notes slap down one after another when the page is new */
+      function moves(how) {
+        var F = SB.Finish, rows, key = page + ':' + left.querySelectorAll('.nb-notes > li, .nb-scraps > li, .nb-charts > li, .nb-cell').length;
+        if (!F) return;
+        if (how === 'pick') { F.move(left, 'wipe'); F.move(right, 'wipe'); }
+        if (key !== animKey) {
+          rows = Array.prototype.slice.call(left.querySelectorAll('.nb-notes > li, .nb-scraps > li, .nb-charts > li, .nb-matter'));
+          F.stagger(rows, firstDraw ? 3 : 0);
+          rows.forEach(function (li) { li.classList.add('mv-slap'); });
+        }
+        animKey = key; firstDraw = false;
+      }
+
+      F0(left); F0(right);
+      render('mount');
       return { update: function () { render(); }, unmount: function () {} };
     }
   });

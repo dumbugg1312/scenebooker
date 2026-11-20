@@ -207,9 +207,40 @@
     roles.slice(0, max).forEach(function (r) { var p = POOL[r]; out.push(p[hash(c.id + ':' + r) % p.length]); });
     return out;
   }
-  var PAPERS = ['canary', 'pink', 'blue', 'green', 'salmon', 'lilac', 'goldenrod'];
-  function bandPaper(c) { return PAPERS[hash(c.id + ':paper') % PAPERS.length]; }
   function kit() { return SB.UI.Kit; }
+  /* the photos' copy stock: the flyers' papers (css/finish.css --pp-blue, --pp-green, --pp-salmon, --pp-buff) */
+  var STOCK = ['#c2d0dc', '#cde3bd', '#e4b49b', '#eadbc7'];
+  function bandStock(c) { return STOCK[hash(c.id + ':paper') % STOCK.length]; }
+
+  /** words(label, items, cls): quiet typed filter words; the one you are on is a strip of black tape (css .rb-word) */
+  function words(label, items, cls) {
+    return h('div', { class: 'rb-words' + (cls ? ' ' + cls : ''), role: 'group', aria: { label: label } }, items.map(function (it) {
+      return h('button', { type: 'button', class: 'rb-word pz-hl' + (it.on ? ' is-on' : ''), data: { fk: it.fk }, aria: { pressed: it.on ? 'true' : 'false', label: it.label || it.text },
+                           on: { click: it.onClick } }, String(it.text).toUpperCase());
+    }));
+  }
+
+  /** nameArt(dd, name, seed, maxW): the name in marker, as big as fits, broken over up to three lines at its words */
+  function nameArt(dd, name, seed, maxW) {
+    var t = String(name).toUpperCase().split(/\s+/), size, lines, cur, i, w, ok, lh, out = '', wide = 0, art;
+    for (size = 64; size >= 26; size -= 4) {
+      lines = []; cur = ''; ok = true;
+      for (i = 0; i < t.length && ok; i++) {
+        w = cur ? cur + ' ' + t[i] : t[i];
+        if (dd.mw(w, size) <= maxW) cur = w;
+        else if (!cur) ok = false;
+        else { lines.push(cur); cur = t[i]; if (dd.mw(cur, size) > maxW) ok = false; }
+      }
+      if (ok) { lines.push(cur); if (lines.length <= 3) break; }
+      lines = null;
+    }
+    if (!lines) { size = 26; lines = [t.join(' ')]; }
+    lh = size * 1.22;
+    lines.forEach(function (ln, k) { out += dd.marker(ln, 6, size * 1.1 + k * lh, size, { seed: seed + k, maxWidth: maxW }); wide = Math.max(wide, Math.min(maxW, dd.mw(ln, size))); });
+    art = dd.art(out, Math.ceil(wide) + 16, Math.ceil(lh * lines.length) + 10);
+    art.nh = Math.ceil(lh * lines.length) + 10;
+    return art;
+  }
 
   function stickerLabel(c) {
     var d = lastPlayed(c), stg = c.trust && c.trust.stage;
@@ -226,7 +257,8 @@
   SB.UI.screen('bands', {
     rail: 'bands', title: 'ui.bands.title', full: false,
     mount: function (root, params) {
-      var tab = params && params.tab === 'touring' ? 'touring' : 'local', q = '', genre = '', st = '', wrap = h('section', { class: 'cb-bands' }), body = h('div', { class: 'cb-piles' }), cardsCache = [], pileTabs = h('div', { class: 'cb-piletabs' });
+      var tab = params && params.tab === 'touring' ? 'touring' : 'local', q = '', genre = '', st = '', wrap = h('section', { class: 'cb-bands' }), body = h('div', { class: 'cb-piles' }), cardsCache = [],
+          pileTabs = h('div', { class: 'cb-piletabs rb-piletabs' }), heroBox = h('div', { class: 'rb-herobox' }), heroKey = null, heroN = 0;
       root.appendChild(wrap);
 
       function metTouring(s, id, c) {
@@ -235,7 +267,7 @@
       }
 
       function render() {
-        var s = game(), ids = [], dd = D(), search;
+        var s = game(), ids = [], search;
         SB.UI.clear(wrap);
         if (!s) { wrap.appendChild(C().Empty({})); return; }
         try { ids = SB.Bands.list(s, { local: tab === 'local' }); } catch (e) { ids = []; }
@@ -243,39 +275,55 @@
         if (tab === 'touring') cardsCache = cardsCache.filter(function (c) { return metTouring(s, c.id, c); });
         search = kit().input({ label: L('search'), value: q, type: 'search', placeholder: L('search'), fk: 'find', cls: 'rb-find', onInput: function (v) { q = v; piles(); } });
         wrap.appendChild(h('h1', { class: 'cb-sr', text: L('title') }));
-        wrap.appendChild(h('div', { class: 'cb-sheethead' }, [
-          dd.tabs({ label: L('title'), items: ['local', 'touring'].map(function (k) {
-            return { text: k === 'local' ? L('tabLocal') : L('tabTouring'), label: k === 'local' ? L('tabLocalL') : L('tabTouringL'), on: tab === k, fk: 'tab-' + k, onClick: function () { tab = k; genre = ''; render(); } };
-          }), size: 18 }),
-          search,
-          dd.tabs({ label: L('stateL', { s: '' }), items: [['active', 'stateActive'], ['out', 'stateOut'], ['ended', 'stateEnded']].map(function (x) {
-            var t = L(x[1]);
-            return { text: t, label: L('stateL', { s: t.toLowerCase() }), on: st === x[0], fk: 'st-' + x[0], onClick: function () { st = st === x[0] ? '' : x[0]; render(); } };
-          }), size: 17 })
+        wrap.appendChild(h('div', { class: 'cb-sheethead rb-top' }, [
+          heroBox,
+          h('div', { class: 'rb-slip pz-paper' }, [
+            h('div', { class: 'rb-row' }, [
+              words(L('title'), ['local', 'touring'].map(function (k) {
+                return { text: k === 'local' ? L('tabLocal') : L('tabTouring'), label: k === 'local' ? L('tabLocalL') : L('tabTouringL'), on: tab === k, fk: 'tab-' + k, onClick: function () { tab = k; genre = ''; render(); } };
+              })),
+              search,
+              words(L('stateL', { s: '' }), [['active', 'stateActive'], ['out', 'stateOut'], ['ended', 'stateEnded']].map(function (x) {
+                var t = L(x[1]);
+                return { text: t, label: L('stateL', { s: t.toLowerCase() }), on: st === x[0], fk: 'st-' + x[0], onClick: function () { st = st === x[0] ? '' : x[0]; render(); } };
+              }))
+            ]),
+            pileTabs
+          ])
         ]));
-        wrap.appendChild(pileTabs);
         wrap.appendChild(body);
         piles();
       }
 
+      /* the one loud thing: the filter you are on, as a big pasted headline with how many it shows; stamped on when the filter changes */
+      function hero(scope, n, key) {
+        var el = h('h2', { class: 'rb-hero pz-paper' }, [h('span', { class: 'rb-hero-w', text: String(scope).toUpperCase() }), h('span', { class: 'rb-hero-n', text: String(n) })]),
+            F = SB.Finish, nEl = el.lastChild;
+        SB.UI.clear(heroBox); heroBox.appendChild(el);
+        if (F && key !== heroKey) {
+          F.move(el, 'stamp', { delay: heroKey === null ? 220 : 0, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: el } });
+          F.countUp(nEl, n, { from: heroKey === null ? 0 : heroN, delay: (heroKey === null ? 220 : 0) + 83 });
+        }
+        heroKey = key; heroN = n;
+      }
+
       function bandCard(c) {
         var r = SB.rng.make('tilt:' + c.id).range(-1.2, 1.2), d = lastPlayed(c), down = c.listedMembers > 0, ended = c.stage === 'ENDED',
-            tag = ended ? L('ended') : c.out ? L('out') : down ? 'ON YOUR LIST' : c.playedOut ? 'PLAYED OUT' : '',
+            tag = down ? 'ON YOUR LIST' : c.playedOut && !ended && !c.out ? 'PLAYED OUT' : '',
             meta = [c.home || '', tierWord(c.tierPublic)].filter(Boolean).join(' / ');
-        return h('button', { type: 'button', class: 'rb-card kt-card kt-card--' + (down ? 'bone' : 'white') + (ended || c.playedOut ? ' is-dim' : ''), style: { '--kt-rot': r.toFixed(2) + 'deg' },
+        return h('button', { type: 'button', class: 'rb-card pz-paper pz-hl' + (down ? ' is-down' : '') + (ended || c.playedOut ? ' is-dim' : ''), style: { '--kt-rot': r.toFixed(2) + 'deg' },
           data: { fk: 'band-' + c.id }, aria: { label: stickerLabel(c) }, on: { click: function () { SB.UI.go('band', { bandId: c.id }); } } }, [
-          kit().tape({ at: 'top', w: 70 }),
-          kit().photo({ ids: bandPhotoIds(c, 2), w: 224, h: 150, paper: down ? 'bone' : bandPaper(c), seed: c.id }),
-          kit().label(String(c.name).toUpperCase(), null, { tag: 'span', cls: 'rb-name' }),
+          kit().photo({ ids: bandPhotoIds(c, 2), w: 224, h: 150, paper: down ? STOCK[3] : bandStock(c), seed: c.id }),
+          down ? h('span', { class: 'rb-name', aria: { hidden: 'true' }, text: String(c.name).toUpperCase() }) : null,
           h('span', { class: 'rb-mark', aria: { hidden: 'true' } }, D().art(sticker(c, 210), 210, Math.round(210 * 0.42) + 8)),
-          h('span', { class: 'kt-type rb-meta', aria: { hidden: 'true' }, text: meta }),
-          h('span', { class: 'kt-type rb-last', aria: { hidden: 'true' }, text: d === null ? 'never played for you' : 'last: ' + SB.time.fmt(d, 'short') }),
+          h('span', { class: 'rb-meta', aria: { hidden: 'true' }, text: meta }),
+          h('span', { class: 'rb-last', aria: { hidden: 'true' }, text: d === null ? 'never played for you' : 'last: ' + SB.time.fmt(d, 'short') }),
           tag ? h('span', { class: 'rb-tag', aria: { hidden: 'true' }, text: tag }) : null
         ]);
       }
 
       function piles() {
-        var dd = D(), needle = q.trim().toLowerCase(), groups = {}, keys, cards;
+        var needle = q.trim().toLowerCase(), groups = {}, keys, cards, shown = 0, scope, key, F = SB.Finish, first;
         SB.UI.clear(body); SB.UI.clear(pileTabs);
         cards = (cardsCache || []).filter(function (c) {
           if (needle && c.name.toLowerCase().indexOf(needle) < 0) return false;
@@ -284,22 +332,33 @@
           if (st === 'active' && (c.stage === 'ENDED' || c.out || c.playedOut)) return false;
           return true;
         });
-        if (!cards.length) { body.appendChild(piece('cb-hintslip', 'white', [h('p', { class: 'cb-typed', text: tab === 'touring' && !(cardsCache || []).length ? L('noTouring') : L('none') })])); return; }
         cards.forEach(function (c) { (groups[c.genre] = groups[c.genre] || []).push(c); });
         keys = Object.keys(groups).sort(function (a, b) { return groups[b].length - groups[a].length || (a < b ? -1 : 1); });
-        if (keys.length > 1) pileTabs.appendChild(dd.tabs({ label: L('allPiles'), items: keys.map(function (g) {
+        if (genre && !groups[genre]) genre = '';
+        shown = genre ? groups[genre].length : cards.length;
+        scope = genre ? genreName(genre) : (tab === 'touring' ? L('tabTouring') : L('tabLocal'));
+        key = tab + '|' + genre + '|' + st;
+        hero(scope, shown, key);
+        if (!cards.length) { body.appendChild(piece('cb-hintslip', 'white', [h('p', { class: 'cb-typed', text: tab === 'touring' && !(cardsCache || []).length ? L('noTouring') : L('none') })])); return; }
+        if (keys.length > 1) pileTabs.appendChild(words(L('allPiles'), keys.map(function (g) {
           return { text: genreName(g), label: genre === g ? L('allPiles') : L('pileL', { g: genreName(g) }), on: genre === g, fk: 'pile-' + g,
                    onClick: function () { genre = genre === g ? '' : g; piles(); var el = pileTabs.querySelector('[data-fk="pile-' + g + '"]'); if (el) el.focus(); } };
-        }), size: 17 }));
+        }), 'rb-words--piles'));
         keys.forEach(function (g) {
-          var list = groups[g].sort(function (a, b) { return (lastPlayed(b) || -1) - (lastPlayed(a) || -1) || (a.name < b.name ? -1 : 1); }), name = genreName(g).toUpperCase(),
-              trend = list[0] && list[0].trend;
+          var list = groups[g].sort(function (a, b) { return (lastPlayed(b) || -1) - (lastPlayed(a) || -1) || (a.name < b.name ? -1 : 1); }), trend = list[0] && list[0].trend;
           if (genre && genre !== g) return;
           body.appendChild(h('div', { class: 'cb-pilebox rb-pile' }, [
-            h('div', { class: 'rb-pilehead' }, [kit().label(name, String(list.length), { tag: 'h2' }), trend === 'UP' ? h('span', { class: 'rb-trend', text: '^ going up' }) : trend === 'DOWN' ? h('span', { class: 'rb-trend', text: 'v slipping' }) : null]),
+            genre ? null : h('div', { class: 'rb-pilehead' }, [h('h2', { class: 'rb-pilename' }, [genreName(g).toUpperCase() + ' ', h('span', { class: 'rb-pilen', text: String(list.length) })]),
+              trend === 'UP' ? h('span', { class: 'rb-trend', text: '^ going up' }) : trend === 'DOWN' ? h('span', { class: 'rb-trend', text: 'v slipping' }) : null]),
             h('div', { class: 'rb-grid' }, list.map(function (c) { return bandCard(c); }))
           ]));
         });
+        if (F && key !== body.getAttribute('data-key')) {
+          first = Array.prototype.slice.call(body.querySelectorAll('.rb-card')).slice(0, 9);
+          F.stagger(first, 3);
+          first.forEach(function (el) { el.classList.add('mv-slap'); });
+        }
+        body.setAttribute('data-key', key);
       }
 
       render();
@@ -317,7 +376,7 @@
     inner += dd.type(label, 14, 22, 10, { bold: true });
     if (!v) {
       return h('li', { class: 'cb-know rb-blank', role: 'img', aria: { label: L('knowL', { what: label.toLowerCase(), text: L('dunno') }) } }, [
-        kit().label(label.toUpperCase(), null, { tag: 'span', cls: 'rb-unk' }), h('span', { class: 'kt-pencil rb-pencil', text: 'not seen yet' })]);
+        h('span', { class: 'rb-unk', text: label.toUpperCase() }), h('span', { class: 'rb-pencil', text: 'not seen yet' })]);
     } else if (kind === 'heads') {
       var hi = Math.max(1, v.hi90 || 0), unit = Math.max(1, Math.ceil(hi / 14)), n = Math.min(14, Math.round(hi / unit)), lo = Math.round((v.lo50 || 0) / unit), k;
       for (k = 0; k < n; k++) inner += dd.head(18 + k * 11, 54, 15, k < lo ? { mode: 'solid' } : { mode: 'dots', op: Math.max(0.3, 1 - (k - lo + 1) / (n - lo + 2)) });
@@ -336,14 +395,14 @@
   SB.UI.screen('band', {
     rail: 'bands', title: 'ui.bands.bandTitle', full: false,
     mount: function (root, params) {
-      var bandId = params && params.bandId, wrap = h('section', { class: 'cb-band' + (params && params.noFlip ? '' : ' is-flipping') });
+      var bandId = params && params.bandId, wrap = h('section', { class: 'cb-band' }), shown = false;
       root.appendChild(wrap);
 
       function asks(s, c) {
         var list = [], dd = D();
         try { list = SB.Shows.list(s, { status: ['DRAFT', 'CONFIRMED'] }); } catch (e) { list = []; }
-        if (!list.length) return piece('cb-askpiece', 'white', [dd.word(L('askToPlay'), 16), h('p', { class: 'cb-typed cb-small', text: L('noShows') })]);
-        return piece('cb-askpiece', 'white', [dd.word(L('askToPlay'), 16), h('div', { class: 'cb-row cb-miniclips', role: 'group', aria: { label: L('askToPlay') } }, list.slice(0, 6).map(function (x) {
+        if (!list.length) return piece('cb-askpiece', 'white', [dd.word(L('askToPlay'), 14), h('p', { class: 'cb-typed cb-small', text: L('noShows') })]);
+        return piece('cb-askpiece', 'white', [dd.word(L('askToPlay'), 14), h('div', { class: 'cb-row cb-miniclips', role: 'group', aria: { label: L('askToPlay') } }, list.slice(0, 6).map(function (x) {
           var d = SB.time.date(x.day), rn = x.roomId && s.rooms[x.roomId] ? s.rooms[x.roomId].name : '';
           return dd.thing({ cls: 'cb-miniclip', label: L('askFor', { name: c.name, d: SB.time.fmt(x.day, 'short'), room: rn ? ', ' + rn : '' }), fk: 'ask-' + x.id,
             svg: dd.clipboard(64, 80, 'mc' + x.id) + dd.marker(d.m + '/' + d.d, 32, 56, 14, { anchor: 'middle', seed: 'mcd' + x.id }), w: 64, h: 80, strip: d.m + '/' + d.d, stripSize: 9,
@@ -352,7 +411,7 @@
       }
 
       function render() {
-        var s = game(), c = null, tr = null, flags = null, hist = null, recs = [], dd = D(), left, right, ex, tv, ts, nameArt;
+        var s = game(), c = null, tr = null, flags = null, hist = null, recs = [], dd = D(), left, right, ex, tv, ts, plate, na, F = SB.Finish, first;
         SB.UI.clear(wrap);
         if (!s || !bandId) { wrap.appendChild(C().Empty({ text: L('none') })); return; }
         try { c = SB.Bands.card(s, bandId); tr = SB.Bands.trust(s, bandId); } catch (e) { c = null; }
@@ -364,13 +423,15 @@
 
         /* the front, peeking: its sticker, the name in marker, where from and how long */
         ex = [c.home ? L('home', { home: c.home }) : '', c.years === 1 ? L('year') : L('years', { n: c.years }), tierWord(c.tierPublic), stageWord(c.stage)].filter(Boolean).join(' / ');
-        nameArt = dd.marker(String(c.name).toUpperCase(), 4, 36, 32, { maxWidth: 330, seed: 'bn' + c.id });
         left = [
           piece('cb-frontpiece', 'white', [
-            kit().tape({ at: 'tl' }), kit().tape({ at: 'tr' }),
-            kit().photo({ ids: bandPhotoIds(c, 3), w: 330, h: 240, paper: bandPaper(c), seed: c.id, alt: c.name + ', photo', rot: -0.6 }),
-            h('div', { class: 'rb-markrow' }, dd.art(sticker(c, 240), 240, Math.round(240 * 0.42) + 8)),
-            h('h1', { class: 'cb-bandname', aria: { label: c.name } }, dd.art(nameArt, 340, 46)),
+            kit().tape({ at: 'tl' }),
+            /* the one loud thing: the name across the foot of their photo, big and at an angle, stamped on */
+            h('div', { class: 'rb-shot', style: { '--nh': String((na = nameArt(dd, c.name, 'bn' + c.id, 300)).nh) } }, [
+              kit().photo({ ids: bandPhotoIds(c, 3), w: 330, h: 240, paper: bandStock(c), seed: c.id, alt: c.name + ', photo', rot: -0.6 }),
+              plate = h('h1', { class: 'rb-nameplate pz-paper', aria: { label: c.name } }, na)
+            ]),
+            h('div', { class: 'rb-markrow' }, dd.art(sticker(c, 180), 180, Math.round(180 * 0.42) + 8)),
             h('p', { class: 'cb-typed', text: ex }),
             h('p', { class: 'cb-typed cb-small', text: [styleName(c), c.genre2 ? genreName(c.genre2) : ''].filter(Boolean).join(' + ').toUpperCase() + (c.trend === 'UP' ? '  ^' : c.trend === 'DOWN' ? '  v' : '') }),
             dd.listen ? dd.listen({ band: c, text: L('listen'), stopText: L('listenStop'), label: L('listenL', { name: c.name }), fk: 'hear-' + c.id }) : null,
@@ -397,10 +458,10 @@
         /* the back: the people, what you know, with you, history */
         right = [
           piece('cb-people', 'white', [
-            dd.word(L('members'), 18),
+            dd.word(L('members'), 14),
             h('ul', { class: 'rb-crew' }, c.members.map(function (m) {
               return h('li', { class: 'rb-member' + (m.listed ? ' is-listed' : ''), aria: { label: m.name + ', ' + lower(m.instrument) + (num(m.since) && m.since >= 1900 ? ', ' + L('since', { y: m.since }) : '') + (m.founder ? ', ' + L('founder') : '') + (m.listed ? ', on your list' : '') } },
-                [kit().label(String(m.name).toUpperCase(), lower(m.instrument), { tag: 'span' }), m.founder ? h('span', { class: 'kt-pencil', text: L('founder') }) : null]);
+                [h('span', { class: 'rb-who' }, [h('span', { class: 'rb-wn', text: String(m.name).toUpperCase() }), h('span', { class: 'rb-wi', text: lower(m.instrument) })]), m.founder ? h('span', { class: 'rb-pencil', text: L('founder') }) : null]);
             })),
             flags && flags.listed && flags.listed.length ? h('p', { class: 'cb-typed cb-listed', text: flags.text || L('listedLine') }) : null,
             c.past && c.past.length ? h('div', { class: 'cb-pastppl' }, [h('p', { class: 'kt-small', text: L('past') }), h('ul', { class: 'rb-past' }, c.past.map(function (m) {
@@ -408,7 +469,7 @@
             }))]) : null
           ], { label: L('members') }),
           h('div', { class: 'cb-knowwrap' }, [
-            dd.word(L('know'), 22, { cls: 'cb-onboard', ink: '#e7ddc4' }),
+            dd.word(L('know'), 16, { cls: 'cb-onboard', ink: '#eadbc7' }),
             h('ul', { class: 'cb-knows' }, [
               knowNote(L('drawL'), c.draw, 'heads', 0), knowNote(L('liveL'), c.live, 'heads', 1), knowNote(L('crossL'), c.cross, 'fill', 2),
               knowNote(L('relL'), c.rel, 'fill', 3), knowNote(L('promoL'), c.promo, 'fill', 4)]),
@@ -420,7 +481,7 @@
             ])
           ]),
           piece('cb-withyou', 'bone', [
-            dd.word(L('withYou'), 18),
+            dd.word(L('withYou'), 14),
             c.shows.length ? h('div', { class: 'cb-flyrow' }, c.shows.map(function (x, i) {
               var rec = recs.filter(function (r) { return r.showId === x.showId; })[0], thumb = null, dt = num(x.day) ? SB.time.date(x.day).m + '/' + SB.time.date(x.day).d : '?';
               if (rec && rec.flyer && SB.UI.parts && SB.UI.parts.flyerThumb) { try { thumb = SB.UI.parts.flyerThumb(rec.flyer, 56); } catch (e5) { thumb = null; } }
@@ -437,10 +498,18 @@
         ];
         wrap.appendChild(h('div', { class: 'cb-bandtop' }, [dd.act('<', L('backToBands'), 'back', function () { SB.UI.go('bands', c.local ? {} : { tab: 'touring' }); }, { size: 14 })]));
         wrap.appendChild(h('div', { class: 'cb-bandcols' }, [h('div', { class: 'cb-bandfront' }, left), h('div', { class: 'cb-bandback' }, right)]));
+        /* first time on the page: the name is stamped on, the papers slap down one after another (js/ui/finish.js) */
+        if (F && !shown) {
+          shown = true;
+          F.move(plate, 'stamp', { delay: 220, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: plate } });
+          first = Array.prototype.slice.call(wrap.querySelectorAll('.cb-bandfront > .cb-piece, .cb-bandback > .cb-piece, .cb-bandback > .cb-knowwrap'));
+          F.stagger(first, 3);
+          first.forEach(function (el) { el.classList.add('mv-slap'); });
+        }
       }
 
       render();
-      return { update: function () { wrap.classList.remove('is-flipping'); keepFocus(root, render); }, unmount: function () { if (SB.Audio) SB.Audio.stop(); } };
+      return { update: function () { keepFocus(root, render); }, unmount: function () { if (SB.Audio) SB.Audio.stop(); } };
     }
   });
 })(SB);

@@ -52,7 +52,20 @@ SB.module('Cutscene', function (SB) {
     if (cur) out.push(cur);
     return out;
   }
-  function dpr() { return Math.min(window.devicePixelRatio || 1, 1.5); }
+  /* the stage is 1280 x 800 of --p (css/finish.css) whatever the window is: sizes here are in those units, shown through
+     calc(var(--p) * n), and canvases raster at SB.Finish.res() so they stay sharp at any size */
+  function res() { return SB.Finish && SB.Finish.res ? SB.Finish.res() : 1; }
+  function P(n) { return 'calc(var(--p) * ' + (Math.round(n * 100) / 100) + ')'; }
+  function sized(svg, w, h) {
+    svg.setAttribute('width', w); svg.setAttribute('height', h);
+    svg.style.width = P(w); svg.style.height = P(h);
+  }
+  function mv(e, name, delay) {
+    if (!e || !SB.Finish) return e;
+    if (delay) e.style.setProperty('--mv-d', delay + 'ms');
+    e.classList.add('mv-' + name);
+    return e;
+  }
 
   /* ---------------- lettering ---------------- */
 
@@ -119,7 +132,7 @@ SB.module('Cutscene', function (SB) {
     var bx = burst ? W * 0.2 : 4, by = burst ? H * 0.25 : 4, VW = W + bx * 2, VH = H + by * 2 + (burst ? 0 : tailH);
     var svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', '0 0 ' + VW.toFixed(0) + ' ' + VH.toFixed(0));
-    svg.setAttribute('width', VW.toFixed(0)); svg.setAttribute('height', VH.toFixed(0));
+    sized(svg, +VW.toFixed(0), +VH.toFixed(0));
     svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('class', 'cs-balloon');
     var g = document.createElementNS(NS, 'g'); g.setAttribute('transform', 'translate(' + bx.toFixed(1) + ' ' + by.toFixed(1) + ')');
     var shape = document.createElementNS(NS, 'path');
@@ -153,7 +166,7 @@ SB.module('Cutscene', function (SB) {
   }
 
   function caption(text, cls) {
-    var p = el('p', 'cs-cap' + (cls ? ' ' + cls : ''));
+    var p = el('p', 'cs-cap pz-paper' + (cls ? ' ' + cls : ''));
     el('span', null, p, text);
     return p;
   }
@@ -175,13 +188,20 @@ SB.module('Cutscene', function (SB) {
     return x;
   }
   function picture(frame, x, cssW, cssH, cls, sized) {
-    var cv = el('canvas', cls || 'cs-art'), s = dpr();
+    var cv = el('canvas', cls || 'cs-art'), s = Math.min(res(), 4000 / Math.max(cssW, cssH, 1));
     cv.width = Math.round(cssW * s); cv.height = Math.round(cssH * s);
-    if (sized) { cv.style.width = Math.round(cssW) + 'px'; cv.style.height = Math.round(cssH) + 'px'; }
+    if (sized) { cv.style.width = P(cssW); cv.style.height = P(cssH); }
     cv.setAttribute('aria-hidden', 'true');
     if (SB.Scenes && SB.Scenes.draw) {
+      /* the photos this picture needs that are not in yet: the picture stays hidden until they are (it draws itself
+         again when they land), so it shows whole, never its stand-in first; a slow load shows the loading tape */
+      var need = SB.Scenes.need ? SB.Scenes.need(frame.art || 'POSTCARD_FRONT', SB.util && SB.util.copy ? SB.util.copy(x) : x) : [];
       try { SB.Scenes.draw(cv, frame.art || 'POSTCARD_FRONT', x); }
       catch (e) { if (SB.log) SB.log('warn', 'SB.Cutscene', 'art ' + frame.art + ': ' + e.message); }
+      if (need.length && SB.Boot && SB.Boot.hold) {
+        cv.classList.add('cs-wait');
+        SB.Boot.hold(need, function () { cv.classList.remove('cs-wait'); });
+      }
     }
     return cv;
   }
@@ -195,30 +215,34 @@ SB.module('Cutscene', function (SB) {
     if (kind !== 'SCENE' && kind !== 'DROP') kind = 'PANELS';
     var counts = {}, ctxs = frames.map(function (f) { return artCtx(f, slots, counts); });
     var still = reduced(), idx = -1, done = false, wasSkipped = false, lastFocus = document.activeElement;
-    var narrow = window.innerWidth < 760;
+    var narrow = false;
     var key = cutscene.key || '';
 
     var root = el('div', 'cs-root cs-k-' + kind.toLowerCase() + (still ? ' cs-still' : ''));
+    /* the stage: 16:10 and letterboxed, like every full screen; everything of the cutscene is on it */
+    var box = el('div', 'cs-box cs-k-' + kind.toLowerCase() + (still ? ' cs-still' : ''), root);
+    if (kind !== 'SCENE' && !still) mv(box, 'wipe');
     root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true');
     root.setAttribute('aria-label', fill(cutscene.title, slots) || 'Cutscene');
     root.tabIndex = -1;
-    var stage = el('div', 'cs-stage', root);
-    var live = el('div', 'cs-sr', root); live.setAttribute('aria-live', 'polite');
+    var stage = el('div', 'cs-stage', box);
+    var live = el('div', 'cs-sr', box); live.setAttribute('aria-live', 'polite');
     if (cutscene.title) {
-      var tt = el('div', 'cs-title', root);
+      var tt = el('div', 'cs-title', box);
       var tl = lettering(fill(cutscene.title, slots), 26, 28, 'title:' + key);
       tl.svg.setAttribute('viewBox', '0 -2 ' + Math.ceil(tl.w + 4) + ' ' + Math.ceil(tl.h + 8));
-      tl.svg.setAttribute('width', Math.ceil(tl.w + 4)); tl.svg.setAttribute('height', Math.ceil(tl.h + 8)); tl.svg.setAttribute('aria-hidden', 'true');
+      sized(tl.svg, Math.ceil(tl.w + 4), Math.ceil(tl.h + 8)); tl.svg.setAttribute('aria-hidden', 'true');
+      if (!still) mv(tt, 'slap', 300);
       tt.appendChild(tl.svg);
     }
-    var bar = el('div', 'cs-bar', root);
-    var strip = el('span', 'cs-strip', bar);
+    var bar = el('div', 'cs-bar', box);
+    var strip = el('span', 'cs-strip pz-paper', bar);
     var count = el('span', 'cs-count', strip);
     var hint = el('span', 'cs-hint', strip, 'click or space');
     void hint;
-    var nextBtn = el('button', 'cs-btn cs-next', bar, 'next');
+    var nextBtn = el('button', 'cs-btn cs-next pz-hl', bar, 'next');
     nextBtn.type = 'button';
-    var skipBtn = el('button', 'cs-btn cs-skip', root, 'skip');
+    var skipBtn = el('button', 'cs-btn cs-skip pz-hl', box, 'skip');
     skipBtn.type = 'button'; skipBtn.setAttribute('aria-label', 'Skip this cutscene');
 
     var spread = null, spreadCount = 0, perSpread = narrow ? 1 : (frames.length === 4 ? 2 : 3);
@@ -231,21 +255,22 @@ SB.module('Cutscene', function (SB) {
     }
     function words(f, x, into, base) {
       var t = base || 0;
-      if (f.caption) { var cp = caption(capFill(f.caption, slots)); cp.style.animationDelay = t + 'ms'; into.appendChild(cp); t += 500; }
+      if (f.caption) { var cp = caption(capFill(f.caption, slots)); if (!still) mv(cp, 'slap', t); into.appendChild(cp); t += 500; }
       (f.lines || []).forEach(function (ln, i) {
         var sp = speech(ln, slots, x, key + ':' + idx + ':' + i, i % 2 ? 'right' : 'left');
         sp.classList.add(i % 2 ? 'cs-right' : 'cs-left');
-        sp.style.animationDelay = t + 'ms'; t += 700;
+        if (!still) mv(sp, 'slap', t); t += 700;
         into.appendChild(sp);
       });
     }
 
     function showScene(f, x) {
       var fr = el('div', 'cs-frame', stage);
+      if (!still) mv(fr, 'wipe');
       /* the scene is a taped photo print that fills the stage; the canvas is drawn at the print's shape and zoomed so the lit part fills it */
-      var print = el('div', 'cs-print', fr), inner = el('div', 'cs-print-in', print);
-      var PW = Math.max(320, window.innerWidth - (narrow ? 40 : 108)), PH = Math.max(240, window.innerHeight - (narrow ? 200 : 188)), Z = 1.35;
-      var cv = picture(f, x, Math.min(PW * Z, 2000), Math.min(PH * Z, 1400), 'cs-art');
+      var print = el('div', 'cs-print pz-paper', fr), inner = el('div', 'cs-print-in', print);
+      var PW = 1280 - 108, PH = 800 - 188, Z = 1.35;      /* the print's shape, in --p */
+      var cv = picture(f, x, PW * Z, PH * Z, 'cs-art');
       var r = SB.rng.make('pan:' + key + ':' + idx);
       cv.style.setProperty('--px0', r.range(-3, 3).toFixed(2) + '%'); cv.style.setProperty('--py0', r.range(-2, 2).toFixed(2) + '%');
       cv.style.setProperty('--px1', r.range(-3, 3).toFixed(2) + '%'); cv.style.setProperty('--py1', r.range(-2, 2).toFixed(2) + '%');
@@ -253,46 +278,48 @@ SB.module('Cutscene', function (SB) {
       var w = el('div', 'cs-words', fr);
       words(f, x, w, still ? 0 : 900);
       var old = stage.querySelectorAll('.cs-frame');
-      for (var i = 0; i < old.length - 1; i++) (function (o) { o.classList.add('cs-out'); setTimeout(function () { if (o.parentNode) o.parentNode.removeChild(o); }, still ? 0 : 1000); })(old[i]);
+      for (var i = 0; i < old.length - 1; i++) (function (o) { setTimeout(function () { if (o.parentNode) o.parentNode.removeChild(o); }, still ? 0 : 300); })(old[i]);
     }
 
     function showPanel(f, x) {
       if (!spread || spreadCount >= perSpread) {
-        if (spread) { var o = spread; o.classList.add('cs-turn'); if (SB.CutsceneAudio) SB.CutsceneAudio.turn(kind); setTimeout(function () { if (o.parentNode) o.parentNode.removeChild(o); }, still ? 0 : 600); }
+        if (spread) { var o = spread; if (!still) { o.classList.remove('mv-slap', 'mv-wipe'); mv(o, 'wipe-out'); } if (SB.CutsceneAudio) SB.CutsceneAudio.turn(kind); setTimeout(function () { if (o.parentNode) o.parentNode.removeChild(o); }, still ? 0 : 260); }
         spread = el('div', 'cs-spread', stage); spreadCount = 0;
         var left = frames.length - idx; spread.style.setProperty('--n', Math.min(perSpread, left));
       }
       spreadCount++;
       var r = SB.rng.make('panel:' + key + ':' + idx);
       var fig = el('figure', 'cs-panel', spread);
+      if (!still) { fig.style.setProperty('--i', spreadCount - 1); mv(fig, 'slap', 120); }
       fig.style.setProperty('--tilt', r.range(-2.2, 2.2).toFixed(2) + 'deg');
       fig.style.setProperty('--from', (r.chance(0.5) ? 1 : -1) * r.range(8, 14).toFixed(1) + 'deg');
       var says = el('div', 'cs-says', fig);
-      var pic = el('div', 'cs-pic', fig);
+      var pic = el('div', 'cs-pic pz-paper', fig);
       if (f.caption) fig.appendChild(caption(capFill(f.caption, slots), 'cs-cap-panel'));
-      var cssW = narrow ? Math.min(window.innerWidth - 48, 520) : Math.min((window.innerWidth - 120) / perSpread - 40, 760);
-      cssW = Math.min(cssW, (window.innerHeight - 230) / 0.75);
+      var cssW = Math.min((1280 - 120) / perSpread - 40, 760);
+      cssW = Math.min(cssW, (800 - 230 - 20) / 0.75);
       var px = {}, k; for (k in x) px[k] = x[k];
       px.paper = ['canary', 'pink', 'blue', 'green', 'salmon', 'lilac'][(idx + (key.length || 0)) % 6]; /* a photocopy on coloured copy paper, the same pass as the night scene */
       pic.appendChild(picture(f, px, cssW, cssW * 0.75, 'cs-art', true));
       (f.lines || []).forEach(function (ln, i) {
         var sp = speech(ln, slots, x, key + ':' + idx + ':' + i, i % 2 ? 'right' : 'left', true);
         sp.classList.add(i % 2 ? 'cs-right' : 'cs-left');
-        sp.style.animationDelay = (still ? 0 : 450 + i * 600) + 'ms';
+        if (!still) mv(sp, 'slap', 450 + i * 600);
         says.appendChild(sp);
       });
     }
 
     function showDrop(f, x) {
       var obj = f.obj || 'postcard', r = SB.rng.make('drop:' + key + ':' + idx);
-      var o = el('div', 'cs-obj cs-obj-' + obj, stage);
+      var o = el('div', 'cs-obj cs-obj-' + obj + (obj === 'tape' || obj === 'text' ? '' : ' pz-paper'), stage);
+      if (!still) mv(o, 'slap');
       o.style.setProperty('--tilt', r.range(-6, 6).toFixed(1) + 'deg');
-      o.style.setProperty('--dx', ((idx % 3) - 1) * 6 + r.range(-3, 3) + 'vw');
-      o.style.setProperty('--dy', r.range(-4, 4).toFixed(1) + 'vh');
+      o.style.setProperty('--dx', P(((idx % 3) - 1) * 77 + r.range(-38, 38)));
+      o.style.setProperty('--dy', P(r.range(-32, 32)));
       var lines = f.lines || [], txt = lines.map(function (l) { return fill(l.say, slots); });
       if (obj === 'note') {
         var L = lettering(txt.join(' ') || capFill(f.caption, slots), 20, 22, 'note:' + key + idx);
-        L.svg.setAttribute('viewBox', '0 -2 ' + Math.ceil(L.w + 4) + ' ' + Math.ceil(L.h + 8)); L.svg.setAttribute('width', Math.ceil(L.w + 4)); L.svg.setAttribute('height', Math.ceil(L.h + 8));
+        L.svg.setAttribute('viewBox', '0 -2 ' + Math.ceil(L.w + 4) + ' ' + Math.ceil(L.h + 8)); sized(L.svg, Math.ceil(L.w + 4), Math.ceil(L.h + 8));
         L.svg.setAttribute('aria-hidden', 'true'); o.appendChild(L.svg);
       } else if (obj === 'text') {
         var ph = el('div', 'cs-phone', o);
@@ -302,7 +329,7 @@ SB.module('Cutscene', function (SB) {
         o.appendChild(picture(f, x, dims[0], dims[1], 'cs-art', true));
         if (obj !== 'flyer' && txt.length) {
           var M = lettering(txt.join(' '), obj === 'polaroid' ? 16 : 15, obj === 'polaroid' ? 24 : 30, 'drop:' + key + idx);
-          M.svg.setAttribute('viewBox', '0 -2 ' + Math.ceil(M.w + 4) + ' ' + Math.ceil(M.h + 8)); M.svg.setAttribute('width', Math.ceil(M.w + 4)); M.svg.setAttribute('height', Math.ceil(M.h + 8));
+          M.svg.setAttribute('viewBox', '0 -2 ' + Math.ceil(M.w + 4) + ' ' + Math.ceil(M.h + 8)); sized(M.svg, Math.ceil(M.w + 4), Math.ceil(M.h + 8));
           M.svg.setAttribute('aria-hidden', 'true');
           var wr = el('div', 'cs-scrawl', o); wr.appendChild(M.svg);
         }
@@ -350,6 +377,15 @@ SB.module('Cutscene', function (SB) {
       if (done) return;
       done = true;
       document.removeEventListener('keydown', onKey, true);
+      /* the stage tears away from the left over whatever is under it: the box goes into a ghost layer (not .cs-root) for the move */
+      if (!silent && !still && SB.Finish && !SB.Finish.reduced() && typeof document !== 'undefined' && document.body && root.parentNode) {
+        try {
+          var ghost = el('div', 'pz-ghost pz-ghost--full'), gone = function () { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); };
+          ghost.setAttribute('aria-hidden', 'true'); ghost.appendChild(box); document.body.appendChild(ghost);
+          box.classList.remove('mv-wipe'); box.style.pointerEvents = 'none';
+          SB.Finish.move(box, 'wipe-out'); setTimeout(gone, 400);
+        } catch (e) { /* the exit is a courtesy */ }
+      }
       if (root.parentNode) root.parentNode.removeChild(root);
       if (current && current.root === root) current = null;
       if (lastFocus && lastFocus.focus) try { lastFocus.focus(); } catch (e) { /* gone */ }

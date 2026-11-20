@@ -97,7 +97,7 @@ SB.module('Draw', function (SB) {
     c.textAlign = 'center';
     c.textBaseline = 'middle';
     var px = Math.round(h * 100);
-    c.font = '900 ' + px + 'px sans-serif';
+    c.font = '900 ' + px + 'px "SB Gothic", sans-serif';
     var wmax = 76;
     var w = c.measureText ? c.measureText(String(text)).width : 0;
     if (w > wmax && w > 0) {

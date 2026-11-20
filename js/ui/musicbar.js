@@ -24,6 +24,7 @@
     back: 'Back a song', play: 'Play', pause: 'Pause', next: 'Next song',
     rew: 'REW', playKey: 'PLAY', pauseKey: 'PAUSE', ff: 'FF',
     vol: 'VOL', volume: 'Music volume', volNow: '{n} of 5',
+    menu: 'Pause and options', menuKey: 'MENU',
     idle: 'MIXTAPE', held: 'PAUSED',
     now: '{artist} – {title}'
   };
@@ -94,7 +95,7 @@
     /* the hubs */
     HUBS.forEach(function (q) {
       var hub = add('g', { 'class': 'mb-hub' }), x = q[0] * vw, y = q[1] * vh;
-      hub.style.transformOrigin = x + 'px ' + y + 'px';
+      hub.style.transformOrigin = (q[0] * 100).toFixed(2) + '% ' + (q[1] * 100).toFixed(2) + '%';
       [0, 60, 120].forEach(function (a) { add('path', { d: 'M' + x + ' ' + (y - 4.6) + 'V' + (y + 4.6), transform: 'rotate(' + a + ' ' + x + ' ' + y + ')' }, hub); });
     });
     into.appendChild(svg);
@@ -206,14 +207,14 @@
     return n;
   }
   function corner() {
-    var vw = W.innerWidth, vh = W.innerHeight, small = vw <= 600, w = small ? 96 : 122, h = small ? 66 : 84, best = null, bestN = 1e9, i, c, x, y, n;
+    var vw = W.innerWidth, vh = W.innerHeight, u = (SB.UI.unit && SB.UI.unit()) || 1, p = u * 1.25, ox = (vw - 1600 * u) / 2, oy = (vh - 1000 * u) / 2, w = 122 * p, h = 84 * p, best = null, bestN = 1e9, i, c, x, y, n;   // the stage's corners, not the window's
     if (!root || root.hidden || !D.elementFromPoint) return;
     root.style.visibility = 'hidden';
     try {
       for (i = 0; i < CORNERS.length; i++) {
         c = CORNERS[i];
-        x = c.charAt(1) === 'r' ? vw - (small ? 12 : 18) - w : (small ? 12 : 18);
-        y = c.charAt(0) === 'b' ? vh - (small ? 12 : 16) - h : (small ? 10 : 12);
+        x = c.charAt(1) === 'r' ? ox + 1600 * u - 18 * p - w : ox + 18 * p;
+        y = c.charAt(0) === 'b' ? oy + 1000 * u - 16 * p - h : oy + 12 * p;
         n = covers(x, y, w, h);
         if (n < bestN) { best = c; bestN = n; }
         if (!n) break;
@@ -272,7 +273,7 @@
     for (var i = 0; i < 5; i++) {
       (function (n) {
         var b = el('span', 'mb-bar', vol);
-        b.style.setProperty('--h', (8 + n * 3) + 'px');
+        b.style.setProperty('--h', 'calc(var(--p) * ' + (8 + n * 3) + ')');
         b.style.setProperty('--r', ((n % 2 ? 1 : -1) * (2 + n % 3)) + 'deg');
         b.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -290,9 +291,11 @@
       else if (e.key === 'End') to = 5;
       if (to !== null) { e.preventDefault(); setVol(to); }
     });
+    /* the quick menu (js/ui/pause.js): pause, volume, full screen, text size, save and quit */
+    row.appendChild(key('mb-menu', L('menu'), L('menuKey'), function () { if (SB.Pause) SB.Pause.toggle(); }).b);
 
     /* the cassette itself: the way in */
-    tape = el('button', 'mb-tape', root);
+    tape = el('button', 'mb-tape pz-hl', root);
     tape.type = 'button';
     tape.setAttribute('aria-controls', 'mb-deck');
     var shell = el('span', 'mb-shell', tape);

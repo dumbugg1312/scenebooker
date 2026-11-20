@@ -127,7 +127,7 @@
 
   function flyerPiece(s, show) {
     var thumb = null;
-    if (SB.UI.parts && SB.UI.parts.flyerThumb && SB.Jobs && SB.Jobs.flyerSpec) thumb = safe(function () { return SB.UI.parts.flyerThumb({ recipe: (show.flyer && show.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, show.id) }, 212); }, null);
+    if (SB.UI.parts && SB.UI.parts.flyerThumb && SB.Jobs && SB.Jobs.flyerSpec) thumb = safe(function () { return SB.UI.cuDraw.thumb({ recipe: (show.flyer && show.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, show.id) }, 170, true); }, null);
     if (!thumb) return null;
     return turn(h('figure', { class: 'rc-piece rc-flyer' }, [tape('rc-tape--tl'), thumb, tape('rc-tape--br')]), -4);
   }
@@ -145,13 +145,13 @@
     list.forEach(function (b) { if (b.set && num(b.set.energy) && (!best || b.set.energy > best.set.energy || (b.set.peak && !best.set.peak))) best = b; });
     if (!best && list.length) best = list[list.length - 1];
     label = R('photo', { band: best ? best.name : '', n: r.heads });
-    cv = canvas(780, 488); cv.className = 'rc-photocv'; cv.setAttribute('aria-hidden', 'true');
+    cv = canvas(Math.max(780, Math.round(600 * (SB.Finish && SB.Finish.res ? SB.Finish.res() : 1.5))), 0); cv.height = Math.round(cv.width * 0.625); cv.className = 'rc-photocv'; cv.setAttribute('aria-hidden', 'true');
     cap = (best ? best.name : '') + ' · ' + safe(function () { var d = SB.time.date(show.day); return d.m + '/' + d.d; }, '');
     var el = turn(h('figure', { class: 'rc-piece rc-polaroid', role: 'img', aria: { label: label } }, [
       h('div', { class: 'rc-photo' }, [cv]),
       h('figcaption', { class: 'rc-cap', html: mk(cap, 22, { seed: 'cap' + show.id, maxWidth: 360 }) }),
       tape('rc-tape--top')
-    ]), 2.2);
+    ]), 5.5);
     safe(function () { shoot(cv, { seed: show.id + ':' + (s.seed || ''), band: best ? best.name : '', bands: list.map(function (b) { return b.name; }), paper: n ? n.paperFor(show.id) : 'goldenrod' }); });
     return el;
   }
@@ -269,7 +269,7 @@
               c.byName ? h('span', { class: 'rc-note-who', html: mk('- ' + c.byName, 17, { seed: 'by' + i + seed, maxWidth: 150 }) }) : null,
               c.byName ? h('span', { class: 'cb-sr', text: c.byName }) : null,
               cause ? (typeof onNote === 'function' && c.noteKey
-                ? h('button', { type: 'button', class: 'rc-cause', data: { fk: 'cause-' + (c.id || i) }, on: { click: function () { onNote(c.noteKey, c); } } }, cause)
+                ? h('button', { type: 'button', class: 'rc-cause pz-hl', data: { fk: 'cause-' + (c.id || i) }, on: { click: function () { onNote(c.noteKey, c); } } }, cause)
                 : h('span', { class: 'rc-cause is-flat', text: cause })) : null
             ])
           ]);
@@ -303,6 +303,7 @@
       h('ul', { class: 'rc-card-l', aria: { label: U('learned') } }, ls.map(function (l) { return h('li', { class: 'rc-type rc-learned', text: l.text || l.label || '' }); }))
     ]);
     paper(el, 'index', 'card' + seed); turn(el, -0.8);
+    el.style.removeProperty('background-image');                                   /* the ruled lines are drawn by css/cu-record.css */
     return el;
   }
 
