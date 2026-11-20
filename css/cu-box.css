@@ -1,0 +1,188 @@
+/* Scene Booker: css/cu-box.css (pairs with js/ui/screens/legacy.js)
+ * The box (design/story.md 6.5): a kraft shoebox on the black table with every flyer in it, stacked crooked by year,
+ * manila dividers standing up out of it for the other parts (bands, the town, years, the end). Around it, loose in the
+ * box: the stories clipped out as photocopies with their photo, the firsts on an index card, the earned patches, the
+ * rooms as snapshots, the people's cards, the chapters on tape. The front page is a typed zine page beside the box.
+ * Paper textures and torn edges come inline from SB.NightScene.paperStyle; photos are real kit cut-outs run through
+ * SB.Scenes.copier; sharpie is SB.Skeleton strokes. Prefix bx-. */
+
+.bx { --kraft: #b08552; --kraftHi: #c99d68; --kraftLo: #8a6337; --kraftDk: #6e4c27; --manila: #d9c288; --tapec: rgba(232, 224, 192, .88);
+  padding: 0 0 24px; }
+.bx .cb-art { pointer-events: none; }
+.bx-mk { display: block; line-height: 0; margin: 0; color: #141312; }
+.bx-mk svg, .bx-clip-h svg, .bx-room-name svg, .bx-heldstory svg, .bx-fig svg, .bx-lid-mk svg, .bx-yeartab-mk svg, .bx-gone svg { display: block; overflow: visible; }
+.bx-mkfb { font: 700 18px/1 var(--block); text-transform: uppercase; }
+.bx-k { margin: 0 0 12px; line-height: 0; }
+.bx-k .cb-strip { filter: none; }
+
+/* masking tape */
+.bx-tape { position: absolute; z-index: 6; width: 78px; height: 21px; background: var(--tapec); box-shadow: 0 1px 1px rgba(0, 0, 0, .25); pointer-events: none;
+  clip-path: polygon(2% 8%, 98% 0, 100% 30%, 97% 52%, 100% 78%, 97% 100%, 3% 94%, 0 70%, 3% 46%, 0 22%); }
+.bx-tape::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(0, 0, 0, .035) 0 2px, transparent 2px 7px); }
+.bx-tape--tl { left: -22px; top: 4px; transform: rotate(-36deg); }
+.bx-tape--tr { right: -22px; top: 4px; transform: rotate(34deg); }
+.bx-tape--br { right: -20px; bottom: 16px; transform: rotate(-32deg); }
+
+/* ================= the dividers, standing up out of the box ================= */
+.bx-dividers { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 0 2px; align-items: flex-end; margin: 4px 0 -26px 26px; }
+.bx-divider.cb-thing { transform: translateY(14px); transition: transform .12s ease; }
+.bx-divider.cb-thing:hover:not(:disabled), .bx-divider.cb-thing:focus-visible { transform: translateY(4px) !important; filter: drop-shadow(3px -2px 0 rgba(0, 0, 0, .35)); }
+.bx-divider.is-on.cb-thing { transform: translateY(0) !important; filter: drop-shadow(3px -3px 0 rgba(0, 0, 0, .4)); }
+.bx-divider .cb-art { display: block; }
+
+/* ================= the shoebox ================= */
+.bx-tray { position: relative; z-index: 2; min-height: 430px; padding: 54px 26px 46px 24px; color: #141312;
+  background-color: var(--kraft);
+  background-image:
+    radial-gradient(ellipse 60% 50% at 40% 40%, rgba(255, 228, 180, .16), transparent 70%),
+    repeating-linear-gradient(91deg, rgba(90, 58, 24, .07) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(1deg, rgba(255, 236, 200, .05) 0 2px, transparent 2px 9px),
+    radial-gradient(circle at 30% 60%, rgba(60, 36, 12, .18) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 20%, rgba(60, 36, 12, .14) 0 1px, transparent 1.4px);
+  background-size: auto, auto, auto, 17px 17px, 23px 23px;
+  border: 16px solid var(--kraftHi); border-top-color: #d5ab76; border-left-color: #c49763; border-right-color: var(--kraftLo); border-bottom-color: var(--kraftDk);
+  box-shadow: inset 26px 30px 0 -6px rgba(58, 34, 10, .28), inset 0 0 0 2px rgba(40, 24, 6, .35), inset 0 0 60px rgba(40, 24, 6, .35), 10px 14px 0 rgba(0, 0, 0, .62); }
+/* the cut corner seams of the box walls */
+.bx-tray::before, .bx-tray::after { content: ""; position: absolute; width: 22px; height: 22px; background: rgba(40, 24, 6, .45); pointer-events: none; }
+.bx-tray::before { left: -16px; top: -16px; clip-path: polygon(0 0, 100% 100%, 92% 100%, 0 8%); }
+.bx-tray::after { right: -16px; bottom: -16px; clip-path: polygon(100% 100%, 0 0, 8% 0, 100% 92%); }
+.bx-tray.is-thin { min-height: 470px; }
+.bx-tray--open { padding: 56px 26px 34px; }
+.bx-tray--open > .cb-piece, .bx-tray--open > .p2-scrap { box-shadow: 5px 8px 0 rgba(0, 0, 0, .45); }
+
+/* the label on the box: masking tape across the rim, sharpie, and the typed warning */
+.bx-lid { position: absolute; right: 40px; bottom: -30px; z-index: 4; transform: rotate(-1.8deg); }
+.bx-lid-label { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 18px 7px; background: var(--tapec);
+  clip-path: polygon(1% 6%, 99% 0, 100% 34%, 98% 60%, 100% 96%, 2% 100%, 0 70%, 2% 40%); box-shadow: 0 2px 2px rgba(0, 0, 0, .3); }
+.bx-lid-label .cb-typed { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+
+.bx-filters { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: flex-end; margin: -20px 0 22px 4px; }
+.bx-filters .cb-tabslip { box-shadow: 3px 4px 0 rgba(0, 0, 0, .4); }
+.bx-hint { color: #2b1d0e; max-width: 26ch; opacity: .8; }
+
+/* each year: a manila divider with the year in sharpie, then its flyers piled crooked, newest on top */
+.bx-years { display: flex; flex-direction: column; gap: 30px; }
+.bx-year { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 0 6px; align-items: start; }
+.bx-yeartab { position: relative; z-index: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 180px; padding: 12px 8px 10px 10px;
+  background: var(--manila); box-shadow: 3px 4px 0 rgba(40, 24, 6, .45); transform: rotate(-1.5deg);
+  clip-path: polygon(0 3%, 100% 0, 100% 100%, 0 100%); }
+.bx-yeartab .cb-typed { font-size: 10px; color: #3a2a14; }
+.bx-stack { display: flex; flex-wrap: wrap; align-items: flex-start; padding: 2px 70px 92px 6px; min-width: 0; }
+.bx-piled { position: relative; margin: 0 -60px -92px 0; transform: translateY(var(--dy, 0)) rotate(var(--r, 0deg)); transition: transform .14s ease; }
+.bx-piled:hover, .bx-piled:focus-within { z-index: 200 !important; transform: translateY(calc(var(--dy, 0px) - 16px)) rotate(calc(var(--r, 0deg) * .4)); }
+.bx-stack.is-one { padding: 0 0 10px 18px; }
+.bx-stack.is-one .bx-piled { margin: 0; }
+.bx-flyer .sb-flyer-thumb { box-shadow: 3px 5px 0 rgba(30, 18, 4, .55), 0 0 0 1px rgba(0, 0, 0, .15); }
+.bx-flyer.cb-thing:hover:not(:disabled), .bx-flyer.cb-thing:focus-visible { filter: drop-shadow(8px 12px 0 rgba(30, 18, 4, .55)); }
+.bx-emptybox { padding: 30px 10px; }
+
+/* ================= the main column and the side ================= */
+.bx-grid { display: grid; grid-template-columns: minmax(0, 1fr) 352px; gap: 0 30px; align-items: start; }
+.bx-main { display: flex; flex-direction: column; gap: 38px; min-width: 0; }
+.bx-side { position: sticky; top: 0; align-self: start; padding-top: 6px; }
+
+/* the front page: a typed zine page */
+.bx-front { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 18px 20px 30px; color: #141312; transform: rotate(.9deg);
+  filter: drop-shadow(7px 10px 0 rgba(0, 0, 0, .6)); }
+.bx-front-mast { border-bottom: 3px solid #141312; padding-bottom: 6px; }
+.bx-front-issue { margin-top: 4px !important; text-transform: uppercase; letter-spacing: .05em; }
+.bx-front-photo { line-height: 0; transform: rotate(-1.2deg); box-shadow: 2px 3px 0 rgba(0, 0, 0, .3); align-self: center; }
+.bx-front-photo .bx-photo { width: 300px; height: 170px; display: block; background: #e8e6dc; }
+.bx-front-figs { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; align-items: end; }
+.bx-fig { line-height: 0; }
+.bx-fig-k { font-size: 11px; font-weight: 700; letter-spacing: .05em; padding-bottom: 6px; }
+.bx-front-text { display: flex; flex-direction: column; gap: 8px; columns: 1; }
+.bx-front-text .cb-typed { font-size: 12.5px; line-height: 1.5; }
+
+/* in your hand */
+.bx-held { display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+.bx-held-k { margin: 0; }
+.bx-heldflyer { position: relative; transform: rotate(1.6deg); filter: drop-shadow(10px 14px 0 rgba(0, 0, 0, .7)); line-height: 0; }
+.bx-heldflyer .sb-flyer-thumb { transform: none !important; }
+.bx-heldcard { max-width: 320px; padding: 12px 14px 18px; transform: rotate(-1deg); filter: drop-shadow(4px 6px 0 rgba(0, 0, 0, .55)); }
+.bx-heldcard .cb-typed { margin: 0 0 4px; }
+.bx-heldstory { margin: 6px 0 6px; line-height: 0; }
+
+/* ================= loose in the box ================= */
+.bx-main > section:not(.bx-tray), .bx-loose { padding: 0 6px; }
+
+/* the stories, clipped out of the photocopy */
+.bx-cliprow { display: flex; flex-wrap: wrap; gap: 30px 26px; align-items: flex-start; }
+.bx-clipwrap { position: relative; transform: rotate(var(--r, 0deg)); }
+.bx-clip.cb-thing { display: block; padding: 0; line-height: normal; text-align: left; }
+.bx-clip-paper { width: 236px; padding: 8px 8px 14px; box-sizing: border-box; color: #141312; filter: drop-shadow(5px 8px 0 rgba(0, 0, 0, .55)); }
+.bx-clip-photo { line-height: 0; margin-bottom: 8px; }
+.bx-clip-photo .bx-photo { width: 220px; height: 138px; display: block; background: #d6d4ca; }
+.bx-clip-h { margin: 2px 0 6px; line-height: 0; display: flex; flex-direction: column; gap: 3px; }
+.bx-clip-told { font-size: 11px; font-weight: 700; margin: 0 0 2px; }
+.bx-clip-when { opacity: .85; }
+.bx-clip.is-held { opacity: .45; }
+.bx-clip--none { max-width: 360px; padding: 14px 16px 18px; transform: rotate(var(--r, -1deg)); filter: drop-shadow(4px 6px 0 rgba(0, 0, 0, .5)); }
+
+.bx-loose { display: flex; flex-wrap: wrap; gap: 30px 30px; align-items: flex-start; }
+
+/* index card */
+.bx-card { position: relative; box-sizing: border-box; padding: 14px 18px 18px 34px; color: #141312; transform: rotate(var(--r, 0deg));
+  background-color: #f4f2ea;
+  background-image: linear-gradient(90deg, transparent 24px, rgba(205, 60, 50, .55) 24px 25.5px, transparent 25.5px),
+    linear-gradient(#f4f2ea 0 44px, transparent 44px), repeating-linear-gradient(transparent 0 20px, rgba(80, 120, 180, .45) 20px 21px);
+  box-shadow: 5px 8px 0 rgba(0, 0, 0, .5); }
+.bx-card-h { margin: 0 0 12px; }
+.bx-firsts { width: 390px; }
+.bx-firsts ol { list-style: none; margin: 0; padding: 0; }
+.bx-firsts li { margin: 0; font-size: 11.5px; line-height: 21px; }
+
+.bx-patches ul { display: flex; flex-wrap: wrap; gap: 8px 10px; max-width: 330px; list-style: none; margin: 0; padding: 0; }
+.bx-patch { line-height: 0; transform: rotate(var(--r, 0deg)); filter: drop-shadow(3px 5px 0 rgba(0, 0, 0, .5)); }
+.bx-patch canvas { width: 72px; height: auto; display: block; }
+
+/* the rooms: snapshots */
+.bx-rooms ul { display: flex; flex-wrap: wrap; gap: 26px 22px; list-style: none; margin: 0; padding: 0; }
+.bx-room { width: 212px; box-sizing: border-box; padding: 8px 8px 12px; background: #f1efe6; transform: rotate(var(--r, 0deg)); box-shadow: 4px 7px 0 rgba(0, 0, 0, .5); color: #141312; }
+.bx-room-photo { position: relative; line-height: 0; margin-bottom: 8px; }
+.bx-room-photo .bx-photo { width: 196px; height: 122px; display: block; background: #c9c7bd; }
+.bx-room-name { margin: 0 0 4px; line-height: 0; }
+.bx-room.is-gone .bx-photo { filter: grayscale(1) contrast(.85) brightness(1.08); }
+.bx-room.is-gone .bx-room-name { text-decoration: line-through; }
+.bx-gone { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-12deg); padding: 4px 10px; color: #c8331e; border: 3px solid #c8331e; background: rgba(241, 239, 230, .7); }
+.bx-gone svg path { stroke: #c8331e; }
+
+/* the people: the cards they handed you */
+.bx-people ul { display: flex; flex-wrap: wrap; gap: 14px 14px; max-width: 470px; list-style: none; margin: 0; padding: 0; }
+.bx-pcard { width: 212px; box-sizing: border-box; padding: 10px 12px 12px; background: #ece4cf; transform: rotate(var(--r, 0deg)); box-shadow: 3px 5px 0 rgba(0, 0, 0, .45);
+  border-top: 5px solid #141312; }
+.bx-pcard:nth-child(3n+2) { background: #f4f2ea; }
+.bx-pcard:nth-child(3n) { background: #d9e6f0; }
+.bx-pcard-n { font-weight: 700; font-size: 13px; margin: 0 0 3px !important; text-transform: uppercase; letter-spacing: .03em; }
+.bx-pcard.is-gone { opacity: .6; }
+
+/* the chapters, on a tape's label card */
+.bx-tapes { position: relative; width: 420px; box-sizing: border-box; padding: 14px 18px 18px; background: #f4f2ea; color: #141312; transform: rotate(.8deg);
+  box-shadow: 5px 8px 0 rgba(0, 0, 0, .5); border-top: 12px solid #c8331e; }
+.bx-tapes .sy-box { margin-top: 0; }
+.bx-tapes .sy-chapters { gap: 10px; }
+.bx-tapes .sy-chapter { border-bottom: 1px dashed rgba(20, 19, 18, .35); padding-bottom: 8px; }
+.bx-tapes .sy-chapter-title { font-size: 12px; }
+.bx-tapes .sy-chapter-line { font-size: 11.5px; }
+
+@media (max-width: 1100px) {
+  .bx-grid { grid-template-columns: minmax(0, 1fr); }
+  .bx-side { position: relative; order: -1; margin-bottom: 30px; }
+}
+.bx-tapes .bx-card-h { margin-bottom: 16px; }
+.bx-tapes .sy-watch { display: inline-block; padding: 3px 9px 2px; background: #141312; color: #f4f2ea; font: 700 11px/1.3 "Courier New", Courier, monospace; text-transform: uppercase;
+  letter-spacing: .05em; box-shadow: 2px 3px 0 rgba(0, 0, 0, .35); transform: rotate(-.6deg); }
+.bx-tapes .sy-watch * { font: inherit; color: inherit; background: transparent; box-shadow: none; }
+.bx-tapes .sy-watch:hover, .bx-tapes .sy-watch:focus-visible { background: var(--hot, #c8331e); outline: none; }
+
+/* thin box (1-3 flyers): bigger fanned piles, a typed note, and the night clip pinned inside the board */
+.bx-tray.is-thin { min-height: 0; padding-bottom: 60px; }
+.bx-tray.is-thin .bx-year { grid-template-columns: 96px minmax(0, 1fr) 190px; align-items: center; }
+.bx-tray.is-thin .bx-stack { padding: 6px 30px 30px 14px; }
+.bx-tray.is-thin .bx-piled { margin: 0 -34px 0 0; }
+.bx-thinnote { max-width: 190px; padding: 14px 16px 16px; color: #141312; filter: drop-shadow(4px 6px 0 rgba(0, 0, 0, .5)); }
+.bx-thinnote .cb-typed { margin: 0; font-size: 15px; line-height: 1.5; }
+.bx-tray.is-thin .bx-clips { margin-top: 26px; padding: 0 0 0 6px; }
+.bx-tray.is-thin .bx-clips .bx-k .cb-strip { filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, .4)); }
+.bx-tray.is-thin .bx-cliprow { gap: 24px 26px; padding-left: 10px; }
+.bx-tray.is-thin .bx-clipwrap::after { content: ""; position: absolute; right: -16px; bottom: 10px; z-index: 6; width: 70px; height: 20px; background: var(--tapec); box-shadow: 0 1px 1px rgba(0, 0, 0, .25); transform: rotate(-34deg); pointer-events: none; }

@@ -1,0 +1,8 @@
+[build]
+  command = "rm -rf dist && mkdir dist && cp -R index.html css js assets dist/"
+  publish = "dist"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

@@ -1,0 +1,20 @@
+/* Scene Booker: css/r-inbox.css — collage restyle layer for the inbox screen(s); loads last so it can override older rules. */
+
+/* the photo attached to a text: taped on at the top of a band's or a room's thread, their words below it */
+.ph-attach { display: flex; justify-content: center; padding: 8px 0 6px; }
+.ph-attach .kt-photo { margin: 0; }
+.ph-attach .kt-photo__cap { font-size: 12px; letter-spacing: .08em; }
+.ph-attach__f { position: relative; margin: 0; padding: 8px 8px 22px; background: #f0e6a0; box-shadow: 0 0 0 2px #141413, 4px 5px 0 2px #141413; transform: rotate(1deg); }
+.ph-attach__c { display: block; width: 300px; max-width: 100%; height: auto; aspect-ratio: 600 / 336; filter: grayscale(1) contrast(1.15); }
+.ph-attach__cap { position: absolute; left: 10px; right: 10px; bottom: 3px; font: 700 12px/1.2 "Courier New", Courier, monospace; letter-spacing: .08em; color: #141413; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-attach .kt-tape { z-index: 2; }
+/* a band's page: their players cut in on the black bar, in place of the drawn heads */
+.ph-hero { position: relative; }
+.ph-hero-row { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 4px; }
+.ph-hero-row .ph-hero-line { flex-direction: column; align-items: flex-start; justify-content: center; margin: 0; }
+.ph-hero-photo { margin: 0; flex: none; }
+/* their words: readable size, the bubble stays plain and white so it reads as typed by them */
+.ph-bub { font-size: 14px; }
+.ph-bub-mark, .ph-replyby, .ph-sig { font-size: 12px; }
+.ph-hero-line, .ph-k { font-size: 12px; }
+.ph-status { font-size: 12px; }

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scene Booker</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/kit.css">
+<link rel="stylesheet" href="css/desk.css">
+<link rel="stylesheet" href="css/screens.css">
+<link rel="stylesheet" href="css/paper.css">
+<link rel="stylesheet" href="css/flyerdesk.css">
+<link rel="stylesheet" href="css/desk-scene.css">
+<link rel="stylesheet" href="css/cu-phone.css">
+<link rel="stylesheet" href="css/cu-calendar.css">
+<link rel="stylesheet" href="css/cu-close.css">
+<link rel="stylesheet" href="css/cu-bill.css">
+<link rel="stylesheet" href="css/cu-notes.css">
+<link rel="stylesheet" href="css/cu-folder.css">
+<link rel="stylesheet" href="css/cu-paper2.css">
+<link rel="stylesheet" href="css/cu-box.css">
+<link rel="stylesheet" href="css/cu-night.css">
+<link rel="stylesheet" href="css/night-collage.css">
+<link rel="stylesheet" href="css/cu-record.css">
+<link rel="stylesheet" href="css/cu-town.css">
+<link rel="stylesheet" href="css/cu-start.css">
+<link rel="stylesheet" href="css/cutscene.css">
+<link rel="stylesheet" href="css/story.css">
+<link rel="stylesheet" href="css/musicbar.css">
+<link rel="stylesheet" href="css/r-clip.css">
+<link rel="stylesheet" href="css/r-week.css">
+<link rel="stylesheet" href="css/r-inbox.css">
+<link rel="stylesheet" href="css/r-bands.css">
+<link rel="stylesheet" href="css/r-people.css">
+<link rel="stylesheet" href="css/r-rooms.css">
+<link rel="stylesheet" href="css/r-money.css">
+<link rel="stylesheet" href="css/r-notebook.css">
+<link rel="stylesheet" href="css/r-polish.css">
+</head>
+<body class="sb-body">
+<div id="desk" class="dk-desk" hidden></div>
+<main id="main" class="sb-main" tabindex="-1"></main>
+<div id="overlay" class="sb-overlay"></div>
+<div id="toasts" class="sb-toasts" aria-live="polite"></div>
+
+<!-- 1. core -->
+<script src="js/core/sb.js"></script>
+<script src="js/core/enums.js"></script>
+<script src="js/core/config.js"></script>
+<!-- 2. content -->
+<script src="js/content/strings.js"></script>
+<script src="js/content/names.js"></script>
+<script src="js/content/requests.js"></script>
+<script src="js/content/jobs.js"></script>
+<script src="js/content/feedback.js"></script>
+<script src="js/content/events.js"></script>
+<script src="js/content/people.js"></script>
+<script src="js/content/legacy.js"></script>
+<script src="js/content/notebook.js"></script>
+<script src="js/content/story.js"></script>
+<script src="js/content/cutscene-audio.js"></script>
+<script src="js/content/cutscene-audio-files.js"></script>
+<script src="js/content/bandNames.js"></script>
+<script src="js/content/loops.js"></script>
+<script src="js/content/mixtape.js"></script>
+<!-- 3. cities (packs are injected on demand) -->
+<script src="js/cities/cities.js"></script>
+<script src="js/cities/index.js"></script>
+<!-- 4. the show -->
+<script src="js/engine/show/model.js"></script>
+<script src="js/engine/show/notebook.js"></script>
+<script src="js/engine/show/forecast.js"></script>
+<script src="js/engine/show/night.js"></script>
+<script src="js/engine/show/feedback.js"></script>
+<!-- 5. the world -->
+<script src="js/engine/world/worldgen.js"></script>
+<script src="js/engine/world/bands.js"></script>
+<script src="js/engine/world/rooms.js"></script>
+<script src="js/engine/world/requests.js"></script>
+<script src="js/engine/world/trends.js"></script>
+<script src="js/engine/world/crowd.js"></script>
+<script src="js/engine/world/territory.js"></script>
+<!-- 6. people and story -->
+<script src="js/engine/story/effects.js"></script>
+<script src="js/engine/story/director.js"></script>
+<script src="js/engine/story/people.js"></script>
+<script src="js/engine/story/harm.js"></script>
+<script src="js/engine/story/legacy.js"></script>
+<script src="js/engine/story/chapters.js"></script>
+<script src="js/engine/story/moments.js"></script>
+<script src="js/engine/story/tutorial.js"></script>
+<script src="js/engine/story/rungs.js"></script>
+<script src="js/engine/story/patches.js"></script>
+<!-- 7. the week -->
+<script src="js/engine/week/money.js"></script>
+<script src="js/engine/week/stress.js"></script>
+<script src="js/engine/week/mail.js"></script>
+<script src="js/engine/week/shows.js"></script>
+<script src="js/engine/week/jobs.js"></script>
+<script src="js/engine/week/week.js"></script>
+<script src="js/engine/week/save.js"></script>
+<script src="js/engine/week/game.js"></script>
+<!-- 8. art -->
+<script src="js/art/skeleton.js"></script>
+<script src="js/art/draw.js"></script>
+<script src="js/art/flyer.js"></script>
+<script src="js/art/identity.js"></script>
+<script src="js/art/cutouts.js"></script>
+<script src="js/art/cutouts-night.js"></script>
+<script src="js/art/scenes.js"></script>
+<script src="js/art/nightscene.js"></script>
+<!-- 9. interface (app.js last; it boots on DOMContentLoaded) -->
+<script src="js/audio/loops.js"></script>
+<script src="js/audio/cutscene-audio.js"></script>
+<script src="js/audio/music.js"></script>
+<script src="js/ui/musicbar.js"></script>
+
+<script src="js/ui/dom.js"></script>
+<script src="js/ui/components.js"></script>
+<script src="js/ui/kit.js"></script>
+<script src="js/ui/cutscene.js"></script>
+<script src="js/ui/screens/start.js"></script>
+<script src="js/ui/screens/week.js"></script>
+<script src="js/ui/screens/close.js"></script>
+<script src="js/ui/screens/inbox.js"></script>
+<script src="js/ui/screens/shows.js"></script>
+<script src="js/ui/screens/showrecord.js"></script>
+<script src="js/ui/screens/money.js"></script>
+<script src="js/ui/screens/settings.js"></script>
+<script src="js/ui/screens/night.js"></script>
+<script src="js/ui/screens/notebook.js"></script>
+<script src="js/ui/screens/bands.js"></script>
+<script src="js/ui/screens/rooms.js"></script>
+<script src="js/ui/screens/people.js"></script>
+<script src="js/ui/screens/town.js"></script>
+<script src="js/ui/screens/legacy.js"></script>
+<script src="js/art/flyerdesk.js"></script>
+<!-- 10. the desk (07-desk) -->
+<script src="js/desk/kit.js"></script>
+<script src="js/desk/scene.js"></script>
+<script src="js/desk/closeup.js"></script>
+<script src="js/ui/story.js"></script>
+<script src="js/ui/app.js"></script>
+<!-- 11. sound (loads its clips, assets/sfx/sfx-data.js, on its own after boot) -->
+<script src="js/audio/sfx.js"></script>
+</body>
+</html>

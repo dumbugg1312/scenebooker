@@ -1,0 +1,163 @@
+/* Scene Booker: css/cutscene.css (ART, 09 §3)
+ * The cutscene player (js/ui/cutscene.js): full-screen scenes, zine panels on the desk, things dropped on the desk.
+ * Typed captions on strips of copy paper, speech in sharpie balloons, masking tape. No rounded cards, no shine.
+ */
+.cs-root {
+  --cs-paper: #F6F4EC; --cs-ink: #141312; --cs-tape: rgba(232, 222, 182, .9);
+  --cs-type: var(--font-type, "Courier New", Courier, monospace);
+  position: fixed; inset: 0; z-index: 900; overflow: hidden; outline: none;
+  color: var(--cs-ink); cursor: pointer; user-select: none;
+  font-family: var(--cs-type);
+}
+.cs-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.cs-stage { position: absolute; inset: 0; }
+
+/* ---------- SCENE: full screen ---------- */
+.cs-k-scene { background: #0D0C0B; }
+.cs-k-scene .cs-frame { position: absolute; inset: 0; overflow: hidden; animation: cs-fade 900ms ease both; }
+.cs-k-scene .cs-frame.cs-out { animation: cs-fadeout 900ms ease both; }
+.cs-print {
+  position: absolute; inset: 64px 40px 96px; background: #E9E2CE; padding: 14px; box-sizing: border-box; transform: rotate(-.8deg);
+  box-shadow: 8px 10px 0 rgba(0, 0, 0, .6); z-index: 1;
+}
+.cs-print::before, .cs-print::after { content: ""; position: absolute; width: 96px; height: 26px; background: var(--cs-tape); z-index: 3; opacity: .92; }
+.cs-print::before { top: -12px; left: -26px; transform: rotate(-33deg); }
+.cs-print::after { bottom: -10px; right: -28px; transform: rotate(-29deg); }
+.cs-print-in { position: relative; width: 100%; height: 100%; overflow: hidden; background: #141312; }
+/* zoomed to the lit part of the drawing (lower right), then the slow pan */
+.cs-k-scene .cs-art {
+  position: absolute; left: -24%; top: -28%; width: 135%; height: 135%; display: block;
+  animation: cs-pan 18s ease-in-out both;
+}
+@keyframes cs-pan {
+  from { transform: translate(var(--px0, 0), var(--py0, 0)) scale(1.0); }
+  to   { transform: translate(var(--px1, 0), var(--py1, 0)) scale(1.06); }
+}
+@keyframes cs-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cs-fadeout { from { opacity: 1; } to { opacity: 0; } }
+.cs-k-scene .cs-words {
+  z-index: 2; position: absolute; left: 6vw; right: 6vw; bottom: 12vh; display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
+}
+.cs-k-scene .cs-cap { margin-bottom: 6px; }
+.cs-k-scene .cs-say { align-self: flex-start; }
+.cs-k-scene .cs-say.cs-right { align-self: flex-end; }
+.cs-k-scene .cs-cap { font-size: clamp(16px, 1.6vw, 22px); max-width: 34em; }
+
+/* ---------- typed captions: strips of copy paper, pasted ---------- */
+.cs-cap { margin: 0; line-height: 1.75; transform: rotate(-.6deg); animation: cs-in 400ms ease both; }
+.cs-cap span {
+  background: var(--cs-paper); color: var(--cs-ink); padding: 3px 8px; font-weight: 700; letter-spacing: .01em;
+  box-decoration-break: clone; -webkit-box-decoration-break: clone;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, .35);
+}
+@keyframes cs-in { from { opacity: 0; transform: translateY(6px) rotate(-.6deg); } to { opacity: 1; transform: rotate(-.6deg); } }
+
+/* ---------- sharpie balloons ---------- */
+.cs-say { position: relative; display: inline-flex; flex-direction: column; align-items: flex-start; animation: cs-in 300ms ease both; color: var(--cs-ink); }
+.cs-say.cs-right { align-items: flex-end; }
+.cs-balloon { display: block; max-width: 100%; height: auto; overflow: visible; }
+.cs-balloon-shape { fill: var(--cs-paper); stroke: var(--cs-ink); stroke-width: 2.6; stroke-linejoin: round; }
+.cs-say-crowd .cs-balloon-shape { fill: #FFE14D; }
+.cs-say-you .cs-balloon-shape { stroke-dasharray: 7 4; }
+.cs-who {
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; background: var(--cs-ink); color: var(--cs-paper);
+  padding: 1px 6px; margin: 0 0 -3px 10px; position: relative; z-index: 1; transform: rotate(-2deg);
+}
+.cs-say.cs-right .cs-who { margin: 0 10px -3px 0; transform: rotate(1.5deg); }
+.cs-letter-fallback { font: 900 17px Impact, "Arial Black", sans-serif; fill: currentColor; }
+
+/* ---------- title on masking tape ---------- */
+.cs-title {
+  position: absolute; top: 22px; left: 24px; z-index: 3; padding: 8px 14px 6px; background: var(--cs-tape); color: var(--cs-ink);
+  transform: rotate(-1.8deg); clip-path: polygon(0 4%, 3% 0, 97% 3%, 100% 0, 99% 50%, 100% 96%, 96% 100%, 4% 97%, 0 100%, 1% 50%);
+  animation: cs-in 500ms ease both; pointer-events: none;
+}
+.cs-title svg { display: block; }
+
+/* ---------- the bar: count, hint, next; skip ---------- */
+.cs-bar { position: absolute; right: 20px; bottom: 18px; z-index: 4; display: flex; align-items: center; gap: 14px; }
+.cs-strip { display: inline-flex; align-items: center; gap: 12px; padding: 5px 10px 4px; background: #F6F4EC; box-shadow: 2px 3px 0 rgba(0, 0, 0, .5); transform: rotate(.8deg); }
+.cs-count, .cs-hint { font-size: 12.5px; font-weight: 700; letter-spacing: .06em; color: #141312; }
+.cs-hint { text-transform: uppercase; }
+.cs-btn {
+  font: 700 14px var(--cs-type); text-transform: uppercase; letter-spacing: .08em; color: var(--cs-ink); background: var(--cs-tape);
+  border: 0; padding: 9px 16px 8px; min-height: 40px; cursor: pointer; transform: rotate(-1deg);
+  clip-path: polygon(0 6%, 4% 0, 96% 4%, 100% 0, 100% 94%, 95% 100%, 5% 96%, 0 100%);
+}
+.cs-btn:hover { background: #F2E9C4; }
+.cs-btn:focus-visible { outline: 3px solid var(--focus, #1F5BD8); outline-offset: 3px; clip-path: none; }
+.cs-skip { position: absolute; top: 18px; right: 20px; z-index: 5; transform: rotate(1.5deg); }
+
+/* ---------- PANELS and DROP: on the desk ---------- */
+/* fully opaque: nothing of the page behind may show through the desk */
+.cs-k-panels, .cs-k-drop {
+  background-color: #12110F;
+  background-image: radial-gradient(ellipse at 50% 40%, rgba(255, 250, 235, .06), rgba(0, 0, 0, 0) 70%);
+}
+.cs-spread {
+  position: absolute; inset: 70px 16px 80px; display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap;
+}
+.cs-spread.cs-turn { animation: cs-turn 600ms ease-in both; }
+@keyframes cs-turn { to { transform: translateX(-110vw) rotate(-8deg); } }
+.cs-panel {
+  margin: 0; position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0;
+  transform: rotate(var(--tilt, 0deg)); animation: cs-slide 520ms cubic-bezier(.3, 1.25, .5, 1) both;
+}
+@keyframes cs-slide { from { opacity: 0; transform: translate(40vw, 12vh) rotate(var(--from, 10deg)); } to { opacity: 1; transform: rotate(var(--tilt, 0deg)); } }
+.cs-pic { position: relative; border: 10px solid #E9E2CE; background: #E9E2CE; box-shadow: 5px 7px 0 rgba(0, 0, 0, .55); }
+.cs-pic::before, .cs-pic::after { /* masking tape at two corners */
+  content: ""; position: absolute; width: 74px; height: 22px; background: var(--cs-tape); z-index: 2; opacity: .92;
+}
+.cs-pic::before { top: -14px; left: -22px; transform: rotate(-34deg); }
+.cs-pic::after { bottom: -12px; right: -24px; transform: rotate(-30deg); }
+.cs-pic .cs-art { display: block; width: 100%; height: auto; }
+.cs-panel .cs-pic .cs-art, .cs-obj .cs-art { max-width: calc(100vw - 56px); height: auto !important; }
+.cs-panel { max-width: calc(100vw - 32px); }
+.cs-panel { width: min-content; }
+.cs-says { position: relative; z-index: 3; align-self: stretch; display: flex; flex-direction: column; gap: 2px; margin: 0 -8px -30px; pointer-events: none; }
+.cs-says .cs-say { align-self: flex-start; }
+.cs-says .cs-say.cs-right { align-self: flex-end; }
+.cs-says:empty { display: none; }
+/* the caption is pasted under the picture, clear of the balloons that hang over its top */
+.cs-cap-panel { position: relative; z-index: 4; margin: 8px 0 0 -6px; font-size: 14px; max-width: 100%; }
+.cs-cap-panel span { font-size: 14px; }
+
+.cs-obj {
+  position: absolute; left: 50%; top: 50%; transform: translate(calc(-50% + var(--dx, 0)), calc(-50% + var(--dy, 0))) rotate(var(--tilt, 0deg));
+  animation: cs-drop 560ms cubic-bezier(.3, 1.3, .5, 1) both; box-shadow: 3px 6px 0 rgba(0, 0, 0, .4);
+}
+@keyframes cs-drop {
+  from { opacity: 0; transform: translate(calc(-50% + var(--dx, 0)), -120vh) rotate(-24deg); }
+  to   { opacity: 1; transform: translate(calc(-50% + var(--dx, 0)), calc(-50% + var(--dy, 0))) rotate(var(--tilt, 0deg)); }
+}
+.cs-obj .cs-art { display: block; }
+.cs-obj-postcard, .cs-obj-flyer { background: #F4F2EA; padding: 8px; }
+.cs-obj-polaroid { background: #F7F6F1; padding: 14px 14px 64px; }
+.cs-obj-polaroid .cs-scrawl { position: absolute; left: 16px; right: 16px; bottom: 12px; }
+.cs-obj-postcard .cs-scrawl { position: absolute; right: -24px; bottom: -30px; background: #F4F2EA; padding: 8px 10px; transform: rotate(3deg); box-shadow: 2px 3px 0 rgba(0, 0, 0, .35); }
+.cs-obj-tape { background: #1D1C1A; padding: 18px; display: flex; gap: 12px; align-items: center; }
+.cs-obj-tape .cs-scrawl { background: #F4F2EA; padding: 6px 8px; }
+.cs-obj-note {
+  padding: 26px 26px 30px 44px; background: #FBFAF4 repeating-linear-gradient(transparent 0 29px, #9DB4D6 29px 30px);
+  border-left: 2px solid #D9726A; clip-path: polygon(0 0, 100% 0, 100% 100%, 92% 98%, 84% 100%, 70% 97%, 55% 100%, 40% 97%, 22% 100%, 8% 97%, 0 100%);
+}
+.cs-obj-text { background: #191917; padding: 18px 14px; width: min(320px, 80vw); border: 3px solid #000; }
+.cs-phone { display: flex; flex-direction: column; gap: 8px; font: 15px/1.35 var(--font-ui, system-ui, sans-serif); }
+.cs-msg { margin: 0; padding: 8px 11px; background: #3A3A37; color: #F4F1E8; align-self: flex-start; max-width: 85%; }
+.cs-msg-you { background: #E8E3D3; color: #141312; align-self: flex-end; }
+.cs-cap-drop { position: absolute; left: -16px; top: -26px; font-size: 13px; white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .cs-spread { inset: 70px 12px 80px; }
+  .cs-print { inset: 64px 14px 120px; }
+  .cs-k-scene .cs-art { left: -10%; top: -10%; width: 120%; height: 120%; }
+  .cs-k-scene .cs-words { left: 16px; right: 16px; bottom: 80px; }
+  .cs-hint { display: none; }
+}
+
+/* reduced motion: no pan, no slides, nothing falls */
+.cs-still .cs-art, .cs-still .cs-frame, .cs-still .cs-panel, .cs-still .cs-obj, .cs-still .cs-cap, .cs-still .cs-say,
+.cs-still .cs-title, .cs-still .cs-spread { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .cs-root *, .cs-root { animation: none !important; transition: none !important; }
+}

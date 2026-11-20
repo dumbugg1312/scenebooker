@@ -1,0 +1,117 @@
+/* cu-night: the show night (js/ui/screens/night.js); the start flow's styles go in their own "start" block at the end.
+ * The night is the door: the desk's dark board, a photocopied sheet of the doorway past the table (the line, the band
+ * through the door), the table's things cut out and pasted on (js/art/nightscene.js, css/night-collage.css). Fixed
+ * 1280 x 800 stage scaled to the window. The note, the envelope and how it went keep the desk's tear-off tabs.
+ * Prefix nt- (night), st- (start). */
+
+/* ======================= the night ======================= */
+.sb-screen-night { padding: 0 !important; }
+.nt { position: fixed; inset: 0; z-index: 40; background: #050505; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  --cb-focus: #e7ddc4; color: #141413; animation: nt-lamp 700ms steps(4, end) both; }
+@keyframes nt-lamp { 0% { filter: brightness(1.8); } 25% { filter: brightness(.05); } 60% { filter: brightness(.05); } 100% { filter: brightness(1); } }
+.nt-fit { position: relative; flex: none; }
+.nt-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; transform-origin: 0 0; overflow: hidden; }
+/* every piece is placed by SB.NightScene's layout (js/art/nightscene.js, css/night-collage.css); a region is only a
+ * group to repaint, except the paper in the middle of the table (the note, the envelope) and how it went */
+.nt-stage .nt-at { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; z-index: auto; pointer-events: none; }
+.nt-stage .nt-at > * { pointer-events: auto; }
+.nt-stage .nt-at--stop { left: 552px; top: 396px; width: 414px; height: auto; max-height: 392px; pointer-events: auto; overflow: auto; z-index: 14; padding: 6px 8px 10px 4px; box-sizing: border-box;
+  scrollbar-color: #e7ddc4 transparent; scrollbar-width: thin; }
+.nt-stage .nt-at--stop.is-note { transform: rotate(1.1deg); }
+.nt-stage .nt-at--stop.is-env { transform: rotate(-.7deg); top: 396px; max-height: 400px; }
+.nt-stage .nt-at--result { left: 26px; top: 396px; width: 530px; height: auto; max-height: 398px; pointer-events: auto; overflow: auto; z-index: 16; padding: 4px 10px 10px 4px; box-sizing: border-box;
+  transform: rotate(.5deg); scrollbar-color: #e7ddc4 transparent; scrollbar-width: thin; }
+.nt-stage .nt-at--result:empty { display: none; }
+.nt-stage .nt-at--actions, .nt-stage .nt-at--leave { z-index: 30; }
+
+/* the working objects: the desk's sign (a label strip) and the desk's lift */
+.nt-scrap { flex: none; animation: nt-land 380ms cubic-bezier(.3, 1.4, .5, 1) both; }
+@keyframes nt-land { from { transform: translateY(-30px) rotate(-8deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.nt-now-line { margin: 0; }
+.nt-now-tick { opacity: .7; }
+
+/* a piece of paper in the middle of the surface */
+.nt-at--stop .cb-piece { margin: 0 0 16px; }
+.nt-prelude { text-align: left; }
+.nt-doorsat { font-size: 15px; margin: 4px 0 10px; }
+.nt-go { position: relative; display: inline-block; margin-top: 10px; }
+.nt-go > .cb-art { position: absolute; left: -6px; top: 4px; }
+.nt-go > .cb-thing { position: relative; }
+
+/* the note slid onto the surface: the event in the engine's words, choices as tear-off tabs */
+.nt-note { animation: nt-slide 420ms cubic-bezier(.2, .9, .3, 1) both; outline: none; }
+@keyframes nt-slide { from { transform: translate(-60px, 40px) rotate(-6deg); opacity: 0; } to { transform: rotate(-.8deg); opacity: 1; } }
+.nt-note-head { display: flex; align-items: flex-start; gap: 6px; }
+.nt-note-title { margin: 6px 0 6px; font: 700 18px/1.25 "Courier New", Courier, monospace; text-transform: uppercase; letter-spacing: .02em; }
+.nt-note-body { margin: 0 0 12px; font-size: 13.5px; }
+.nt-tabs { display: flex; flex-wrap: wrap; gap: 0 3px; margin: 8px -6px -10px; padding-top: 4px; border-top: 2px dashed #141413; }
+.nt-tab { position: relative; display: flex; flex-direction: column; gap: 4px; flex: 1 1 140px; min-width: 120px; max-width: 260px; margin: 0; padding: 18px 10px 12px;
+  background: #f4f2ea; color: #141413; border: 0; border-left: 1.5px dashed rgba(20, 20, 19, .5); text-align: left; cursor: pointer;
+  font: 700 12.5px/1.3 "Courier New", Courier, monospace; transition: transform 120ms ease, filter 120ms ease;
+  clip-path: polygon(0 0, 100% 0, 100% 96%, 92% 100%, 80% 97%, 64% 100%, 48% 97%, 30% 100%, 14% 96%, 0 100%); }
+.nt-tab-n { position: absolute; left: 8px; top: 2px; font: 900 13px/1 Impact, "Arial Black", sans-serif; }
+.nt-tab-label { text-transform: none; }
+.nt-tab-costs { display: flex; flex-wrap: wrap; gap: 3px 6px; }
+.nt-cost { font-size: 12.5px; padding: 0 4px; background: #141413; color: #f4f2ea; }
+.nt-tab-likely { font-size: 12.5px; font-weight: 600; opacity: .8; }
+.nt-tab-why { font-size: 12.5px; font-weight: 600; }
+.nt-tab:hover:not(:disabled), .nt-tab:focus-visible { transform: translateY(6px) rotate(2deg); filter: drop-shadow(3px 5px 0 rgba(0, 0, 0, .55)); background: #141413; color: #f4f2ea; z-index: 3; outline: none; }
+.nt-tab:hover:not(:disabled) .nt-cost, .nt-tab:focus-visible .nt-cost { background: #f4f2ea; color: #141413; }
+.nt-tab:focus-visible { box-shadow: inset 0 0 0 3px #e7ddc4; }
+.nt-tab:disabled { cursor: default; opacity: .45; }
+
+/* the envelope, laid open: the cash box emptied into it line by line */
+.nt-env { position: relative; margin: 0 0 14px; padding: 14px 16px 16px; isolation: isolate; filter: drop-shadow(4px 6px 0 rgba(0, 0, 0, .55)); }
+.nt-env::before { content: ""; position: absolute; inset: 0; z-index: -1; background-color: #f2f0e6;
+  background-image: radial-gradient(rgba(20, 20, 19, .5) .6px, transparent 1px), radial-gradient(rgba(20, 20, 19, .35) .5px, transparent .9px);
+  background-size: 37px 41px, 23px 29px; background-position: 3px 5px, 11px 17px;
+  clip-path: polygon(0 0, 100% .4%, 100% 98.6%, 92% 100%, 81% 98.8%, 66% 100%, 50% 98.9%, 34% 100%, 18% 98.8%, 0 99.6%); }
+.nt-env-flap { display: none; }
+.nt-env-h { display: block; margin: 0 0 6px; }
+.nt-env-door { margin: 2px 0; font-size: 13.5px; }
+.nt-env-lines { list-style: none; margin: 10px 0 6px; padding: 0; }
+.nt-env-line { display: flex; align-items: baseline; gap: 10px; padding: 3px 0; border-bottom: 1.5px solid rgba(20, 20, 19, .35); animation: nt-line 300ms ease both; animation-delay: calc(var(--i, 0) * 0ms); }
+@keyframes nt-line { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+.nt-env-label { flex: 1; font-size: 13px; }
+.nt-env-run { font: 600 11px/1 "Courier New", monospace; opacity: .65; min-width: 58px; text-align: right; }
+.nt-env-line.is-you { border-bottom: 0; margin-top: 6px; background: linear-gradient(transparent 40%, rgba(255, 232, 0, .62) 40%, rgba(255, 232, 0, .62) 88%, transparent 88%); }
+.nt-env:has(.nt-env-net) .nt-env-line.is-you { background: none; }
+.nt-env-net { margin: 4px 0 0; padding-top: 6px; border-top: 3px double rgba(20, 20, 19, .7); font-size: 13px; background: linear-gradient(transparent 40%, rgba(255, 232, 0, .62) 40%, rgba(255, 232, 0, .62) 88%, transparent 88%); }
+.nt-fig { font: 400 20px/1 Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif; letter-spacing: .02em; }
+.nt-env-gap { margin: 8px 0 0; }
+
+/* how it went */
+.nt-result { transform: rotate(.5deg); }
+.nt-verdict { font-size: 15px; margin: 4px 0 8px; }
+.nt-heads { font-size: 13px; }
+.nt-gens { display: flex; gap: 14px; margin: 4px 0 8px; font: 700 13px "Courier New", monospace; }
+.nt-gen { display: inline-flex; align-items: center; gap: 4px; }
+.nt-stamps { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.nt-chits { list-style: none; padding: 0; margin: 8px 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.nt-chit { background: #f4f2ea; padding: 3px 8px; font-size: 12px; box-shadow: 2px 3px 0 rgba(0, 0, 0, .4); transform: rotate(-1deg); }
+.nt-chit:nth-child(2n) { transform: rotate(1.2deg); }
+.nt-chit .nt-fig { font-size: 15px; }
+.nt-scrapline { margin: 4px 0; padding: 2px 6px; background: #f4f2ea; display: inline-block; font-size: 12px; }
+.nt-comments { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
+.nt-comment { margin: 0 0 6px !important; padding: 10px 12px !important; }
+.nt-comment p { margin: 0 0 4px; }
+.nt-by { font-size: 11.5px; margin-bottom: 6px; }
+.nt-you { margin: 10px 0 4px; }
+.nt-you .nt-fig { font-size: 30px; }
+.nt-after-list { margin: 6px 0 0; padding-left: 18px; }
+.nt-leave { margin: 6px 0 20px; }
+.nt-empty { max-width: 420px; margin: 20vh auto; }
+.nt-stagecard { max-width: 460px; }
+.nt-stage-h { font-size: 16px; }
+
+/* ======================= motion ======================= */
+:root[data-motion="reduce"] .nt, :root[data-motion="reduce"] .nt-scrap, :root[data-motion="reduce"] .nt-note, :root[data-motion="reduce"] .nt-env-line,
+:root[data-motion="reduce"] .nt-tab,
+.nt.is-still, .nt.is-still .nt-scrap, .nt.is-still .nt-note, .nt.is-still .nt-env-line { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) .nt, :root:not([data-motion="full"]) .nt-scrap, :root:not([data-motion="full"]) .nt-note, :root:not([data-motion="full"]) .nt-env-line,
+  :root:not([data-motion="full"]) .nt-tab { animation: none !important; transition: none !important; }
+}
+
+/* the envelope scrolls inside its slot: its heading stays in view after a click */
+.nt-stage .nt-at--stop .nt-env-h { position: sticky; top: -14px; z-index: 3; background: #f2f0e6; padding-top: 6px; }

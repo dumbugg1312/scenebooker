@@ -1,0 +1,56 @@
+/* Scene Booker: css/r-clip.css — collage restyle layer for the clip screen(s); loads last so it can override older rules. */
+
+/* ---------- the clipboard in your hands (shows.js dress()) ----------
+ * The close-up's flat board is hidden; shows.js draws, in layers round .cu-in: the masonite board with its stickers and
+ * the older sheets (.cb-hold--board, photocopied), the top sheet (.cb-hold--sheet, flat paper the screen is typed on)
+ * and the steel clip over it (.cb-hold--clip, photocopied). The .cu-in insets below match SHEET in shows.js. */
+.cu--clipboard.cb-held > .cu-art { display: none; }
+.cu--clipboard.cb-held--show { width: min(900px, 95vw); height: min(780px, 95vh); }
+.cu--clipboard.cb-held--list { width: min(1220px, 97vw); height: min(860px, 95vh); transform: none; }
+.cb-hold { position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none; line-height: 0; }
+.cb-hold svg, .cb-hold img { display: block; }
+.cb-hold--clip { z-index: 2; }
+.cu--clipboard.cb-held .cu-in {
+  background: transparent; scrollbar-width: thin; scrollbar-color: #141413 transparent;
+}
+.cu--clipboard.cb-held--show .cu-in { top: 80px; right: 60px; bottom: 54px; left: 48px; padding: 26px 20px 40px 18px; }
+.cu--clipboard.cb-held--list .cu-in { top: 14px; right: 14px; bottom: 14px; left: 14px; padding: 22px 22px 24px; }
+
+/* ---------- the list: clipboards on the table ---------- */
+.cb-held--list .cb-shows { min-height: 100%; display: flex; flex-direction: column; justify-content: space-around; gap: 26px; }
+.cb-held--list .cb-clips { justify-content: center; align-items: flex-start; gap: 34px 22px; padding: 14px 0 0; }
+.cb-held--list .cb-clipwrap { zoom: var(--cb-zoom, 1.1); }
+.cb-shelf { display: flex; align-items: flex-end; justify-content: center; flex-wrap: wrap; gap: 18px 30px; padding: 0 6px 6px; }
+.cb-held--list .cb-shelf .cb-clipwrap { zoom: 1.5; }
+.cb-shelf .cb-pastrow { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 22px 18px; padding: 0; zoom: 2; }
+.cb-shelf.is-open .cb-pastrow { flex-basis: 100%; justify-content: center; }
+.cb-held--list .cb-hintslip { align-self: center; }
+
+/* ---------- the played show's record on the (narrower) top sheet: its top row tightens ---------- */
+.cb-held--show .rc-sheet { margin: 0 -4px; padding: 26px 18px 36px; }
+.cb-held--show .rc-top { grid-template-columns: 172px minmax(0, 1fr) 216px; }
+.cb-held--show .rc-flyer canvas, .cb-held--show .rc-flyer img { width: 168px !important; height: auto !important; }
+.cb-held--show .rc-polaroid { width: 100%; max-width: 380px; padding: 12px 12px 0; }
+.cb-held--show .rc-photo, .cb-held--show .rc-photocv { width: 100%; height: auto; aspect-ratio: 376 / 235; }
+.cb-held--show .rc-verdict { max-width: 100%; }
+
+/* the crowd drawing shrinks to its piece rather than losing its figures off the edge */
+.cb-held .cb-crowd > .cb-art { max-width: 100%; height: auto !important; }
+.cb-held .cb-crowd > .cb-art img, .cb-held .cb-crowd > .cb-art svg { width: auto; max-width: 100%; height: auto; }
+
+/* ---------- one show: the set list's snapshot ---------- */
+.cb-sethead { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin: 0 0 4px; }
+.cb-sethead .cb-head { margin-top: 4px; }
+.cb-set .cb-bandphoto { flex: none; margin: -34px -4px 0 0; z-index: 2; }
+.cb-set .cb-bandphoto .kt-photo__cap { font-size: 13px; max-width: 156px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- draft: the town-expects piece is only as wide as its figures, so TO DO gets the room ---------- */
+.cb-held .cb-crowdsec { width: fit-content; max-width: 100%; padding-right: 24px; }
+/* the pencil blank on the bill (candidate sticker space with nobody yet) keeps its tilt off the pointer */
+
+/* ---------- the bill: a smaller snapshot so its caption stays on the sheet ---------- */
+.cb-billnight .cb-set .cb-bandphoto { margin: 0; zoom: .72; }
+
+/* ---------- scrolling sheets keep their heading in view after a click ---------- */
+.cb-sheet > .cb-head:first-child { position: sticky; top: -14px; z-index: 5; margin-top: -14px; padding-top: 14px;
+  background: var(--cb-stock, #B4CDE4); box-shadow: 0 6px 6px -6px rgba(0,0,0,.35); }

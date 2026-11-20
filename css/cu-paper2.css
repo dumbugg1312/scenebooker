@@ -1,0 +1,194 @@
+/* cu-paper2 — the cash envelope (js/ui/screens/money.js), the flyer pile (legacy.js) and the road map (town.js).
+ * Laid out on a patch of the black table like the calendar (07-desk.md 2b): every paper thing is one piece with table
+ * showing round it, drawn pieces are photocopied SVG (SB.UI.cuDraw.art), and every control wears one of the four signs
+ * the calendar and the clipboards use: label strip (open), tear-off tab (choose), drawn box (tick), lifted corner
+ * (drag; always with a tap). Hot ink (--hot, the city's) only marks what needs the player. Prefix p2-. */
+
+.cu-obj.cu--tin .cu-in, .cu-obj.cu--window .cu-in, .cu-obj.cu--wall .cu-in { background: #101010; color: #141413; padding: 16px 20px 28px; }
+
+.p2 {
+  --toner: #141413; --paper: #f4f2ea; --bone: #e7ddc4; --pencil: #6d6a62; --tape: rgba(230, 220, 184, .92); --fx: #e7ddc4;
+  --swipe: rgba(255, 232, 0, .62); --cb-focus: #e7ddc4;
+  --type: "Courier New", Courier, "Nimbus Mono PS", ui-monospace, monospace;
+  --block: Impact, Haettenschweiler, "Arial Narrow Bold", "Arial Black", sans-serif;
+  --label: "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  position: relative; color: var(--toner); min-height: 520px;
+}
+.p2 ::selection { background: var(--swipe); color: var(--toner); }
+.p2 ul, .p2 ol { list-style: none; margin: 0; padding: 0; }
+.p2 h2, .p2 h3, .p2 p { margin: 0; }
+.p2-quiet { color: #b9b6ac; max-width: 34ch; margin: 6px 2px 0 !important; }
+.p2 .cb-piece .p2-quiet, .p2-page .p2-quiet { color: var(--pencil); }
+.p2 .cb-typed.on-table { color: #d9d5c7; text-shadow: none; }
+.p2-note { max-width: 260px; transform: rotate(-.8deg); }
+.p2 .cb-art { pointer-events: none; }
+.p2 .cb-strip { pointer-events: none; }
+.p2-col { display: flex; flex-direction: column; gap: 22px; min-width: 0; align-items: flex-start; }
+.p2-cols { display: grid; gap: 26px 30px; align-items: start; }
+/* a strip sitting on the corner of a piece that is not itself a button (it names the thing) */
+.p2-envelope, .p2-statement { position: relative; }
+.p2-envelope > .cb-strip, .p2-statement > .cb-strip { position: absolute; left: 6px; top: -6px; }
+.p2 [data-drop].is-over { outline: 3px dashed var(--bone); outline-offset: -6px; }
+
+/* ================= the cash envelope ================= */
+
+.p2-slider { display: flex; flex-direction: column; gap: 10px; margin: -6px 0 -4px 6px; }
+.p2-sliderow { display: flex; flex-direction: column; gap: 4px; }
+.p2-sliderow-k { filter: invert(.88); }
+.p2-bills { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.p2-bill.cc-lift { cursor: grab; touch-action: none; }
+.p2-bill:disabled { opacity: .28; }
+.p2-statement { margin-top: 4px; }
+
+.p2-spike { position: relative; padding-top: 4px; }
+.p2-nail { position: absolute; left: 50%; top: -8px; margin-left: -27px; z-index: 30; }
+.p2-slips { display: flex; flex-direction: column; align-items: center; padding-top: 18px; }
+.p2-slip { position: relative; margin-top: -18px; transform: rotate(var(--r, 0deg)); }
+.p2-slip:first-child { margin-top: 0; }
+.p2-slip-b.is-on { transform: translate(14px, 0) rotate(2deg); filter: drop-shadow(5px 7px 0 rgba(0, 0, 0, .6)); }
+
+.p2-tapewrap { display: flex; flex-direction: column; gap: 10px; align-self: stretch; }
+.p2-cattabs { max-width: 300px; }
+.p2-tapefor { gap: 8px; }
+.p2-tapefor > .cb-art { filter: invert(.88); }
+.p2-tape { position: relative; width: 100%; max-width: 270px; box-sizing: border-box; max-height: 330px; overflow: auto; padding: 14px 14px 22px; background: #f1eee3;
+  background-image: radial-gradient(rgba(20, 20, 19, .08) 1px, transparent 1.3px); background-size: 6px 6px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 92% 100%, 82% calc(100% - 5px), 70% 100%, 58% calc(100% - 6px), 44% 100%, 30% calc(100% - 4px), 16% 100%, 6% calc(100% - 6px), 0 100%);
+  transform: rotate(.8deg); scrollbar-width: thin; }
+.p2-tape:focus-visible { outline: 3px dashed var(--toner); outline-offset: -6px; }
+.p2-tapeline { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 6px; font: 700 11px/1.5 var(--type); color: var(--toner); border-bottom: 1px dotted rgba(20, 20, 19, .2); }
+.p2-tl-w { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p2-tl-a { text-align: right; }
+.p2-tapeline.is-out .p2-tl-a { text-decoration: underline; text-decoration-thickness: 1px; }
+
+.p2-owed { display: flex; flex-direction: column; gap: 6px; }
+.p2-billpile { display: flex; flex-direction: column; }
+.p2-owebill { position: relative; margin-top: -40px; transform: rotate(var(--r, 0deg)); }
+.p2-owebill:first-child { margin-top: 0; }
+.p2-short { display: flex; flex-direction: column; gap: 6px; }
+.p2-notes { display: flex; flex-wrap: wrap; gap: 4px 10px; max-width: 420px; }
+.p2-waynote { transform: rotate(var(--r, 0deg)); }
+.p2-waynote.is-out { opacity: .55; }
+.p2-dayjob { display: flex; flex-direction: column; gap: 2px; }
+
+/* pieces scale down with their column */
+.p2-col .cb-art { max-width: 100%; height: auto !important; }
+.p2-col .cb-art img, .p2-col .cb-art svg { max-width: 100%; height: auto; }
+.p2-cols--money { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr); gap: 24px 26px; }
+.p2-col .cb-thing { max-width: 100%; }
+.p2-col .cb-thing > .cb-art { max-width: 100%; }
+.p2-spike > .cb-thing { margin: 8px 0 0 16px; }
+
+/* ================= the flyer pile ================= */
+.p2-openers { display: flex; flex-wrap: wrap; gap: 14px 26px; align-items: flex-end; margin: 6px 0 22px 8px; }
+.p2-opener.is-on { transform: translateY(-4px) rotate(-1deg); filter: drop-shadow(5px 8px 0 rgba(0, 0, 0, .6)); }
+.p2-opener.is-on .cb-strip { filter: invert(1); }
+.p2-offers { display: flex; flex-wrap: wrap; gap: 16px; margin: 0 0 22px; }
+.p2-offer { max-width: 440px; transform: rotate(-.6deg); }
+.p2-offer .cb-typed { margin-bottom: 8px; }
+.p2-scrap { max-width: 320px; transform: rotate(-.7deg); }
+.p2-pilecols { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 28px; align-items: start; }
+.p2-pilewrap { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.p2-wall { display: flex; flex-wrap: wrap; gap: 18px 26px; align-items: flex-start; padding: 0 0 6px; }
+.p2-walled { display: flex; flex-direction: column; align-items: center; transform: rotate(var(--r, 0deg)); }
+.p2-walled > .p2-tapeline-art, .p2-walled > .p2-tapebare { position: relative; z-index: 4; margin-bottom: -18px; }
+.p2-grown { margin-top: 4px; }
+.p2-pick { line-height: 0; }
+.p2-pick .sb-flyer-thumb { box-shadow: 4px 6px 0 rgba(0, 0, 0, .65); }
+.p2-pick.is-held { opacity: .35; }
+.p2-filters { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+.p2-roomtabs { max-width: 640px; }
+.p2-spread { display: flex; flex-direction: column; gap: 18px; }
+.p2-month { display: flex; flex-direction: column; gap: 4px; }
+.p2-monthpile { display: flex; flex-wrap: wrap; gap: 0; padding-left: 22px; }
+.p2-piled { margin: 0 0 6px -22px; transform: rotate(var(--r, 0deg)); }
+.p2-piled:hover, .p2-piled:focus-within { z-index: 6; position: relative; }
+.p2-blankflyer { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 8px; background: #d9d5c7; color: #141413;
+  font: 700 10px/1.2 var(--type); text-transform: uppercase; box-shadow: inset 0 0 0 2px #141413; }
+.p2-held { position: sticky; top: 8px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.p2-heldflyer { transform: rotate(1.4deg); filter: drop-shadow(8px 11px 0 rgba(0, 0, 0, .7)); }
+.p2-heldcard { max-width: 280px; }
+.p2-heldcard .cb-typed { margin: 0 0 4px; }
+.p2-heldacts { gap: 10px; }
+.p2-flyerback { max-width: 290px; max-height: 360px; overflow: auto; font: 12px/1.35 var(--type); }
+.p2-bandstrips { display: flex; flex-direction: column; gap: 26px; }
+.p2-bandstrip { display: grid; grid-template-columns: 200px minmax(0, 1fr) 280px; gap: 18px; align-items: start; transform: rotate(var(--r, 0deg)); }
+.p2-filmstrip { justify-self: start; max-width: 100%; display: flex; flex-wrap: wrap; gap: 2px; padding: 8px 8px 6px; background: #f4f2ea; box-shadow: 4px 6px 0 rgba(0, 0, 0, .6); align-self: start;
+  background-image: linear-gradient(rgba(230, 220, 184, .85), rgba(230, 220, 184, .85)); background-size: 100% 18px; background-repeat: no-repeat; background-position: 0 40%; }
+.p2-filmcell { display: flex; flex-direction: column; align-items: center; gap: 2px; font: 700 9px var(--type); }
+.p2-filmcell .sb-flyer-thumb { transform: none !important; }
+.p2-bandhist ul { margin: 6px 0; }
+.p2-bandhist li { margin: 0 0 3px; }
+.p2-towncols, .p2-endcols { display: grid; grid-template-columns: minmax(0, 660px) minmax(260px, 340px); gap: 26px; align-items: start; }
+.p2-linepage { position: relative; }
+.p2-linepage > .cb-strip { position: absolute; left: 10px; top: -6px; }
+.p2-wordtext { max-width: 520px; }
+.p2-firsts ol { margin: 6px 0 0; }
+.p2-firsts li { margin: 0 0 4px; }
+.p2-years { display: flex; flex-direction: column; gap: 30px; align-items: flex-start; }
+.p2-endhand { max-width: 640px; }
+.p2-endhand h3 { margin: 12px 0 6px; }
+.p2-endpeople { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow: auto; padding: 4px; }
+.p2-typeline { display: flex; align-items: baseline; gap: 6px; margin: 4px 0 8px; font: 700 13px var(--type); }
+.p2-typein { flex: 1; min-width: 0; border: 0; border-bottom: 1.5px solid #141413; background: transparent; padding: 3px 2px; font: 700 14px var(--type); color: #141413; }
+.p2-typein:focus { outline: none; background: rgba(255, 232, 0, .35); }
+.p2-endlast, .p2-endsure { max-width: 340px; position: relative; }
+.p2-endsure { transform: rotate(1deg); }
+.p2-endpage { max-width: 620px; }
+.p2-epilogue { white-space: pre-wrap; margin-top: 10px !important; }
+.p2-offer, .p2-endsure, .p2-tourgo { position: relative; }
+
+/* the year page: a photocopied zine page (also inside the torn-off page of the close-out) */
+.p2-zine { --toner: #141413; --type: "Courier New", Courier, monospace; position: relative; max-width: 640px; padding: 22px 24px 24px; color: #141413;
+  background: #f1eee3; background-image: radial-gradient(rgba(20, 20, 19, .1) 1px, transparent 1.3px); background-size: 5px 5px;
+  box-shadow: 7px 9px 0 rgba(0, 0, 0, .7), inset 0 0 22px rgba(20, 20, 19, .3); transform: rotate(-.4deg);
+  clip-path: polygon(0 .6%, 40% 0, 100% .4%, 99.6% 50%, 100% 99.4%, 58% 100%, .3% 99.5%, .2% 46%); }
+.p2-zine h2, .p2-zine h3, .p2-zine p { margin: 0; }
+.p2-zine-h { margin: 0 0 8px; }
+.p2-zine-front { margin: 0 0 10px !important; font-size: 14px; max-width: 54ch; }
+.p2-zine-figs { margin: 6px 0; }
+.p2-zine-k { display: inline-block; margin: 14px 0 6px !important; padding: 2px 8px; background: #141413; color: #f4f2ea; font: 900 11px/1.3 "Arial Black", Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; transform: rotate(-1deg); }
+.p2-cutnames { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 8px; }
+.p2-cutname { padding: 2px 6px; background: #f4f2ea; box-shadow: inset 0 0 0 1.5px #141413, 2px 2px 0 rgba(0, 0, 0, .35); font: 700 11px var(--type); transform: rotate(var(--r, 0deg)); }
+.p2-cutname.is-black { background: #141413; color: #f4f2ea; }
+.p2-zine-nights { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 16px; }
+.p2-zine-night { display: flex; gap: 8px; align-items: flex-start; max-width: 290px; }
+.p2-zine-flyers { display: flex; flex-wrap: wrap; gap: 8px; }
+.p2-zine-seasons { list-style: none; margin: 0; padding: 0; }
+.p2-zine-seasons li { margin: 0 0 3px; }
+.p2-zine-forward { margin-top: 14px !important; padding: 8px 10px; background: #141413; color: #f4f2ea; font: 700 12px/1.4 var(--type); }
+.p2-zine .cb-typed { color: #141413; }
+
+/* ================= the road map ================= */
+.p2-mapcols { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+.p2-mapwrap { min-width: 0; }
+.p2-map { position: relative; width: 100%; max-width: 900px; }
+.p2-map > .cb-art { width: 100% !important; height: auto !important; }
+.p2-map > .cb-art img, .p2-map > .cb-art svg { width: 100%; height: auto; }
+.p2-maphit { position: absolute; display: block; padding: 0; margin: 0; border: 0; background: transparent; cursor: pointer; }
+.p2-maphit:hover { background: rgba(255, 232, 0, .28); mix-blend-mode: multiply; }
+.p2-maphit.is-on { background: rgba(255, 232, 0, .5); mix-blend-mode: multiply; }
+.p2-maphit:focus { outline: none; }
+.p2-mapside { gap: 18px; }
+.p2-zonenote, .p2-contacts, .p2-routes, .p2-toursheet { max-width: 300px; width: 100%; }
+.p2-zonenote { transform: rotate(.8deg); }
+.p2-zonenote > * + * { margin-top: 5px !important; }
+.p2-contacts li, .p2-routes li { margin: 0 0 3px; }
+.p2-routes h3 + * { margin: 4px 0 10px; }
+.p2-toursheet > * + * { margin-top: 8px; }
+.p2-stops { display: flex; flex-direction: column; gap: 4px; }
+.p2-tourgo { display: inline-block; }
+
+@media (max-width: 1100px) {
+  .p2-cols--money { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .p2-bandstrip { grid-template-columns: 200px minmax(0, 1fr); }
+  .p2-bandhist { grid-column: 1 / -1; }
+}
+@media (max-width: 860px) {
+  .p2-cols, .p2-cols--money, .p2-pilecols, .p2-mapcols, .p2-towncols, .p2-endcols, .p2-bandstrip { grid-template-columns: minmax(0, 1fr); }
+  .p2-held { position: static; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) .p2 *, :root:not([data-motion="full"]) .p2-zine * { transition: none !important; animation: none !important; }
+}
+:root[data-motion="reduce"] .p2 *, :root[data-motion="reduce"] .p2-zine * { transition: none !important; animation: none !important; }

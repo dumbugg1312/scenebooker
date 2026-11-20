@@ -1,0 +1,16 @@
+# OS / editor
+.DS_Store
+__pycache__/
+*.pyc
+node_modules/
+
+# Netlify
+.netlify/
+dist/
+
+# Heavy generated / source material (kept local only)
+design/shots/
+design/audit/
+design/sample/
+tools/music/
+tools/cutscene-audio/
