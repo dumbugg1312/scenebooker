@@ -176,28 +176,28 @@
       fee = SB.Bands.fee(S(), c.bandId, c.showId);
       if (fee.pay === 'FLAT' || fee.amount > 0) fail('the local draw the texts name asks ' + fee.pay + ' $' + fee.amount + ' for a ' + show().door.price + ' dollar door');
       tap(fk('row-slot-CLOSE')); tap(fk('cand-' + c.bandId));
-      expect('BILL', 'WAIT'); clean();
-      if (outN() !== 3) fail('the card\'s foot counts ' + outN() + ' asks going out tonight, not the offer and the two locals');
-      down();
-      until('BILL:WAIT', 'the bands to answer');
+      /* everybody on the bill is asked: sound next, in the same sitting, before any wait */
       expect('SOUND', 'ASK'); clean();
-      var o = SB.Chapters.billOrder(S(), show()), last = show().bill.slots[show().bill.slots.length - 1];
-      if (!o.ok || o.n < 3) fail('the bill is not kids, touring, draw: ' + JSON.stringify(show().bill.slots.map(function (x) { return S().bands[x.bandId].name + ' ' + x.role; })));
-      if (last.pay === 'FLAT' || last.fee > 0) fail('the closer is on the bill for a flat fee');
+      if (outN() !== 3) fail('the card\'s foot counts ' + outN() + ' asks going out tonight, not the offer and the two locals');
     });
-    /* 4 SOUND */
-    phase('sound: the clipboard, the crew', '04-SOUND', function () {
-      tap(clip());
+    /* 4 SOUND: asked while the bands answer, so bands and sound come back over one wait */
+    phase('sound: the row, the crew', '04-SOUND', function () {
       rowsFit();
       tap(fk('row-sound'));
       taped(fk('cr-sound' + cur().personId));
     });
-    phase('sound: asked, answered', null, function () {
+    phase('sound: asked; the bands and sound answer over one wait', null, function () {
       tap(fk('cr-sound' + cur().personId));
-      expect('SOUND', 'WAIT');
+      expect('BILL', 'WAIT'); clean();
+      if (outN() !== 4) fail('the card\'s foot counts ' + outN() + ' asks going out tonight, not the offer, the two locals and sound');
       down();
-      until('SOUND:WAIT', 'sound to answer');
+      until('BILL:WAIT', 'the bands and sound to answer');
+      if (cur().step === 'SOUND') until('SOUND:WAIT', 'sound to answer');
       expect('FLYER'); clean();
+      var o = SB.Chapters.billOrder(S(), show()), last = show().bill.slots[show().bill.slots.length - 1];
+      if (!o.ok || o.n < 3) fail('the bill is not kids, touring, draw: ' + JSON.stringify(show().bill.slots.map(function (x) { return S().bands[x.bandId].name + ' ' + x.role; })));
+      if (last.pay === 'FLAT' || last.fee > 0) fail('the closer is on the bill for a flat fee');
+      if (!(show().crew && show().crew.sound)) fail('sound did not say yes over the same wait as the bands');
     });
     /* 5 FLYER: the card's flyer row, into the flyer desk, and USE THIS FLYER comes back to the card */
     phase('flyer: the flyer desk', '05-FLYER', function () {

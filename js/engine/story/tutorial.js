@@ -245,16 +245,23 @@ SB.module('Tutorial', function (SB) {
    * nudge is the "you there?" text once the player has left the step alone for NUDGE_DAYS days (null before that);
    * wrong is the line for a step being done badly (the bill out of order), else null. */
   function current(state) {
-    var t = peek(state), s, o, ctx, base, w, g, tx;
+    var t = peek(state), s, o, ctx, base, w, g, tx, step, sg;
     if (!t || !t.on || !t.step) return null;
     s = showOf(state, t);
     o = s ? SB.Chapters.billOrder(state, s) : { touring: null, closer: null };
     ctx = SB.Chapters.slots(state, 'tutorial');
-    base = 'story.tutorial.steps.' + t.step;
+    step = t.step;
     w = t.step === 'BILL' && s && o.n >= 2 && !o.ok ? o.why : null;
     g = stageOf(state, t, t.step, s);
+    /* Everybody on the bill is asked: ask sound in the same sitting, so the bands and sound answer over one wait.
+     * (done() is given a scratch record: this is a read.) */
+    if (t.step === 'BILL' && g.stage === 'WAIT' && s && cast(state).sound) {
+      sg = stageOf(state, t, 'SOUND', s);
+      if (sg.stage === 'ASK' && !done(state, { replied: t.replied, wrong: {} }, 'SOUND', s)) { step = 'SOUND'; g = sg; w = null; }
+    }
+    base = 'story.tutorial.steps.' + step;
     tx = g.stage ? say(base + '.stages.' + g.stage, ctx) : '';
-    return { step: t.step, n: STEPS.indexOf(t.step) + 1, of: STEPS.length, target: STAGE_TARGET[g.stage] || (TARGET[t.step] === 'clip' && !s ? 'phone' : TARGET[t.step]),
+    return { step: step, n: STEPS.indexOf(step) + 1, of: STEPS.length, target: STAGE_TARGET[g.stage] || (TARGET[step] === 'clip' && !s ? 'phone' : TARGET[step]),
              stage: g.stage, bandId: g.bandId || null, slot: g.slot || null, personId: g.personId || null, jobId: g.jobId || null,
              showId: s ? s.id : null, requestId: (s && s.requestId) || t.requestId || null,
              text: say(base + '.text', ctx), more: tx || null,

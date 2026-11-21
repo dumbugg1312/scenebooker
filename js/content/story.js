@@ -59,7 +59,7 @@ SB.Content.story = {
           OFFER: "Start with {touring}. They're already on the clipboard. Tap their row and make the offer. The door deal they asked for is fine. Send it.",
           KIDS: "Offer's out. Now the OPENER row. Pick {kids} off the sticker sheet.",
           LOCAL: "Now {local}. The HEADLINER row. A cut of the door, no flat fee.",
-          WAIT: "Everybody's asked. Press play. Bands answer when they answer.",
+          WAIT: "Bands and sound are all asked. Press play. Everybody answers when they answer.",
           ORDER: "Tap a band's row and move them until it reads {kids}, {touring}, {local}."
         }
       },
@@ -67,7 +67,7 @@ SB.Content.story = {
         text: "{sound} for sound. {soundRate:money}. Late every time, never misses. Unless a wedding calls. Weddings pay better than we do.",
         nudge: "you need sound. {sound} answers texts faster than calls.",
         stages: {
-          ASK: "The SOUND row on the clipboard. Ask {sound}.",
+          ASK: "The SOUND row on the clipboard. Ask {sound}. Sound doesn't have to wait on the bands.",
           WAIT: "Asked. Press play. {sound} will say yes, {sound} always says yes."
         }
       },
