@@ -14,10 +14,11 @@ SB.module('Tutorial', function (SB) {
   var STEPS = ['ANSWER', 'HOLD', 'BILL', 'SOUND', 'FLYER', 'PROMO', 'WAIT', 'DOOR', 'SETTLE', 'CLOSEOUT'];
   /* The desk object each step points at: ids of js/desk/scene.js add('...'). 'clip' is the show's own clip on the
    * calendar (scene ids clip0, clip1, ...: the one whose params.showId is current().showId); 'night' is the night screen. */
-  var TARGET = { ANSWER: 'phone', HOLD: 'phone', BILL: 'clip', SOUND: 'clip', FLYER: 'paper', PROMO: 'calendar', WAIT: 'lamp',
+  var TARGET = { ANSWER: 'phone', HOLD: 'clip', BILL: 'clip', SOUND: 'clip', FLYER: 'clip', PROMO: 'clip', WAIT: 'lamp',
                  DOOR: 'night', SETTLE: 'night', CLOSEOUT: 'lamp' };
-  /* where a stage sends the player, when it is not the step's own target ('lamp' is the tape deck: let the days go by) */
-  var STAGE_TARGET = { WAIT: 'lamp', CONFIRM: 'clip', OFFER: 'phone', PLAY: 'lamp' };
+  /* where a stage sends the player, when it is not the step's own target ('lamp' is the tape deck: let the days go by).
+   * The whole show is built on its clipboard (the card); until the show exists there is no clip, so the phone it is. */
+  var STAGE_TARGET = { WAIT: 'lamp', PLAY: 'lamp' };
   var RIG_DAYS = 2;
   var NUDGE_DAYS = 2, BILL_MIN = 3, PROMO_MIN = 2, LATE_FLYER_DAYS = 3;
 
@@ -253,7 +254,7 @@ SB.module('Tutorial', function (SB) {
     w = t.step === 'BILL' && s && o.n >= 2 && !o.ok ? o.why : null;
     g = stageOf(state, t, t.step, s);
     tx = g.stage ? say(base + '.stages.' + g.stage, ctx) : '';
-    return { step: t.step, n: STEPS.indexOf(t.step) + 1, of: STEPS.length, target: STAGE_TARGET[g.stage] || TARGET[t.step],
+    return { step: t.step, n: STEPS.indexOf(t.step) + 1, of: STEPS.length, target: STAGE_TARGET[g.stage] || (TARGET[t.step] === 'clip' && !s ? 'phone' : TARGET[t.step]),
              stage: g.stage, bandId: g.bandId || null, slot: g.slot || null, personId: g.personId || null, jobId: g.jobId || null,
              showId: s ? s.id : null, requestId: (s && s.requestId) || t.requestId || null,
              text: say(base + '.text', ctx), more: tx || null,

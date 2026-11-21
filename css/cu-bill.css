@@ -315,3 +315,45 @@ body.cb-dragging { user-select: none; }
 /* scrolling sheets keep their heading in view after a click */
 .cb-sheet > .cb-head:first-child { position: sticky; top: calc(var(--p) * -14); z-index: 5; margin-top: calc(var(--p) * -14); padding-top: calc(var(--p) * 14);
   background: var(--cb-stock, var(--pp-blue)); box-shadow: 0 calc(var(--p) * 6) calc(var(--p) * 6) calc(var(--p) * -6) rgba(0, 0, 0, .35); }
+
+/* ================================================================================================================
+ * the card (show): the whole show built in one place. Left: one row per part of the show (its name on a label strip,
+ * what is written in, how it stands as a stamp). Right: the picker for the row that is picked (or the forecast).
+ * The same clipboard, wider; the loud thing is still the status stamp across the date line.
+ * ================================================================================================================ */
+.cu--clipboard.cb-held--show.cb-held--card { width: calc(var(--p) * 1220); transform: none; }
+.cu--clipboard.cb-held--card .cu-in { padding: calc(var(--p) * 24) calc(var(--p) * 14) calc(var(--p) * 10) calc(var(--p) * 16); overflow: hidden; }
+.cb-held--card .cu-host { height: 100%; }
+.cb-card { display: grid; grid-template-columns: calc(var(--p) * 440) minmax(0, 1fr); gap: 0 calc(var(--p) * 14); height: 100%; }
+.cb-cardleft { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.cb-card .cb-showhead--big { margin: 0 0 calc(var(--p) * 26); gap: calc(var(--p) * 10); }
+.cb-cardrows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.cb-cardrows > li { line-height: 0; }
+.cb-cardrow { display: block; }
+.cb-cardrow.is-on { transform: translateX(calc(var(--p) * 5)) rotate(-.4deg); filter: drop-shadow(calc(var(--p) * 3) calc(var(--p) * 4) 0 rgba(0, 0, 0, .55)); z-index: 4; }
+.cb-cardfoot { display: flex; align-items: center; justify-content: space-between; gap: calc(var(--p) * 10); margin-top: auto; padding: calc(var(--p) * 2) calc(var(--p) * 4) 0 0; }
+.cb-asksout { line-height: 0; }
+.cb-pick { position: relative; height: 100%; min-height: 0; min-width: 0; overflow: auto; overscroll-behavior: contain; padding: calc(var(--p) * 2) calc(var(--p) * 12) calc(var(--p) * 8) calc(var(--p) * 8); }
+.cb-pickhead { margin: 0 0 calc(var(--p) * 6); line-height: 0; }
+.cb-pickhint { margin: calc(var(--p) * 4) 0 0; max-width: 52ch; }
+.cb-pick .cb-piece { margin-bottom: calc(var(--p) * 14); }
+.cb-pick .cb-sheet { max-height: none; overflow: visible; }
+.cb-pick .cb-pile { gap: calc(var(--p) * 12) calc(var(--p) * 6); }
+.cb-pick .cb-flyerclip { flex-direction: column; align-items: center; gap: calc(var(--p) * 12); margin: calc(var(--p) * 14) 0 0; }
+.cb-pick .cb-flyernote { margin: 0; background: var(--pp-white); padding: calc(var(--p) * 4) calc(var(--p) * 8); transform: rotate(-.6deg); }
+.cb-pick .cb-sheet > .cb-head:first-child { position: static; margin-top: 0; padding-top: 0; box-shadow: none; }
+.cb-pick .cb-candbox, .cb-pick .cb-pile > .cb-cand { zoom: .9; }
+/* the show's jobs: one line each: what it is, its window, and the week's half-days to pencil it in on */
+.cb-pick .cb-note { max-width: none; display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 4) calc(var(--p) * 14); margin: 0 calc(var(--p) * 6) calc(var(--p) * 10) 0; padding: calc(var(--p) * 7) calc(var(--p) * 10) calc(var(--p) * 8); }
+.cb-pick .cb-note:nth-child(even) { margin-left: calc(var(--p) * 6); margin-right: 0; }
+.cb-pick .cb-note-top { flex: 1 1 calc(var(--p) * 190); min-width: 0; }
+.cb-pick .cb-hl, .cb-pick .cb-slotwrap { margin: 0; }
+.cb-pick .cb-note > p { margin: 0; }
+.cb-card .cb-showtitle { position: relative; display: block; }
+.cb-card .cb-statstamp { position: absolute; left: calc(var(--p) * -4); top: calc(var(--p) * 44); margin: 0; }
+.cb-bandpick > .cb-locked + .cb-row { margin-top: calc(var(--p) * 20); }
+.cb-pick .cb-scraps { margin-top: calc(var(--p) * 6); }
+.cb-bandtabs { margin: calc(var(--p) * 12) 0; align-items: flex-start; }
+.cb-offer > * + *, .cb-bandpick > * + * { margin-top: calc(var(--p) * 10); }
+.cb-offer p, .cb-bandpick p { margin-bottom: 0; }
+.cb-offerrow { align-items: flex-end; }

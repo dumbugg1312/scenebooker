@@ -46,9 +46,9 @@ SB.Content.story = {
         text: "Text {host} for {room}. {dow}, {date}. Get it held, then get it confirmed, before you tell anybody it's happening.",
         nudge: "did {host} say yes? a show without a room is a rumor.",
         stages: {
-          ASK: "Same message from {sender}. Hold a room, pick {dow}, ask for the hold.",
+          ASK: "On the clipboard, the ROOM row: pick {room}, {dow}, hang your tag. No clipboard yet? HOLD on {sender}'s message starts one.",
           WAIT: "Asked. Nobody answers until the days go by. Press play on the tape deck.",
-          CONFIRM: "{host} is holding {dow} for you. A hold isn't a show. Open the clipboard and ask to confirm."
+          CONFIRM: "{host} is holding {dow} for you. A hold isn't a show. On the clipboard, the ROOM row. Ask to confirm."
         }
       },
       BILL: {
@@ -56,18 +56,18 @@ SB.Content.story = {
         nudge: "set list. kids, then {touring}, then {local}. that's the whole trick.",
         wrong: "Look at the order again. If {local} plays before {touring}, half the room goes home before the band that drove here. Touring second to last. {local} last.",
         stages: {
-          OFFER: "Start with {touring}. Open their message, make an offer. The door deal they asked for is fine. Send it.",
-          KIDS: "Offer's out. Now the clipboard. Peel stickers, pick {kids}, stick them in the opening slot.",
-          LOCAL: "Now {local}. Stick them in the closing slot. A cut of the door, no flat fee.",
+          OFFER: "Start with {touring}. They're already on the clipboard. Tap their row and make the offer. The door deal they asked for is fine. Send it.",
+          KIDS: "Offer's out. Now the OPENER row. Pick {kids} off the sticker sheet.",
+          LOCAL: "Now {local}. The HEADLINER row. A cut of the door, no flat fee.",
           WAIT: "Everybody's asked. Press play. Bands answer when they answer.",
-          ORDER: "On the set list, move them until it reads {kids}, {touring}, {local}."
+          ORDER: "Tap a band's row and move them until it reads {kids}, {touring}, {local}."
         }
       },
       SOUND: {
         text: "{sound} for sound. {soundRate:money}. Late every time, never misses. Unless a wedding calls. Weddings pay better than we do.",
         nudge: "you need sound. {sound} answers texts faster than calls.",
         stages: {
-          ASK: "It's on the clipboard, down by the crew. Ask {sound}.",
+          ASK: "The SOUND row on the clipboard. Ask {sound}.",
           WAIT: "Asked. Press play. {sound} will say yes, {sound} always says yes."
         }
       },
@@ -76,14 +76,14 @@ SB.Content.story = {
         nudge: "flyer. today. every day it waits is people making other plans.",
         wrong: "That flyer's late. Every day it sat in your head, somebody made other plans. It'll still help. Next time, the day you confirm.",
         stages: {
-          MAKE: "Pick up the paste-up on the desk. Change whatever you want on it, then press USE THIS FLYER."
+          MAKE: "The FLYER row on the clipboard takes you to the paste-up. Change whatever you want on it, then press USE THIS FLYER."
         }
       },
       PROMO: {
         text: "Now get it out. The record store counter, the coffee place, and send it to the bands so they share it. Two places at least.",
         nudge: "a flyer nobody sees is a drawing. put it somewhere.",
         stages: {
-          PLAN: "The jobs are on the calendar. Pick one up and put it on a day. Two of them.",
+          PLAN: "The PROMO row on the clipboard. Pencil a job in on a day. Two of them.",
           WAIT: "Planned. Press play and they get done."
         }
       },

@@ -1,9 +1,11 @@
 /* Scene Booker — ui/screens/shows.js (UI-A2, redrawn for the desk)
  * The clipboards. shows: the clipboards of the shows on the way, a blank one to start a show, a shoebox of past ones.
- * show: one clipboard: the bill as a set list, the room as its key and tag, the date page, the door price tag, the
- * ages stamp, the deal slip, the crowd as rows of heads, the jobs as a checklist of notes, the flyer clipped on top.
- * bill: the same set list with the sticker sheet of local bands at its side: peel a sticker and stick it in the
- * running order to ask that band (drag, or tap the sticker then the gap); what each band would add shows as heads.
+ * show: one clipboard, and the whole show is built on it (the card). Left: one row per part of the show (night, room,
+ * each slot of the bill, sound, door, security, flyer, promo, price, deal): its name, what is written in, how it stands
+ * as a stamp. Right: the picker for the row that is picked: the hold form, the sticker sheet of local bands for that
+ * slot, the offer slip for a request's touring band, the crew, the flyer, the jobs to pencil in on days, the door
+ * controls, the deal; with nothing picked, the forecast as rows of heads. Its foot counts the asks that go out tonight.
+ * A played or cancelled show is the night's record instead. bill: the old route; it opens the same card on the bill.
  * Also defines SB.UI.cuDraw, the small drawing helpers the clipboard, sticker sheet and key hooks share.
  * Reads Shows, Jobs, Forecast, Bands, Harm, People, Money and Rooms views; changes state only through SB.UI.act.
  */
@@ -52,8 +54,6 @@
     planIn: 'Pencil it in: {d} {half}',
     waived: 'Not needed here.',
     bill: 'SET LIST',
-    buildBill: 'PEEL STICKERS',
-    buildBillL: 'Open the sticker sheet and build the bill',
     deal: 'The deal',
     written: 'written down',
     handshake: 'a handshake',
@@ -107,6 +107,36 @@
     locked: 'The bill is locked. Changing it now costs trust with the bands.',
     result: 'How it went',
     unknown: '?'
+  };
+  SB.Content.ui.card = {
+    rows: 'The show, part by part',
+    picker: 'The part you picked',
+    forecast: 'How it looks',
+    hint: 'Pick a part of the show on the left to work on it. Everything you ask for goes out with tonight\'s send.',
+    night: 'NIGHT', room: 'ROOM', sound: 'SOUND', door: 'DOOR', security: 'SECURITY', flyer: 'FLYER', promo: 'PROMO', prep: 'PREP', price: 'PRICE', deal: 'DEAL',
+    blank: 'nothing yet',
+    noJobs: 'Nothing here yet. Jobs turn up as the show takes shape.',
+    inDays: 'IN {n} DAYS', inDay: 'TOMORROW', tonight: 'TONIGHT',
+    st: { EMPTY: 'EMPTY', TONIGHT: 'GOES OUT TONIGHT', WAITING: 'WAITING', YES: 'YES', NO: 'NO', COUNTER: 'CAME BACK $?', HELD: 'HELD', HELDN: 'HELD #{n}', CONFIRMED: 'CONFIRMED', OFFER: 'NO OFFER YET', DONE: 'DONE' },
+    flyerV: { MADE: 'made', PASTED: 'pasted up' },
+    flyerNone: 'No flyer yet. Paste one up at the flyer desk.',
+    flyerPasted: 'Pasted up. Making it is a job: pencil it in under PROMO.',
+    flyerMade: 'Made. Change it at the flyer desk if you want.',
+    promoV: '{n} of {of} on days',
+    owe: '{amount} if nobody comes',
+    out0: 'nothing goes out tonight', out1: '1 ask goes out tonight', outN: '{n} asks go out tonight',
+    theirNights: 'THE NIGHTS THEY ASKED FOR',
+    holdAsked: 'You asked {room} to hold {d}.', confAsked: 'You asked {room} to confirm.',
+    holdQueued: 'It goes out with tonight\'s send.', holdSent: 'Waiting to hear back.',
+    theyAsk: 'They asked for {deal}.',
+    toOffer: 'THE OFFER', toOfferL: 'Open the offer to the touring band',
+    page: 'PAGE', bandPage: 'Turn {name}\'s sticker over',
+    order: 'RUNNING ORDER', earlier: 'EARLIER', later: 'LATER', earlierL: 'Move {name} earlier in the night', laterL: 'Move {name} later in the night',
+    bigger: 'BIGGER', smaller: 'SMALLER',
+    another: '+ ANOTHER BAND', anotherL: 'Ask another band for the {slot} slot',
+    peel: 'PEEL THEM OFF',
+    takeIt: 'TAKE IT', takeItL: 'Take what they came back with',
+    takeBack: 'TAKE IT BACK', takeBackL: 'Take the ask back'
   };
   SB.Content.ui.bill = {
     title: 'The bill',
@@ -276,7 +306,7 @@
 
     /* ---- lettering ---- */
     function marker(t, x, y, s, o) { return K().marker(String(t), x, y, s, o || {}); }
-    function mw(t, s) { return K().markerWidth(String(t), s); }
+    function mw(t, s, o) { return K().markerWidth(String(t), s, o); }
     function type(t, x, y, s, o) { return K().type(String(t), x, y, s, o || {}); }
     function tw(t, s) { return K().typeWidth(String(t), s); }
     function letter(t, x, y, s, o) { return K().letter(String(t), x, y, s, o || {}); }
@@ -860,8 +890,11 @@
    *  Returns the undress function (stops watching the size). */
   function dress(root, mode, s) {
     var obj = safe(function () { return holder(root); }, null), inner, layers = {}, last = '', ro = null, bands;
+    var wide = mode === 'card';
+    if (wide) mode = 'show';
     if (!obj || typeof document === 'undefined' || !obj.querySelector) return function () {};
     inner = obj.querySelector('.cu-in');
+    if (wide) obj.classList.add('cb-held--card');
     obj.classList.add('cb-held');
     obj.classList.add('cb-held--' + mode);
     bands = mode === 'show' ? boardBands(s) : [];
@@ -1014,120 +1047,6 @@
     return { label: next.label, frac: Math.max(0.05, Math.min(1, 1 - (w.lateFrom - s.clock.day) / span)), late: s.clock.day >= w.lateFrom };
   }
 
-  /* ================================================================ */
-  /* the set list, shared by the clipboard and the bill               */
-  /* ================================================================ */
-
-  /* a snapshot of the band at the top of the bill, taped to the set list (cut-outs through the copier; decoration) */
-  function bandPhoto(band) {
-    var Kit = SB.UI.Kit, r, ids, paper;
-    if (!band || !Kit || !Kit.photo || !SB.Cutouts || !SB.Cutouts.filter) return null;
-    r = K().rng('bp' + band.id);
-    function one(role) { var l = SB.Cutouts.filter(function (c) { return c.role === role && (c.frame === 'full' || c.frame === 'waist'); }); return l.length ? l[r.int(0, l.length - 1)].id : null; }
-    ids = [one('guitar'), one('singer'), one('bass')].filter(Boolean);
-    paper = ['canary', 'pink', 'blue', 'green', 'salmon'][r.int(0, 4)];
-    return safe(function () { return Kit.photo({ ids: ids, w: 156, h: 104, paper: paper, tape: ['top'], rot: 2.5, seed: 'bp' + band.id, cls: 'cb-bandphoto', caption: String(band.name || '').toUpperCase() }); }, null);
-  }
-
-  function setList(s, v, ctx) {
-    var show = v.show, showId = show.id, locked = !!show.bill.locked, room = v.room, asks = bandAsks(s, showId), onBill = {},
-        order = show.bill.slots.map(function (x) { return x.bandId; }), pend = { OPEN: [], MIDDLE: [], CLOSE: [] }, noes = [], kids = [];
-    show.bill.slots.forEach(function (x) { onBill[x.bandId] = true; });
-    Object.keys(asks).forEach(function (id) {
-      var a = asks[id], c;
-      if (onBill[id]) return;
-      c = safe(function () { return SB.Bands.card(s, id); }, null);
-      if (!c) return;
-      if (a.status === 'QUEUED' || a.status === 'SENT' || a.status === 'COUNTER') (pend[(a.payload && a.payload.wantSlot) || 'MIDDLE'] || pend.MIDDLE).push({ c: c, a: a });
-      else if (a.status === 'NO' || a.status === 'SILENT') noes.push({ c: c, a: a });
-    });
-    function move(i, d) {
-      if (i + d < 0 || i + d >= order.length) return;
-      var o = order.slice(), t = o[i]; o[i] = o[i + d]; o[i + d] = t;
-      guard(locked, function () { act(function (x) { return SB.Shows.setBill(x, showId, { order: o }); }); });
-    }
-    function moveTo(id, j) {
-      var o = order.filter(function (x) { return x !== id; });
-      o.splice(Math.max(0, Math.min(o.length, j)), 0, id);
-      guard(locked, function () { act(function (x) { return SB.Shows.setBill(x, showId, { order: o }); }); });
-    }
-    function dropBand(b) { guard(locked && b.confirmed, function () { act(function (x) { return SB.Shows.dropBand(x, showId, b.band.id, 'PLAYER'); }); }); }
-    function setMin(b, m) { var mm = {}; mm[b.band.id] = Math.max(15, Math.min(90, m)); act(function (x) { return SB.Shows.setBill(x, showId, { minutes: mm }); }); }
-    function onDrop(target, p) {
-      if (!target) return;
-      if (/^pos:/.test(target) && p.slot) moveTo(p.slot, Number(target.slice(4)));
-      else if (/^gap:/.test(target) && p.cand && ctx.ask) ctx.ask(p.cand, target.slice(4));
-    }
-    ctx.onDrop = onDrop;
-
-    /* a gap in the running order: a dashed box drawn on the sheet; asks waiting for an answer sit in it, taped, with a ? */
-    function gap(slot, list) {
-      var picking = !!(ctx.picked && ctx.ask), w = 380, ht = list.length ? 30 + list.length * 66 : 46, out = '', gw = D.tw(T('bill', 'gap.' + slot), 11);
-      out += '<path d="M6 6H' + (w - 6) + 'V' + (ht - 6) + 'H6Z" fill="' + (picking ? '#f4f2ea' : 'none') + '" stroke="#141413" stroke-width="' + (picking ? 3 : 1.6) + '" stroke-dasharray="' + (picking ? '10 5' : '5 5') + '"/>';
-      out += D.type(T('bill', 'gap.' + slot), 16, 25, 11, { bold: true });
-      if (picking) out += D.marker(T('bill', 'stickHere'), w - 14, 28, 15, { anchor: 'end', seed: 'sh' + slot }) + K().arrow(gw + 30, 20, w - D.mw(T('bill', 'stickHere'), 15) - 24, 20, { seed: 'sha' + slot, sw: 2.6, head: 10 });
-      list.forEach(function (p, i) {
-        var y = 34 + i * 66, sw = 150;
-        out += '<g transform="translate(16 ' + y + ') rotate(' + (i % 2 ? 2 : -2) + ')">' + D.bandSticker(p.c, sw) + '</g>' + K().tape(30, y + 8, 40, 13, { seed: 'pt' + p.c.id, rot: -28 }) + K().tape(sw + 4, y + 52, 40, 13, { seed: 'pt2' + p.c.id, rot: -28 });
-        out += (p.a.status === 'COUNTER' ? D.swipe(190, y + 36, 56, 22) : '') + D.marker(p.a.status === 'COUNTER' ? '$?' : '?', 196, y + 50, 40, { fill: p.a.status === 'COUNTER' ? D.hot() : '#141413', seed: 'q' + p.c.id });
-        out += D.type(p.a.status === 'COUNTER' ? T('bill', 'counter').toUpperCase() : T('bill', 'asked').toUpperCase(), 250, y + 36, 12, { bold: true, maxWidth: 124 });
-      });
-      var lab = T('bill', 'gapL', { slot: T('bill', 'gap.' + slot).toLowerCase() }) + (list.length ? '. ' + list.map(function (p) { return p.c.name + ', ' + (p.a.status === 'COUNTER' ? T('bill', 'counter') : T('bill', 'asked')); }).join('; ') : '');
-      if (!ctx.ask) return h('div', { class: 'cb-gap', role: list.length ? 'img' : null, aria: list.length ? { label: lab } : { hidden: 'true' } }, list.length ? D.art(out, w, ht) : null);
-      return D.thing({ cls: 'cb-gap' + (picking ? ' is-ready' : ''), label: lab, drop: 'gap:' + slot, fk: 'gap-' + slot, svg: out, w: w, h: ht,
-        onClick: function () { if (ctx.picked) ctx.ask(ctx.picked, slot); } });
-    }
-
-    /* a band on the bill: its number in marker, its sticker (flat when they said yes, taped when they have not), its set */
-    function row(b, i) {
-      var w = 244, ht = 76, out = '', st0 = b.confirmed ? T('bill', 'yes') : T('bill', 'asked'), el, mins;
-      out += D.marker(String(i + 1), 4, 56, 34, { seed: 'n' + i });
-      out += '<g transform="translate(36 6) rotate(' + (i % 2 ? 1 : -1.5) + ' 85 36)">' + D.bandSticker(b.band, 156, { peel: true }) + '</g>';
-      if (!b.confirmed) out += K().tape(54, 12, 44, 14, { seed: 'st' + b.band.id, rot: -24 }) + D.marker('?', 202, 52, 32, { seed: 'sq' + b.band.id });
-      if (b.listed) out += D.bang(210, 28, 20);
-      el = D.thing({ cls: 'cb-setrow' + (b.confirmed ? '' : ' is-taped'), fk: 'set-' + b.band.id, drop: 'pos:' + i, svg: out, w: w, h: ht,
-        label: T('bill', 'setL', { n: i + 1, name: b.band.name, state: st0, t: num(b.start) ? SB.time.clock(b.start) : '?', m: b.minutes || 0 }),
-        on: { keydown: function (e) {
-          if (e.key === 'ArrowUp') { e.preventDefault(); move(i, -1); }
-          else if (e.key === 'ArrowDown') { e.preventDefault(); move(i, 1); }
-          else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); dropBand(b); }
-        }, click: function () { SB.UI.go('band', { bandId: b.band.id }); } } });
-      D.draggable(el, { slot: b.band.id }, onDrop);
-      mins = h('div', { class: 'cb-setctl' }, [
-        num(b.start) ? D.typed(T('bill', 'starts', { t: SB.time.clock(b.start) }), 12, { bold: true }) : null,
-        D.tabs({ label: T('bill', 'minutes', { n: b.minutes || 0 }) + ', ' + b.band.name, title: T('bill', 'minutes', { n: b.minutes || 0 }), items: [
-          { text: '-5', label: T('bill', 'shorter') + ': ' + b.band.name, fk: 'mn-' + b.band.id, onClick: function () { setMin(b, (b.minutes || 30) - 5); } },
-          { text: '+5', label: T('bill', 'longer') + ': ' + b.band.name, fk: 'mx-' + b.band.id, onClick: function () { setMin(b, (b.minutes || 30) + 5); } },
-          { text: 'X', label: T('bill', 'drop', { name: b.band.name }), fk: 'dr-' + b.band.id, onClick: function () { dropBand(b); } }] })
-      ]);
-      return h('li', { class: 'cb-setli' }, [el, mins]);
-    }
-
-    var snap = v.bands.length ? bandPhoto(v.bands[v.bands.length - 1].band) : null, hd = D.word(T('show', 'bill'), 30, { cls: 'cb-head' });
-    kids.push(snap ? h('div', { class: 'cb-sethead' }, [hd, snap]) : hd);
-    if (locked) kids.push(h('p', { class: 'cb-typed cb-locked' }, [D.art(lockSvg(), 26, 28), ' ', T('show', 'locked')]));
-    var items = [];
-    function showGap(k) { return !!ctx.ask || pend[k].length > 0; }
-    function gapLi(k) { return h('li', { class: 'cb-gapli' }, gap(k, pend[k])); }
-    if (showGap('OPEN')) items.push(gapLi('OPEN'));
-    v.bands.forEach(function (b, i) {
-      items.push(row(b, i));
-      if (i === 0 && v.bands.length > 1 && showGap('MIDDLE')) items.push(gapLi('MIDDLE'));
-    });
-    if (v.bands.length <= 1 && showGap('MIDDLE')) items.push(gapLi('MIDDLE'));
-    if (showGap('CLOSE')) items.push(gapLi('CLOSE'));
-    kids.push(h('ol', { class: 'cb-setlist', data: { tut: 'bill-slots', 'tut-ref': showId } }, items));
-    if (!v.bands.length && !ctx.ask && !pend.OPEN.length && !pend.MIDDLE.length && !pend.CLOSE.length) kids.push(D.art(K().scrawl(10, 14, 200, { seed: 'empty' }) + K().scrawl(10, 30, 140, { seed: 'empty2' }) + K().heart(230, 24, 18, { seed: 'eh', fill: 'none' }), 260, 40));
-    if (room && num(room.curfew)) kids.push(h('div', { class: 'cb-curfew', role: 'img', aria: { label: T('bill', 'stop', { t: SB.time.clock(room.curfew) }) } },
-      D.art(D.marker(T('bill', 'stop', { t: SB.time.clock(room.curfew) }), 6, 26, 18, { seed: 'cf' }) + K().under3(6, 32, D.mw(T('bill', 'stop', { t: SB.time.clock(room.curfew) }), 18), { seed: 'cfu', sw: 2.4, gap: 4 }), D.mw(T('bill', 'stop', { t: SB.time.clock(room.curfew) }), 18) + 20, 50)));
-    if (noes.length) kids.push(h('div', { class: 'cb-noes' }, noes.map(function (p, i) {
-      var cid = 'tn' + i + String(p.c.id).replace(/\W/g, '');
-      var out = '<g transform="rotate(' + (i % 2 ? 8 : -6) + ' 60 28)"><clipPath id="' + cid + '"><path d="M0 0H74L62 14L78 30L60 62H0Z"/></clipPath><g clip-path="url(#' + cid + ')">' + D.bandSticker(p.c, 140) + '</g></g>';
-      out += D.marker(T('bill', 'noWord'), 96, 44, 22, { seed: 'no' + i });
-      return D.thing({ cls: 'cb-torn', label: p.c.name + ', ' + T('bill', 'no'), fk: 'no-' + p.c.id, svg: out, w: 140, h: 66, onClick: function () { SB.UI.go('band', { bandId: p.c.id }); } });
-    })));
-    return piece('cb-set', 'white', kids);
-  }
   function lockSvg() { return K().rect(4, 12, 18, 14, { seed: 'lk', fill: '#141413', sw: 2.2 }) + K().path([[8, 12], [8, 6], [13, 2], [18, 6], [18, 12]], { seed: 'lks', sw: 2.4 }); }
   function guard(locked, fn) { if (locked) confirmCard(T('bill', 'lockedWarn'), T('bill', 'yesGo'), T('bill', 'noGo'), fn); else fn(); }
 
@@ -1137,28 +1056,37 @@
     out += D.marker(tt, 4, 40, 34, { maxWidth: 400, seed: 'hd' + show.id });
     if (room) out += D.type(String(room.name).toUpperCase(), 6, 65, 14, { bold: true, maxWidth: 400 });
     /* the one loud thing on a show: its status, stamped big across the date line, a long way off level */
-    if (big) { w = Math.ceil(sx) + 10; sw = Math.ceil(D.stampW(stt, 32)) + 34; }
+    var ss = typeof big === 'number' ? big : 32;                    // the card stamps it a size smaller, so it stays on its own column
+    if (big) { w = Math.ceil(sx) + 10; sw = Math.ceil(D.stampW(stt, ss)) + 34; }
     else out += D.stamp(stt, sx, 10, 16, { rot: -7 });
     return h('header', { class: 'cb-showhead' + (big ? ' cb-showhead--big' : '') }, [
       D.act('<', backLabel, 'back', backFn, { size: 14 }),
       h('h1', { class: 'cb-showtitle', aria: { label: SB.time.fmt(show.day, 'long') + (room ? ', ' + room.name : '') + ', ' + T('shows', 'status.' + show.status).toLowerCase() } },
-        [D.art(out, w, 76), big ? D.art(D.stamp(stt, 16, 18, 32, { rot: -8 }), sw, 96, 'cb-statstamp mv-stamp') : null])
+        [D.art(out, w, 76), big ? D.art(D.stamp(stt, 16, typeof big === 'number' ? 8 : 18, ss, { rot: typeof big === 'number' ? -3 : -8 }), sw, typeof big === 'number' ? ss * 2.7 : ss * 3, 'cb-statstamp mv-stamp') : null])
     ]);
   }
 
   /* ================================================================ */
   /* show: one clipboard                                              */
   /* ================================================================ */
-
   function mountShow(root, params) {
-    var showId = params && params.showId, ui = { roomId: null, day: null, editPrice: false }, lastStat = null, firstDraw = true;
+    var showId = params && params.showId, ui = { roomId: null, day: params && num(params.day) ? params.day : null, editPrice: false, deal: null }, lastStat = null, firstDraw = true,
+        sel = params && params.row ? String(params.row) : null,       // the row whose picker shows on the right (null: the forecast)
+        fl = { freeOnly: true, genre: '' }, whatCache = {}, lastSel = null, lastGenre = '', mode = 'show', keyHandler;
     if (root && root.removeAttribute) root.removeAttribute('data-mv-sig');
+    function pick(k) { sel = k; keepFocus(root, render); }
 
     function render() { draw(); settle(); }
     /* the papers slap down when the page first shows; the status is stamped on whenever it changes (and sounds like it) */
     function settle() {
       var F = SB.Finish, el = root.querySelector('.cb-statstamp'), s = st(), sh = s && s.shows ? s.shows[showId] : null;
+      var pk = root.querySelector('.cb-pick'), sheetEl = root.querySelector('.cb-sheet');
       slap(root, '.cb-show .cb-piece, .rc-sheet .rc-piece:not(.rc-polaroid):not(.rc-tape)', 'show:' + showId, 2);
+      /* the picker's papers slap down when another row is picked; a different pile tears across the sheet */
+      if (F && pk && !firstDraw && lastSel !== sel) { F.stagger(Array.prototype.slice.call(pk.querySelectorAll('.cb-piece')), 2); Array.prototype.forEach.call(pk.querySelectorAll('.cb-piece'), function (e) { e.classList.add('mv-slap'); }); }
+      if (F && pk && F.scrollbar) F.scrollbar(pk);
+      if (F && sheetEl && !firstDraw && lastSel === sel && lastGenre !== fl.genre) F.move(sheetEl, 'wipe');
+      lastSel = sel; lastGenre = fl.genre;
       /* a played show: the night's photo is stamped on, and the ledger's figures count up */
       var ph = root.querySelector('.rc-polaroid');
       if (F && ph && firstDraw) {
@@ -1182,21 +1110,308 @@
       if (!v) { root.appendChild(C().Empty({})); return; }
       show = v.show;
       if (!LIVE[show.status]) { root.appendChild(after(s, v)); return; }
-      root.appendChild(h('div', { class: 'cb-show' }, [
-        showHead(s, show, v.room, T('show', 'back'), function () { SB.UI.go('shows'); }, null, true),
-        h('div', { class: 'cb-cols' }, [
-          h('div', { class: 'cb-main' }, [
-            setList(s, v, {}),
-            h('div', { class: 'cb-under' }, [D.act(T('show', 'buildBill'), T('show', 'buildBillL'), 'tobill', function () { SB.UI.go('bill', { showId: showId }); }, { size: 15, tut: 'bill-add', tutRef: showId })]),
-            crowdSection(s, v),
-            jobsSection(s, v)
-          ]),
-          h('aside', { class: 'cb-side' }, [flyerSection(s, v), roomSection(s, v), doorSection(s, v), dealSection(s, v), crewSection(s, v),
-            h('div', { class: 'cb-under' }, [D.act(T('show', 'cancel'), T('show', 'cancelL'), 'cancel', function () {
+      whatCache = {};
+      var rows = rowsOf(s, v), n = queuedN(s);
+      if (sel === 'bill') sel = (rows.filter(function (r) { return r.kind === 'slot'; })[0] || rows.filter(function (r) { return r.band; })[0] || { key: null }).key;
+      if (sel && !rows.some(function (r) { return r.key === sel; })) sel = fallbackSel(rows, sel);
+      root.appendChild(h('div', { class: 'cb-show cb-card', data: { sel: sel || '' } }, [
+        h('div', { class: 'cb-cardleft' }, [
+          showHead(s, show, null, T('show', 'back'), function () { SB.UI.go('shows'); }, SB.time.fmt(show.day, 'short'), 22),   // the room has its own row; the stamp goes under the date
+          h('ol', { class: 'cb-cardrows', aria: { label: T('card', 'rows') } }, rows.map(function (r, i) { return h('li', null, rowThing(r, i, rows.length)); })),
+          h('footer', { class: 'cb-cardfoot' }, [
+            h('span', { class: 'cb-asksout', role: 'status', aria: { label: T('card', n === 1 ? 'out1' : (n ? 'outN' : 'out0'), { n: n }) }, data: { n: String(n) } }, outArt(n)),
+            D.act(T('show', 'cancel'), T('show', 'cancelL'), 'cancel', function () {
               confirmCard(T('show', 'cancelSure'), T('show', 'cancelYes'), T('show', 'keep'), function () { act(function (x) { return SB.Shows.cancel(x, showId, 'PLAYER'); }); });
-            })])])
-        ])
+            }, { size: 11 })
+          ])
+        ]),
+        h('div', { class: 'cb-pick', role: 'region', aria: { label: T('card', sel ? 'picker' : 'forecast'), live: 'polite' } }, picker(s, v, rows))
       ]));
+    }
+
+    /* ================= the card: one row per part of the show (left), the picked row's picker (right) ================= */
+    var OPEN_ASK = { QUEUED: 1, SENT: 1, COUNTER: 1 };
+    function askState(a) {
+      if (!a) return null;
+      return a.status === 'QUEUED' ? 'TONIGHT' : (a.status === 'SENT' ? 'WAITING' : (a.status === 'COUNTER' ? 'COUNTER' : (a.status === 'YES' ? 'YES' : (a.status === 'NO' || a.status === 'SILENT' ? 'NO' : null))));
+    }
+    /* the ask that matters among these: the one still open, else the last one answered */
+    function askOf(list, test) {
+      var open = null, last = null;
+      list.forEach(function (a) { if (a.status === 'WITHDRAWN' || !test(a)) return; if (OPEN_ASK[a.status]) open = a; last = a; });
+      return open || last;
+    }
+    /* asks are queued by SB.Mail.ask and go out with the evening's send: how many of this show's are waiting to go */
+    function queuedN(s) { return asksFor(s, showId).filter(function (a) { return a.status === 'QUEUED'; }).length; }
+    function bandCard(s, id) { return safe(function () { return SB.Bands.card(s, id); }, null); }
+    function first(s, id) { return s.people && s.people[id] ? (s.people[id].first || '') : ''; }
+    function promoJobs(v) { return (v.jobs || []).filter(function (j) { return j.group === 'TELLING' && j.mode !== 'PROMISE' && !j.covered && !j.hidden && !j.optional && !j.waived; }); }
+    /* the rest of the work that takes hours (the advance, the neighbours, the house rules, the thanks, the debrief): not promo, not booking */
+    function prepJobs(v) { return (v.jobs || []).filter(function (j) { return j.group !== 'TELLING' && j.mode === 'HOURS' && !j.covered && !j.hidden && !j.optional && !j.waived; }); }
+    function late(s, j) { return j.status === 'TODO' && !j.planned && j.window && num(j.window.lateFrom) && s.clock.day >= j.window.lateFrom; }
+
+    function rowsOf(s, v) {
+      var show = v.show, rows = [], asks = asksFor(s, showId), q = show.requestId && s.requests ? s.requests[show.requestId] : null,
+          tourId = q && q.bandId && s.bands && s.bands[q.bandId] ? q.bandId : null, onBill = {}, n = v.bands.length, days = show.day - s.clock.day,
+          hold = askOf(asks, function (a) { return a.kind === 'ROOM_HOLD'; }), conf = askOf(asks, function (a) { return a.kind === 'ROOM_CONFIRM'; }),
+          terms = askOf(asks, function (a) { return a.kind === 'TERMS'; }), slots = { OPEN: [], MIDDLE: [], CLOSE: [] }, noes = {}, st0, c, d = v.deal || {}, pj, np, ex, paid, sec = v.security;
+      function add(r) { rows.push(r); }
+      function crew(role, key, need) {
+        var cur = show.crew[role], a = askOf(asks, function (x) { return x.kind === 'CREW' && x.payload && x.payload.role === role; }), stc = cur ? 'YES' : (a && a.status !== 'YES' ? askState(a) : 'EMPTY');
+        add({ key: key, label: T('card', key), value: cur ? (cur === 'player' ? T('show', 'you') : first(s, cur)) : (a && a.status !== 'YES' ? first(s, a.toId) : ''), struck: !cur && stc === 'NO',
+              st: stc, hot: stc === 'NO' || (need && stc === 'EMPTY') });
+      }
+      add({ key: 'night', label: T('card', 'night'), value: SB.time.fmt(show.day, 'short'), note: days > 0 ? T('card', days === 1 ? 'inDay' : 'inDays', { n: days }) : (days === 0 ? T('card', 'tonight') : '') });
+      st0 = show.status === 'CONFIRMED' ? 'CONFIRMED' : (conf && conf.status !== 'YES' && (show.hold || show.roomId) ? askState(conf) : (show.hold || show.roomId ? 'HELD' : (hold && hold.status !== 'YES' ? askState(hold) : 'EMPTY')));
+      add({ key: 'room', label: T('card', 'room'), value: v.room ? v.room.name : (hold && hold.status !== 'YES' ? roomName(s, hold.toId) : ''), struck: !v.room && st0 === 'NO', st: st0,
+            stText: st0 === 'HELD' && show.hold && num(show.hold.rank) ? T('card', 'st.HELDN', { n: show.hold.rank }) : null, hot: st0 === 'NO' || (st0 === 'HELD' && show.hold && show.hold.rank > 1) });
+      /* the bill, in running order: who is on it, who has been asked, and a blank line for any slot nobody is in */
+      v.bands.forEach(function (b, i) {
+        var raw = show.bill.slots[i] || {}, k = n >= 3 ? (i === 0 ? 'OPEN' : (i === n - 1 ? 'CLOSE' : 'MIDDLE')) : (raw.want === 'OPEN' && i === 0 ? 'OPEN' : (raw.want === 'CLOSE' && i === n - 1 ? 'CLOSE' : 'MIDDLE'));
+        onBill[b.band.id] = true;
+        slots[k].push({ key: 'band-' + b.band.id, kind: 'band', slot: k, band: b.band, b: b, idx: i, value: b.band.name, st: b.confirmed ? 'YES' : 'WAITING', hot: !!b.listed });
+      });
+      asks.forEach(function (a) {
+        var k = (a.payload && a.payload.wantSlot) || 'MIDDLE';
+        if (a.kind !== 'BAND_PLAY' || onBill[a.toId]) return;
+        if (!slots[k]) k = 'MIDDLE';
+        if (OPEN_ASK[a.status]) { c = bandCard(s, a.toId); if (c) slots[k].push({ key: 'ask-' + a.toId, kind: 'ask', slot: k, band: c, ask: a, value: c.name, st: askState(a), hot: a.status === 'COUNTER' }); }
+        else if (a.status === 'NO' || a.status === 'SILENT') noes[k] = a;
+      });
+      /* a request's touring band is on the card from the start: its row is where the offer is made */
+      if (tourId && !onBill[tourId] && ((terms && OPEN_ASK[terms.status]) || q.status === 'NEW' || q.status === 'REPLIED' || q.status === 'NEGOTIATING')) {
+        c = bandCard(s, tourId);
+        if (c) slots.MIDDLE.push({ key: 'offer', kind: 'offer', slot: 'MIDDLE', band: c, ask: terms, req: q, value: c.name, st: terms && terms.status !== 'YES' ? askState(terms) : 'OFFER', hot: !!terms && (terms.status === 'COUNTER' || terms.status === 'NO' || terms.status === 'SILENT') });
+      }
+      ['OPEN', 'MIDDLE', 'CLOSE'].forEach(function (k) {
+        var no = noes[k], nc = null;
+        slots[k].forEach(function (r) { r.label = T('bill', 'gap.' + k); add(r); });
+        if (slots[k].length && sel !== 'slot-' + k) return;
+        if (no && !slots[k].length) nc = bandCard(s, no.toId);
+        add({ key: 'slot-' + k, kind: 'slot', slot: k, label: T('bill', 'gap.' + k), value: nc ? nc.name : '', struck: !!nc, st: nc ? 'NO' : 'EMPTY' });
+      });
+      crew('sound', 'sound', true);
+      add({ key: 'door', label: T('card', 'door'), value: show.crew.floor ? (show.crew.floor === 'player' ? T('show', 'you') : first(s, show.crew.floor)) : '', st: show.crew.floor ? 'YES' : 'EMPTY' });
+      if (sec && (sec.required || sec.recommended || show.crew.security || asks.some(function (a) { return a.kind === 'CREW' && a.payload && a.payload.role === 'security' && OPEN_ASK[a.status]; }))) crew('security', 'security', !!sec.required);
+      st0 = show.promo && show.promo.flyer ? 'MADE' : (show.flyer && show.flyer.recipe ? 'PASTED' : 'EMPTY');
+      add({ key: 'flyer', label: T('card', 'flyer'), value: st0 === 'EMPTY' ? '' : T('card', 'flyerV.' + st0), st: st0 === 'EMPTY' ? 'EMPTY' : (st0 === 'MADE' ? 'YES' : null) });
+      pj = promoJobs(v); np = pj.filter(function (j) { return j.status === 'DONE' || j.planned; }).length;
+      add({ key: 'promo', label: T('card', 'promo'), value: pj.length ? T('card', 'promoV', { n: np, of: pj.length }) : '', st: pj.length && pj.every(function (j) { return j.status === 'DONE'; }) ? 'DONE' : (pj.length ? null : 'EMPTY'),
+            hot: pj.some(function (j) { return late(s, j); }) });
+      pj = prepJobs(v); np = pj.filter(function (j) { return j.status === 'DONE' || j.planned; }).length;
+      add({ key: 'prep', label: T('card', 'prep'), value: pj.length ? T('card', 'promoV', { n: np, of: pj.length }) : '', st: pj.length && pj.every(function (j) { return j.status === 'DONE'; }) ? 'DONE' : (pj.length ? null : 'EMPTY'),
+            hot: pj.some(function (j) { return late(s, j); }) });
+      add({ key: 'price', label: T('card', 'price'), value: (show.door.donation ? T('show', 'donation') : '$' + (show.door.price || 0)) + ' · ' + word('ages.' + show.door.ages, show.door.ages) });
+      paid = show.bill.slots.some(function (x) { return (x.fee || 0) > 0; });
+      if (tourId || paid || (d.guarantee || 0) > 0) {
+        ex = safe(function () { return SB.Money.exposure(s, showId); }, null);
+        add({ key: 'deal', label: T('card', 'deal'), value: tourId || (d.guarantee || 0) > 0 ? word('deal.' + (d.shape || 'DOOR') + '.name', lower(d.shape || 'DOOR')) + ((d.guarantee || 0) > 0 ? ' ' + money(d.guarantee) : '') : T('card', 'owe', { amount: money(ex && num(ex.total) ? ex.total : 0) }),
+              st: d.agreedDay != null ? 'YES' : (terms && terms.status !== 'YES' ? askState(terms) : null) });
+      }
+      return rows;
+    }
+    /* where the selection goes when its row has turned into another (an empty slot that was asked, an ask that said yes) */
+    function fallbackSel(rows, was) {
+      var m = /^(slot|ask|band)-(.+)$/.exec(was), r = null;
+      if (was === 'offer') r = rows.filter(function (x) { return x.kind === 'band' && x.band && v0Tour(x); })[0];
+      else if (m && m[1] === 'ask') r = rows.filter(function (x) { return x.key === 'band-' + m[2]; })[0];
+      else if (m && m[1] === 'slot') r = rows.filter(function (x) { return x.slot === m[2]; })[0];
+      return r ? r.key : null;
+    }
+    function v0Tour(x) { var s = st(), sh = s && s.shows[showId], q = sh && sh.requestId && s.requests ? s.requests[sh.requestId] : null; return !!q && q.bandId === x.band.id; }
+
+    /* one row: its name on a label-maker strip (it opens), what is written in by hand, how it stands as a stamp */
+    function rowThing(r, i, n) {
+      var W = 434, ht = Math.max(27, Math.min(38, Math.floor(424 / n))), on = sel === r.key, out = '', lx = 98, stT = r.st ? (r.stText || T('card', 'st.' + r.st)) : '', sw = 0, vx = lx + 6, maxV, val = String(r.value || '').toUpperCase(), vw;
+      if (on) out += '<path d="M2 2H' + (W - 3) + 'L' + (W - 2) + ' ' + (ht - 3) + 'H3Z" fill="' + D.PAPER + '" stroke="' + D.TONER + '" stroke-width="2.4"/>';
+      else out += '<path d="M' + lx + ' ' + (ht - 2.5) + 'H' + (W - 6) + '" stroke="' + D.TONER + '" stroke-opacity=".4" stroke-width="1.2"/>';
+      out += D.strip(r.label, 5, (ht - 25) / 2 - 1, 12, { rot: ((i % 3) - 1) * 0.7 });
+      if (r.st === 'EMPTY') {
+        sw = D.tw(stT, 12) + 16;
+        out += '<path d="M' + f(W - 8 - sw) + ' ' + f(ht / 2 - 10) + 'h' + f(sw) + 'v20h' + f(-sw) + 'Z" fill="none" stroke="' + D.GRAY + '" stroke-width="1.4" stroke-dasharray="4 3"/>' + D.type(stT, W - 8 - sw / 2, ht / 2 + 4.5, 12, { anchor: 'middle', bold: true, fill: D.GRAY });
+      } else if (r.st) {
+        /* a typed rubber stamp (narrower than marker capitals), so what is written in keeps its room */
+        sw = D.tw(stT, 12) + 28;                                  // the letters start well inside the box and end well inside it
+        out += '<g transform="rotate(' + (i % 2 ? 1.5 : -1.5) + ' ' + f(W - 9 - sw / 2) + ' ' + f(ht / 2) + ')">' + K().rect(W - 8 - sw, ht / 2 - 10.5, sw - 2, 21, { seed: 'rst' + stT, sw: 2.2, wob: 0.5, over: 0.3 }) +
+          D.type(stT, W - 8 - sw + 12, ht / 2 + 4.5, 12, { bold: true }) + D.type(stT, W - 8 - sw + 12.5, ht / 2 + 4.5, 12, { bold: true }) + '</g>';   // struck twice: a stamp inks heavy
+        sw += 4;
+      }
+      else if (r.note) { sw = D.tw(r.note, 12) + 4; out += D.type(r.note, W - 8 - sw, ht / 2 + 4.5, 12, { bold: true }); }
+      if (r.hot) { out += D.bang(W - 8 - sw - 22, ht / 2 + 8, 17); sw += 26; }
+      maxV = Math.max(40, W - 8 - sw - 6 - vx);
+      function vW(t) { return D.mw(t, 17, { seed: 'rv' + r.key }); }
+      if (val) {
+        /* what is written in keeps its size: a long name is cut short, never squeezed under the stamp */
+        if (vW(val) > maxV) val = val.replace(/^THE\s+/, '');
+        if (vW(val) > maxV) { while (val.length > 1 && vW(val.replace(/\s+$/, '') + '..') > maxV) val = val.slice(0, -1); val = val.replace(/\s+$/, '') + '..'; }
+        vw = vW(val);
+        out += D.marker(val, vx, ht / 2 + 6.5, 17, { seed: 'rv' + r.key }) + (r.struck ? K().line(vx - 2, ht / 2 + 1, vx + vw + 2, ht / 2 - 1, { seed: 'rs' + r.key, sw: 2.6 }) : '');
+      } else out += '<path d="M' + vx + ' ' + (ht - 8) + 'h' + f(maxV * 0.7) + '" stroke="' + D.TONER + '" stroke-width="1.4" stroke-dasharray="2 4"/>';
+      return D.thing({ cls: 'cb-cardrow' + (on ? ' is-on' : ''), pressed: on, fk: 'row-' + r.key, tut: 'card-row', tutRef: r.kind || r.key, svg: out, w: W, h: ht,
+        label: r.label + ': ' + (r.value || T('card', 'blank')) + (stT ? ', ' + stT.toLowerCase() : '') + (r.note ? ', ' + r.note.toLowerCase() : '') + (r.hot ? ' (!!)' : ''),
+        onClick: function () { pick(on ? null : r.key); } });
+    }
+    function outArt(n) {
+      var t = T('card', n === 1 ? 'out1' : (n ? 'outN' : 'out0'), { n: n }).toUpperCase(), w = D.mw(t, 13);
+      return D.art(D.marker(t, 4, 18, 13, { seed: 'out' + n }) + (n ? K().under3(4, 23, w, { seed: 'outu', sw: 2, gap: 3 }) : ''), w + 12, 32);
+    }
+    function pickHead(t) { return h('h2', { class: 'cb-pickhead', aria: { label: t } }, D.word(String(t).slice(0, 34), 22)); }
+
+    function picker(s, v, rows) {
+      var r = rows.filter(function (x) { return x.key === sel; })[0], head;
+      if (!r) return forecast(s, v);
+      head = pickHead(r.label + (r.value && (r.kind || r.key === 'room') ? ': ' + r.value : ''));
+      switch (r.kind || r.key) {
+        case 'night': case 'room': return [head, roomSection(s, v)];
+        case 'slot': return [head, sheet(s, v, r.slot)];
+        case 'band': return [head, bandPicker(s, v, r)];
+        case 'ask': return [head, askPicker(s, v, r)];
+        case 'offer': return [head, offerPicker(s, v, r)];
+        case 'sound': return [head, piece('cb-crew', 'white', [crewRow(s, v, 'sound', 'sound')], { label: T('show', 'sound') })];
+        case 'security': return [head, piece('cb-crew', 'white', [crewRow(s, v, 'security', 'security'), securityNote(s, v)], { label: T('show', 'security') })];
+        case 'door': return [head, floorPicker(s, v, rows)];
+        case 'flyer': return [head, flyerSection(s, v)];
+        case 'promo': return [head, jobsSection(s, v, true)];
+        case 'prep': return [head, jobsSection(s, v, false)];
+        case 'price': return [head, doorSection(s, v)];
+        case 'deal': return [head, dealSection(s, v), rows.some(function (x) { return x.key === 'offer'; }) ? h('div', { class: 'cb-under' }, [D.act(T('card', 'toOffer'), T('card', 'toOfferL'), 'to-offer', function () { pick('offer'); }, { size: 12 })]) : null];
+      }
+      return forecast(s, v);
+    }
+
+    /* nothing picked: the night as it stands: your call against what the town expects, the room's size, what you do not know yet */
+    function forecast(s, v) {
+      var fc = v.forecast || {}, ex = safe(function () { return SB.Money.exposure(s, showId); }, null), room = v.room, pace = v.show.deal && v.show.deal.guarantee > 0 && fc.guaranteePace ? T('bill', 'pace', { w: T('shows', 'pace.' + fc.guaranteePace) }) : '',
+          stop = room && num(room.curfew) ? T('bill', 'stop', { t: SB.time.clock(room.curfew) }) : '';
+      return [
+        pickHead(T('card', 'forecast')),
+        piece('cb-crowdsec', 'bone', [
+          D.crowd({ par: fc.par && fc.par.heads, lo: fc.call && fc.call.lo, hi: fc.call && fc.call.hi, cap: fc.cap || null, even: ex && num(ex.breakEven) ? ex.breakEven : null, per: 22 }),
+          D.unknowns(fc.call && fc.call.unknowns ? fc.call.unknowns.slice(0, 2) : null)
+        ]),
+        pace || stop || (fc.flow && fc.flow.length) || (fc.unknownPairs && fc.unknownPairs.length) ? piece('cb-nightnotes', 'white', [
+          pace ? D.art(D.stamp(pace, 4, 4, 13, { rot: -3 }), D.stampW(pace, 13) + 14, 36) : null,
+          stop ? h('div', { class: 'cb-curfew', role: 'img', aria: { label: stop } }, D.art(D.marker(stop, 6, 22, 16, { seed: 'cf' }) + K().under3(6, 28, D.mw(stop, 16), { seed: 'cfu', sw: 2.2, gap: 3 }), D.mw(stop, 16) + 20, 42)) : null,
+          fc.flow && fc.flow.length ? h('ul', { class: 'cb-flow' }, fc.flow.map(function (x) {
+            var gl = safe(function () { return SB.Identity.genGlyph(x.gen, 18); }, '');
+            return h('li', null, [gl ? D.art('<g style="color:#141413">' + D.place(gl, 0, 0) + '</g>', 18, 18) : null, h('span', { class: 'cb-typed cb-small', text: word('gen.' + ['KIDS', 'MIDDLE', 'OLD'][x.gen] + '.name', '') + ': ' +
+              (num(x.arrive) ? T('bill', 'arrive', { t: SB.time.clock(x.arrive) }) : '') + (num(x.leave) ? ', ' + T('bill', 'leave', { t: SB.time.clock(x.leave) }) : '') })]);
+          })) : null,
+          fc.unknownPairs && fc.unknownPairs.length ? h('p', { class: 'cb-typed cb-small cb-pairs', text: T('bill', 'unknownPairs', {
+            list: fc.unknownPairs.map(function (p) { return word('genre.' + p.a + '.name', p.a) + ' + ' + word('genre.' + p.b + '.name', p.b); }).join('; ') }) }) : null,
+          hearBill(s, v.show)
+        ]) : hearBill(s, v.show),
+        h('p', { class: 'cb-typed cb-small cb-pickhint', text: T('card', 'hint') })
+      ];
+    }
+
+    /* a band on the bill: when they are on, how long, where in the order and on the flyer; peel them off */
+    function bandPicker(s, v, r) {
+      var b = r.b, show = v.show, locked = !!show.bill.locked, order = show.bill.slots.map(function (x) { return x.bandId; }), i = r.idx,
+          bill = (v.billing && v.billing.length ? v.billing : order).slice(), bi, name = b.band.name;
+      if (bill.length && typeof bill[0] === 'object') bill = bill.map(function (x) { return x.bandId || x.id; });
+      bi = bill.indexOf(b.band.id);
+      function move(d) {
+        var o = order.slice(), t = o[i];
+        if (i + d < 0 || i + d >= o.length) return;
+        o[i] = o[i + d]; o[i + d] = t;
+        guard(locked, function () { act(function (x) { return SB.Shows.setBill(x, showId, { order: o }); }); });
+      }
+      function flyerMove(d) { var o = bill.slice(), t = o[bi]; o[bi] = o[bi + d]; o[bi + d] = t; act(function (x) { return SB.Shows.setBilling(x, showId, o); }); }
+      function setMin(m) { var mm = {}; mm[b.band.id] = Math.max(15, Math.min(90, m)); act(function (x) { return SB.Shows.setBill(x, showId, { minutes: mm }); }); }
+      return piece('cb-bandpick', 'white', [
+        locked ? h('p', { class: 'cb-typed cb-locked' }, [D.art(lockSvg(), 26, 28), ' ', T('show', 'locked')]) : null,
+        h('div', { class: 'cb-row' }, [
+          D.thing({ cls: 'cb-bandstk', label: T('card', 'bandPage', { name: name }), fk: 'bandpage', svg: D.bandSticker(b.band, 200), w: 200, h: 84, strip: T('card', 'page'), stripSize: 11, onClick: function () { SB.UI.go('band', { bandId: b.band.id }); } }),
+          h('div', { class: 'cb-setctl' }, [
+            h('span', { class: 'cb-typed', text: (b.confirmed ? T('bill', 'yes') : T('bill', 'asked')) + (b.listed ? '. ' + T('bill', 'listed') : '') }),
+            num(b.start) ? D.typed(T('bill', 'starts', { t: SB.time.clock(b.start) }), 13, { bold: true }) : null,
+            D.listen({ band: b.band, text: T('bill', 'listen'), stopText: T('bill', 'listenStop'), label: T('bill', 'listenL', { name: name }), fk: 'hear-' + b.band.id })
+          ])
+        ]),
+        h('div', { class: 'cb-row cb-bandtabs' }, [
+          D.tabs({ label: T('bill', 'minutes', { n: b.minutes || 0 }) + ', ' + name, title: T('bill', 'minutes', { n: b.minutes || 0 }), items: [
+            { text: '-5', label: T('bill', 'shorter') + ': ' + name, fk: 'mn-' + b.band.id, onClick: function () { setMin((b.minutes || 30) - 5); } },
+            { text: '+5', label: T('bill', 'longer') + ': ' + name, fk: 'mx-' + b.band.id, onClick: function () { setMin((b.minutes || 30) + 5); } }] }),
+          order.length > 1 ? D.tabs({ label: T('card', 'order'), title: T('card', 'order'), items: [
+            { text: T('card', 'earlier'), label: T('card', 'earlierL', { name: name }), tut: 'bill-move', tutRef: showId, fk: 'mv-up', disabled: i === 0, onClick: function () { move(-1); } },
+            { text: T('card', 'later'), label: T('card', 'laterL', { name: name }), tut: 'bill-move', tutRef: showId, fk: 'mv-down', disabled: i === order.length - 1, onClick: function () { move(1); } }] }) : null,
+          bill.length > 1 && bi >= 0 ? D.tabs({ label: T('bill', 'billing'), title: T('bill', 'billing') + ' ' + (bi + 1) + '/' + bill.length, items: [
+            { text: T('card', 'bigger'), label: T('bill', 'billUp', { name: name }), fk: 'bu-' + b.band.id, disabled: bi === 0, onClick: function () { flyerMove(-1); } },
+            { text: T('card', 'smaller'), label: T('bill', 'billDown', { name: name }), fk: 'bd-' + b.band.id, disabled: bi === bill.length - 1, onClick: function () { flyerMove(1); } }] }) : null
+        ]),
+        h('div', { class: 'cb-row' }, [
+          D.act(T('card', 'another'), T('card', 'anotherL', { slot: r.label.toLowerCase() }), 'another', function () { pick('slot-' + r.slot); }, { size: 12 }),
+          D.act(T('card', 'peel'), T('bill', 'drop', { name: name }), 'dr-' + b.band.id, function () { guard(locked && b.confirmed, function () { act(function (x) { return SB.Shows.dropBand(x, showId, b.band.id, 'PLAYER'); }); }); }, { size: 11 })
+        ])
+      ], { label: name });
+    }
+
+    /* an ask that is out (or about to go): how it stands; take what they came back with, or take the ask back */
+    function askStatus(s, a, name) {
+      var t = a.status === 'QUEUED' ? T('show', 'queued', { name: name }) : (a.status === 'SENT' ? T('show', 'asked', { name: name }) : (a.status === 'COUNTER' ? name + ': ' + T('bill', 'counter') + '.' : (a.status === 'YES' ? name + ' ' + T('bill', 'yes') + '.' : name + ' ' + T('bill', 'no') + '.')));
+      return h('p', { class: 'cb-typed', text: t + (a.answer && a.answer.text && a.status !== 'QUEUED' && a.status !== 'SENT' ? ' “' + a.answer.text + '”' : '') });
+    }
+    function askActs(a, r) {
+      return h('div', { class: 'cb-row' }, [
+        a.status === 'COUNTER' ? D.act(T('card', 'takeIt'), T('card', 'takeItL'), 'take-it', function () {
+          var p = Object.assign({}, a.payload || {}, { acceptCounter: a.id });
+          delete p.inPerson;
+          act(function (x) { return SB.Mail.ask(x, a.kind, a.toId, p); });
+        }) : null,
+        r && r.kind === 'ask' ? D.act(T('card', 'another'), T('card', 'anotherL', { slot: r.label.toLowerCase() }), 'another', function () { pick('slot-' + r.slot); }, { size: 12 }) : null,
+        OPEN_ASK[a.status] ? D.act(T('card', 'takeBack'), T('card', 'takeBackL'), 'take-back', function () { act(function (x) { return SB.Mail.withdraw(x, a.id); }); }, { size: 11 }) : null
+      ]);
+    }
+    function bandTop(c) {
+      return h('div', { class: 'cb-row' }, [
+        D.thing({ cls: 'cb-bandstk', label: T('card', 'bandPage', { name: c.name }), fk: 'bandpage', svg: D.bandSticker(c, 200), w: 200, h: 84, strip: T('card', 'page'), stripSize: 11, onClick: function () { SB.UI.go('band', { bandId: c.id }); } }),
+        D.listen({ band: c, text: T('bill', 'listen'), stopText: T('bill', 'listenStop'), label: T('bill', 'listenL', { name: c.name }), fk: 'hear-' + c.id })
+      ]);
+    }
+    function askPicker(s, v, r) { return piece('cb-bandpick', 'white', [bandTop(r.band), askStatus(s, r.ask, r.band.name), askActs(r.ask, r)], { label: r.band.name }); }
+
+    /* the touring band of a request: the offer slip (what they asked for, changed if you like), sent as the reply to their request */
+    function offerPicker(s, v, r) {
+      var q = r.req, a = r.ask, show = v.show, rv = safe(function () { return SB.Requests.view(s, q.id); }, null), ask = (rv && rv.ask) || {}, d, withG, ex, I = function (k, c) { return SB.text.label('ui.inbox.' + k, c); };
+      if (a && OPEN_ASK[a.status]) return piece('cb-bandpick', 'manila', [bandTop(r.band), askStatus(s, a, r.band.name),
+        h('p', { class: 'cb-typed cb-small', text: word('deal.' + ((a.payload && a.payload.deal && a.payload.deal.shape) || 'DOOR') + '.words', '', { amount: (a.payload && a.payload.deal && a.payload.deal.guarantee) || 0, pct: Math.round((((a.payload && a.payload.deal) || {}).pct == null ? 1 : a.payload.deal.pct) * 100) }) }),
+        askActs(a, r)], { label: r.band.name });
+      if (!ui.deal) ui.deal = { shape: ask.shape || show.deal.shape || 'DOOR', guarantee: ask.guarantee || 0, pct: ask.pct == null ? 1 : ask.pct, lodging: !!ask.lodging, meal: !!ask.meal };
+      d = ui.deal; withG = d.shape === 'GUARANTEE' || d.shape === 'GUARANTEE_PLUS' || d.shape === 'VERSUS';
+      ex = safe(function () { return SB.Money.exposure(s, showId); }, null);
+      return piece('cb-offer', 'manila', [
+        bandTop(r.band),
+        a && (a.status === 'NO' || a.status === 'SILENT') ? askStatus(s, a, r.band.name) : null,
+        h('p', { class: 'cb-typed', text: T('card', 'theyAsk', { deal: word('deal.' + (ask.shape || 'DOOR') + '.words', lower(ask.shape || 'DOOR'), { amount: ask.guarantee || 0, pct: Math.round((ask.pct == null ? 1 : ask.pct) * 100) }) }) }),
+        D.tabs({ label: I('deal'), title: I('slip'), items: Object.keys(SB.Enums.DEAL).map(function (k) {
+          return { text: word('deal.' + k + '.name', lower(k)), label: word('deal.' + k + '.name', lower(k)), on: d.shape === k, fk: 'shape-' + k, onClick: function () { d.shape = k; render(); } };
+        }) }),
+        h('div', { class: 'cb-row cb-offerrow' }, [
+          withG ? D.tabs({ label: I('guarantee') + ' ' + money(d.guarantee || 0), title: I('guarantee') + ' ' + money(d.guarantee || 0), items: [
+            { text: '-$5', label: I('guarantee') + ' -5', fk: 'g-less', onClick: function () { d.guarantee = Math.max(0, (d.guarantee || 0) - 5); render(); } },
+            { text: '+$5', label: I('guarantee') + ' +5', fk: 'g-more', onClick: function () { d.guarantee = (d.guarantee || 0) + 5; render(); } }] }) : null,
+          D.tickThing({ on: !!d.meal, text: I('meal').toUpperCase(), label: I('meal'), fk: 'meal', onClick: function () { d.meal = !d.meal; render(); } }),
+          D.tickThing({ on: !!d.lodging, text: I('lodging').toUpperCase(), label: I('lodging'), fk: 'lodging', onClick: function () { d.lodging = !d.lodging; render(); } })
+        ]),
+        ex ? h('p', { class: 'cb-typed cb-small', text: I('ifNobody') + ': ' + (num(ex.total) ? money(ex.total) : '?') + (num(ex.breakEven) ? '. ' + I('breakEven') + ': ' + I('paidN', { n: ex.breakEven }) : '') + '.' }) : null,
+        h('div', { class: 'cb-row' }, [D.act(I('sendOffer'), I('sendOffer') + ': ' + r.band.name, 'send-offer', function () {
+          var deal = { shape: d.shape, guarantee: withG ? d.guarantee : 0, pct: d.pct, lodging: !!d.lodging, meal: !!d.meal }, day = show.day;
+          var res = act(function (x) { return SB.Mail.reply(x, q.id, 'OFFER', { showId: showId, deal: deal, date: day }); });
+          if (res && res.ok !== false) ui.deal = null;
+        }, { size: 15 })])
+      ], { label: I('slip') });
+    }
+
+    /* the door and the floor: you (or nobody yet); security sits here when the room does not ask for it by name */
+    function floorPicker(s, v, rows) {
+      var floor = v.show.crew.floor, own = rows.some(function (x) { return x.key === 'security'; });
+      return piece('cb-crew', 'white', [
+        h('div', { class: 'cb-crewrow' }, [D.word(T('show', 'floor'), 13),
+          D.tickThing({ on: floor === 'player', text: T('show', 'you'), label: T('show', 'youWork'), fk: 'floor', onClick: function () { var on = floor !== 'player'; act(function (x) { return SB.Shows.setCrew(x, showId, 'floor', on ? 'player' : null); }); } })]),
+        !own && v.security ? crewRow(s, v, 'security', 'security') : null,
+        !own ? securityNote(s, v) : null
+      ], { label: T('card', 'door') });
     }
 
     function after(s, v) {
@@ -1224,7 +1439,11 @@
       lo = Math.max(s.clock.day + 1, v.show.day - 14); hi = lo + 28;
       if (!rooms.length) return null;
       function move(d) { ui.day = Math.max(lo, Math.min(hi, ui.day + d)); render(); }
+      var rv = v.show.requestId ? safe(function () { return SB.Requests.view(s, v.show.requestId); }, null) : null, asked = rv && rv.dates ? rv.dates.filter(function (d) { return d.day > s.clock.day; }) : [];
       return h('div', { class: 'cb-holdform' }, [
+        asked.length > 1 ? D.tabs({ label: T('card', 'theirNights'), title: T('card', 'theirNights'), items: asked.map(function (d) {
+          return { text: SB.time.fmt(d.day, 'dow3') + ' ' + md(d.day), label: SB.time.fmt(d.day, 'long') + (d.clash && d.clash.length ? ', ' + d.clash.join(', ') : ''), on: ui.day === d.day, fk: 'rq-' + d.day, onClick: function () { ui.day = d.day; render(); } };
+        }) }) : null,
         D.tabs({ label: T('show', 'room'), items: rooms.map(function (id) {
           var r = s.rooms[id], gl = safe(function () { return SB.Identity.roomGlyph(r.kind, 22); }, '');
           return { text: String(r.name).slice(0, 16), label: T('show', 'pickRoom', { room: String(r.name).replace(/^the\s+/i, '') }) + ', ' + word('room.' + r.kind + '.name', lower(r.kind)) + (num(r.cap) ? ', ' + r.cap : ''),
@@ -1242,8 +1461,16 @@
     }
 
     function roomSection(s, v) {
-      var show = v.show, room = v.room, kids = [];
-      if (!room) {
+      var show = v.show, room = v.room, kids = [], asks = asksFor(s, showId), ha = askOf(asks, function (a) { return a.kind === 'ROOM_HOLD'; }), ca = askOf(asks, function (a) { return a.kind === 'ROOM_CONFIRM'; }), ar;
+      function takeBack(a) { return D.act(T('card', 'takeBack'), T('card', 'takeBackL'), 'take-back', function () { act(function (x) { return SB.Mail.withdraw(x, a.id); }); }, { size: 11 }); }
+      if (!room && ha && OPEN_ASK[ha.status] && s.rooms && s.rooms[ha.toId]) {
+        /* the hold is asked for: what was asked, how it stands, take it back; another night stays possible, folded away */
+        ar = s.rooms[ha.toId];
+        kids.push(D.art(keyTag(ar, 230), 230, 70));
+        kids.push(h('p', { class: 'cb-typed', text: T('card', 'holdAsked', { room: ar.name, d: SB.time.fmt(ha.payload && num(ha.payload.day) ? ha.payload.day : show.day, 'long') }) + ' ' + T('card', ha.status === 'QUEUED' ? 'holdQueued' : 'holdSent') }));
+        kids.push(h('div', { class: 'cb-row' }, [takeBack(ha)]));
+        kids.push(h('details', { class: 'cb-fold' }, [h('summary', { class: 'pz-hl' }, [D.stripArt(T('show', 'holdOther'), 11)]), holdForm(s, v)]));
+      } else if (!room) {
         kids.push(D.art(K().cutout([[14, 6], [26, 6], [26, 30], [36, 34], [36, 40], [14, 40]], '', { seed: 'hook', edge: 3 }) + D.marker(T('show', 'noRoom'), 48, 36, 20, { seed: 'nr' }), 260, 48));
         kids.push(holdForm(s, v));
       } else {
@@ -1254,11 +1481,13 @@
           if (v.needsToConfirm && v.needsToConfirm.length) kids.push(h('ul', { class: 'cb-needs', aria: { label: T('show', 'needs') } }, v.needsToConfirm.map(function (n) {
             return h('li', { class: n.met ? 'is-met' : '' }, [D.art(D.mark(n.met ? 'DONE' : 'TODO', 16), 18, 18), h('span', { class: 'cb-typed cb-small', text: n.text })]);
           })));
+          if (ca && OPEN_ASK[ca.status]) kids.push(h('p', { class: 'cb-typed', text: T('card', 'confAsked', { room: room.name }) + ' ' + T('card', ca.status === 'QUEUED' ? 'holdQueued' : 'holdSent') }));
           kids.push(h('div', { class: 'cb-row' }, [
-            D.act(T('show', 'confirm'), T('show', 'confirmL'), 'confirm', function () { act(function (x) { return SB.Mail.ask(x, 'ROOM_CONFIRM', show.roomId, { showId: showId }); }); }),
+            ca && OPEN_ASK[ca.status] ? takeBack(ca) : D.act(T('show', 'confirm'), T('show', 'confirmL'), 'confirm', function () { act(function (x) { return SB.Mail.ask(x, 'ROOM_CONFIRM', show.roomId, { showId: showId }); }); }),
             D.act(T('show', 'release'), T('show', 'releaseL'), 'release', function () { act(function (x) { return SB.Rooms.release(x, showId); }); }, { size: 11 })
           ]));
         }
+        kids.push(insuranceRow(s, v));
         kids.push(h('details', { class: 'cb-fold' }, [h('summary', { class: 'pz-hl' }, [D.stripArt(T('show', 'holdOther'), 11)]), holdForm(s, v)]));
       }
       return piece('cb-roompiece', 'bone', kids, { label: T('show', 'room') });
@@ -1316,28 +1545,22 @@
       ], { label: T('show', 'deal') });
     }
 
-    function crowdSection(s, v) {
-      var f0 = v.forecast || {}, ex = safe(function () { return SB.Money.exposure(s, showId); }, null);
-      return piece('cb-crowdsec', 'bone', [
-        D.crowd({ par: f0.par && f0.par.heads, lo: f0.call && f0.call.lo, hi: f0.call && f0.call.hi, cap: f0.cap || null, even: ex && num(ex.breakEven) ? ex.breakEven : null, per: 16 }),
-        D.unknowns(f0.call && f0.call.unknowns)
-      ]);
-    }
-
     function flyerSection(s, v) {
       var thumb = null;
-      if (SB.UI.parts.flyerThumb) thumb = safe(function () { return D.thumb({ recipe: (v.show.flyer && v.show.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, showId) }, 140); }, null);
+      if (SB.UI.parts.flyerThumb) thumb = safe(function () { return D.thumb({ recipe: (v.show.flyer && v.show.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, showId) }, 230); }, null);
       return h('div', { class: 'cb-flyerclip' }, [
         h('button', { type: 'button', class: 'cb-thing pz-hl has-strip cb-flyerbtn', aria: { label: T('show', 'flyerDesk') }, data: { fk: 'flyer', tut: 'show-flyer', 'tut-ref': showId }, on: { click: function () { SB.UI.go('flyerdesk', { showId: showId }); } } },
-          [D.stripArt(T('show', 'flyerDeskT') || 'FLYER', 11), D.art(K().cutout([[46, 2], [96, 2], [100, 18], [42, 18]], '', { seed: 'bc', edge: 3 }) + K().path([[52, 16], [71, 34], [90, 16]], { seed: 'bcw', sw: 2.4, stroke: '#f4f2ea' }), 140, 36, 'cb-binder'), thumb])
+          [D.stripArt(T('show', 'flyerDeskT') || 'FLYER', 11), D.art(K().cutout([[46, 2], [96, 2], [100, 18], [42, 18]], '', { seed: 'bc', edge: 3 }) + K().path([[52, 16], [71, 34], [90, 16]], { seed: 'bcw', sw: 2.4, stroke: '#f4f2ea' }), 140, 36, 'cb-binder'), thumb]),
+        h('p', { class: 'cb-typed cb-flyernote', text: T('card', v.show.promo && v.show.promo.flyer ? 'flyerMade' : (v.show.flyer && v.show.flyer.recipe ? 'flyerPasted' : 'flyerNone')) })
       ]);
     }
 
     function slotGrid(s, j) {
-      var w = s.clock.week * 7, cells = [], i;
+      var w = s.clock.week * 7, cells = [], i, cur = s.clock.cursor || { dayIdx: 0, half: 'DAY' }, now = s.clock.phase === 'PLAY' ? cur.dayIdx * 2 + (cur.half === 'NIGHT' ? 1 : 0) : -1, taped = j.id !== tutJob;
       for (i = 0; i < 7; i++) ['DAY', 'NIGHT'].forEach(function (half) {
-        var on = j.planned && j.planned.dayIdx === i && j.planned.half === half, d = i, hf = half;
-        cells.push(D.thing({ cls: 'cb-slot' + (half === 'NIGHT' ? ' is-night' : ''), pressed: on, fk: 'pl-' + j.id + '-' + i + half,
+        var on = j.planned && j.planned.dayIdx === i && j.planned.half === half, d = i, hf = half, tape = false;
+        if (!taped && i * 2 + (half === 'NIGHT' ? 1 : 0) > now && safe(function () { return SB.Jobs.canDo(s, j.id, w + i, half).ok; }, false)) { taped = true; tape = true; }
+        cells.push(D.thing({ cls: 'cb-slot' + (half === 'NIGHT' ? ' is-night' : ''), pressed: on, fk: 'pl-' + j.id + '-' + i + half, tut: tape ? 'promo-slot' : null, tutRef: tape ? j.id : null,
           label: T('show', 'planIn', { d: SB.time.fmt(w + i, 'dow'), half: word('half.' + half, lower(half)) }),
           svg: D.tick(on ? 'DONE' : 'TODO', 20) + (half === 'NIGHT' ? '<path d="M10 3H17V10Z" fill="#141413"/>' : ''), w: 20, h: 20,
           onClick: function () { act(function (x) { return SB.Week.plan(x, j.id, d, hf, {}); }); } }));
@@ -1347,7 +1570,7 @@
       return h('div', { class: 'cb-slotwrap' }, [h('div', { class: 'cb-slotheads' }, heads), h('div', { class: 'cb-slots', role: 'group', aria: { label: j.label } }, cells)]);
     }
 
-    var firstLocals = null, PROMO_JOBS = { FLYER_RUN: 1, ANNOUNCE: 1, BANDS_SHARE: 1, PRINT: 1, LISTINGS: 1, LOCAL_AD: 1, MAILING_LIST: 1, HAND_OUT: 1, INVITES: 1, WEEK_PUSH: 1, DAY_OF_POST: 1 };
+    var tutJob = null, PROMO_JOBS = { FLYER_RUN: 1, ANNOUNCE: 1, BANDS_SHARE: 1, PRINT: 1, LISTINGS: 1, LOCAL_AD: 1, MAILING_LIST: 1, HAND_OUT: 1, INVITES: 1, WEEK_PUSH: 1, DAY_OF_POST: 1 };
     function jobNote(s, j, i) {
       var planAble = j.mode === 'HOURS' && j.status === 'TODO' && (s.clock.phase === 'PLAN' || s.clock.phase === 'PLAY'), status = j.waived ? 'WAIVED' : j.status, kids,
           late = j.status === 'TODO' && j.window && num(j.window.lateFrom) && s.clock.day >= j.window.lateFrom;
@@ -1359,8 +1582,7 @@
         j.waived ? h('p', { class: 'cb-typed cb-small', text: j.text || word('jobs.waived', T('show', 'waived')) })
           : h('div', { class: 'cb-hl', role: 'img', aria: { label: (j.window && j.window.label) || '' } }, [D.art(D.highlighter(j.window, s.clock.day, j.planned ? s.clock.week * 7 + j.planned.dayIdx : null, 200), 200, 18),
               j.window && j.window.label ? h('span', { class: 'cb-typed cb-small', aria: { hidden: 'true' }, text: j.window.label }) : null]),
-        planAble ? slotGrid(s, j) : null,
-        j.mode === 'MESSAGE' && /LOCALS/.test(j.type) && j.id === firstLocals ? D.act(T('show', 'buildBill'), T('show', 'buildBillL'), 'jb-' + j.id, function () { SB.UI.go('bill', { showId: showId }); }, { size: 10 }) : null
+        planAble ? slotGrid(s, j) : null
       ];
       return piece('cb-note is-' + String(status).toLowerCase(), status === 'DONE' || status === 'WAIVED' ? 'newsprint' : (i % 2 ? 'bone' : 'white'), kids, { tag: 'li', data: j.type === 'LOCK_BILL' ? { tut: 'bill-lock', 'tut-ref': showId } : (PROMO_JOBS[j.type] ? { tut: 'promo-job', 'tut-ref': showId } : null) });
     }
@@ -1385,21 +1607,25 @@
       ], { tag: 'div' });
     }
 
-    function jobsSection(s, v) {
-      var all = v.jobs || [], jobs = all.filter(function (j) { return !j.covered && !j.hidden; }),
+    /* the PROMO row's picker (promo true): the jobs that get the word out. The PREP row's (promo false): the other work that
+       takes hours, and what you promise on the advance and on the night. Booking jobs (answer, hold, ask, confirm) are the
+       card's own rows, so they are in neither. The one the texts point at first, then what is to do, then what is done. */
+    function jobsSection(s, v, promo) {
+      var all = (v.jobs || []).filter(function (j) { return (j.group === 'TELLING') === promo && (promo || j.mode === 'HOURS'); }), jobs = all.filter(function (j) { return !j.covered && !j.hidden; }),
           cov = all.filter(function (j) { return j.covered && j.status !== 'MOOT'; }),
           main = jobs.filter(function (j) { return !j.optional && j.mode !== 'PROMISE'; }),
-          opt = jobs.filter(function (j) { return j.optional && j.mode !== 'PROMISE'; }),
-          adv = jobs.filter(function (j) { return j.type === 'ADVANCE'; })[0], run = jobs.filter(function (j) { return j.type === 'RUN_SHOW'; })[0],
-          loc = main.filter(function (j) { return j.mode === 'MESSAGE' && /LOCALS/.test(j.type); });
-      firstLocals = loc.length ? loc[0].id : null;              // one way to the sticker sheet, however many bands were asked
+          opt = jobs.filter(function (j) { return j.optional && j.mode !== 'PROMISE'; }), adv = [], night = [], played = !!(s.shows[showId] && s.shows[showId].status === 'PLAYED');
+      var tc = safe(function () { return SB.Tutorial && SB.Tutorial.current ? SB.Tutorial.current(s) : null; }, null);
+      (v.jobs || []).forEach(function (j) { if (j.covered || j.hidden) return; (j.riders || []).forEach(function (r) { if ((r.group === 'TELLING') === promo) (j.type === 'ADVANCE' ? adv : night).push(r); }); });
+      tutJob = tc && tc.step === 'PROMO' && tc.showId === showId ? tc.jobId : null;
+      main = main.map(function (j, i) { return { j: j, k: (j.id === tutJob ? 0 : (j.status === 'DONE' || j.waived ? 2 : 1)) * 1000 + i }; }).sort(function (a, b) { return a.k - b.k; }).map(function (x) { return x.j; });
       return h('section', { class: 'cb-jobs' }, [
-        D.word(T('show', 'jobs'), 26, { cls: 'cb-head cb-onboard' }),
-        h('ol', { class: 'cb-notes', data: { tut: 'promo-jobs', 'tut-ref': showId } }, main.map(function (j, i) { return jobNote(s, j, i); })),
+        h('ol', { class: 'cb-notes', data: { tut: promo ? 'promo-jobs' : 'prep-jobs', 'tut-ref': showId } }, main.map(function (j, i) { return jobNote(s, j, i); })),
         cov.length ? coveredNote(cov) : null,
-        adv && adv.riders && adv.riders.length ? riders(adv.riders, 'advance', s.shows[showId] && s.shows[showId].status === 'PLAYED') : null,
-        run && run.riders && run.riders.length ? riders(run.riders, 'night', s.shows[showId] && s.shows[showId].status === 'PLAYED') : null,
-        opt.length ? h('details', { class: 'cb-fold' }, [h('summary', { class: 'pz-hl' }, [D.stripArt(T('show', 'ifYouWant'), 11)]), h('ul', { class: 'cb-notes is-optional' }, opt.map(function (j, i) { return jobNote(s, j, i); }))]) : null
+        adv.length ? riders(adv, 'advance', played) : null,
+        night.length ? riders(night, 'night', played) : null,
+        opt.length ? h('details', { class: 'cb-fold' }, [h('summary', { class: 'pz-hl' }, [D.stripArt(T('show', 'ifYouWant'), 11)]), h('ul', { class: 'cb-notes is-optional' }, opt.map(function (j, i) { return jobNote(s, j, i); }))]) : null,
+        !main.length && !cov.length && !adv.length && !night.length && !opt.length ? h('p', { class: 'cb-typed cb-pickhint', text: T('card', 'noJobs') }) : null
       ]);
     }
 
@@ -1462,83 +1688,7 @@
         h('p', { class: 'cb-typed cb-small', text: lines.filter(Boolean).join(' ') })]);
     }
 
-    function crewSection(s, v) {
-      var floor = v.show.crew.floor;
-      return piece('cb-crew', 'white', [
-        crewRow(s, v, 'sound', 'sound'),
-        crewRow(s, v, 'security', 'security'),
-        securityNote(s, v),
-        insuranceRow(s, v),
-        h('div', { class: 'cb-crewrow' }, [D.word(T('show', 'floor'), 13),
-          D.tickThing({ on: floor === 'player', text: T('show', 'you'), label: T('show', 'youWork'), fk: 'floor', onClick: function () { var on = floor !== 'player'; act(function (x) { return SB.Shows.setCrew(x, showId, 'floor', on ? 'player' : null); }); } })])
-      ], { label: T('show', 'crew') });
-    }
-
-    var undress = dress(root, 'show', st());
-    render();
-    return { update: function () { keepFocus(root, render); }, unmount: function () { undress(); } };
-  }
-
-  /* ================================================================ */
-  /* bill: the set list and the sticker sheet                         */
-  /* ================================================================ */
-
-  function mountBill(root, params) {
-    var showId = params && params.showId, fl = { freeOnly: true, genre: '' }, ctx = { picked: null, ask: null }, preview = null, lastV = null, whatCache = {}, keyHandler,
-        lastCall = null, lastGenre = '', firstDraw = true, callFig = null;
-    if (root && root.removeAttribute) root.removeAttribute('data-mv-sig');
-
-    function render() { draw(); settle(); }
-    /* the papers slap down when the bill first shows; the call is stamped on and counted up when it first shows or changes;
-       a different pile tears across the sheet */
-    function settle() {
-      var F = SB.Finish, el = root.querySelector('.cb-callhero'), sheet = root.querySelector('.cb-sheet'), key, from, d = firstDraw ? 220 : 0;
-      slap(root, '.cb-bill .cb-piece', 'bill:' + showId, 2);
-      if (F && sheet) F.scrollbar(sheet);
-      if (F && sheet && !firstDraw && lastGenre !== fl.genre) F.move(sheet, 'wipe');
-      lastGenre = fl.genre;
-      if (F && el && callFig) {
-        key = callFig.lo + '-' + callFig.hi;
-        if (key !== lastCall) {
-          from = lastCall ? lastCallFig : { lo: 0, hi: 0 };
-          F.move(el, 'stamp', { delay: d, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: el } });
-          F.countUp(document.createElement('span'), 100, { from: 0, delay: d + 83, fmt: function (n) { drawCall(el, from.lo + (callFig.lo - from.lo) * n / 100, from.hi + (callFig.hi - from.hi) * n / 100); return ''; } });
-          lastCall = key; lastCallFig = callFig;
-        }
-      }
-      firstDraw = false;
-    }
-    var lastCallFig = null;
-    /* the call, in marker, big and crooked, on a highlighter swipe: the one loud thing on the bill */
-    function callArt(lo, hi, W) {
-      var t = Math.round(lo) + '-' + Math.round(hi);
-      return D.art(D.swipe(8, 50, W - 16, 32) + D.marker(t, 18, 66, 50, { seed: 'callhero' + showId }), W, 86);
-    }
-    function drawCall(el, lo, hi) { var a = el.firstChild; if (a) el.replaceChild(callArt(lo, hi, el.getAttribute('data-w') * 1), a); }
-    function callHero(fc) {
-      var c = fc && fc.call, W, el;
-      if (!c || !num(c.lo) || !num(c.hi) || !(c.hi > 0)) { callFig = null; return null; }
-      callFig = { lo: Math.round(c.lo), hi: Math.round(c.hi) };
-      W = Math.ceil(D.mw(callFig.lo + '-' + callFig.hi, 50)) + 40;
-      el = h('div', { class: 'cb-callhero', role: 'img', aria: { label: SB.text.label('ui.show.call') + ' ' + callFig.lo + '-' + callFig.hi }, data: { w: String(W) } }, callArt(callFig.lo, callFig.hi, W));
-      return el;
-    }
-
-    function draw() {
-      var s = st(), v, show;
-      SB.UI.clear(root);
-      whatCache = {};
-      if (!s || !showId || !s.shows || !s.shows[showId]) { root.appendChild(C().Empty({})); return; }
-      v = safe(function () { return SB.Shows.view(s, showId); }, null);
-      if (!v) { root.appendChild(C().Empty({})); return; }
-      lastV = v; show = v.show;
-      ctx.ask = LIVE[show.status] ? function (bandId, slot) { ctx.picked = null; askBand(st(), bandId, slot, false); } : null;
-      root.appendChild(h('div', { class: 'cb-bill' + (ctx.picked ? ' is-picking' : '') }, [
-        showHead(s, show, v.room, T('bill', 'back'), function () { SB.UI.go('show', { showId: showId }); }, SB.time.fmt(show.day, 'short')),
-        ctx.picked ? piece('cb-hintslip', 'white', [h('p', { class: 'cb-typed', role: 'status', text: T('bill', 'picked', { name: (s.bands[ctx.picked] || {}).name || '' }) })]) : null,
-        h('div', { class: 'cb-billcols' }, [sheet(s, v), h('div', { class: 'cb-billnight' }, [projection(s, v), hearBill(s, show), setList(s, v, ctx), billing(s, v)])])
-      ]));
-    }
+    /* ---- the sticker sheet (was the bill screen): candidates for the slot that is picked ---- */
 
     /* the bill as it would sound, in running order: each band's loop twice, one after another */
     function hearBill(s, show) {
@@ -1562,6 +1712,7 @@
           ])
         ]), { label: T('bill', 'listedTitle') });
       } else if (!r || r.ok === false) render();
+      else if (sel === 'slot-' + slot) pick('ask-' + bandId);
     }
 
     function what(s, id) {
@@ -1598,7 +1749,7 @@
     }
 
     var billTop = null;
-    function sheet(s, v) {
+    function sheet(s, v, slot) {
       var show = v.show, onBill = {}, asks = bandAsks(s, showId), ids, piles = {}, cards, keys, out = [];
       billTop = billGenreOf(s, show);
       show.bill.slots.forEach(function (x) { onBill[x.bandId] = true; });
@@ -1617,7 +1768,7 @@
         if (fl.genre && fl.genre !== g) return;
         out.push(D.typed(word('genre.' + g + '.name', g).toUpperCase(), 12, { bold: true, cls: 'cb-pilename' }));
         out.push(h('div', { class: 'cb-pile' }, piles[g].map(function (c, i) {
-          var el = candidate(s, c, onBill[c.id], asks[c.id], i),
+          var el = candidate(s, c, onBill[c.id], asks[c.id], i, slot),
               ear = D.listen({ band: c, text: T('bill', 'listen'), stopText: T('bill', 'listenStop'), label: T('bill', 'listenL', { name: c.name }), fk: 'hear-' + c.id });
           return ear ? h('div', { class: 'cb-candbox' }, [el, ear]) : el;
         })));
@@ -1626,7 +1777,7 @@
     }
 
     /* a band's sticker on the sheet: the lifted corner says peel me; under it, what they cost, how soon they answer, what they would add */
-    function candidate(s, c, on, ask, i) {
+    function candidate(s, c, on, ask, i, slot) {
       var rw = safe(function () { return SB.Bands.replyWindow(s, c.id); }, null), fee = safe(function () { return SB.Bands.fee(s, c.id, showId); }, null), w = 200, ht = 112, out = '', peeled = on || (ask && ask.status !== 'NO' && ask.status !== 'SILENT'),
           wv = peeled ? null : what(s, c.id), feeT = fee ? (fee.amount ? money(fee.amount) : word('localPay.' + fee.pay + '.name', lower(fee.pay))) : '?', stg = c.trust && c.trust.stage, el, lab, sh = Math.round(w * 0.42),
           fit = fitOf(s, c.genre, billTop), withOk = !!(wv && wv.call && num(wv.call.hi) && wv.call.hi > 0);
@@ -1652,67 +1803,21 @@
         lab = (sty ? sty + '. ' : '') + T('bill', 'pick', { name: c.name, fee: feeT, lo: rw ? rw.lo : '?', hi: rw ? rw.hi : '?', with: withOk ? T('bill', 'withThem', { lo: Math.round(wv.call.lo), hi: Math.round(wv.call.hi) }) : '' }) +
           (fit ? '. ' + T('bill', 'fitL.' + fit) : '') + (c.listedMembers ? '. ' + T('bill', 'listed') : '') + (stg ? '. ' + word('stage.' + stg, lower(stg)) : '');
       }
-      el = D.thing({ cls: 'cb-cand' + (peeled ? ' is-peeled' : '') + (ctx.picked === c.id ? ' is-picked' : ''), label: lab, pressed: peeled ? undefined : ctx.picked === c.id, tut: 'bill-cand', tutRef: showId, fk: 'cand-' + c.id, svg: out, w: w, h: peeled ? sh + 4 : ht,
-        on: peeled ? { click: function () { SB.UI.go('band', { bandId: c.id }); } } : {
-          click: function () { ctx.picked = ctx.picked === c.id ? null : c.id; preview = ctx.picked; render(); var g = root.querySelector('[data-fk="gap-MIDDLE"]') || root.querySelector('[data-fk="gap-OPEN"]'); if (ctx.picked && g) try { g.focus(); } catch (e) { /* fine */ } },
-          mouseenter: function () { showPreview(c.id); }, focus: function () { showPreview(c.id); },
-          mouseleave: function () { showPreview(ctx.picked); }, blur: function () { showPreview(ctx.picked); } } });
-      if (!peeled && ctx.ask) D.draggable(el, { cand: c.id }, function (t, p) { if (ctx.onDrop) ctx.onDrop(t, p); });
+      el = D.thing({ cls: 'cb-cand' + (peeled ? ' is-peeled' : ''), label: lab, tut: 'bill-cand', tutRef: showId, fk: 'cand-' + c.id, svg: out, w: w, h: peeled ? sh + 4 : ht,
+        onClick: peeled ? function () { SB.UI.go('band', { bandId: c.id }); } : function () { askBand(st(), c.id, slot, false); } });
       return el;
     }
 
-    function crowdFor(s, v, add) {
-      var fc = safe(function () { return SB.Forecast.card(s, showId); }, null) || {}, w = add ? what(s, add) : null;
-      return D.crowd({ par: fc.par && fc.par.heads, lo: fc.call && fc.call.lo, hi: fc.call && fc.call.hi, cap: fc.cap || null, even: num(fc.breakEven) ? fc.breakEven : null,
-                       add: w && w.call ? { lo: w.call.lo, hi: w.call.hi } : null, per: 11, noCallFig: !!(fc.call && num(fc.call.lo) && num(fc.call.hi) && fc.call.hi > 0) });
-    }
-    function showPreview(id) {
-      var s = st(), box = root.querySelector('.cb-proj-crowd');
-      if (!s || !box || !lastV || preview === id) return;
-      preview = id;
-      SB.UI.clear(box); box.appendChild(crowdFor(s, lastV, id));
-    }
-
-    function projection(s, v) {
-      var fc = safe(function () { return SB.Forecast.card(s, showId); }, null) || {};
-      return piece('cb-proj', 'bone', [
-        callHero(fc),
-        h('div', { class: 'cb-proj-crowd', aria: { live: 'polite' } }, crowdFor(s, v, preview && !(s.bands[preview] && v.show.bill.slots.some(function (x) { return x.bandId === preview; })) ? preview : null)),
-        D.unknowns(fc.call && fc.call.unknowns),
-        v.show.deal && v.show.deal.guarantee > 0 && fc.guaranteePace ? D.art(D.stamp(T('bill', 'pace', { w: T('shows', 'pace.' + fc.guaranteePace) }), 4, 4, 13, { rot: -3, ink: fc.guaranteePace === 'OK' ? '#141413' : D.hot() }), D.stampW(T('bill', 'pace', { w: T('shows', 'pace.' + fc.guaranteePace) }), 13) + 14, 36) : null,
-        fc.flow && fc.flow.length ? h('ul', { class: 'cb-flow' }, fc.flow.map(function (x) {
-          var gl = safe(function () { return SB.Identity.genGlyph(x.gen, 18); }, '');
-          return h('li', null, [gl ? D.art('<g style="color:#141413">' + D.place(gl, 0, 0) + '</g>', 18, 18) : null, h('span', { class: 'cb-typed cb-small', text: word('gen.' + ['KIDS', 'MIDDLE', 'OLD'][x.gen] + '.name', '') + ': ' +
-            (num(x.arrive) ? T('bill', 'arrive', { t: SB.time.clock(x.arrive) }) : '') + (num(x.leave) ? ', ' + T('bill', 'leave', { t: SB.time.clock(x.leave) }) : '') })]);
-        })) : null,
-        fc.unknownPairs && fc.unknownPairs.length ? h('p', { class: 'cb-typed cb-small cb-pairs', text: T('bill', 'unknownPairs', {
-          list: fc.unknownPairs.map(function (p) { return word('genre.' + p.a + '.name', p.a) + ' + ' + word('genre.' + p.b + '.name', p.b); }).join('; ') }) }) : null
-      ]);
-    }
-
-    /* the order on the flyer: a bone mock-up, biggest name first; tabs move a name up or down */
-    function billing(s, v) {
-      var order = (v.billing && v.billing.length ? v.billing : v.bands.map(function (b) { return b.band.id; })).slice(), w = 250, out = '';
-      if (order.length && typeof order[0] === 'object') order = order.map(function (x) { return x.bandId || x.id; });
-      function move(i, d) { var o = order.slice(), t = o[i]; o[i] = o[i + d]; o[i + d] = t; act(function (x) { return SB.Shows.setBilling(x, showId, o); }); }
-      if (!order.length) return null;
-      out += D.type(T('bill', 'billing'), w / 2, 18, 10, { anchor: 'middle', bold: true });
-      order.forEach(function (id, i) { out += D.marker(String(s.bands[id] ? s.bands[id].name : id).toUpperCase(), w / 2, 50 + i * 34, Math.max(11, 22 - i * 4), { anchor: 'middle', maxWidth: w - 20, seed: 'bl' + i }); });
-      return piece('cb-billing', 'bone', [D.art(out, w, 40 + order.length * 34),
-        h('div', { class: 'cb-billctl' }, order.map(function (id, i) {
-          var name = s.bands[id] ? s.bands[id].name : id;
-          return D.tabs({ label: name, items: [
-            { text: '^', label: T('bill', 'billUp', { name: name }), tut: 'bill-move', tutRef: showId, fk: 'bu-' + id, disabled: i === 0, onClick: function () { move(i, -1); } },
-            { text: 'v', label: T('bill', 'billDown', { name: name }), tut: 'bill-move', tutRef: showId, fk: 'bd-' + id, disabled: i === order.length - 1, onClick: function () { move(i, 1); } }], size: 10 });
-        }))], { label: T('bill', 'billing') });
-    }
-
-    keyHandler = function (e) { if (e.key === 'Escape' && ctx.picked) { ctx.picked = null; preview = null; e.stopPropagation(); e.preventDefault(); render(); } };
+    /* Escape puts the picked row down (back to the forecast) */
+    keyHandler = function (e) { if (e.key === 'Escape' && sel) { e.stopPropagation(); e.preventDefault(); pick(null); } };
     if (root && typeof root.addEventListener === 'function') root.addEventListener('keydown', keyHandler);
-    var undress = dress(root, 'show', st());
+    mode = safe(function () { var x = st().shows[showId]; return x && LIVE[x.status] ? 'card' : 'show'; }, 'show');
+    var undress = dress(root, mode, st());
     render();
     return { update: function () { keepFocus(root, render); }, unmount: function () { undress(); if (SB.Audio) SB.Audio.stop(); if (root && root.removeEventListener) root.removeEventListener('keydown', keyHandler); } };
   }
+  /* the old bill route: the same card, opened on the bill (the first open slot, else the first band) */
+  function mountBill(root, params) { return mountShow(root, { showId: params && params.showId, row: (params && params.row) || 'bill' }); }
 
   SB.UI.screen('shows', { rail: 'shows', title: 'ui.shows.title', full: false, mount: mountShows });
   SB.UI.screen('show', { rail: 'shows', title: 'ui.show.title', full: false, mount: mountShow });

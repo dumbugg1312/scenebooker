@@ -406,7 +406,7 @@
           var d = SB.time.date(x.day), rn = x.roomId && s.rooms[x.roomId] ? s.rooms[x.roomId].name : '';
           return dd.thing({ cls: 'cb-miniclip', label: L('askFor', { name: c.name, d: SB.time.fmt(x.day, 'short'), room: rn ? ', ' + rn : '' }), fk: 'ask-' + x.id,
             svg: dd.clipboard(64, 80, 'mc' + x.id) + dd.marker(d.m + '/' + d.d, 32, 56, 14, { anchor: 'middle', seed: 'mcd' + x.id }), w: 64, h: 80, strip: d.m + '/' + d.d, stripSize: 9,
-            onClick: function () { SB.UI.go('bill', { showId: x.id }); } });
+            onClick: function () { SB.UI.go('show', { showId: x.id, row: 'bill' }); } });
         }))]);
       }
 

@@ -61,6 +61,15 @@
     }
     function down() { if (SB.UI.route() !== 'desk') tap('#main .cu-down'); if (SB.UI.route() !== 'desk') fail('putting it down did not go back to the desk'); }
     function show() { return S().shows[cur().showId]; }
+    /* the card (js/ui/screens/shows.js): its root, the count on its foot, and its rows all on the sheet (a real browser only) */
+    function card() { var e = q('#main .cb-card'); if (!e) fail('the show\'s card is not up'); return e; }
+    function outN() { var e = q('#main .cb-asksout'); return e ? Number(e.getAttribute('data-n')) : -1; }
+    function rowsFit() {
+      var rows = d.querySelectorAll('#main .cb-cardrow'), box = q('#main .cu-in'), b = box && box.getBoundingClientRect ? box.getBoundingClientRect() : null, i, r;
+      if (rows.length < 9) fail('the card has ' + rows.length + ' rows');
+      if (!b || !b.height) return;
+      for (i = 0; i < rows.length; i++) { r = rows[i].getBoundingClientRect(); if (r.height && (r.top < b.top - 1 || r.bottom > b.bottom + 1)) fail('the card\'s row ' + describe(rows[i]) + ' is off the sheet'); }
+    }
     function text() { var c = cur(); return (c.text || '') + ' ' + (c.more || ''); }
     function clean() { var t = text(); if (!/\S/.test(t) || /\{|\}|undefined|  |\.,|, ,| \./.test(t)) fail('the step text has a hole in it: "' + t + '"'); }
 
@@ -119,14 +128,18 @@
       tap(fk('tab-INTERESTED'));
       expect('HOLD', 'ASK'); clean();
     });
-    /* 2 HOLD */
+    /* 2 HOLD: the request's HOLD tab makes the show and opens its card on the room row */
     phase('hold: hold a room, ask for the hold', '02-HOLD', function () {
       tap(fk('tab-HOLD'));
-      taped(fk('tab-send-hold'));
+      if (SB.UI.route() !== 'show') fail('HOLD did not open the show\'s card');
+      if (card().getAttribute('data-sel') !== 'room') fail('the card did not open on the room row');
+      rowsFit();
+      taped(fk('hold'));
     });
     phase('hold: sent, the host answers, confirm', null, function () {
-      tap(fk('tab-send-hold'));
+      tap(fk('hold'));
       expect('HOLD', 'WAIT'); clean();
+      if (outN() !== 1) fail('the card\'s foot counts ' + outN() + ' asks going out tonight, not the one hold');
       down();
       taped(hit('lamp'));
       if (env.autoPause) env.autoPause(hit('lamp')); else until('HOLD:WAIT', 'the hold');
@@ -134,6 +147,7 @@
       if (!show().hold) fail('the room is not held');
       if (S().clock.stop && S().clock.stop.kind === 'END_OF_WEEK') fail('time ran to the end of the week past the hold');
       tap(clip());
+      tap(fk('row-room'));
       tap(fk('confirm'));
       expect('HOLD', 'WAIT');
       down();
@@ -141,31 +155,29 @@
       expect('BILL', 'OFFER'); clean();
       if (show().status !== 'CONFIRMED') fail('the show is not confirmed');
     });
-    /* 3 BILL */
+    /* 3 BILL: all of it on the card: the touring band's row is the offer, an empty slot's row is the sticker sheet */
     phase('bill: the offer to the touring band', null, function () {
       var touring = cur().bandId, name = S().bands[touring].name;
       if (text().indexOf(name) < 0 || !/offer/i.test(text())) fail('the BILL text does not say how ' + name + ' gets on the bill: "' + text() + '"');
-      tap(hit('phone'));
-      tap('#main .ph-row[data-fk="c-q:' + cur().requestId + '"]');
-      tap(fk('tab-OFFER'));
-      tap(fk('tab-send-offer'));
+      tap(clip());
+      tap(fk('row-offer'));
+      tap(fk('send-offer'));
       expect('BILL', 'KIDS'); clean();
-      down();
     });
     phase('bill: the sticker sheet', '03-BILL', function () {
-      tap(clip());
-      tap(fk('tobill'));
+      tap(fk('row-slot-' + cur().slot));
       taped(fk('cand-' + cur().bandId));
     });
     phase('bill: kids open, the draw closes', null, function () {
       var c = cur(), fee;
-      tap(fk('cand-' + c.bandId)); tap(fk('gap-OPEN'));
+      tap(fk('cand-' + c.bandId));
       expect('BILL', 'LOCAL'); clean();
       c = cur();
       fee = SB.Bands.fee(S(), c.bandId, c.showId);
       if (fee.pay === 'FLAT' || fee.amount > 0) fail('the local draw the texts name asks ' + fee.pay + ' $' + fee.amount + ' for a ' + show().door.price + ' dollar door');
-      tap(fk('cand-' + c.bandId)); tap(fk('gap-CLOSE'));
+      tap(fk('row-slot-CLOSE')); tap(fk('cand-' + c.bandId));
       expect('BILL', 'WAIT'); clean();
+      if (outN() !== 3) fail('the card\'s foot counts ' + outN() + ' asks going out tonight, not the offer and the two locals');
       down();
       until('BILL:WAIT', 'the bands to answer');
       expect('SOUND', 'ASK'); clean();
@@ -176,6 +188,8 @@
     /* 4 SOUND */
     phase('sound: the clipboard, the crew', '04-SOUND', function () {
       tap(clip());
+      rowsFit();
+      tap(fk('row-sound'));
       taped(fk('cr-sound' + cur().personId));
     });
     phase('sound: asked, answered', null, function () {
@@ -185,36 +199,31 @@
       until('SOUND:WAIT', 'sound to answer');
       expect('FLYER'); clean();
     });
-    /* 5 FLYER */
+    /* 5 FLYER: the card's flyer row, into the flyer desk, and USE THIS FLYER comes back to the card */
     phase('flyer: the flyer desk', '05-FLYER', function () {
-      tap(hit('paper'));
+      tap(clip());
+      tap(fk('row-flyer'));
+      tap(fk('flyer'));
+      if (SB.UI.route() !== 'flyerdesk') fail('the flyer row did not open the flyer desk');
       taped('#main [data-tut="flyer-make"]');
     });
     phase('flyer: use this flyer', null, function () {
       tap('#main [data-tut="flyer-make"]');
       expect('PROMO', 'PLAN'); clean();
-      down();
+      if (SB.UI.route() !== 'show' || card().getAttribute('data-sel') !== 'flyer') fail('USE THIS FLYER did not come back to the card\'s flyer row');
     });
-    /* 6 PROMO */
+    /* 6 PROMO: the card's promo row: the show's jobs, pencilled in on days */
     phase('promo: the calendar, a job', '06-PROMO', function () {
-      var i, e;
-      tap(hit('calendar'));
-      for (i = 0; i < 6; i++) {            // open the pile the job is in
-        e = tapedEl();
-        if (!e) fail('no tape on the calendar');
-        if (e.classList.contains('cc-note')) break;
-        if (!e.classList.contains('cc-pile-top')) fail('the tape is on ' + describe(e) + ', not on a job');
-        e.click();
-      }
-      taped('#main .cc-note[data-job="' + cur().jobId + '"]');
+      tap(fk('row-promo'));
+      taped('#main [data-tut="promo-slot"][data-tut-ref="' + cur().jobId + '"]');
     });
     phase('promo: jobs on days, done', null, function () {
       var i, e, n = 0;
       for (i = 0; i < 40 && at() === 'PROMO:PLAN'; i++) {
         e = tapedEl();
-        if (!e || d.querySelectorAll('.sy-tape').length !== 1) fail('no tape on the calendar');
-        if (e.classList.contains('cc-half')) n++;
-        else if (!e.classList.contains('cc-note') && !e.classList.contains('cc-pile-top')) fail('the tape is on ' + describe(e));
+        if (!e || d.querySelectorAll('.sy-tape').length !== 1) fail('no tape on the card');
+        if (e.getAttribute('data-tut') !== 'promo-slot') fail('the tape is on ' + describe(e) + ', not on a day for a job');
+        n++;
         e.click();
       }
       if (at() === 'PROMO:PLAN') fail('the jobs never got planned');

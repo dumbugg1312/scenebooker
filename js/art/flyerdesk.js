@@ -302,6 +302,7 @@
       if (r && r.ok !== false) {
         if (SB.UI.toast) SB.UI.toast(L('saved'), 'info');
         if (thenBack && SB.UI.back) SB.UI.back();
+        else if (!thenBack && SB.UI.go) SB.UI.go('show', { showId: showId, row: 'flyer' });      // back to the show's card, on its flyer row
       }
     }
 

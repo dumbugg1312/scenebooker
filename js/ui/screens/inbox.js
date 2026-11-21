@@ -512,7 +512,7 @@
         statusBar(s),
         view === 'list' ? null : convHead(s, c),
         body = h('div', { class: 'ph-body', tabindex: '-1' }, view === 'list' ? listView(s) : (view === 'chat' ? chatView(s, c) : (view === 'page' ? pageView(s, c) :
-          (view === 'hold' ? holdView(s, c) : (view === 'pass' ? passView(s, c) : slipView(s, c)))))),
+          passView(s, c)))),
         view === 'list' ? null : dock(s, c),
         crack()
       ]);
@@ -970,8 +970,9 @@
         queued = queuedFor(s, c).map(function (o) { return o.kind; });
         tabs.push(tab('INTERESTED', L('interested'), function () { act(function (x) { return SB.Mail.reply(x, q.id, 'INTERESTED'); }); },
                       { done: queued.indexOf('INTERESTED') >= 0 || !!(s.mail && s.mail.extended && s.mail.extended[q.id]), tut: 'req-interested', ref: q.id }));
-        tabs.push(tab('HOLD', L('hold'), function () { view = 'hold'; draft.mode = 'HOLD'; render(); }, { icon: gpic('KEY', 18, 'dk'), tut: 'req-hold', ref: q.id }));
-        tabs.push(tab('OFFER', L('offer'), function () { view = 'slip'; draft.mode = 'OFFER'; render(); }, { done: queued.indexOf('TERMS') >= 0, tut: 'req-offer', ref: q.id }));
+        /* the room and the offer are worked on the show's card (js/ui/screens/shows.js): these open it at the right row */
+        tabs.push(tab('HOLD', L('hold'), function () { toCard(q, 'room'); }, { icon: gpic('KEY', 18, 'dk'), tut: 'req-hold', ref: q.id }));
+        tabs.push(tab('OFFER', L('offer'), function () { toCard(q, 'offer'); }, { done: queued.indexOf('TERMS') >= 0, tut: 'req-offer', ref: q.id }));
         tabs.push(tab('PASS', L('pass'), function () { view = 'pass'; draft.mode = 'PASS'; render(); }, { done: queued.indexOf('PASS') >= 0, tut: 'req-pass', ref: q.id }));
       }
       return tabs.length ? h('div', { class: 'ph-fringe ph-dock', role: 'group', aria: { label: L('reply') } }, tabs) : null;
@@ -985,28 +986,11 @@
       return null;
     }
 
-    function holdView(s, c) {
-      var q = c.req, rv = safe(function () { return SB.Requests.view(s, q.id); }, null), rooms = safe(function () { return SB.Rooms.list(s, { bookable: true }); }, []), show = showFor(s, q), text;
-      if (draft.roomId == null && rooms.length) draft.roomId = rooms[0];
-      if (draft.day == null && rv && rv.dates && rv.dates.length) draft.day = rv.dates[0].day;
-      if (!rooms.length) return h('p', { class: 'ph-sys', text: L('noRooms') });
-      text = num(draft.day) ? safe(function () { return SB.text.line('requests.compose.ROOM_HOLD', { dow: SB.time.fmt(draft.day, 'dow'), date: SB.time.date(draft.day).d }, null); }, '') : '';
-      return h('div', { class: 'ph-sheet' }, [
-        h('section', { class: 'ph-sec', aria: { label: L('holdRoom') } }, [kicker(L('holdRoom')),
-          h('div', { class: 'ph-keys', role: 'group', data: { tut: 'hold-room', 'tut-ref': q.id } }, rooms.map(function (id) {
-            var r = s.rooms[id], on = id === draft.roomId, kind = word('room.' + r.kind + '.name', String(r.kind).toLowerCase());
-            return tab('room-' + id, r.name, function () { draft.roomId = id; render(); },
-                       { on: on, pressed: on ? 'true' : 'false', icon: gpic('KEY', 22, id), sub: kind + (num(r.cap) ? ' · ' + r.cap : ''), aria: r.name + ', ' + kind + (num(r.cap) ? ', ' + r.cap : ''), cls: 'ph-tab--wide' });
-          }))]),
-        h('section', { class: 'ph-sec', aria: { label: L('holdDay') }, data: { tut: 'hold-night', 'tut-ref': q.id } }, [kicker(L('holdDay')), tearOff(rv ? rv.dates || [] : [], function (d) { draft.day = d; render(); })]),
-        myBubble(text, null),
-        tab('send-hold', L('holdGo'), function () {
-          var sid = show ? show.id : null, r, roomId = draft.roomId, day = draft.day;
-          if (!sid) { r = act(function (x) { return SB.Shows.create(x, { requestId: q.id }); }); if (!r || r.ok === false) return; sid = r.showId; }
-          r = act(function (x) { return SB.Mail.ask(x, 'ROOM_HOLD', roomId, { showId: sid, day: day }); });
-          if (r && r.ok !== false) { view = 'chat'; draft = {}; render(); }
-        }, { big: true, disabled: !num(draft.day), tut: 'hold-ask', ref: q.id })
-      ]);
+    /* the show this request is for (made now if there is none yet), opened at a row of its card */
+    function toCard(q, row) {
+      var show = showFor(st(), q), sid = show ? show.id : null, r;
+      if (!sid) { r = act(function (x) { return SB.Shows.create(x, { requestId: q.id }); }); if (!r || r.ok === false) return; sid = r.showId; }
+      SB.UI.go('show', { showId: sid, row: row, day: num(draft.day) ? draft.day : null });
     }
 
     /* ---------------- pass ---------------- */
@@ -1025,59 +1009,6 @@
           var r = act(function (x) { return SB.Mail.reply(x, q.id, 'PASS', { tone: draft.tone }); });
           if (r && r.ok !== false) { view = 'chat'; draft = {}; render(); }
         }, { big: true })
-      ]);
-    }
-
-    /* ---------------- the deal slip ---------------- */
-
-    function offerSlots(s, show) {
-      var d = draft.deal, room = show.roomId && s.rooms ? s.rooms[show.roomId] : null, acc = safe(function () { return SB.Money.showAccounts(s, show.id); }, null),
-          costs = acc && acc.offTop ? acc.offTop.reduce(function (t, x) { return t + (x.amount || 0); }, 0) : '—', t = SB.time.date(show.day);
-      return { dateLong: SB.time.fmt(show.day, 'dow') + ' the ' + SB.text.ordinal(t.d), doorDeal: d.shape === 'DOOR', costs: costs,
-               guarantee: d.shape !== 'DOOR' && d.shape !== 'HAT' && d.guarantee > 0 ? d.guarantee : null,
-               price: show.door ? show.door.price : null, ages: show.door ? word('ages.' + show.door.ages, show.door.ages) : '',
-               lodging: !!d.lodging, host: room && room.ownerId && s.people && s.people[room.ownerId] ? (s.people[room.ownerId].first || '') : '',
-               stay: room && room.ownerId && s.people && s.people[room.ownerId] && s.people[room.ownerId].first ? s.people[room.ownerId].first + '\'s' : 'my place' };
-    }
-
-    function slipView(s, c) {
-      var q = c.req, show = showFor(s, q), rv = safe(function () { return SB.Requests.view(s, q.id); }, null), ask = (rv && rv.ask) || {}, d, withG, ex, b = rv && rv.band, gIn;
-      if (!draft.deal) draft.deal = { shape: ask.shape || 'DOOR', guarantee: ask.guarantee || 0, pct: ask.pct == null ? 1 : ask.pct, lodging: !!ask.lodging, meal: !!ask.meal };
-      if (!show) return h('div', { class: 'ph-sheet' }, [h('p', { class: 'ph-note pz-paper', text: L('needShow') }),
-        tab('toHold', L('hold'), function () { view = 'hold'; draft.mode = 'HOLD'; render(); }, { icon: gpic('KEY', 18, 'th') })]);
-      d = draft.deal; withG = d.shape === 'GUARANTEE' || d.shape === 'GUARANTEE_PLUS' || d.shape === 'VERSUS';
-      ex = safe(function () { return SB.Money.exposure(s, show.id); }, null);
-      gIn = h('input', { type: 'number', class: 'ph-fig-in', min: '0', step: '5', value: String(d.guarantee || 0), aria: { label: L('guarantee') }, data: { fk: 'g-in' },
-                         on: { change: function (e) { d.guarantee = Math.max(0, Math.round(Number(e.target.value) || 0)); render(); } } });
-      return h('div', { class: 'ph-sheet' }, [
-        h('section', { class: 'ph-slip pz-paper', aria: { label: L('slip') } }, [
-          h('div', { class: 'ph-slip-top' }, [
-            rn(up(L('slip')), 22, { seed: 'slip', stock: 'white' }),
-            b ? h('span', { class: 'ph-slip-mark' }, markPic(SB.Identity.bandMark({ id: b.id, name: b.name, genre: b.genre }, 20), 20, 30, b.id)) : null,
-            h('span', { class: 'ph-slip-date', text: up(SB.time.fmt(show.day, 'short')) })
-          ]),
-          h('div', { class: 'ph-shapes', role: 'radiogroup', aria: { label: L('deal') } }, Object.keys(SB.Enums.DEAL).map(function (k) {
-            var on = d.shape === k;
-            return tickBox('shape-' + k, word('deal.' + k + '.name', k.toLowerCase()), on, null, function () { d.shape = k; render(); }, true);
-          })),
-          withG ? h('div', { class: 'ph-fig' }, [
-            h('span', { class: 'ph-k', text: up(L('guarantee')) }),
-            tab('g-less', '−5', function () { d.guarantee = Math.max(0, (d.guarantee || 0) - 5); render(); }, { aria: L('less'), cls: 'ph-tab--pm' }),
-            h('label', { class: 'ph-fig-box' }, [h('span', { class: 'ph-fig-cur', text: '$' }), gIn]),
-            tab('g-more', '+5', function () { d.guarantee = (d.guarantee || 0) + 5; render(); }, { aria: L('more'), cls: 'ph-tab--pm' })
-          ]) : null,
-          h('div', { class: 'ph-extras' }, [
-            tickBox('meal', L('meal'), !!d.meal, 'MEAL', function () { d.meal = !d.meal; render(); }),
-            tickBox('lodging', L('lodging'), !!d.lodging, 'FLOOR', function () { d.lodging = !d.lodging; render(); })
-          ]),
-          stamps(ex),
-          myBubble(safe(function () { return SB.text.line('requests.compose.OFFER', offerSlots(s, show), null); }, ''), null),
-          tab('send-offer', L('sendOffer'), function () {
-            var deal = { shape: d.shape, guarantee: withG ? d.guarantee : 0, pct: d.pct, lodging: !!d.lodging, meal: !!d.meal };
-            var r = act(function (x) { return SB.Mail.reply(x, q.id, 'OFFER', { showId: show.id, deal: deal, date: show.day }); });
-            if (r && r.ok !== false) { view = 'chat'; draft = {}; render(); }
-          }, { big: true })
-        ])
       ]);
     }
 

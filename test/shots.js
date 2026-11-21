@@ -36,8 +36,25 @@ const GROUPS = {
     ['phone-answer', click('#main .ph-hero-need')],
     ['phone-chat', "(document.querySelector('#main .ph-row[data-tut=\"req-row\"]') || document.querySelector('#main .ph-row')).click()"],
     ['phone-page', click('#main [data-fk="tab-seg-page"]')],
-    ['phone-pass', click('#main [data-fk="tab-PASS"]')],
-    ['phone-slip', click('#main [data-fk="back"]') + '; ' + click('#main [data-fk="tab-OFFER"]')]
+    ['phone-pass', click('#main [data-fk="tab-PASS"]')]
+  ] },
+  /* the show's card: every part of the show on one clipboard; the pickers for a few of its rows */
+  card: { walk: 'sound: asked, answered', views: [
+    ['card', `SB.UI.go('show', { showId: ${tutShow} })`],
+    ['card-room', click('#main [data-fk="row-room"]')],
+    ['card-band', click('#main [data-tut-ref="band"]')],
+    ['card-sheet', click('#main [data-fk="another"]')],
+    ['card-flyer', click('#main [data-fk="row-flyer"]')],
+    ['card-promo', click('#main [data-fk="row-promo"]')],
+    ['card-prep', click('#main [data-fk="row-prep"]')],
+    ['card-price', click('#main [data-fk="row-price"]')],
+    ['card-deal', click('#main [data-fk="row-deal"]')]
+  ] },
+  cardnew: { views: [
+    ['card-new', "(document.querySelector('#desk .dk-hit[data-obj=\"phone\"]') || { click: function () {} }).click(); (document.querySelector('#main .ph-row[data-tut=\"req-row\"]') || document.querySelector('#main .ph-row')).click(); " + click('#main [data-fk="tab-HOLD"]')],
+    ['card-offer', click('#main [data-fk="row-offer"]')],
+    ['card-hold-asked', click('#main [data-fk="row-room"]') + '; ' + click('#main [data-fk="hold"]')],
+    ['card-offer-asked', click('#main [data-fk="row-offer"]') + '; ' + click('#main [data-fk="send-offer"]')]
   ] },
   calendar: { walk: 'promo: jobs on days, done', views: [['week', "SB.UI.go('week')", 2200]] },
   close: { walk: 'close-out: the week closes', views: [['close', "SB.UI.route() === 'close' || SB.UI.go('close')", 2500]] },

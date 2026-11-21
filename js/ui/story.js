@@ -215,23 +215,23 @@
     if (r === 'desk') { id = targetOf(cur); return id ? first(desk, ['.dk-hit[data-obj="' + id + '"]']) : null; }
     switch (r) {
       case 'inbox':
-        if (t !== 'phone') break;
-        list.push(fk(cur.step === 'ANSWER' ? 'tab-INTERESTED' : (cur.step === 'HOLD' ? 'tab-send-hold' : 'tab-send-offer')));
-        if (cur.step !== 'ANSWER') list.push(fk(cur.step === 'HOLD' ? 'tab-HOLD' : 'tab-OFFER'), fk('tab-toHold'));
-        list.push('.ph-row' + fk('c-q:' + cur.requestId), fk('back'));
+        /* the request's HOLD and OFFER tabs open the show's card at the right row */
+        if (cur.step === 'ANSWER') list.push(fk('tab-INTERESTED'));
+        else if (cur.step === 'HOLD' && st === 'ASK') list.push(fk('tab-HOLD'));
+        else if (cur.step === 'BILL' && st === 'OFFER') list.push(fk('tab-OFFER'));
+        if (t === 'phone') list.push('.ph-row' + fk('c-q:' + cur.requestId), fk('back'));
         break;
       case 'shows': if (t === 'clip') list.push(fk('clip-' + cur.showId)); break;
-      case 'show':
+      case 'show': case 'bill':
+        /* the card: the thing to press in the picker when the right row is open, else the row */
         if (t !== 'clip') break;
-        if (st === 'CONFIRM') list.push(fk('confirm'));
-        else if (cur.step === 'BILL') list.push(fk('tobill'));
-        else if (cur.step === 'SOUND') list.push(fk('cr-sound' + cur.personId), '[data-tut="crew-sound"]');
-        break;
-      case 'bill':
-        if (cur.step !== 'BILL' || wait) break;
-        if (st === 'ORDER') list.push('.cb-setrow');
-        else if (main && main.querySelector('.cb-bill.is-picking')) list.push(fk('gap-' + cur.slot));
-        else list.push(fk('cand-' + cur.bandId), fk('free'));
+        if (cur.step === 'HOLD') list.push(fk(st === 'CONFIRM' ? 'confirm' : 'hold'), fk('row-room'));
+        else if (cur.step === 'BILL' && st === 'OFFER') list.push(fk('send-offer'), fk('row-offer'));
+        else if (cur.step === 'BILL' && st === 'ORDER') list.push('[data-tut="bill-move"]:not([disabled])', '[data-tut="card-row"][data-tut-ref="band"]');
+        else if (cur.step === 'BILL') list.push('.cb-card[data-sel="slot-' + cur.slot + '"] ' + fk('cand-' + cur.bandId), '.cb-card[data-sel="slot-' + cur.slot + '"] ' + fk('free'), fk('row-slot-' + cur.slot));
+        else if (cur.step === 'SOUND') list.push(fk('cr-sound' + cur.personId), fk('row-sound'));
+        else if (cur.step === 'FLYER') list.push(fk('flyer'), fk('row-flyer'));
+        else if (cur.step === 'PROMO' && st === 'PLAN') list.push('[data-tut="promo-slot"][data-tut-ref="' + cur.jobId + '"]', '.cb-card:not([data-sel="promo"]) ' + fk('row-promo'));
         break;
       case 'flyerdesk': if (cur.step === 'FLYER') list.push('[data-tut="flyer-make"]'); break;
       case 'week':
