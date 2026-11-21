@@ -37,7 +37,7 @@ SB.Cities.register('lakeland-fl', {
     { id: 'sebring', kind: 'FEEDER', name: 'Sebring', minutes: 60, bearing: 155, note: 'A racetrack town an hour south; its teenagers drive up for shows.' },
     { id: 'wauchula', kind: 'FEEDER', name: 'Wauchula', minutes: 60, bearing: 175, note: 'Cattle and citrus country; a few kids drive in.' },
     { id: 'clearwater', kind: 'PEER', name: 'Clearwater', minutes: 60, bearing: 295, scene: 900, note: 'A beach-and-retiree city; a different, coastal world.' },
-    { id: 'sarasota', kind: 'PEER', name: 'Sarasota', minutes: 80, bearing: 215, scene: 700, note: 'A smaller Gulf-coast city that trades the odd band.' },
+    { id: 'sarasota', kind: 'PEER', name: 'Sarasota', slug: 'sarasota-fl', minutes: 80, bearing: 215, scene: 700, note: 'A smaller Gulf-coast city that trades the odd band.' },
     { id: 'palm-bay', kind: 'PEER', name: 'Palm Bay and Melbourne', minutes: 105, bearing: 105, slug: 'palm-bay-fl', note: 'The Space Coast, a long drive east on I-4 and I-95.' },
     { id: 'gainesville', kind: 'PEER', name: 'Gainesville', minutes: 120, bearing: 345, slug: 'gainesville-fl', note: 'A university town with an older punk reputation; Lakeland kids look up to it.' }
   ],

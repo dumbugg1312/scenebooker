@@ -1,12 +1,10 @@
 'use strict';
 // week.test — 06-harness section 3, `week.test`: the week, its jobs and its mail, through the public functions only (02-engine 2, 5.1).
-//   * a job cannot be planned before its needs, in the wrong half, or past its missed day; only HOURS jobs can be planned;
-//   * overtime over OVERTIME_MAX is refused;
-//   * a queued ask goes out the evening of the day it was written, free; the sixth and later item costs a Night hour; a phone-off day
-//     sends and delivers nothing;
+// The night clock itself (hours, doNow, messages, staying up, the crunch) is in nightclock.test.js.
+//   * a phone-off day sends and delivers nothing;
 //   * a promise unticked is SKIPPED when its carrier resolves; an optional job is never reported late;
-//   * step never advances past a pending decision, and is re-entrant: DAY_START once a day, each plan item once;
-//   * a decision handed to Week.raise during nextWeek is the first stop on Monday;
+//   * step raises EVENING once a day and waits for Week.endNight; it never advances past a pending decision; DAY_START once a day;
+//   * a new week plays by itself (no PLAN stop), and a decision handed to Week.raise during nextWeek is the first stop on Monday;
 //   * after a show played through Night.begin, next and settle (not auto), state.week.log holds NIGHT_START, SET_START and SET_END, SETTLE_LINE,
 //     SHOW_RESULT, LEARNED and TRUST records exactly once each, and Week.close reports `learned` and `people` from them;
 //   * the scripted opening: the guided first show's first date is day 11 (the walkthrough); skipped, it is day 31 and every job of that show can be on time for a player who acts in week 0,
@@ -62,86 +60,34 @@ module.exports = function (t) {
     t.eq(sixth, [], 'by the end of week 0 no job of the swap show is missed');
   });
 
-  /* ---- planning refusals ---- */
-  H.section(t, 'plan refusals', () => {
-    const state = fresh('week-plan');
-    const d = draftShow(state); if (!d) { t.fail('no draft show'); return; }
-    const jobs = SB.Jobs.forShow(state, d.showId);
-    const flyer = jobs.filter(j => j.type === 'MAKE_FLYER')[0];
-    if (flyer) {
-      const r = SB.Week.plan(state, flyer.id, 0, 'DAY', {});
-      t.ok(r.ok === false && r.code === 'NEEDS', 'MAKE_FLYER cannot be planned before the room is confirmed (got ' + (r.ok === false ? r.code : 'ok') + ')');
-    } else t.fail('the show has no MAKE_FLYER job');
-    const hold = jobs.filter(j => j.type === 'HOLD_ROOM')[0];
-    if (hold) { const r = SB.Week.plan(state, hold.id, 0, 'DAY', {}); t.ok(r.ok === false && r.code === 'INVALID', 'a MESSAGE job cannot be planned (INVALID)'); }
-    const promise = jobs.filter(j => C.JOBS[j.type].mode === 'PROMISE')[0];
-    if (promise) { const r = SB.Week.plan(state, promise.id, 0, 'DAY', {}); t.ok(r.ok === false, 'a PROMISE job cannot be planned'); }
-    const lock = jobs.filter(j => j.type === 'LOCK_BILL')[0];
-    if (lock) { const r = SB.Week.plan(state, lock.id, 0, 'DAY', {}); t.ok(r.ok === false && (r.code === 'NEEDS' || r.code === 'WINDOW'), 'LOCK_BILL needs ASK_LOCALS first'); }
-    // an unknown id is a broken contract (6.4): SB.fail, not a refusal
-    t.throws(() => SB.Week.plan(state, 'j999999', 0, 'DAY', {}), 'unknown', 'an unknown job id is a contract break');
-  });
-
-  H.section(t, 'plan: wrong half and window', () => {
-    const state = fresh('week-half');
-    const r = SB.Week.addJob(state, 'EXTRA_SHIFT', {}); t.ok(ok(r), 'EXTRA_SHIFT can be added');
-    if (ok(r)) {
-      const w = SB.Week.plan(state, r.jobId, 5, 'NIGHT', {});
-      t.ok(w.ok === false && w.code === 'WRONG_HALF', 'a DAY-only job is refused at night (got ' + (w.ok === false ? w.code : 'ok') + ')');
+  /* ---- the night clock (design/spec/10-night-clock.md) ---- */
+  const tonight = state => SB.Week.tonight(state);
+  // step until the day reaches its evening (or something else stops it); answers decisions on the way
+  function toEvening(state) {
+    for (let g = 0; g < 80; g++) {
+      const st = state.clock.stop;
+      if (st && st.kind === 'EVENING') return st;
+      const r = SB.Week.step(state);
+      if (r.stop && r.stop.kind === 'DECISION') SB.Week.decide(state, r.stop.decision.id, r.stop.decision.options.filter(o => o.enabled !== false)[0].id);
+      else if (r.stop && r.stop.kind === 'SHOW_NIGHT') SB.Night.auto(state, r.stop.showId, { settle: 'FAIR' });
+      else if (r.stop && r.stop.kind === 'END_OF_WEEK') return r.stop;
     }
-  });
-
-  H.section(t, 'overtime', () => {
-    // overtime is hours used over the day's capacity, summed per day (01-state: week.cap and week.used); OVERTIME_MAX is per day
-    const state = fresh('week-ot');
-    const day = SB.Week.view(state).days[0];
-    const capDay = day.cap.DAY + day.cap.NIGHT;
-    const a = SB.Week.addJob(state, 'EXTRA_SHIFT', {});
-    if (!ok(a)) { t.fail('no EXTRA_SHIFT'); return; }
-    const six = C.JOBS.EXTRA_SHIFT.hours;
-    const first = SB.Week.plan(state, a.jobId, 0, 'DAY', {});
-    const over1 = Math.max(0, six - capDay);
-    if (over1 <= C.OVERTIME_MAX) t.ok(ok(first) && first.overtime === over1, 'a ' + six + '-hour job on a ' + capDay + '-hour day is ' + over1 + ' over, within OVERTIME_MAX (overtime ' + first.overtime + ')');
-    else t.ok(first.ok === false && first.code === 'NO_HOURS', 'a job more than OVERTIME_MAX over the day is refused with NO_HOURS');
-    const b = SB.Week.addJob(state, 'EXTRA_SHIFT', {});
-    if (ok(b)) { const again = SB.Week.plan(state, b.jobId, 0, 'DAY', {}); t.ok(again.ok === false && again.code === 'NO_HOURS', 'a second one the same day goes over OVERTIME_MAX and is refused (got ' + (again.ok === false ? again.code : 'ok') + ')'); }
-    t.ok(SB.Week.view(state).days[0].over <= C.OVERTIME_MAX, 'the day view never shows more than OVERTIME_MAX of overtime');
-    const sat = SB.Week.view(state).days[5];
-    const c = SB.Week.addJob(state, 'EXTRA_SHIFT', {});
-    if (ok(c)) { const r = SB.Week.plan(state, c.jobId, 5, 'DAY', {}); t.ok(ok(r), 'a day off takes a six-hour job without trouble (overtime ' + (r && r.overtime) + ' of a ' + (sat.cap.DAY + sat.cap.NIGHT) + '-hour day)'); }
-    const burn = SB.Week.unplan; t.ok(typeof burn === 'function', 'a planned job can be unplanned');
-  });
-
-  /* ---- mail: free evening send, the sixth costs an hour, phone off ---- */
-  H.section(t, 'mail', () => {
-    const state = fresh('week-mail');
-    const bands = SB.Bands.list(state, { local: true, active: true });
-    t.ok(bands.length >= 8, 'the town has local bands to ask (' + bands.length + ')');
-    const d = draftShow(state); if (!d) { t.fail('no draft'); return; }
-    const asked = [];
-    bands.slice(0, 7).forEach(b => { const r = SB.Mail.ask(state, 'BAND_PLAY', b, { showId: d.showId, pay: 'FREE', fee: 0, wantSlot: 'OPEN', inPerson: false }); if (ok(r)) asked.push(r.askId); });
-    t.ok(asked.length >= 6, 'six or more asks queued (' + asked.length + ')');
-    const view = SB.Week.view(state);
-    t.eq(view.days[0].queued, asked.length, 'the day header says how many go out tonight');
-    t.ok(!SB.Week.check(state).ok, 'a sixth message in one evening shows up in the check as costing a Night hour');
-    SB.Week.startPlay(state);
-    const used0 = state.week.used[0].NIGHT;
-    let guard = 0;
-    while (guard++ < 60 && state.clock.cursor.dayIdx === 0) { const r = SB.Week.step(state); if (r.stop && r.stop.kind !== 'DECISION' && r.stop.kind !== 'REPLY' && r.stop.kind !== 'NEED_BY') break; if (r.stop && r.stop.kind === 'DECISION') SB.Week.decide(state, r.stop.decision.id, r.stop.decision.options[0].id); }
-    const sent = asked.filter(id => state.asks[id] && state.asks[id].status !== 'QUEUED');
-    t.eq(sent.length, asked.length, 'every queued ask went out on Monday evening (' + sent.length + ' of ' + asked.length + ')');
-    t.ok(state.week.used[0].NIGHT >= used0 + 1, 'the sixth and later items cost a Night hour');
-    asked.forEach(id => t.eq(state.asks[id].sentDay, 0, 'ask ' + id + ' was sent on day 0'));
-  });
+    return null;
+  }
+  // call the night and play on to the next evening
+  function nextEvening(state) { SB.Week.endNight(state); return toEvening(state); }
+  const localBands = state => SB.Bands.list(state, { local: true, active: true });
+  const askBand = (state, showId, b) => SB.Mail.ask(state, 'BAND_PLAY', b, { showId: showId, pay: 'FREE', fee: 0, wantSlot: 'OPEN', inPerson: false });
 
   H.section(t, 'phone off', () => {
     const state = fresh('week-phone');
-    const b = SB.Bands.list(state, { local: true, active: true })[0];
+    const b = localBands(state)[0];
     const d = draftShow(state); if (!d || !b) { t.fail('no draft or band'); return; }
-    const r = SB.Mail.ask(state, 'BAND_PLAY', b, { showId: d.showId, pay: 'FREE', fee: 0, wantSlot: 'OPEN', inPerson: false });
-    t.ok(ok(r), 'an ask queues');
     t.ok(ok(SB.Week.phoneOff(state, 0, true)), 'Monday can be a phone-off day');
-    SB.Week.startPlay(state);
+    toEvening(state);
+    const r = askBand(state, d.showId, b);
+    t.ok(ok(r), 'an ask queues');
+    SB.Week.endNight(state);
     let guard = 0;
     while (guard++ < 40 && state.clock.cursor.dayIdx === 0) { const s = SB.Week.step(state); if (s.stop && s.stop.kind === 'DECISION') SB.Week.decide(state, s.stop.decision.id, s.stop.decision.options[0].id); }
     t.eq(state.asks[r.askId].status, 'QUEUED', 'nothing goes out on a phone-off day');
@@ -174,8 +120,7 @@ module.exports = function (t) {
   /* ---- step ---- */
   H.section(t, 'step', () => {
     const state = fresh('week-step');
-    SB.Week.startPlay(state);
-    let r, guard = 0, dayStarts = 0, stoppedAt = null;
+    let r, guard = 0, stoppedAt = null, evenings = [];
     for (; guard < 400; guard++) {
       r = SB.Week.step(state);
       if (r && r.ok === false) { stoppedAt = r; break; }
@@ -185,34 +130,47 @@ module.exports = function (t) {
         const cur = JSON.stringify(state.clock.cursor);
         SB.Week.step(state); t.eq(JSON.stringify(state.clock.cursor), cur, 'the cursor stays put while a decision is pending');
         SB.Week.decide(state, r.stop.decision.id, r.stop.decision.options.filter(o => o.enabled !== false)[0].id);
+      } else if (r.stop && r.stop.kind === 'EVENING') {
+        evenings.push(r.stop.day);
+        t.eq([r.cursor.dayIdx, r.cursor.half], [r.stop.dayIdx, 'NIGHT'], 'the evening stops the day at its night');
+        const again = SB.Week.step(state);
+        t.ok(again.ok === false && again.code === 'STOP_PENDING' && state.clock.stop.kind === 'EVENING', 'the evening is the player\'s until the night is called');
+        t.ok(tonight(state).open, 'tonight is open');
+        t.ok(ok(SB.Week.endNight(state)), 'Week.endNight calls it');
+        t.ok(SB.Week.endNight(state).ok === false, 'once');
       } else if (r.stop && r.stop.kind === 'SHOW_NIGHT') SB.Night.auto(state, r.stop.showId, { settle: 'FAIR' });
       else if (r.stop && r.stop.kind === 'END_OF_WEEK') break;
     }
-    t.ok(guard < 400, 'step reaches the end of the week');
+    t.ok(guard < 400 && !stoppedAt, 'step reaches the end of the week');
+    t.eq(evenings, [0, 1, 2, 3, 4, 5, 6], 'EVENING is raised once a day, seven in the week');
     const recs = state.week.log.filter(x => x.t === 'DAY_START');
     t.eq(recs.length, 7, 'DAY_START is emitted once a day, seven in the week');
     t.eq(new Set(recs.map(x => x.day)).size, 7, 'on seven different days');
     const done = state.week.log.filter(x => x.t === 'JOB_DONE').map(x => x.jobId);
-    t.eq(done.length, new Set(done).size, 'each plan item resolves once');
+    t.eq(done.length, new Set(done).size, 'each job resolves once');
     t.ok(state.week.log.every(x => typeof x.n === 'number'), 'every logged record is stamped');
     t.eq(state.week.log.map(x => x.n), state.week.log.map((x, i) => i), 'the stamps run 0, 1, 2 ... in order');
   });
 
-  /* ---- raise ---- */
+  /* ---- raise, and the week after ---- */
   H.section(t, 'raise', () => {
     const state = fresh('week-raise');
-    const dec = { id: 'dtest', kind: 'HARM', eventId: null, showId: null, day: 7, half: 'DAY', at: null, tier: null, title: 'test', body: 'test',
-                  options: [{ id: 'LEAVE', label: 'leave it', likely: '', costs: [], enabled: true, why: null }] };
-    SB.Week.startPlay(state);
-    let g = 0; while (g++ < 400) { const r = SB.Week.step(state); if (r.stop && r.stop.kind === 'END_OF_WEEK') break; if (r.stop && r.stop.kind === 'DECISION') SB.Week.decide(state, r.stop.decision.id, r.stop.decision.options.filter(o => o.enabled !== false)[0].id); if (r.stop && r.stop.kind === 'SHOW_NIGHT') SB.Night.auto(state, r.stop.showId, { settle: 'FAIR' }); }
+    const dec = { id: 'dtest', kind: 'BURNOUT', eventId: null, showId: null, day: 7, half: 'DAY', at: null, tier: null, title: 'test', body: 'test',
+                  options: [{ id: 'REST', label: 'rest', likely: '', costs: [], enabled: true, why: null }], shows: [] };
+    let g = 0; while (g++ < 60) { const st = toEvening(state); if (!st || st.kind === 'END_OF_WEEK') break; SB.Week.endNight(state); }
+    t.eq(state.clock.stop && state.clock.stop.kind, 'END_OF_WEEK', 'the week still ends at END_OF_WEEK');
     SB.Week.close(state);
     SB.Week.raise(state, dec);
     t.eq(state.clock.pending.length >= 1, true, 'Week.raise puts the decision on clock.pending');
     const b = SB.Week.nextWeek(state);
     if (b && b.ok === false && b.code === 'BILLS_FIRST') { const bv = SB.Money.billsView(state); SB.Week.payBills(state, { pay: bv ? bv.lines.map(l => l.k) : [], late: [], ladder: [] }); SB.Week.nextWeek(state); }
-    SB.Week.startPlay(state);
+    t.eq([state.clock.phase, state.clock.week, state.clock.stop], ['PLAY', 1, null], 'the new week plays by itself: no PLAN stop');
+    t.eq(tonight(state).day, 7, 'and its clock is Monday\'s');
     const first = SB.Week.step(state);
     t.ok(first.stop && first.stop.kind === 'DECISION' && first.stop.decision.id === 'dtest', 'a decision handed to Week.raise is the first stop on Monday (got ' + JSON.stringify(first.stop && first.stop.kind) + ')');
+    SB.Week.decide(state, 'dtest', 'REST');
+    const ev = toEvening(state);
+    t.ok(ev && ev.kind === 'EVENING' && ev.day === 7, 'then Monday reaches its evening without anybody pressing play');
   });
 
   const NIGHT = ['Night', 'Forecast', 'Feedback', 'Legacy'];

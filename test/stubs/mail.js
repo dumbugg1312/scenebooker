@@ -16,6 +16,7 @@ SB.module('Mail', function (SB) {
     outbox: function () { return []; },
     post: function () { return 'm0'; },
     flush: function () { return { records: [], hours: 0 }; },
-    deliver: function () { return { records: [], stops: [] }; }
+    deliver: function () { return { records: [], stops: [] }; },
+    unqueue: function () { return { ok: true }; }
   };
 });

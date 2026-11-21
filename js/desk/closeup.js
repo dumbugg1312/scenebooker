@@ -9,7 +9,7 @@
   'use strict';
 
   SB.Content.ui.closeup = {
-    putDown: 'put it down',
+    putDown: 'back to the desk',
     stressTitle: 'What is weighing on you',
     causes: 'wearing on you',
     easing: 'what helps',

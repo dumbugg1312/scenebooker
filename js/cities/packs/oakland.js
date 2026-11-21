@@ -45,7 +45,7 @@ SB.Cities.register('oakland', {
     { id: 'santa-cruz', kind: 'PEER', name: 'Santa Cruz', minutes: 80, bearing: 170, slug: 'santa-cruz-ca', beyond: 'highway-17', note: 'A beach and college scene across a notorious mountain road.' },
     { id: 'stockton', kind: 'PEER', name: 'Stockton', minutes: 75, bearing: 85, slug: 'stockton-ca', note: 'A Delta port with a strong local scene and its own history.' },
     { id: 'santa-rosa', kind: 'PEER', name: 'Santa Rosa', minutes: 75, bearing: 340, slug: 'santa-rosa-ca', note: 'The biggest North Bay city, with an old punk and metal history.' },
-    { id: 'sacramento', kind: 'PEER', name: 'Sacramento', minutes: 75, bearing: 50, scene: 3000, note: 'A smaller neighbor up I-80 that touring bands often add.' }
+    { id: 'sacramento', kind: 'PEER', name: 'Sacramento', slug: 'sacramento', minutes: 75, bearing: 50, scene: 3000, note: 'A smaller neighbor up I-80 that touring bands often add.' }
   ],
 
   chokepoints: [

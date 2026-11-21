@@ -446,7 +446,7 @@ SB.module('Money', function (SB) {
         if (!borrowFrom) continue;
         a = Math.max(0, Math.min(C.MONEY.BORROW.max, (m.lateFee || 0) + Math.max(0, -(m.bank || 0))));
         if (a <= 0) a = C.MONEY.BORROW.max;
-        res = SB.Mail.ask(state, 'BORROW', borrowFrom, { amount: a });
+        res = SB.Mail.ask(state, 'BORROW', borrowFrom, { amount: a, noClock: true });   // asked over the bills, not on an evening's clock
         if (!res || !res.ok) continue;
       } else if (k === E.LADDER.COUCH) {
         if (P.couch) continue;

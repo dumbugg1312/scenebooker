@@ -21,10 +21,21 @@ module.exports = {
     return { bills: opts && opts.bills, dayJob: 'FULL' };
   },
 
+  // the week's own choices: the phone, a shift, the day job
   planWeek: function (state, SB) {
     if (!R) R = SB.rng.make('bot:random:' + SEED);
-    const week = state.clock && typeof state.clock.week === 'number' ? state.clock.week : 0;
-    const day0 = week * 7;
+    if (coin(.1)) SB.Week.phoneOff(state, R.int(0, 6), coin(.7));
+    if (coin(.05)) SB.Week.dropShift(state, R.int(0, 4));
+    if (coin(.03)) SB.Week.setDayJob(state, pick(['FULL', 'PART', 'NONE']));
+    if (coin(.05)) SB.Week.check(state);
+    if (coin(.03)) SB.Money.move(state, R.int(1, 100), pick(['FUND', 'BANK']), pick(['FUND', 'BANK']));
+  },
+
+  // an evening: any legal choice, at about a third of the old weekly odds (there are seven evenings in a week)
+  evening: function (state, SB) {
+    if (!R) R = SB.rng.make('bot:random:' + SEED);
+    const coin = p => R.chance(p / 3);
+    const day0 = state.clock && typeof state.clock.day === 'number' ? state.clock.day : 0;
 
     /* requests: any of the three replies, at random */
     L.openRequests(state, SB).forEach(q => {
@@ -54,7 +65,6 @@ module.exports = {
         const rid = pick(rooms);
         if (rid) SB.Mail.ask(state, 'ROOM_HOLD', rid, { showId: show.id, day: show.day, slot: 'EVENING', inPerson: coin(.2) });
       }
-      if (coin(.2) && show.roomId) SB.Mail.ask(state, 'ROOM_CONFIRM', show.roomId, { showId: show.id });
       if (coin(.35)) {
         const bands = L.arr(SB.Bands.list(state, { local: true, active: true }));
         const b = pick(bands);
@@ -89,33 +99,26 @@ module.exports = {
       else if (coin(.05)) SB.Mail.setNeedBy(state, a.id, day0 + R.int(1, 10));
     });
 
-    /* jobs: random days, halves and helpers, legal or not (a refusal is an outcome) */
+    /* jobs: any open job, now, with a random effort / choice / helper, staying up or not (a refusal is an outcome) */
     const tray = SB.Jobs.tray(state) || {};
-    ['late', 'thisWeek', 'soon'].forEach(k => {
+    ['late', 'thisWeek', 'later'].forEach(k => {
       L.arr(tray[k]).forEach(j => {
-        if (j.mode !== 'HOURS' || !coin(.6)) return;
-        const dayIdx = R.int(0, 6), half = j.half === 'ANY' ? pick(['DAY', 'NIGHT']) : j.half;
-        const opts = { by: 'player' };
-        if (j.opt && j.opt.choices && j.opt.choices.length && coin(.5)) opts.opt = pick(j.opt.choices).key;
-        SB.Week.plan(state, j.id, dayIdx, half, opts);
+        if (j.mode !== 'HOURS' || !R.chance(.5)) return;
+        const opts = {};
+        if (j.type === 'MAKE_FLYER') opts.effort = pick(['ROUGH', 'STANDARD', 'SHARP']);
+        if (j.opt && j.opt.choices && j.opt.choices.length && R.chance(.5)) opts.opt = pick(j.opt.choices).key;
+        if (j.helper && R.chance(.2)) { const p = pick(L.arr(SB.People.crew(state, 'sound', j.showId || undefined))); if (p) opts.by = p.personId; }
+        SB.Week.doNow(state, j.id, opts);
       });
     });
     L.arr(SB.Jobs.freeJobs(state)).forEach(f => {
       if (!coin(.2)) return;
       const r = SB.Week.addJob(state, f.type, f.args || {});
-      if (L.ok(r)) SB.Week.plan(state, r.jobId, R.int(0, 6), f.half === 'ANY' || !f.half ? pick(['DAY', 'NIGHT']) : f.half, { by: 'player' });
-    });
-    L.arr(SB.Week.suggest(state)).forEach(e => {            // the odd plan from the usual, applied at random
-      if (!coin(.15) || !e.jobId) return;
-      SB.Week.plan(state, e.jobId, e.dayIdx, e.half, { by: e.by || 'player' });
+      if (L.ok(r) && !L.ok(SB.Week.doNow(state, r.jobId, {}))) SB.Week.removeJob(state, r.jobId);
     });
 
-    /* the week itself */
-    if (coin(.1)) SB.Week.phoneOff(state, R.int(0, 6), coin(.7));
-    if (coin(.05)) SB.Week.dropShift(state, R.int(0, 4));
-    if (coin(.03)) SB.Week.setDayJob(state, pick(['FULL', 'PART', 'NONE']));
-    if (coin(.05)) SB.Week.check(state);
-    if (coin(.03)) SB.Money.move(state, R.int(1, 100), pick(['FUND', 'BANK']), pick(['FUND', 'BANK']));
+    /* messages taken back, now and then */
+    if (coin(.05)) { const o = L.arr(SB.Mail.outbox(state))[0]; if (o && o.id) SB.Mail.unqueue(state, o.id); }
     if (coin(.05)) SB.Mail.markRead(state, (pick(L.arr(SB.Mail.inbox(state, 'ALL'))) || {}).id);
   },
 

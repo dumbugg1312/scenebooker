@@ -39,7 +39,7 @@ SB.Cities.register('wichita-ks', {
     { id: 'emporia', kind: 'FEEDER', name: 'Emporia', minutes: 80, bearing: 50, pop: 24139, note: 'A real college town on the edge of the Flint Hills, with a counterpart scene.' },
     { id: 'topeka', kind: 'PEER', name: 'Topeka', minutes: 120, bearing: 55, scene: 800, note: 'A state capital that is more government than music; the two cities mostly ignore each other.' },
     { id: 'lawrence', kind: 'PEER', name: 'Lawrence', minutes: 150, bearing: 60, slug: 'lawrence-ks', note: 'The state\'s best-known college and music town. Wichita bands look up to it.' },
-    { id: 'tulsa', kind: 'PEER', name: 'Tulsa', state: 'OK', minutes: 165, bearing: 120, scene: 2500, note: 'A natural destination for bands and kids who outgrow Wichita.' }
+    { id: 'tulsa', kind: 'PEER', name: 'Tulsa', slug: 'tulsa', state: 'OK', minutes: 165, bearing: 120, scene: 2500, note: 'A natural destination for bands and kids who outgrow Wichita.' }
   ],
 
   hoods: [

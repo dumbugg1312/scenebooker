@@ -579,23 +579,30 @@ function main() {
     } catch (e) { report('shell placeholder', e); }
   }
 
-  /* the lamp's pull chain: Play the week (Week.check, then Week.startPlay), then Pause sends 'sb-play' */
+  /* the tape deck (the old lamp): a new game sits down at its first evening; pressing the deck calls it a night
+     (Week.endNight) and the night plays out; pressed again it pauses ('sb-play' { cmd: 'pause' }); 'next' plays the night
+     out in one go, to the next stop */
   if (wanted('shell')) {
     try {
       const lamp = () => fakeDocument.querySelector('#desk .dk-hit[data-obj="lamp"]');
       SB.UI.go('desk');
       const btn = lamp();
       if (!btn) throw new Error('no lamp on the desk');
+      const stop = () => state.clock.stop ? state.clock.stop.kind : 'none';
+      if (stop() !== 'EVENING') throw new Error('the game is not at an evening at the desk (stop ' + stop() + ', phase ' + state.clock.phase + ')');
+      if (!btn.querySelector('.dk-clock .ck-boxes')) throw new Error('no clock under the tape deck');
+      if (SB.UI.lamp.label().key !== 'night') throw new Error('the tape deck does not call it a night at an evening: ' + JSON.stringify(SB.UI.lamp.label()));
+      const day0 = state.clock.day;
       btn.click();
-      const check = fakeDocument.querySelector('#overlay .sb-check');
-      if (check) { const b = check.querySelectorAll('button'); b[b.length - 1].click(); }
-      if (state.clock.phase !== 'PLAY') throw new Error('the week did not start playing (phase ' + state.clock.phase + ')');
-      if (!SB.UI.playing()) throw new Error('SB.UI.playing() is false after Play the week');
+      if (stop() === 'EVENING') throw new Error('pressing the tape deck did not call it a night');
+      if (!SB.UI.playing()) throw new Error('SB.UI.playing() is false after calling it a night');
       let heard = null;
       fakeDocument.addEventListener('sb-play', e => { heard = e.detail && e.detail.cmd; });
       lamp().click();
       if (heard !== 'pause' || SB.UI.playing()) throw new Error('Pause did not send sb-play { cmd: pause }');
-      report('shell lamp (' + (check ? 'check card, then ' : '') + 'PLAY, pause)');
+      SB.UI.fire('sb-play', { cmd: 'next' });
+      if (stop() === 'none') throw new Error('the night played out to no stop');
+      report('shell lamp (call it a night, pause, played out from day ' + day0 + ' to day ' + state.clock.day + ' ' + stop() + ')');
     } catch (e) { report('shell play', e); }
   }
 
@@ -688,17 +695,21 @@ function main() {
       timers.length = 0;
       const env = {
         flush,
-        /* pressing play runs the days by themselves; time has to stop by itself when the step has something new to say */
+        /* calling it a night plays the night out by itself, on timers, to the next evening; the step moves on within a
+           few nights (cards that come up on the way are answered "later") */
         autoPause(lampSel) {
-          const before = walk.at(), day0 = st.clock.day;
-          fakeDocument.querySelector(lampSel).click();
-          const check = fakeDocument.querySelector('#overlay .sb-check');
-          if (check) { const b = check.querySelectorAll('button'); b[b.length - 1].click(); }
-          if (!SB.UI.playing()) throw new Error('pressing play did not start the week');
-          for (let i = 0; i < 60 && SB.UI.playing(); i++) flush(1);
-          if (SB.UI.playing()) throw new Error('the week never paused');
-          if (walk.at() === before) throw new Error('time stopped at day ' + st.clock.day + ' without the step moving on (' + before + ')');
-          if (st.clock.stop && st.clock.stop.kind === 'END_OF_WEEK') throw new Error('play ran from day ' + day0 + ' to the end of the week, past the moment ' + before + ' was done');
+          const before = walk.at(), day0 = st.clock.day, live = sel => Array.from(fakeDocument.querySelectorAll(sel)).filter(e => !e.closest('.is-leaving'))[0];
+          for (let n = 0; n < 24 && walk.at() === before; n++) {
+            const c = live('#overlay .sb-decision') || live('#overlay .cc-slap');
+            if (c) { const bs = Array.from(c.querySelectorAll('button')).filter(b => !b.disabled); (bs.filter(b => /^\s*\d*\s*(later|keep waiting|close)\b/i.test(b.textContent))[0] || bs[0]).click(); continue; }
+            if (!(st.clock.stop && st.clock.stop.kind === 'EVENING')) { SB.UI.fire('sb-play', { cmd: 'next' }); continue; }
+            fakeDocument.querySelector(lampSel).click();
+            if (!SB.UI.playing()) throw new Error('calling it a night did not play the night out');
+            for (let i = 0; i < 80 && SB.UI.playing() && !live('#overlay .cc-slap'); i++) flush(1);
+            if (SB.UI.playing() && !live('#overlay .cc-slap')) throw new Error('the night never stopped');
+            if (st.clock.stop && st.clock.stop.kind === 'END_OF_WEEK') throw new Error('the nights ran from day ' + day0 + ' to the end of the week, past the moment ' + before + ' was done');
+          }
+          if (walk.at() === before) throw new Error('the nights went by from day ' + day0 + ' to ' + st.clock.day + ' without the step moving on (' + before + ')');
         }
       };
       const walk = SBTutorialWalk(env);
@@ -715,7 +726,7 @@ function main() {
       if (!mentor || byMentor.length < 3) throw new Error('the friend did ' + byMentor.length + ' jobs');
       const lock = Object.keys(st.jobs).map(k => st.jobs[k]).filter(j => j.type === 'LOCK_BILL' && j.showId)[0], adv = Object.keys(st.jobs).map(k => st.jobs[k]).filter(j => j.type === 'ADVANCE' && j.showId)[0];
       if (!lock || lock.status !== 'DONE' || !adv || adv.status !== 'DONE') throw new Error('the first show: bill lock ' + (lock && lock.status) + ', advance ' + (adv && adv.status));
-      if (st.player.dayJob !== 'NONE' || !st.player.dayJobLater) throw new Error('the day job started on show one');
+      if (st.player.dayJob !== 'FULL') throw new Error('a guided start works its shifts from day one, got ' + st.player.dayJob);
       if (onDesk.length && (onDesk.indexOf('notebook') < 0 || onDesk.indexOf('tin') >= 0)) throw new Error('desk after one show: ' + onDesk.join(','));
       report('tutorial (ten steps by the tape; ' + walk.log[walk.log.length - 2] + '; friend did ' + byMentor.map(j => j.type).join(' ') + '; desk ' + onDesk.join(',') + ')');
     } catch (e) { report('tutorial, at "' + where + '"', e); }

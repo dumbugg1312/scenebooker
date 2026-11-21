@@ -1,20 +1,24 @@
-/* Scene Booker — ui/screens/shows.js (UI-A2, redrawn for the desk)
+/* Scene Booker — ui/screens/shows.js (UI-A2, redrawn for the desk; the card rebuilt on the booking pipeline)
  * The clipboards. shows: the clipboards of the shows on the way, a blank one to start a show, a shoebox of past ones.
- * show: one clipboard, and the whole show is built on it (the card). Left: one row per part of the show (night, room,
- * each slot of the bill, sound, door, security, flyer, promo, price, deal): its name, what is written in, how it stands
- * as a stamp. Right: the picker for the row that is picked: the hold form, the sticker sheet of local bands for that
- * slot, the offer slip for a request's touring band, the crew, the flyer, the jobs to pencil in on days, the door
- * controls, the deal; with nothing picked, the forecast as rows of heads. Its foot counts the asks that go out tonight.
+ * show: one clipboard, and the whole show is booked on it (the card, design/spec/11-booking-pipeline.md). Left: NEXT
+ * (the one thing to do now, with its button), then the seven steps in the order a booker works: DATE, ROOM, THE DEAL,
+ * BILL, CREW, ANNOUNCE, SHOW NIGHT. Each has one stamp (DONE / TO DO / WAITING ON a name / LOCKED / !!); the step in
+ * hand is unfolded to its rows, the rest fold to one line. Right: the picker for the row that is picked: the hold
+ * form, the offer slip, the sticker sheet of local bands, the crew, the flyer, the jobs with DO IT TONIGHT, the door,
+ * the deal; HOW IT LOOKS (the forecast) sits behind a strip. Foot: tonight's clock (js/ui/clock.js, design/spec/
+ * 10-night-clock.md) and CALL IT A NIGHT, which is the tape deck's own pull; the card comes back at the next evening.
+ * Everything that takes time says what it takes, and is crossed out with the reason when tonight cannot take it.
  * A played or cancelled show is the night's record instead. bill: the old route; it opens the same card on the bill.
  * Also defines SB.UI.cuDraw, the small drawing helpers the clipboard, sticker sheet and key hooks share.
- * Reads Shows, Jobs, Forecast, Bands, Harm, People, Money and Rooms views; changes state only through SB.UI.act.
+ * Reads Shows, Jobs, Forecast, Bands, Harm, People, Money, Rooms and Week views; changes state only through SB.UI.act
+ * (and SB.UI.lamp.pull for the night).
  */
 (function (SB) {
   'use strict';
 
   SB.Content.ui.shows = {
     title: 'Shows',
-    none: 'No shows on the way. Start one on the blank clipboard, or answer a request on the phone.',
+    none: 'No shows on the way. Start one yourself, or answer a band\'s message on the phone.',
     newOwn: 'Start a show of your own',
     blank: 'NEW SHOW',
     create: 'START IT',
@@ -26,24 +30,23 @@
     noRoom: 'no room yet',
     asks: '{yes} yes, {wait} waiting, {no} no',
     reach: 'Who has heard',
-    open: 'Pick up the clipboard for {d}',
-    status: { DRAFT: 'DRAFT', CONFIRMED: 'CONFIRMED', PLAYED: 'PLAYED', CANCELLED: 'CALLED OFF' },
+    open: 'Open the show on {d}',
+    status: { DRAFT: 'DRAFT', CONFIRMED: 'CONFIRMED', PLAYED: 'PLAYED', CANCELLED: 'CANCELLED' },
     pace: { OK: 'ON PACE', TIGHT: 'TIGHT', SHORT: 'SHORT' }
   };
   SB.Content.ui.show = {
     title: 'The show',
-    back: 'All the clipboards',
-    noRoom: 'NO KEY YET',
+    back: 'All the shows',
+    noRoom: 'NO ROOM YET',
     room: 'The room',
-    holdRoom: 'HANG MY TAG',
-    holdRoomL: 'Ask {room} to hold {d}',
-    holdOther: 'Hold another night',
-    pickRoom: 'Pick the {room} key',
-    confirm: 'ASK TO CONFIRM',
-    confirmL: 'Ask the room to confirm',
-    needs: 'Before the room confirms',
-    release: 'TAKE MY TAG BACK',
-    releaseL: 'Let the hold go',
+    holdRoom: 'ASK THEM TO HOLD IT',
+    holdRoomL: 'Message {room} and ask them to hold {d}',
+    holdOther: 'Try another night',
+    pickRoom: 'Pick {room}',
+    needs: 'It\'s yours once they have',
+    needsMet: 'They have everything they asked for. It\'s yours in the morning.',
+    release: 'LET THE NIGHT GO',
+    releaseL: 'Tell the room you do not need the night anymore',
     rank: '#{n} IN LINE',
     jobs: 'TO DO',
     advance: 'On the advance',
@@ -53,7 +56,7 @@
     coveredL: '{name} is doing these for you this time: {list}.',
     planIn: 'Pencil it in: {d} {half}',
     waived: 'Not needed here.',
-    bill: 'SET LIST',
+    bill: 'THE BILL',
     deal: 'The deal',
     written: 'written down',
     handshake: 'a handshake',
@@ -66,7 +69,7 @@
     each: 'EACH = {n}',
     unknownL: 'You do not know yet: {what}. Open the notebook.',
     price: 'Door price',
-    priceL: 'Door price {p}. Tap to rewrite it.',
+    priceL: 'Door price {p}. Tap to change it.',
     cheaper: 'A dollar less',
     dearer: 'A dollar more',
     donation: 'DONATION',
@@ -93,16 +96,16 @@
     on: '{name} is on it',
     busy: '{name} is busy',
     asked: 'Asked {name}. Waiting to hear back.',
-    queued: 'Asking {name}: it goes out with tonight\'s send.',
+    queued: 'Asking {name}: the message goes out tonight.',
     askedShort: 'asked, waiting',
     queuedShort: 'goes out tonight',
     saidNo: '{name} said no to this one. Ask again?',
     noSound: 'no sound yet',
     noSecurity2: 'no security yet',
-    cancel: 'CALL IT OFF',
-    cancelL: 'Call the show off',
-    cancelSure: 'Call this show off? The bands and the room will remember.',
-    cancelYes: 'Call it off',
+    cancel: 'CANCEL IT',
+    cancelL: 'Cancel the show',
+    cancelSure: 'Cancel this show? The bands and the room will remember.',
+    cancelYes: 'Cancel it',
     keep: 'Keep it',
     locked: 'The bill is locked. Changing it now costs trust with the bands.',
     result: 'How it went',
@@ -112,35 +115,98 @@
     rows: 'The show, part by part',
     picker: 'The part you picked',
     forecast: 'How it looks',
-    hint: 'Pick a part of the show on the left to work on it. Everything you ask for goes out with tonight\'s send.',
+    hint: 'This is your read on the night as it stands. The steps on the left are how you book it.',
     night: 'NIGHT', room: 'ROOM', sound: 'SOUND', door: 'DOOR', security: 'SECURITY', flyer: 'FLYER', promo: 'PROMO', prep: 'PREP', price: 'PRICE', deal: 'DEAL',
     blank: 'nothing yet',
-    noJobs: 'Nothing here yet. Jobs turn up as the show takes shape.',
+    noJobs: 'Nothing to do here yet. It fills in as the show comes together.',
     inDays: 'IN {n} DAYS', inDay: 'TOMORROW', tonight: 'TONIGHT',
-    st: { EMPTY: 'EMPTY', TONIGHT: 'GOES OUT TONIGHT', WAITING: 'WAITING', YES: 'YES', NO: 'NO', COUNTER: 'CAME BACK $?', HELD: 'HELD', HELDN: 'HELD #{n}', CONFIRMED: 'CONFIRMED', OFFER: 'NO OFFER YET', DONE: 'DONE' },
+    st: { EMPTY: 'TO DO', OPT: 'IF YOU WANT', TONIGHT: 'GOES OUT TONIGHT', WAITING: 'WAITING', YES: 'YES', NO: 'SAID NO', COUNTER: 'COUNTERED', HELD: 'ON HOLD · FIRST IN LINE', HELDN: 'ON HOLD · #{n} IN LINE', CONFIRMED: 'CONFIRMED', OFFER: 'NO OFFER YET', DONE: 'DONE' },
     flyerV: { MADE: 'made', PASTED: 'pasted up' },
     flyerNone: 'No flyer yet. Paste one up at the flyer desk.',
-    flyerPasted: 'Pasted up. Making it is a job: pencil it in under PROMO.',
+    flyerPasted: 'Pasted up. Now make it: pick how sharp, then DO IT TONIGHT.',
     flyerMade: 'Made. Change it at the flyer desk if you want.',
-    promoV: '{n} of {of} on days',
+    promoV: '{n} of {of} done',
     owe: '{amount} if nobody comes',
-    out0: 'nothing goes out tonight', out1: '1 ask goes out tonight', outN: '{n} asks go out tonight',
+    out0: 'no messages go out tonight', out1: '1 message goes out tonight', outN: '{n} messages go out tonight',
     theirNights: 'THE NIGHTS THEY ASKED FOR',
-    holdAsked: 'You asked {room} to hold {d}.', confAsked: 'You asked {room} to confirm.',
-    holdQueued: 'It goes out with tonight\'s send.', holdSent: 'Waiting to hear back.',
+    holdAsked: 'You asked {room} to hold {d}.',
+    holdQueued: 'The message goes out tonight.', holdSent: 'Asked on {day}. You hear back overnight.',
     theyAsk: 'They asked for {deal}.',
     toOffer: 'THE OFFER', toOfferL: 'Open the offer to the touring band',
-    page: 'PAGE', bandPage: 'Turn {name}\'s sticker over',
+    page: 'PAGE', bandPage: 'Open {name}\'s page',
     order: 'RUNNING ORDER', earlier: 'EARLIER', later: 'LATER', earlierL: 'Move {name} earlier in the night', laterL: 'Move {name} later in the night',
     bigger: 'BIGGER', smaller: 'SMALLER',
     another: '+ ANOTHER BAND', anotherL: 'Ask another band for the {slot} slot',
-    peel: 'PEEL THEM OFF',
+    peel: 'TAKE THEM OFF',
     takeIt: 'TAKE IT', takeItL: 'Take what they came back with',
-    takeBack: 'TAKE IT BACK', takeBackL: 'Take the ask back'
+    takeBack: 'TAKE IT BACK', takeBackL: 'Take back the ask',
+    /* the seven steps (design/spec/11-booking-pipeline.md): one stamp each, the current one unfolded */
+    steps: 'The show, step by step',
+    step: { DATE: 'DATE', ROOM: 'ROOM', DEAL: 'THE DEAL', BILL: 'BILL', CREW: 'CREW', ANNOUNCE: 'ANNOUNCE', NIGHT: 'SHOW NIGHT' },
+    stepSt: { DONE: 'DONE', TODO: 'TO DO', WAITING: 'WAITING ON {name}', WAITING0: 'WAITING', LOCKED: 'NOT YET', BANG: 'somebody said no or countered' },
+    opens: { ROOM: 'opens when the room is confirmed', BILL: 'opens when the bands have said yes' },
+    stepL: 'Step {n}, {step}, {stamp}: {line}',
+    lock: 'LOCK IT', lockV: 'locked', lockNo: 'NOT LOCKED',
+    sum: { date: '{d} · {when}', bill0: 'nobody yet', crew: 'sound {sound} · door {door}', flyer: 'flyer made', flyerNo: 'no flyer yet',
+           ready: 'ready for the night', wants: 'they want: {need}', yours: 'yours in the morning' },
+    offerRow: 'OFFER', soon: 'IN {n} DAYS', soon1: 'TOMORROW', soon0: 'TONIGHT',
+    asked: 'ASKED {day}', tonightWord: 'TONIGHT',
+    askedSince: 'Asked {name} on {day}. You hear back overnight.',
+    next: 'NEXT',
+    nextL: 'What to do next',
+    nx: {
+      room: 'Pick a room and ask them to hold {d}.',
+      roomNo: '{room} said no: ask another room, or another night.',
+      roomWants: '{room} is holding the night and wants this first: {need}.',
+      pickRoom: 'PICK A ROOM', holdGo: 'ASK THEM', offerGo: 'SEND IT', jobGo: 'DO IT',
+      offer: 'Send {band} your offer.',
+      offerNo: '{band} said no to the offer: change it and send it again.',
+      counter: '{band} came back with their own number: take it, or take back the ask.',
+      seeOffer: 'THE OFFER', see: 'SEE IT',
+      band: 'Ask a band to take the {slot} slot: press their sticker.',
+      bandNamed: 'Ask {band} to take the {slot} slot: press their sticker.',
+      bandNo: '{band} said no: ask another band for the {slot} slot.',
+      bandOrLock: 'Ask a band for the {slot} slot, or lock the bill as it stands.',
+      pickBand: 'PICK A BAND',
+      order: 'Set the running order: pick a band, then EARLIER or LATER.',
+      pickOrder: 'RUNNING ORDER',
+      crew: 'Ask someone to run {role}.',
+      crewNamed: 'Ask {name} to run {role}.',
+      crewNo: '{name} said no: ask someone else to run {role}.',
+      pickCrew: 'PICK SOMEONE',
+      door: 'Say who works the door.',
+      doorMe: 'I WILL',
+      flyer: 'Paste up the flyer at the flyer desk.',
+      flyerMake: 'Make the flyer: pick how sharp, then do it tonight.',
+      job: 'Do this tonight: {job}{due}.',
+      jobDue: ', {due}',
+      seeJobs: 'SEE THE JOBS',
+      noTime: '{job}. {why} Call it a night.',
+      stayJob: '{job} means staying up {n}: your call, or call it a night.',
+      stayMsg: 'Another message means staying up {n}: your call, or call it a night.',
+      noMsg: '{why} Call it a night.',
+      early: 'Nothing on this show can be done yet. {job}. {why}',
+      jobTomorrow: '{job} waits for tomorrow night: call it a night.',
+      waiting: 'Waiting on {names}: you hear back overnight.',
+      heldYours: '{room} has what it asked for, so the night is yours in the morning.',
+      held2: '{room} has you #{n} in line: you hear if it opens up.',
+      nothing: 'Nothing more to do on this show tonight.',
+      keepOn: 'Everything is in hand: call it a night till the show.',
+      notOpen: 'This evening is over.'
+    },
+    look: 'HOW IT LOOKS', lookL: 'How the night looks: the crowd you can expect', lookBack: 'BACK TO {row}', lookBackL: 'Back to {row}',
+    callNight: 'CALL IT A NIGHT', callNightL: 'Call it a night: answers come overnight, and tomorrow evening you are back here',
+    callOff: 'cancel the show',
+    doNow: 'DO IT TONIGHT', doNowL: 'Do it tonight: {job}',
+    effort: 'HOW SHARP', effortWord: { ROUGH: 'ROUGH', STANDARD: 'STANDARD', SHARP: 'SHARP' },
+    hasIt: '{name} has it',
+    stayUp: 'means staying up {n}',
+    msgCost: 'Each ask is a message: {cost} of tonight.',
+    theShow: 'this show'
   };
   SB.Content.ui.bill = {
     title: 'The bill',
-    back: 'Back to the clipboard',
+    back: 'Back to the show',
     cands: 'LOCAL BANDS',
     listen: 'listen',
     listenStop: 'stop',
@@ -152,7 +218,7 @@
     pileL: 'Only the {g} pile',
     allPiles: 'Every pile',
     noCands: 'No local band fits that.',
-    pick: 'Peel {name}: {fee}, answers in {lo} to {hi} days{with}',
+    pick: 'Ask {name}: {fee}, answers in {lo} to {hi} days{with}',
     withThem: ', with them {lo} to {hi} people',
     fit: { FIT: 'FITS THIS BILL', STRETCH: 'A STRETCH', WRONG: 'WRONG BILL' },
     fitL: { FIT: 'their sound fits this bill', STRETCH: 'their sound is a stretch for this bill', WRONG: 'wrong bill for their sound' },
@@ -161,7 +227,7 @@
     asked: 'asked',
     yes: 'said yes',
     no: 'said no',
-    counter: 'came back with something',
+    counter: 'came back with a number',
     onBill: 'on the bill',
     listed: 'Someone in this band is on your list',
     gap: { OPEN: 'OPENER', MIDDLE: 'MIDDLE', CLOSE: 'HEADLINER' },
@@ -173,7 +239,7 @@
     setL: '{n}. {name}, {state}, on at {t}, {m} minutes. Arrow keys move it, Delete peels it off.',
     shorter: 'Five minutes shorter',
     longer: 'Five minutes longer',
-    drop: 'Peel {name} off the bill',
+    drop: 'Take {name} off the bill',
     minutes: '{n} MIN',
     starts: 'ON AT {t}',
     stop: 'HARD STOP {t}',
@@ -235,7 +301,7 @@
     function imgHtml(url, w, ht) { return '<img alt="" draggable="false" src="' + url + '" width="' + f(w) + '" height="' + f(ht) + '">'; }
     function remember(key, url) {
       cache[key] = url; cacheKeys.push(key);
-      if (cacheKeys.length > 600) delete cache[cacheKeys.shift()];
+      if (cacheKeys.length > 600) { var old = cacheKeys.shift(); K().dropUrl(cache[old]); delete cache[old]; }
     }
     function pump() {
       if (busy || !queue.length) return;
@@ -252,16 +318,16 @@
       try { url = URL.createObjectURL(new Blob([fonts(job.markup)], { type: 'image/svg+xml' })); } catch (e) { done(null); return; }
       im = new Image();
       im.onload = function () {
-        var cv, ctx, out = null, cw = Math.max(2, Math.round(job.w * scale)), ch = Math.max(2, Math.round(job.ht * scale));
+        var c, cw = Math.max(2, Math.round(job.w * scale)), ch = Math.max(2, Math.round(job.ht * scale));
         try {
-          cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
-          ctx = cv.getContext('2d');
-          ctx.drawImage(im, 0, 0, cw, ch);
-          K().photocopy(ctx, cw, ch, job.key, { px: scale, streaks: Math.max(1, Math.round(cw / 400)), amp: 0.14 });
-          out = cv.toDataURL('image/png');
-        } catch (e) { out = null; }
+          c = K().copyCanvas(cw, ch);
+          c.ctx.drawImage(im, 0, 0, cw, ch);
+        } catch (e) { c = null; }
         URL.revokeObjectURL(url);
-        done(out);
+        if (!c) { done(null); return; }
+        K().photocopyAsync(c.ctx, cw, ch, job.key, { px: scale, streaks: Math.max(1, Math.round(cw / 400)), amp: 0.14 }, function (ok) {
+          if (ok) K().copyUrl(c.cv, done); else done(null);
+        });
       };
       im.onerror = function () { URL.revokeObjectURL(url); done(null); };
       im.src = url;
@@ -383,7 +449,8 @@
         if (!it.on) out += '<path d="M3 2.5H' + f(w - 3) + '" stroke="' + TONER + '" stroke-width="1.6" stroke-dasharray="3 3"/>' + '<path d="M2 3V' + f(th - 2) + 'M' + f(w - 2) + ' 3V' + f(th - 2) + '" stroke="' + TONER + '" stroke-width="1.2" stroke-opacity=".5"/>';
         if (it.art) out += '<g transform="translate(' + f((w - aw) / 2) + ' 6)">' + it.art + '</g>';
         out += type(t, w / 2, th - s * 0.75 - 1, s, { anchor: 'middle', bold: true, fill: it.on ? PAPER : TONER, maxWidth: w - 8 });
-        return thing({ cls: 'cb-tab' + (it.on ? ' is-on' : ''), label: it.label || t, pressed: !!it.on, fk: it.fk, disabled: it.disabled, tut: it.tut, tutRef: it.tutRef, svg: out, w: w, h: th, onClick: it.onClick });
+        if (it.no) out += K().line(5, th - s * 0.75 - 4, w - 5, th - s * 0.75 - 7, { seed: 'tno' + i, sw: 2.2 });      // crossed out: it will not fit tonight
+        return thing({ cls: 'cb-tab' + (it.on ? ' is-on' : '') + (it.no ? ' cb-nofit' : ''), label: it.label || t, pressed: !!it.on, fk: it.fk, disabled: it.disabled, tut: it.tut, tutRef: it.tutRef, svg: out, w: w, h: th, onClick: it.onClick });
       });
       return h('div', { class: 'cb-tabslip cb-stock-' + (o.stock || 'white') + (o.cls ? ' ' + o.cls : ''), role: 'group', aria: { label: o.label || o.title || '' } }, [
         o.title ? h('span', { class: 'cb-tabtitle', aria: { hidden: 'true' } }, typed(String(o.title).toUpperCase(), 11, { bold: true })) : null,
@@ -1047,6 +1114,44 @@
     return { label: next.label, frac: Math.max(0.05, Math.min(1, 1 - (w.lateFrom - s.clock.day) / span)), late: s.clock.day >= w.lateFrom };
   }
 
+  /* CALL IT A NIGHT on the card is the tape deck's own pull (SB.UI.lamp.pull: Week.endNight, then the desk plays the
+   * night out, with its stage cards, decisions and show nights). The card only asks to be picked up again at the next
+   * evening: when the play-out stops at an evening one day on and nothing else took the screen. */
+  var backTo = null, backHooked = false, backWatch = null;
+  function backDrop() { backTo = null; if (backWatch) { clearInterval(backWatch); backWatch = null; } }
+  function backTook() {
+    var d = typeof document !== 'undefined' ? document : null;
+    if (!backTo) return true;
+    if (safe(function () { return SB.UI.route(); }, null) !== 'desk') return true;                    // the night screen, the week's close, the phone
+    if (SB.Cutscene && SB.Cutscene.playing && safe(function () { return SB.Cutscene.playing(); }, false)) return true;
+    return !!(d && d.querySelector && d.querySelector('#overlay .sb-scrim:not(.is-leaving) .sb-decision'));                       // a decision is the player's now
+  }
+  function backCheck() {
+    var s = st(), stop, id, x;
+    if (!backTo) return;
+    if (!s || backTook()) { backDrop(); return; }
+    stop = s.clock.stop;
+    if (!stop || stop.kind !== 'EVENING') { if (stop && stop.kind === 'END_OF_WEEK') backDrop(); return; }
+    id = backTo.showId; x = s.shows && s.shows[id];
+    if (s.clock.day !== backTo.day + 1 || !x || !LIVE[x.status]) { backDrop(); return; }
+    backDrop();
+    SB.UI.go('show', { showId: id });
+  }
+  function comeBack(showId, day) {
+    backDrop();
+    backTo = { showId: showId, day: day };
+    if (!backHooked && typeof document !== 'undefined') {
+      backHooked = true;
+      SB.UI.on(document, 'sb-play', function (e) {
+        var d = e && e.detail;
+        if (!backTo || !d || d.cmd !== 'pause') return;
+        if (d.by === 'player') { backDrop(); return; }
+        setTimeout(backCheck, 0);
+      });
+    }
+    if (typeof setInterval === 'function') backWatch = setInterval(function () { if (backTo && backTook()) backDrop(); }, 400);
+  }
+
   function lockSvg() { return K().rect(4, 12, 18, 14, { seed: 'lk', fill: '#141413', sw: 2.2 }) + K().path([[8, 12], [8, 6], [13, 2], [18, 6], [18, 12]], { seed: 'lks', sw: 2.4 }); }
   function guard(locked, fn) { if (locked) confirmCard(T('bill', 'lockedWarn'), T('bill', 'yesGo'), T('bill', 'noGo'), fn); else fn(); }
 
@@ -1070,11 +1175,14 @@
   /* show: one clipboard                                              */
   /* ================================================================ */
   function mountShow(root, params) {
-    var showId = params && params.showId, ui = { roomId: null, day: params && num(params.day) ? params.day : null, editPrice: false, deal: null }, lastStat = null, firstDraw = true,
-        sel = params && params.row ? String(params.row) : null,       // the row whose picker shows on the right (null: the forecast)
+    var showId = params && params.showId, ui = { roomId: null, day: params && num(params.day) ? params.day : null, editPrice: false, deal: null, effort: null, noTime: null }, lastStat = null, firstDraw = true,
+        sel = params && params.row ? String(params.row) : null,       // the row whose picker shows on the right
+        auto = !sel,                                                   // nobody picked a row: the card picks the one NEXT is about
+        look = false,                                                  // HOW IT LOOKS: the forecast, on the right, in place of the picker
+        selDay = null, tutJob = null, tonightV = null, curStep = null, canMsg = null,
         fl = { freeOnly: true, genre: '' }, whatCache = {}, lastSel = null, lastGenre = '', mode = 'show', keyHandler;
     if (root && root.removeAttribute) root.removeAttribute('data-mv-sig');
-    function pick(k) { sel = k; keepFocus(root, render); }
+    function pick(k) { if (k) { sel = k; auto = false; } else auto = true; look = false; keepFocus(root, render); }
 
     function render() { draw(); settle(); }
     /* the papers slap down when the page first shows; the status is stamped on whenever it changes (and sounds like it) */
@@ -1102,8 +1210,12 @@
       if (sh) lastStat = sh.status;
       firstDraw = false;
     }
+    function tutCur(s) {
+      var tc = safe(function () { return SB.Tutorial && SB.Tutorial.current ? SB.Tutorial.current(s) : null; }, null);
+      return tc && tc.showId === showId ? tc : null;
+    }
     function draw() {
-      var s = st(), v, show;
+      var s = st(), v, show, rows, steps, nx, n, tc, tgt, pk, r, i, ink;
       SB.UI.clear(root);
       if (!s || !showId || !s.shows || !s.shows[showId]) { root.appendChild(C().Empty({})); return; }
       v = safe(function () { return SB.Shows.view(s, showId); }, null);
@@ -1111,22 +1223,124 @@
       show = v.show;
       if (!LIVE[show.status]) { root.appendChild(after(s, v)); return; }
       whatCache = {};
-      var rows = rowsOf(s, v), n = queuedN(s);
-      if (sel === 'bill') sel = (rows.filter(function (r) { return r.kind === 'slot'; })[0] || rows.filter(function (r) { return r.band; })[0] || { key: null }).key;
-      if (sel && !rows.some(function (r) { return r.key === sel; })) sel = fallbackSel(rows, sel);
-      root.appendChild(h('div', { class: 'cb-show cb-card', data: { sel: sel || '' } }, [
+      /* a new evening: the card opens on what is next again, and last night's "no time" is gone */
+      if (selDay !== s.clock.day) { if (selDay !== null) { auto = true; look = false; } ui.noTime = null; selDay = s.clock.day; }
+      tonightV = safe(function () { return SB.Week.tonight(s); }, null);
+      canMsg = fitsNow(s, mailH());
+      tc = tutCur(s);
+      tutJob = tc && tc.step === 'PROMO' ? tc.jobId : null;
+      /* the guided first show: the card stands on the row the guide is talking about */
+      tgt = tc ? tutRow(s, v, tc) : null;
+      if (auto && tgt) sel = tgt;
+      rows = rowsOf(s, v);
+      if (sel === 'bill') sel = (rows.filter(function (x) { return x.kind === 'slot'; })[0] || rows.filter(function (x) { return x.band; })[0] || { key: null }).key;
+      if (sel && !rows.some(function (x) { return x.key === sel; })) sel = fallbackSel(rows, sel);
+      steps = stepsOf(s, v, rows, tc, auto ? null : sel);
+      nx = nextOf(s, v, rows, steps, tc);
+      /* nothing picked: the row NEXT is about, else the first open row of the first step that is not done */
+      if (auto || !sel) {
+        r = nx.row && rows.some(function (x) { return x.key === nx.row; }) ? nx.row : null;
+        if (!r) for (i = 0; i < steps.length && !r; i++) if (steps[i].state !== 'DONE' && steps[i].state !== 'LOCKED') r = (firstOpen(steps[i]) || {}).key;
+        sel = r || (rows[0] && rows[0].key) || null;
+      }
+      r = rows.filter(function (x) { return x.key === sel; })[0];
+      curStep = r ? stepOfRow(r) : null;
+      n = queuedN(s);
+      pk = picker(s, v, rows);                                    // first: the hold form and the offer slip set what NEXT's button sends
+      nx = nextOf(s, v, rows, steps, tc);                         // again: its button depends on which row is open and what the picker holds
+      ink = hotInk(s);                                           // the city's hot ink: late work, the stay-up hour, what will not fit
+      root.appendChild(h('div', { class: 'cb-show cb-card', data: { sel: sel || '', step: curStep || '' }, style: ink ? { '--hot': ink, '--ck-hot': ink } : null }, [
         h('div', { class: 'cb-cardleft' }, [
-          showHead(s, show, null, T('show', 'back'), function () { SB.UI.go('shows'); }, SB.time.fmt(show.day, 'short'), 22),   // the room has its own row; the stamp goes under the date
-          h('ol', { class: 'cb-cardrows', aria: { label: T('card', 'rows') } }, rows.map(function (r, i) { return h('li', null, rowThing(r, i, rows.length)); })),
-          h('footer', { class: 'cb-cardfoot' }, [
-            h('span', { class: 'cb-asksout', role: 'status', aria: { label: T('card', n === 1 ? 'out1' : (n ? 'outN' : 'out0'), { n: n }) }, data: { n: String(n) } }, outArt(n)),
-            D.act(T('show', 'cancel'), T('show', 'cancelL'), 'cancel', function () {
-              confirmCard(T('show', 'cancelSure'), T('show', 'cancelYes'), T('show', 'keep'), function () { act(function (x) { return SB.Shows.cancel(x, showId, 'PLAYER'); }); });
-            }, { size: 11 })
-          ])
+          showHead(s, show, null, T('show', 'back'), function () { SB.UI.go('shows'); }, SB.time.fmt(show.day, 'dow3') + ' ' + md(show.day), 13),   // the room has its own step; the stamp sits beside the date
+          nextLine(s, nx),
+          h('ol', { class: 'cb-steps', aria: { label: T('card', 'steps') } }, steps.map(function (sp, k) {
+            var open = sp.key === curStep, m = sp.rows.length, ht = Math.max(24, Math.min(34, Math.floor(196 / Math.max(1, m))));
+            return h('li', { class: 'cb-step is-' + sp.state.toLowerCase() + (open ? ' is-open' : '') }, [
+              stepThing(sp, k, open),
+              open ? h('ol', { class: 'cb-cardrows', aria: { label: T('card', 'rows') } }, sp.rows.map(function (x, j) { return h('li', null, rowThing(x, j, ht)); })) : null
+            ]);
+          })),
+          foot(s, v, n)
         ]),
-        h('div', { class: 'cb-pick', role: 'region', aria: { label: T('card', sel ? 'picker' : 'forecast'), live: 'polite' } }, picker(s, v, rows))
+        h('div', { class: 'cb-pick', role: 'region', aria: { label: T('card', look ? 'forecast' : 'picker'), live: 'polite' } }, pk)
       ]));
+    }
+
+    /* ---- tonight's clock on the card (js/ui/clock.js draws it; SB.Week says what fits) ---- */
+    function CK() { return SB.Clock || null; }
+    function mailH() { return SB.Config.MAIL && num(SB.Config.MAIL.hours) ? SB.Config.MAIL.hours : 0.5; }
+    function fitsNow(s, hours) { return safe(function () { return SB.Week.fits(s, hours); }, null) || { ok: true }; }
+    function canNow(s, id, o) { return safe(function () { return SB.Week.canDoNow(s, id, o || {}); }, null) || { ok: false, why: '' }; }
+    function tag(label, hours) { return CK() ? CK().tag(label, hours) : String(label); }
+    function costT(hours) { return CK() ? CK().cost(hours) : ''; }
+    function whyT(r) { return (CK() ? CK().why(r) : (r && r.why)) || ''; }
+    /* an action that takes time: a refusal for want of hours stays on the card (the foot), not only in a toast */
+    function doAct(f) {
+      var r = act(f);
+      if (r && r.ok === false && (r.code === 'NO_TIME' || r.code === 'BURNT_OUT' || r.code === 'PHASE')) { ui.noTime = whyT(r); render(); }
+      else if (r && r.ok !== false && ui.noTime) { ui.noTime = null; render(); }
+      return r;
+    }
+    /* the top sheet is yellow copy paper: a city whose hot ink is the yellow gets the red here, so it can be read */
+    function hotInk(s) { var c = CK() ? CK().hot(s) : null; return c && c === safe(function () { return K().ink('fluorYellow'); }, '') ? safe(function () { return K().ink('fireRed'); }, c) : c; }
+    function clockEl(extra) { var s = st(); return CK() ? CK().slip(s, { crunch: 0, cls: 'cb-clock', tonight: tonightV || undefined, extra: extra || 0, hot: hotInk(s) || undefined }) : null; }
+    /* while a button that takes time is pointed at, its hours are hatched on the clock's boxes */
+    function preview(el, hours) {
+      function show(x) { var slot = root.querySelector ? root.querySelector('.cb-clockslot') : null, c; if (!slot) return; c = clockEl(x); if (!c) return; SB.UI.clear(slot); slot.appendChild(c); }
+      if (!el || !el.addEventListener || !(hours > 0)) return el;
+      el.addEventListener('mouseenter', function () { show(hours); });
+      el.addEventListener('focus', function () { show(hours); });
+      el.addEventListener('mouseleave', function () { show(0); });
+      el.addEventListener('blur', function () { show(0); });
+      return el;
+    }
+    /** costAct(o): a strip that does something and takes time: its words carry what it costs; when it will not fit even
+     *  staying up it is crossed out with the reason and does nothing. o = { text, label, fk, hours, fn, refusal, size, tut, tutRef, cls } */
+    function costAct(o) {
+      var r = o.refusal === undefined ? (o.hours > 0 ? fitsNow(st(), o.hours) : { ok: true }) : (o.refusal || { ok: true }), ok = r.ok !== false, why = ok ? '' : whyT(r), el;
+      el = D.thing({ cls: 'cb-act' + (ok ? '' : ' cb-nofit') + (o.cls ? ' ' + o.cls : ''), strip: tag(o.text, o.hours), stripSize: o.size || 14, fk: o.fk, disabled: !ok, tut: o.tut, tutRef: o.tutRef,
+        label: (o.label || o.text) + (costT(o.hours) ? ', ' + costT(o.hours).toLowerCase() : '') + (ok ? '' : '. ' + why), onClick: ok ? o.fn : function () {} });
+      if (ok) return preview(el, o.hours);
+      return h('span', { class: 'cb-nofitwrap' }, [el, why ? h('span', { class: 'cb-typed cb-small cb-whynot', text: why }) : null]);
+    }
+    function callNight() {
+      var s = st(), l = safe(function () { return SB.UI.lamp.label(); }, null);
+      if (!s || !l) return;
+      if (l.key === 'night' || l.key === 'resume') comeBack(showId, s.clock.day);
+      SB.UI.lamp.pull();
+      if (safe(function () { return SB.UI.route(); }, null) === 'show') backDrop();           // refused: the card is still up
+    }
+    function nightBtn(fk, tut, hotOn) {
+      var l = safe(function () { return SB.UI.lamp.label(); }, null), isNight = !l || l.key === 'night';
+      return D.act(isNight ? T('card', 'callNight') : String(l.text || '').toUpperCase(), isNight ? T('card', 'callNightL') : String(l.text || ''), fk, callNight,
+        { size: fk === 'next' ? 12 : 14, tut: tut, tutRef: showId, cls: 'cb-nightbtn' + (hotOn ? ' is-hot' : '') });
+    }
+    function dayWordOf(s, day) { return !num(day) || day >= s.clock.day ? T('card', 'tonightWord') : SB.time.fmt(day, 'dow3').toUpperCase(); }
+    function sinceOf(s, a) { return dayWordOf(s, a && num(a.queuedDay) ? a.queuedDay : (a ? a.sentDay : null)); }
+
+    /* the foot: what will not fit before it is due (this show's), tonight's clock, CALL IT A NIGHT; calling the show off is a small link */
+    function foot(s, v, n) {
+      var ours = {}, cr, today = s.clock.day, ink = hotInk(s);
+      (v.jobs || []).forEach(function (j) { ours[j.id] = true; });
+      /* only warn about work the player can start: a crunch made of jobs still waiting on the room or the bill is noise */
+      function startable(id) { var r = safe(function () { return SB.Week.canDoNow(s, id); }, null); return !!r && (r.ok !== false || r.code === 'NO_TIME'); }
+      cr = CK() ? (safe(function () { return SB.Week.crunch(s); }, []) || []).filter(function (c) { return (c.jobs || []).some(function (id) { return ours[id] && startable(id); }); }) : [];
+      return h('footer', { class: 'cb-cardfoot cb-nightfoot', style: ink ? { '--ck-hot': ink } : null }, [
+        ui.noTime ? h('p', { class: 'cb-typed cb-small cb-notime', role: 'alert' }, [h('span', { class: 'ck-bang', aria: { hidden: 'true' }, text: '!!' }), ' ' + ui.noTime]) : null,
+        cr.length ? h('ul', { class: 'ck-crunch cb-crunch', role: 'note' }, cr.slice(0, 1).map(function (c) {
+          return h('li', null, [h('span', { class: 'ck-bang', aria: { hidden: 'true' }, text: '!!' }), CK().crunchLine(c, { today: today })]);
+        })) : null,
+        h('div', { class: 'cb-clockrow' }, [
+          h('div', { class: 'cb-clockslot' }, clockEl(0)),
+          nightBtn('card-night', 'card-night', !!tonightV && tonightV.open && tonightV.left <= 0)
+        ]),
+        h('div', { class: 'cb-footrow' }, [
+          h('span', { class: 'cb-asksout cb-typed cb-small', role: 'status', data: { n: String(n) }, text: T('card', n === 1 ? 'out1' : (n ? 'outN' : 'out0'), { n: n }) }),
+          h('button', { type: 'button', class: 'cb-link pz-hl', data: { fk: 'cancel' }, aria: { label: T('show', 'cancelL') }, text: T('card', 'callOff'), on: { click: function () {
+            confirmCard(T('show', 'cancelSure'), T('show', 'cancelYes'), T('show', 'keep'), function () { act(function (x) { return SB.Shows.cancel(x, showId, 'PLAYER'); }); });
+          } } })
+        ])
+      ]);
     }
 
     /* ================= the card: one row per part of the show (left), the picked row's picker (right) ================= */
@@ -1145,71 +1359,332 @@
     function queuedN(s) { return asksFor(s, showId).filter(function (a) { return a.status === 'QUEUED'; }).length; }
     function bandCard(s, id) { return safe(function () { return SB.Bands.card(s, id); }, null); }
     function first(s, id) { return s.people && s.people[id] ? (s.people[id].first || '') : ''; }
-    function promoJobs(v) { return (v.jobs || []).filter(function (j) { return j.group === 'TELLING' && j.mode !== 'PROMISE' && !j.covered && !j.hidden && !j.optional && !j.waived; }); }
+    /* the jobs that get the word out, once the flyer is made (making the flyer is the FLYER row's own job) */
+    function promoJobs(v) { return (v.jobs || []).filter(function (j) { return j.group === 'TELLING' && j.type !== 'MAKE_FLYER' && j.mode === 'HOURS' && !j.covered && !j.hidden && !j.optional && !j.waived; }); }
     /* the rest of the work that takes hours (the advance, the neighbours, the house rules, the thanks, the debrief): not promo, not booking */
-    function prepJobs(v) { return (v.jobs || []).filter(function (j) { return j.group !== 'TELLING' && j.mode === 'HOURS' && !j.covered && !j.hidden && !j.optional && !j.waived; }); }
-    function late(s, j) { return j.status === 'TODO' && !j.planned && j.window && num(j.window.lateFrom) && s.clock.day >= j.window.lateFrom; }
+    function prepJobs(v) { return (v.jobs || []).filter(function (j) { return j.group !== 'TELLING' && j.type !== 'LOCK_BILL' && j.mode === 'HOURS' && !j.covered && !j.hidden && !j.optional && !j.waived; }); }
+    function jobOf(v, type) { return (v.jobs || []).filter(function (j) { return j.type === type && !j.covered && !j.hidden && !j.waived; })[0] || null; }
+    function late(s, j) { return mine(j) && j.window && (j.window.state === 'LATE' || (num(j.window.lateFrom) && s.clock.day >= j.window.lateFrom)); }
+    function byOther(j) { return j.planned && j.planned.by && j.planned.by !== 'player' ? j.planned.by : null; }
+    function mine(j) { return (j.status === 'TODO' || j.status === 'PLANNED') && !byOther(j); }                                      // still the player's to do
+    function jobsDone(list) { return list.every(function (j) { return j.status !== 'TODO' && j.status !== 'PLANNED' && j.status !== 'WAITING'; }); }      // done, or missed: nothing left to do about it
+    function jobsState(list) {
+      var w;
+      if (jobsDone(list)) return { state: 'DONE' };
+      if (list.some(mine)) return { state: 'TODO' };
+      w = list.filter(byOther)[0];
+      return { state: 'WAIT', who: w ? (w.planned.byName || '') : '' };                                                              // somebody else has what is left
+    }
 
+    /* Every row says how it stands for the step it is in (r.state): DONE, TODO (the player's move), WAIT (somebody
+     * else's: r.who, asked on r.since), BAD (a no or a counter, or work that is late), HOLD (the room wants something
+     * first), OPT (open, but nothing has to happen there). */
     function rowsOf(s, v) {
       var show = v.show, rows = [], asks = asksFor(s, showId), q = show.requestId && s.requests ? s.requests[show.requestId] : null,
           tourId = q && q.bandId && s.bands && s.bands[q.bandId] ? q.bandId : null, onBill = {}, n = v.bands.length, days = show.day - s.clock.day,
           hold = askOf(asks, function (a) { return a.kind === 'ROOM_HOLD'; }), conf = askOf(asks, function (a) { return a.kind === 'ROOM_CONFIRM'; }),
-          terms = askOf(asks, function (a) { return a.kind === 'TERMS'; }), slots = { OPEN: [], MIDDLE: [], CLOSE: [] }, noes = {}, st0, c, d = v.deal || {}, pj, np, ex, paid, sec = v.security;
-      function add(r) { rows.push(r); }
+          terms = askOf(asks, function (a) { return a.kind === 'TERMS'; }), slots = { OPEN: [], MIDDLE: [], CLOSE: [] }, noes = {}, st0, c, d = v.deal || {}, pj, np, ex, paid, sec = v.security,
+          offerRow = null, anyBand, rm, owner, unmet, ra, lj, fj, js;
+      function add(r) { rows.push(r); return r; }
+      function waitState(k) { return k === 'TONIGHT' || k === 'WAITING' ? 'WAIT' : (k === 'NO' || k === 'COUNTER' ? 'BAD' : null); }
+      function asked(a) { return a.status === 'QUEUED' ? null : T('card', 'asked', { day: sinceOf(s, a) }); }
       function crew(role, key, need) {
-        var cur = show.crew[role], a = askOf(asks, function (x) { return x.kind === 'CREW' && x.payload && x.payload.role === role; }), stc = cur ? 'YES' : (a && a.status !== 'YES' ? askState(a) : 'EMPTY');
-        add({ key: key, label: T('card', key), value: cur ? (cur === 'player' ? T('show', 'you') : first(s, cur)) : (a && a.status !== 'YES' ? first(s, a.toId) : ''), struck: !cur && stc === 'NO',
-              st: stc, hot: stc === 'NO' || (need && stc === 'EMPTY') });
+        var cur = show.crew[role], a = askOf(asks, function (x) { return x.kind === 'CREW' && x.payload && x.payload.role === role; }), stc = cur ? 'YES' : (a && a.status !== 'YES' ? askState(a) : 'EMPTY'),
+            who = a ? first(s, a.toId) : '', wt = waitState(stc);
+        if (stc === 'EMPTY' && !need) stc = 'OPT';
+        add({ key: key, label: T('card', key), value: cur ? (cur === 'player' ? T('show', 'you') : first(s, cur)) : (a && a.status !== 'YES' ? who : ''), struck: !cur && stc === 'NO',
+              st: stc, stText: wt === 'WAIT' ? asked(a) : null, hot: stc === 'NO' || (need && stc === 'EMPTY'),
+              state: cur ? 'DONE' : (wt || (need ? 'TODO' : 'OPT')), who: wt === 'WAIT' ? who : null, ask: a && a.status !== 'YES' ? a : null });
       }
-      add({ key: 'night', label: T('card', 'night'), value: SB.time.fmt(show.day, 'short'), note: days > 0 ? T('card', days === 1 ? 'inDay' : 'inDays', { n: days }) : (days === 0 ? T('card', 'tonight') : '') });
+      add({ key: 'night', label: T('card', 'night'), value: SB.time.fmt(show.day, 'short'), note: days > 0 ? T('card', days === 1 ? 'inDay' : 'inDays', { n: days }) : (days === 0 ? T('card', 'tonight') : ''), state: 'DONE' });
       st0 = show.status === 'CONFIRMED' ? 'CONFIRMED' : (conf && conf.status !== 'YES' && (show.hold || show.roomId) ? askState(conf) : (show.hold || show.roomId ? 'HELD' : (hold && hold.status !== 'YES' ? askState(hold) : 'EMPTY')));
+      rm = v.room || (hold && hold.status !== 'YES' && s.rooms ? s.rooms[hold.toId] : null);
+      owner = rm && rm.ownerId ? first(s, rm.ownerId) : '';
+      unmet = (v.needsToConfirm || []).filter(function (x) { return !x.met; });
+      ra = st0 === 'HELD' ? null : (conf && conf.status !== 'YES' && (show.hold || show.roomId) ? conf : hold);
       add({ key: 'room', label: T('card', 'room'), value: v.room ? v.room.name : (hold && hold.status !== 'YES' ? roomName(s, hold.toId) : ''), struck: !v.room && st0 === 'NO', st: st0,
-            stText: st0 === 'HELD' && show.hold && num(show.hold.rank) ? T('card', 'st.HELDN', { n: show.hold.rank }) : null, hot: st0 === 'NO' || (st0 === 'HELD' && show.hold && show.hold.rank > 1) });
+            stText: st0 === 'HELD' && show.hold && num(show.hold.rank) && show.hold.rank > 1 ? T('card', 'st.HELDN', { n: show.hold.rank }) : (waitState(st0) === 'WAIT' && ra ? asked(ra) : null),
+            hot: st0 === 'NO' || (st0 === 'HELD' && show.hold && show.hold.rank > 1),
+            state: st0 === 'CONFIRMED' ? 'DONE' : (st0 === 'EMPTY' ? 'TODO' : (st0 === 'HELD' ? (show.hold && show.hold.rank > 1 ? 'WAIT' : (unmet.length ? 'HOLD' : 'WAIT')) : (waitState(st0) || 'TODO'))),
+            who: owner || (rm ? String(rm.name || '').replace(/^the\s+/i, '') : ''), room: rm, unmet: unmet, rank: show.hold && num(show.hold.rank) ? show.hold.rank : null });
       /* the bill, in running order: who is on it, who has been asked, and a blank line for any slot nobody is in */
       v.bands.forEach(function (b, i) {
-        var raw = show.bill.slots[i] || {}, k = n >= 3 ? (i === 0 ? 'OPEN' : (i === n - 1 ? 'CLOSE' : 'MIDDLE')) : (raw.want === 'OPEN' && i === 0 ? 'OPEN' : (raw.want === 'CLOSE' && i === n - 1 ? 'CLOSE' : 'MIDDLE'));
+        var raw = show.bill.slots[i] || {}, k = n >= 3 ? (i === 0 ? 'OPEN' : (i === n - 1 ? 'CLOSE' : 'MIDDLE')) : (raw.want === 'OPEN' && i === 0 ? 'OPEN' : (raw.want === 'CLOSE' && i === n - 1 ? 'CLOSE' : 'MIDDLE')),
+            ba = b.confirmed ? null : askOf(asks, function (a) { return a.kind === 'BAND_PLAY' && a.toId === b.band.id; });
         onBill[b.band.id] = true;
-        slots[k].push({ key: 'band-' + b.band.id, kind: 'band', slot: k, band: b.band, b: b, idx: i, value: b.band.name, st: b.confirmed ? 'YES' : 'WAITING', hot: !!b.listed });
+        slots[k].push({ key: 'band-' + b.band.id, kind: 'band', slot: k, band: b.band, b: b, idx: i, value: b.band.name, st: b.confirmed ? 'YES' : 'WAITING', stText: !b.confirmed && ba && OPEN_ASK[ba.status] ? asked(ba) : null, hot: !!b.listed,
+                        state: b.confirmed ? 'DONE' : 'WAIT', who: b.confirmed ? null : b.band.name });
       });
       asks.forEach(function (a) {
         var k = (a.payload && a.payload.wantSlot) || 'MIDDLE';
         if (a.kind !== 'BAND_PLAY' || onBill[a.toId]) return;
         if (!slots[k]) k = 'MIDDLE';
-        if (OPEN_ASK[a.status]) { c = bandCard(s, a.toId); if (c) slots[k].push({ key: 'ask-' + a.toId, kind: 'ask', slot: k, band: c, ask: a, value: c.name, st: askState(a), hot: a.status === 'COUNTER' }); }
+        if (OPEN_ASK[a.status]) { c = bandCard(s, a.toId); if (c) slots[k].push({ key: 'ask-' + a.toId, kind: 'ask', slot: k, band: c, ask: a, value: c.name, st: askState(a), stText: a.status === 'SENT' ? asked(a) : null, hot: a.status === 'COUNTER',
+                                                                                 state: a.status === 'COUNTER' ? 'BAD' : 'WAIT', who: c.name }); }
         else if (a.status === 'NO' || a.status === 'SILENT') noes[k] = a;
       });
-      /* a request's touring band is on the card from the start: its row is where the offer is made */
+      /* a request's touring band: its offer is THE DEAL's first row until they take it; then they sit in their slot */
       if (tourId && !onBill[tourId] && ((terms && OPEN_ASK[terms.status]) || q.status === 'NEW' || q.status === 'REPLIED' || q.status === 'NEGOTIATING')) {
         c = bandCard(s, tourId);
-        if (c) slots.MIDDLE.push({ key: 'offer', kind: 'offer', slot: 'MIDDLE', band: c, ask: terms, req: q, value: c.name, st: terms && terms.status !== 'YES' ? askState(terms) : 'OFFER', hot: !!terms && (terms.status === 'COUNTER' || terms.status === 'NO' || terms.status === 'SILENT') });
+        st0 = terms && terms.status !== 'YES' ? askState(terms) : 'OFFER';
+        if (c) offerRow = add({ key: 'offer', kind: 'offer', slot: 'MIDDLE', label: T('card', 'offerRow'), band: c, ask: terms, req: q, value: c.name, st: st0, stText: terms && terms.status === 'SENT' ? asked(terms) : null,
+                                hot: !!terms && (terms.status === 'COUNTER' || terms.status === 'NO' || terms.status === 'SILENT'), state: st0 === 'OFFER' ? 'TODO' : (waitState(st0) || 'TODO'), who: c.name });
       }
+      anyBand = n > 0 || slots.OPEN.length + slots.MIDDLE.length + slots.CLOSE.length > 0;
       ['OPEN', 'MIDDLE', 'CLOSE'].forEach(function (k) {
-        var no = noes[k], nc = null;
+        var no = noes[k], nc = null, held = k === 'MIDDLE' && !!offerRow;          // the touring band's place, while the offer is out
         slots[k].forEach(function (r) { r.label = T('bill', 'gap.' + k); add(r); });
-        if (slots[k].length && sel !== 'slot-' + k) return;
+        if ((slots[k].length || held) && sel !== 'slot-' + k) return;
         if (no && !slots[k].length) nc = bandCard(s, no.toId);
-        add({ key: 'slot-' + k, kind: 'slot', slot: k, label: T('bill', 'gap.' + k), value: nc ? nc.name : '', struck: !!nc, st: nc ? 'NO' : 'EMPTY' });
+        add({ key: 'slot-' + k, kind: 'slot', slot: k, label: T('bill', 'gap.' + k), value: nc ? nc.name : '', struck: !!nc, st: nc ? 'NO' : (slots[k].length || held || show.bill.locked ? 'OPT' : 'EMPTY'),
+              state: nc ? 'BAD' : (slots[k].length || held || show.bill.locked ? 'OPT' : 'TODO'), band: nc || null });
       });
+      lj = jobOf(v, 'LOCK_BILL');
+      if (lj || show.bill.locked) add({ key: 'lock', kind: 'lock', label: T('card', 'lock'), value: show.bill.locked ? T('card', 'lockV') : '', st: show.bill.locked ? 'DONE' : 'OPT', stText: show.bill.locked ? null : T('card', 'lockNo'), job: lj,
+                                        hot: !!lj && !show.bill.locked && late(s, lj), state: show.bill.locked ? 'DONE' : 'OPT' });
       crew('sound', 'sound', true);
-      add({ key: 'door', label: T('card', 'door'), value: show.crew.floor ? (show.crew.floor === 'player' ? T('show', 'you') : first(s, show.crew.floor)) : '', st: show.crew.floor ? 'YES' : 'EMPTY' });
+      add({ key: 'door', label: T('card', 'door'), value: show.crew.floor ? (show.crew.floor === 'player' ? T('show', 'you') : first(s, show.crew.floor)) : '', st: show.crew.floor ? 'YES' : 'EMPTY', state: show.crew.floor ? 'DONE' : 'TODO' });
       if (sec && (sec.required || sec.recommended || show.crew.security || asks.some(function (a) { return a.kind === 'CREW' && a.payload && a.payload.role === 'security' && OPEN_ASK[a.status]; }))) crew('security', 'security', !!sec.required);
       st0 = show.promo && show.promo.flyer ? 'MADE' : (show.flyer && show.flyer.recipe ? 'PASTED' : 'EMPTY');
-      add({ key: 'flyer', label: T('card', 'flyer'), value: st0 === 'EMPTY' ? '' : T('card', 'flyerV.' + st0), st: st0 === 'EMPTY' ? 'EMPTY' : (st0 === 'MADE' ? 'YES' : null) });
-      pj = promoJobs(v); np = pj.filter(function (j) { return j.status === 'DONE' || j.planned; }).length;
-      add({ key: 'promo', label: T('card', 'promo'), value: pj.length ? T('card', 'promoV', { n: np, of: pj.length }) : '', st: pj.length && pj.every(function (j) { return j.status === 'DONE'; }) ? 'DONE' : (pj.length ? null : 'EMPTY'),
-            hot: pj.some(function (j) { return late(s, j); }) });
-      pj = prepJobs(v); np = pj.filter(function (j) { return j.status === 'DONE' || j.planned; }).length;
-      add({ key: 'prep', label: T('card', 'prep'), value: pj.length ? T('card', 'promoV', { n: np, of: pj.length }) : '', st: pj.length && pj.every(function (j) { return j.status === 'DONE'; }) ? 'DONE' : (pj.length ? null : 'EMPTY'),
-            hot: pj.some(function (j) { return late(s, j); }) });
-      add({ key: 'price', label: T('card', 'price'), value: (show.door.donation ? T('show', 'donation') : '$' + (show.door.price || 0)) + ' · ' + word('ages.' + show.door.ages, show.door.ages) });
+      fj = jobOf(v, 'MAKE_FLYER');
+      add({ key: 'flyer', label: T('card', 'flyer'), value: st0 === 'EMPTY' ? '' : T('card', 'flyerV.' + st0), st: st0 === 'EMPTY' ? 'EMPTY' : (st0 === 'MADE' ? 'YES' : null), job: fj, pasted: st0 !== 'EMPTY',
+            hot: st0 !== 'MADE' && !!fj && late(s, fj), state: st0 === 'MADE' ? 'DONE' : 'TODO' });
+      pj = promoJobs(v); np = pj.filter(function (j) { return j.status === 'DONE'; }).length; js = jobsState(pj);
+      add({ key: 'promo', label: T('card', 'promo'), value: pj.length ? T('card', 'promoV', { n: np, of: pj.length }) : '', st: pj.length && js.state === 'DONE' ? 'DONE' : null, jobs: pj,
+            hot: pj.some(function (j) { return late(s, j); }), state: js.state, who: js.who || null });
+      pj = prepJobs(v); np = pj.filter(function (j) { return j.status === 'DONE'; }).length; js = jobsState(pj);
+      add({ key: 'prep', label: T('card', 'prep'), value: pj.length ? T('card', 'promoV', { n: np, of: pj.length }) : '', st: pj.length && js.state === 'DONE' ? 'DONE' : null, jobs: pj,
+            hot: pj.some(function (j) { return late(s, j); }), state: js.state, who: js.who || null });
+      add({ key: 'price', label: T('card', 'price'), value: (show.door.donation ? T('show', 'donation') : '$' + (show.door.price || 0)) + ' · ' + word('ages.' + show.door.ages, show.door.ages), state: 'DONE' });
       paid = show.bill.slots.some(function (x) { return (x.fee || 0) > 0; });
       if (tourId || paid || (d.guarantee || 0) > 0) {
         ex = safe(function () { return SB.Money.exposure(s, showId); }, null);
         add({ key: 'deal', label: T('card', 'deal'), value: tourId || (d.guarantee || 0) > 0 ? word('deal.' + (d.shape || 'DOOR') + '.name', lower(d.shape || 'DOOR')) + ((d.guarantee || 0) > 0 ? ' ' + money(d.guarantee) : '') : T('card', 'owe', { amount: money(ex && num(ex.total) ? ex.total : 0) }),
-              st: d.agreedDay != null ? 'YES' : (terms && terms.status !== 'YES' ? askState(terms) : null) });
+              st: d.agreedDay != null ? 'YES' : null, state: 'DONE' });
       }
       return rows;
     }
+
+    /* ---- the seven steps (design/spec/11-booking-pipeline.md) ---- */
+    var STEPS = ['DATE', 'ROOM', 'DEAL', 'BILL', 'CREW', 'ANNOUNCE', 'NIGHT'], DEAL_ORDER = { offer: 0, deal: 1, price: 2 }, SLOT_FIRST = { CLOSE: 0, OPEN: 1, MIDDLE: 2 },
+        RANK = { STAY: 3, NO_TIME: 2, BURNT_OUT: 2 };            // why NEXT says call it a night: staying up is the player's call, never NEXT's
+    function stepOfRow(r) {
+      var k = r.kind || r.key;
+      if (k === 'night') return 'DATE';
+      if (k === 'room') return 'ROOM';
+      if (k === 'offer' || k === 'deal' || k === 'price') return 'DEAL';
+      if (k === 'slot' || k === 'band' || k === 'ask' || k === 'lock') return 'BILL';
+      if (k === 'sound' || k === 'door' || k === 'security') return 'CREW';
+      if (k === 'flyer' || k === 'promo') return 'ANNOUNCE';
+      return 'NIGHT';
+    }
+    function firstOpen(sp) {
+      var order = ['BAD', 'TODO', 'WAIT', 'HOLD'], i, r;
+      for (i = 0; i < order.length; i++) { r = sp.rows.filter(function (x) { return x.state === order[i]; })[0]; if (r) return r; }
+      return sp.rows[0] || null;
+    }
+    function short(t, max) { t = String(t || ''); return t.length > max ? t.slice(0, max - 2).replace(/\s+$/, '') + '..' : t; }
+    /* stepsOf: each step's rows, how it stands (DONE / TODO / WAITING / LOCKED / BANG), who it waits on, and the one line
+     * it folds to. Locks are the card's own (the engine gates nothing here): the deal, the bill, the crew and the show
+     * night open when the room is confirmed (or holds the night and wants something from them first); announcing opens
+     * when the bill is done. A step the guide is on, one with an ask already out, or one picked by hand is never locked. */
+    function stepsOf(s, v, rows, tc, picked) {
+      var show = v.show, by = {}, room = rows.filter(function (r) { return r.key === 'room'; })[0], offer = rows.filter(function (r) { return r.key === 'offer'; })[0],
+          roomOk = show.status === 'CONFIRMED' || (room && room.state === 'HOLD'), tutStep = tc ? tutStepOf(tc) : null, pr = picked ? rows.filter(function (r) { return r.key === picked; })[0] : null,
+          billDone, out, days = show.day - s.clock.day;
+      STEPS.forEach(function (k) { by[k] = []; });
+      rows.forEach(function (r) { by[stepOfRow(r)].push(r); });
+      by.DEAL.sort(function (a, b) { return DEAL_ORDER[a.key] - DEAL_ORDER[b.key]; });
+      function some(k, stt) { return by[k].some(function (r) { return r.state === stt; }); }
+      function stateOf(k) { return some(k, 'BAD') ? 'BANG' : (some(k, 'TODO') ? 'TODO' : (some(k, 'WAIT') ? 'WAITING' : (some(k, 'HOLD') ? 'TODO' : 'DONE'))); }
+      billDone = !!show.bill.locked || (v.bands.length > 0 && !some('BILL', 'BAD') && !some('BILL', 'TODO') && !some('BILL', 'WAIT') && !offer);
+      out = STEPS.map(function (k) {
+        var stt = stateOf(k), need = k === 'ANNOUNCE' ? 'BILL' : (k === 'DATE' || k === 'ROOM' ? null : 'ROOM'), locked, w, line = '', f;
+        if (k === 'BILL') stt = billDone ? 'DONE' : (stt === 'DONE' ? 'WAITING' : stt);              // every band said yes, but the touring band has not taken the offer
+        locked = !!need && !(need === 'ROOM' ? roomOk : billDone) && !some(k, 'WAIT') && k !== tutStep && !(pr && stepOfRow(pr) === k) &&
+                 !(k === 'BILL' && (billDone || v.bands.length || some(k, 'BAD'))) && !(k === 'DEAL' && ((offer && offer.state !== 'TODO') || (v.deal && v.deal.agreedDay != null))) &&
+                 !(k === 'ANNOUNCE' && by[k].some(function (r) { return r.pasted; }));
+        if (locked) stt = 'LOCKED';
+        else if (k === 'NIGHT' && stt === 'DONE') stt = 'SOON';                                    // nothing to do for it yet: it is done when it is played
+        w = stt === 'WAITING' ? ((by[k].filter(function (r) { return r.state === 'WAIT' && r.who; })[0] || {}).who || (k === 'BILL' && offer ? offer.who : '')) : '';
+        /* the one line a folded step says */
+        if (stt === 'LOCKED') line = T('card', 'opens.' + need);
+        else if (k === 'DATE') line = T('card', 'sum.date', { d: SB.time.fmt(show.day, 'short'), when: days > 0 ? T('card', days === 1 ? 'inDay' : 'inDays', { n: days }) : T('card', 'tonight') });
+        else if (k === 'ROOM') line = room && room.value ? room.value + (room.state === 'HOLD' && room.unmet[0] ? ' · ' + T('card', 'sum.wants', { need: room.unmet[0].text }) : (room.st === 'HELD' && room.state === 'WAIT' && room.rank === 1 ? ' · ' + T('card', 'sum.yours') : '')) : T('show', 'noRoom');
+        else if (k === 'DEAL') line = by[k].map(function (r) { return r.key === 'offer' ? r.value + ': ' + (r.stText || T('card', 'st.' + r.st)) : r.value; }).join(' · ');
+        else if (k === 'BILL') line = v.bands.length || by[k].some(function (r) { return r.kind === 'ask'; }) ? by[k].filter(function (r) { return r.kind === 'band' || r.kind === 'ask'; }).map(function (r) { return short(r.value, 16) + (r.state === 'DONE' ? '' : '?'); }).join(', ') : T('card', 'sum.bill0');
+        else if (k === 'CREW') line = T('card', 'sum.crew', { sound: (by[k][0] && by[k][0].value) || '?', door: (by[k][1] && by[k][1].value) || '?' });
+        else if (k === 'ANNOUNCE') { f = by[k][0]; line = T('card', f && f.state === 'DONE' ? 'sum.flyer' : 'sum.flyerNo') + (by[k][1] && by[k][1].value ? ' · ' + by[k][1].value : ''); }
+        else line = stt === 'SOON' ? T('card', 'sum.ready') : (by[k][0] && by[k][0].value ? by[k][0].value : T('card', 'sum.ready'));
+        return { key: k, rows: by[k], state: stt, who: w, line: line, need: need, days: days };
+      });
+      return out;
+    }
+    function tutStepOf(tc) { return { HOLD: 'ROOM', BILL: tc.stage === 'OFFER' ? 'DEAL' : 'BILL', SOUND: 'CREW', FLYER: 'ANNOUNCE', PROMO: 'ANNOUNCE' }[tc.step] || null; }
+    /* the row the guide is talking about, or null when it is only waiting */
+    function tutRow(s, v, tc) {
+      var j;
+      switch (tc.step) {
+        case 'HOLD': return 'room';
+        case 'BILL':
+          if (tc.stage === 'OFFER') return 'offer';
+          if (tc.stage === 'KIDS' || tc.stage === 'LOCAL') return 'slot-' + (tc.slot || 'MIDDLE');
+          if (tc.stage === 'ORDER') return v.bands.length ? 'band-' + v.bands[v.bands.length - 1].band.id : null;
+          return null;
+        case 'SOUND': return 'sound';
+        case 'FLYER': return 'flyer';
+        case 'PROMO':
+          j = tc.jobId ? (v.jobs || []).filter(function (x) { return x.id === tc.jobId; })[0] : null;
+          return j ? (j.type === 'MAKE_FLYER' ? 'flyer' : (j.group === 'TELLING' ? 'promo' : 'prep')) : null;
+      }
+      return null;
+    }
+
+    /* ---- NEXT: the one thing to do now, in plain words, with its button ---- */
+    function sortJobs(s, list) {
+      function k(j) { var d = !mine(j) ? (byOther(j) ? 8.5e6 : 9e6) : (late(s, j) ? -1 : (num(j.due) ? j.due : (j.window && num(j.window.idealUntil) ? j.window.idealUntil : 8e6))); return d; }
+      return list.map(function (j, i) { return { j: j, k: k(j), i: i }; }).sort(function (a, b) { return (a.k - b.k) || (a.i - b.i); }).map(function (x) { return x.j; });
+    }
+    function effortOf() { return ui.effort || (SB.Config.USUAL && SB.Config.USUAL.effort) || 'STANDARD'; }
+    function jobOpts(j) { return j.type === 'MAKE_FLYER' ? { effort: effortOf() } : {}; }
+    function doJob(j) {
+      var id = j.id, o = jobOpts(j), r = doAct(function (x) { return SB.Week.doNow(x, id, o); });
+      if (!r || r.ok === false) return r;
+      if (r.answer && r.answer.text) SB.UI.toast(r.answer.text, r.answer.status === 'NO' ? 'no' : 'info');
+      (r.records || []).forEach(function (x) { if (x && x.t === 'OVERTIME' && x.text) SB.UI.toast(x.text, 'info'); });
+      return r;
+    }
+    function doHold() { var rid = ui.roomId, day = ui.day; if (!rid || !num(day)) return null; return doAct(function (x) { return SB.Mail.ask(x, 'ROOM_HOLD', rid, { showId: showId, day: day }); }); }
+    function sendOffer(q, show) {
+      var d = ui.deal, withG, deal, day = show.day, res;
+      if (!d || !q) return null;
+      withG = d.shape === 'GUARANTEE' || d.shape === 'GUARANTEE_PLUS' || d.shape === 'VERSUS';
+      deal = { shape: d.shape, guarantee: withG ? d.guarantee : 0, pct: d.pct, lodging: !!d.lodging, meal: !!d.meal };
+      res = doAct(function (x) { return SB.Mail.reply(x, q.id, 'OFFER', { showId: showId, deal: deal, date: day }); });
+      if (res && res.ok !== false) ui.deal = null;
+      return res;
+    }
+    /* what a row asks of the player: { text, row, btn: { text, label, hours, fn, refusal }, msg: it is a message, stop: { kind, why } when it cannot be done tonight } */
+    function todoFor(s, v, r, tc) {
+      var on = sel === r.key && !look, N = function (k, c) { return T('card', 'nx.' + k, c); }, go = function () { pick(r.key); }, band = r.band ? r.band.name : '', slot = r.slot ? T('bill', 'gap.' + r.slot).toLowerCase() : '', role, name, list, j, i, c, t = null;
+      function open(text) { return { text: text, label: text, fn: go }; }
+      switch (r.kind || r.key) {
+        case 'room':
+          if (r.state === 'HOLD') return null;
+          return { row: r.key, msg: true, text: r.st === 'NO' ? N('roomNo', { room: r.value }) : N('room', { d: SB.time.fmt(num(ui.day) ? ui.day : v.show.day, 'short') }),
+                   btn: on && ui.roomId ? { text: N('holdGo'), label: T('show', 'holdRoomL', { room: roomName(s, ui.roomId), d: SB.time.fmt(ui.day, 'short') }), hours: mailH(), fn: doHold } : open(N('pickRoom')) };
+        case 'offer':
+          if (r.st === 'COUNTER') return { row: r.key, text: N('counter', { band: band }), btn: on ? null : open(N('see')) };
+          return { row: r.key, msg: true, text: r.st === 'NO' ? N('offerNo', { band: band }) : N('offer', { band: band }),
+                   btn: on && ui.deal ? { text: N('offerGo'), label: SB.text.label('ui.inbox.sendOffer') + ': ' + band, hours: mailH(), fn: function () { sendOffer(r.req, v.show); } } : open(N('seeOffer')) };
+        case 'ask': return { row: r.key, text: N('counter', { band: band }), btn: on ? null : open(N('see')) };
+        case 'slot':
+          c = tc && tc.bandId && (tc.stage === 'KIDS' || tc.stage === 'LOCAL') && tc.slot === r.slot ? bandCard(s, tc.bandId) : null;
+          return { row: r.key, msg: true, text: c ? N('bandNamed', { band: c.name, slot: slot }) : (r.st === 'NO' ? N('bandNo', { band: band, slot: slot }) : N(v.bands.length >= 2 && v.bands.every(function (b) { return b.confirmed; }) ? 'bandOrLock' : 'band', { slot: slot })),
+                   btn: on ? null : open(N('pickBand')) };
+        case 'band': return { row: r.key, text: N('order'), btn: on ? null : open(N('pickOrder')) };
+        case 'sound': case 'security':
+          role = T('show', (r.kind || r.key) === 'sound' ? 'sound' : 'security').toLowerCase();
+          name = tc && tc.step === 'SOUND' && tc.personId && r.key === 'sound' ? first(s, tc.personId) : '';
+          return { row: r.key, msg: true, text: r.st === 'NO' ? N('crewNo', { name: r.value || '?', role: role }) : (name ? N('crewNamed', { name: name, role: role }) : N('crew', { role: role })), btn: on ? null : open(N('pickCrew')) };
+        case 'door':
+          return { row: r.key, text: N('door'), btn: on ? { text: N('doorMe'), label: T('show', 'youWork'), fn: function () { act(function (x) { return SB.Shows.setCrew(x, showId, 'floor', 'player'); }); } } : open(N('pickCrew')) };
+        case 'flyer':
+          if (!r.pasted) return { row: r.key, text: N('flyer'), btn: { text: T('show', 'flyerDeskT'), label: T('show', 'flyerDesk'), fn: function () { SB.UI.go('flyerdesk', { showId: showId }); } } };
+          list = r.job ? [r.job] : [];
+          break;
+        case 'lock': list = r.job ? [r.job] : []; break;
+        case 'promo': case 'prep': list = sortJobs(s, r.jobs || []); break;
+        default: return null;
+      }
+      /* work that takes hours: the soonest due that can be done tonight; else why nothing here can */
+      for (i = 0; i < list.length; i++) {
+        j = list[i];
+        if (!mine(j)) continue;
+        if (tutJob && tc && tc.step === 'PROMO' && tc.stage === 'PLAN' && j.id !== tutJob && list.some(function (x) { return x.id === tutJob; })) continue;
+        c = canNow(s, j.id, jobOpts(j));
+        if (c.ok && c.overtime > 0) { if (!t || t.kind !== 'STAY') t = { kind: 'STAY', why: costT(c.overtime).toLowerCase(), job: j.label }; continue; }
+        if (c.ok) {
+          return (function (job, can) {
+            var due = CK() ? CK().due(job, { today: s.clock.day }) : null;
+            return { row: r.key, text: job.type === 'MAKE_FLYER' ? N('flyerMake') : N('job', { job: job.label, due: due ? N('jobDue', { due: due.text.toLowerCase() }) : '' }),
+                     btn: on ? { text: N('jobGo'), label: T('card', 'doNowL', { job: job.label }), hours: can.hours, refusal: can, fn: function () { doJob(job); } } : open(N('seeJobs')) };
+          })(j, c);
+        }
+        if (!t || (c.code === 'NO_TIME' && t.kind !== 'NO_TIME' && t.kind !== 'STAY')) t = { kind: c.code, why: whyT(c), job: j.label };
+      }
+      return t ? { row: r.key, stop: t } : null;
+    }
+    function nightNext(text, row) { return { text: text, row: row || null, night: true }; }
+    function nextOf(s, v, rows, steps, tc) {
+      var N = function (k, c) { return T('card', 'nx.' + k, c); }, i, k, sp, r, t, order = ['BAD', 'TODO'], stop = null, names = [], room = rows.filter(function (x) { return x.key === 'room'; })[0], tr, tk, later = [],
+          asked = rows.filter(function (x) { return x.kind === 'band' || x.kind === 'ask' || x.kind === 'offer'; }).length;
+      function rowBy(key) { return rows.filter(function (x) { return x.key === key; })[0] || null; }
+      function usable(t0) {
+        if (!t0) return null;
+        if (t0.stop) { if (!stop || (RANK[t0.stop.kind] || 0) > (RANK[stop.kind] || 0)) stop = t0.stop; return null; }
+        if (t0.msg && canMsg && canMsg.ok === false) { if (!stop || !RANK[stop.kind]) stop = { kind: 'NO_TIME', why: whyT(canMsg), job: '' }; return null; }
+        if (t0.msg && tonightV && tonightV.left < mailH()) { if (!stop || stop.kind !== 'STAY') stop = { kind: 'STAY', why: costT(mailH()).toLowerCase(), job: '', text: t0.text }; return null; }
+        return t0;
+      }
+      function stopText() {
+        if (stop.kind === 'STAY') return stop.job ? N('stayJob', { job: stop.job, n: stop.why }) : N('stayMsg', { n: stop.why });
+        return stop.kind === 'NO_TIME' || stop.kind === 'BURNT_OUT' ? (stop.job ? N('noTime', { job: stop.job, why: stop.why }) : N('noMsg', { why: stop.why })) : N('early', { job: stop.job, why: stop.why });
+      }
+      if (tonightV && !tonightV.open) return nightNext(tonightV.called ? N('nothing') : N('notOpen'));
+      /* the guided first show: the card says what the guide says */
+      if (tc) {
+        tk = tutRow(s, v, tc); tr = tk ? rowBy(tk) : null;
+        if (tc.stage === 'WAIT') {
+          /* the guide says call it a night: so does the card, with who it is waiting on (WAIT:PLAY and DOOR:PLAY say
+             "do what fits, then call it a night": that is the card's own reading, below) */
+          if (tc.step === 'HOLD' && room) return nightNext(N('waiting', { names: room.who || room.value }), 'room');
+          if (tc.step === 'PROMO' && tc.jobId) { t = (v.jobs || []).filter(function (x) { return x.id === tc.jobId; })[0]; if (t) return nightNext(N('jobTomorrow', { job: t.label }), tk); }
+          rows.forEach(function (x) { if (x.state === 'WAIT' && x.who && names.indexOf(x.who) < 0) names.push(x.who); });
+          return nightNext(names.length ? N('waiting', { names: names.slice(0, 3).join(', ') }) : N('keepOn'));
+        } else if (tc.step === 'HOLD' && tc.stage === 'HELD' && room && room.state === 'WAIT') {
+          return nightNext(room.rank > 1 ? N('held2', { room: room.value, n: room.rank }) : N('heldYours', { room: room.value }), 'room');
+        } else if (tr && !(tc.step === 'HOLD' && tc.stage === 'HELD')) {
+          t = usable(todoFor(s, v, tr, tc));
+          if (t) return t;
+          if (stop) return nightNext(stopText(), tr.key);
+        }
+      }
+      for (i = 0; i < steps.length; i++) {
+        sp = steps[i];
+        if (sp.state === 'LOCKED' || sp.state === 'DONE') continue;
+        for (k = 0; k < order.length; k++) {
+          r = sp.rows.filter(function (x) { return x.state === order[k]; });
+          if (sp.key === 'BILL' && order[k] === 'TODO') {
+            /* the headliner first, then the opener; with two bands asked a third is the player's call (it, or locking
+               the bill as it stands), so it waits until everything else is asked for */
+            r.sort(function (a, b) { return (SLOT_FIRST[a.slot] === undefined ? 9 : SLOT_FIRST[a.slot]) - (SLOT_FIRST[b.slot] === undefined ? 9 : SLOT_FIRST[b.slot]); });
+            if (asked >= 2) { later = later.concat(r); r = []; }
+          }
+          for (t = 0; t < r.length; t++) { tr = usable(todoFor(s, v, r[t], tc)); if (tr) return tr; }
+        }
+        sp.rows.forEach(function (x) { if (x.state === 'WAIT' && x.who && names.indexOf(x.who) < 0) names.push(x.who); });
+      }
+      for (t = 0; t < later.length; t++) { tr = usable(todoFor(s, v, later[t], tc)); if (tr) return tr; }
+      if (stop && RANK[stop.kind]) return nightNext(stopText());
+      if (room && room.state === 'WAIT' && room.st === 'HELD') return nightNext(room.rank > 1 ? N('held2', { room: room.value, n: room.rank }) : N('heldYours', { room: room.value }), 'room');
+      if (names.length) return nightNext(N('waiting', { names: names.slice(0, 3).join(', ') }));
+      if (room && room.state === 'HOLD') return nightNext(N('roomWants', { room: room.value, need: room.unmet.map(function (x) { return x.text; }).join('; ') }), 'room');
+      if (stop) return nightNext(stopText());
+      return nightNext(N('nothing'));
+    }
+    function nextLine(s, nx) {
+      var b = nx.btn, btn = null, w = D.mw(T('card', 'next'), 20);
+      if (nx.night) btn = nightBtn('next', 'card-next', false);
+      else if (b && b.hours > 0) btn = costAct({ text: b.text, label: b.label, fk: 'next', hours: b.hours, fn: b.fn, refusal: b.refusal, size: 12, tut: 'card-next', tutRef: showId });
+      else if (b) btn = D.act(b.text, b.label || b.text, 'next', b.fn, { size: 12, tut: 'card-next', tutRef: showId });
+      return h('div', { class: 'cb-next' + (nx.night ? ' is-night' : ''), role: 'group', aria: { label: T('card', 'nextL') } }, [
+        h('span', { class: 'cb-nextword', aria: { hidden: 'true' } }, D.art(D.swipe(2, 17, w + 8, 20) + D.marker(T('card', 'next'), 5, 24, 20, { seed: 'nx' }), w + 14, 32)),
+        h('p', { class: 'cb-typed cb-nexttext', role: 'status', text: nx.text || '' }),
+        btn
+      ]);
+    }
+
     /* where the selection goes when its row has turned into another (an empty slot that was asked, an ask that said yes) */
     function fallbackSel(rows, was) {
       var m = /^(slot|ask|band)-(.+)$/.exec(was), r = null;
@@ -1220,63 +1695,94 @@
     }
     function v0Tour(x) { var s = st(), sh = s && s.shows[showId], q = sh && sh.requestId && s.requests ? s.requests[sh.requestId] : null; return !!q && q.bandId === x.band.id; }
 
+    /* a typed rubber stamp (o.dashed: a pencilled box, nothing inked yet), right-aligned at xr; returns { svg, w } */
+    function stampBox(t, xr, cy, o) {
+      o = o || {};
+      var sw, out;
+      if (o.dashed) {
+        sw = D.tw(t, 12) + 16;
+        out = '<path d="M' + f(xr - sw) + ' ' + f(cy - 10) + 'h' + f(sw) + 'v20h' + f(-sw) + 'Z" fill="none" stroke="' + (o.ink || D.GRAY) + '" stroke-width="1.4" stroke-dasharray="4 3"/>' + D.type(t, xr - sw / 2, cy + 4.5, 12, { anchor: 'middle', bold: true, fill: o.ink || D.GRAY });
+        return { svg: out, w: sw };
+      }
+      sw = D.tw(t, 12) + 28;                                        // the letters start well inside the box and end well inside it
+      out = '<g transform="rotate(' + (o.rot || 0) + ' ' + f(xr - 1 - sw / 2) + ' ' + f(cy) + ')">' + K().rect(xr - sw, cy - 10.5, sw - 2, 21, { seed: 'rst' + t, sw: 2.2, wob: 0.5, over: 0.3 }) +
+        D.type(t, xr - sw + 12, cy + 4.5, 12, { bold: true }) + D.type(t, xr - sw + 12.5, cy + 4.5, 12, { bold: true }) + '</g>';   // struck twice: a stamp inks heavy
+      return { svg: out, w: sw + 4 };
+    }
+    function fitType(t, s, max) { t = String(t || ''); if (D.tw(t, s) <= max) return t; while (t.length > 1 && D.tw(t.replace(/\s+$/, '') + '..', s) > max) t = t.slice(0, -1); return t.replace(/\s+$/, '') + '..'; }
+
+    /* a step's header: its number and name on a strip, the one line it folds to, and its one stamp. The open step is
+       boxed; a locked one is pencil grey and says what opens it. Pressing a folded step that is open to work unfolds it. */
+    function stepThing(sp, i, open) {
+      var W = 434, ht = 27, out = '', name = (i + 1) + ' ' + T('card', 'step.' + sp.key), locked = sp.state === 'LOCKED', x0 = 4, sx, stT, sb, line, first0 = firstOpen(sp),
+          who = String(sp.who || '').split(' ').slice(0, 2).join(' ').toUpperCase();
+      stT = sp.state === 'BANG' ? '' : (sp.state === 'WAITING' ? (who ? T('card', 'stepSt.WAITING', { name: short(who, 14) }) : T('card', 'stepSt.WAITING0')) :
+            (sp.state === 'SOON' ? T('card', sp.days > 1 ? 'soon' : (sp.days === 1 ? 'soon1' : 'soon0'), { n: sp.days }) : T('card', 'stepSt.' + sp.state)));
+      if (open) out += '<path d="M2 2H' + (W - 3) + 'L' + (W - 2) + ' ' + (ht - 2) + 'H3Z" fill="' + D.PAPER + '" stroke="' + D.TONER + '" stroke-width="2.6"/>';
+      else out += '<path d="M4 ' + (ht - 1.5) + 'H' + (W - 6) + '" stroke="' + D.TONER + '" stroke-opacity="' + (locked ? '.25' : '.5') + '" stroke-width="1.2"/>';
+      out += D.strip(name, x0, 1, 12, locked ? { ground: D.GRAY } : null);
+      sx = x0 + D.stripW(name, 12) + 10;
+      if (sp.state === 'BANG') { out += D.bang(W - 30, ht / 2 + 9, 19); sb = { w: 30 }; }
+      else { sb = stampBox(stT, W - 8, ht / 2 + 0.5, { dashed: locked || sp.state === 'TODO' || sp.state === 'SOON', ink: sp.state === 'TODO' ? D.TONER : null, rot: i % 2 ? 1.2 : -1.2 }); out += sb.svg; }
+      if (sp.state === 'DONE') { out += '<g transform="translate(' + f(sx) + ' ' + f(ht / 2 - 8) + ')">' + D.mark('DONE', 15) + '</g>'; sx += 20; }
+      line = fitType(String(sp.line || '').toUpperCase(), 12, Math.max(30, W - 8 - sb.w - 8 - sx));
+      if (line) out += D.type(line, sx, ht / 2 + 4.5, 12, { bold: open || sp.state === 'DONE', fill: locked ? D.GRAY : D.TONER });
+      return D.thing({ cls: 'cb-stephead' + (open ? ' is-on' : '') + (locked ? ' is-locked' : ''), pressed: open, fk: 'step-' + sp.key, tut: 'card-step', tutRef: sp.key, svg: out, w: W, h: ht,
+        label: T('card', 'stepL', { n: i + 1, step: T('card', 'step.' + sp.key).toLowerCase(), stamp: (sp.state === 'BANG' ? T('card', 'stepSt.BANG') : stT).toLowerCase(), line: sp.line || '' }),
+        onClick: function () { if (locked) { SB.UI.toast(T('card', 'step.' + sp.key) + ': ' + sp.line + '.', 'info'); return; } if (first0) pick(first0.key); } });
+    }
+
     /* one row: its name on a label-maker strip (it opens), what is written in by hand, how it stands as a stamp */
-    function rowThing(r, i, n) {
-      var W = 434, ht = Math.max(27, Math.min(38, Math.floor(424 / n))), on = sel === r.key, out = '', lx = 98, stT = r.st ? (r.stText || T('card', 'st.' + r.st)) : '', sw = 0, vx = lx + 6, maxV, val = String(r.value || '').toUpperCase(), vw;
+    function rowThing(r, i, ht) {
+      var W = 420, on = sel === r.key, out = '', lx = 98, stT = r.st ? (r.stText || T('card', 'st.' + r.st)) : '', sw = 0, vx = lx + 6, maxV, val = String(r.value || '').toUpperCase(), vw, sb;
       if (on) out += '<path d="M2 2H' + (W - 3) + 'L' + (W - 2) + ' ' + (ht - 3) + 'H3Z" fill="' + D.PAPER + '" stroke="' + D.TONER + '" stroke-width="2.4"/>';
       else out += '<path d="M' + lx + ' ' + (ht - 2.5) + 'H' + (W - 6) + '" stroke="' + D.TONER + '" stroke-opacity=".4" stroke-width="1.2"/>';
       out += D.strip(r.label, 5, (ht - 25) / 2 - 1, 12, { rot: ((i % 3) - 1) * 0.7 });
-      if (r.st === 'EMPTY') {
-        sw = D.tw(stT, 12) + 16;
-        out += '<path d="M' + f(W - 8 - sw) + ' ' + f(ht / 2 - 10) + 'h' + f(sw) + 'v20h' + f(-sw) + 'Z" fill="none" stroke="' + D.GRAY + '" stroke-width="1.4" stroke-dasharray="4 3"/>' + D.type(stT, W - 8 - sw / 2, ht / 2 + 4.5, 12, { anchor: 'middle', bold: true, fill: D.GRAY });
-      } else if (r.st) {
-        /* a typed rubber stamp (narrower than marker capitals), so what is written in keeps its room */
-        sw = D.tw(stT, 12) + 28;                                  // the letters start well inside the box and end well inside it
-        out += '<g transform="rotate(' + (i % 2 ? 1.5 : -1.5) + ' ' + f(W - 9 - sw / 2) + ' ' + f(ht / 2) + ')">' + K().rect(W - 8 - sw, ht / 2 - 10.5, sw - 2, 21, { seed: 'rst' + stT, sw: 2.2, wob: 0.5, over: 0.3 }) +
-          D.type(stT, W - 8 - sw + 12, ht / 2 + 4.5, 12, { bold: true }) + D.type(stT, W - 8 - sw + 12.5, ht / 2 + 4.5, 12, { bold: true }) + '</g>';   // struck twice: a stamp inks heavy
-        sw += 4;
-      }
+      if (r.st) { sb = stampBox(stT, W - 8, ht / 2, { dashed: r.st === 'EMPTY' || r.st === 'OPT', ink: r.st === 'EMPTY' ? D.TONER : null, rot: i % 2 ? 1.5 : -1.5 }); out += sb.svg; sw = sb.w; }
       else if (r.note) { sw = D.tw(r.note, 12) + 4; out += D.type(r.note, W - 8 - sw, ht / 2 + 4.5, 12, { bold: true }); }
       if (r.hot) { out += D.bang(W - 8 - sw - 22, ht / 2 + 8, 17); sw += 26; }
       maxV = Math.max(40, W - 8 - sw - 6 - vx);
-      function vW(t) { return D.mw(t, 17, { seed: 'rv' + r.key }); }
+      var vs = ht >= 30 ? 17 : (ht >= 27 ? 15 : 13);                // a long step packs its rows tighter: the hand shrinks with them
+      function vW(t) { return D.mw(t, vs, { seed: 'rv' + r.key }); }
       if (val) {
         /* what is written in keeps its size: a long name is cut short, never squeezed under the stamp */
         if (vW(val) > maxV) val = val.replace(/^THE\s+/, '');
         if (vW(val) > maxV) { while (val.length > 1 && vW(val.replace(/\s+$/, '') + '..') > maxV) val = val.slice(0, -1); val = val.replace(/\s+$/, '') + '..'; }
         vw = vW(val);
-        out += D.marker(val, vx, ht / 2 + 6.5, 17, { seed: 'rv' + r.key }) + (r.struck ? K().line(vx - 2, ht / 2 + 1, vx + vw + 2, ht / 2 - 1, { seed: 'rs' + r.key, sw: 2.6 }) : '');
+        out += D.marker(val, vx, ht / 2 + vs * 0.38, vs, { seed: 'rv' + r.key }) + (r.struck ? K().line(vx - 2, ht / 2 + 1, vx + vw + 2, ht / 2 - 1, { seed: 'rs' + r.key, sw: 2.6 }) : '');
       } else out += '<path d="M' + vx + ' ' + (ht - 8) + 'h' + f(maxV * 0.7) + '" stroke="' + D.TONER + '" stroke-width="1.4" stroke-dasharray="2 4"/>';
       return D.thing({ cls: 'cb-cardrow' + (on ? ' is-on' : ''), pressed: on, fk: 'row-' + r.key, tut: 'card-row', tutRef: r.kind || r.key, svg: out, w: W, h: ht,
         label: r.label + ': ' + (r.value || T('card', 'blank')) + (stT ? ', ' + stT.toLowerCase() : '') + (r.note ? ', ' + r.note.toLowerCase() : '') + (r.hot ? ' (!!)' : ''),
-        onClick: function () { pick(on ? null : r.key); } });
-    }
-    function outArt(n) {
-      var t = T('card', n === 1 ? 'out1' : (n ? 'outN' : 'out0'), { n: n }).toUpperCase(), w = D.mw(t, 13);
-      return D.art(D.marker(t, 4, 18, 13, { seed: 'out' + n }) + (n ? K().under3(4, 23, w, { seed: 'outu', sw: 2, gap: 3 }) : ''), w + 12, 32);
+        onClick: function () { pick(r.key); } });
     }
     function pickHead(t) { return h('h2', { class: 'cb-pickhead', aria: { label: t } }, D.word(String(t).slice(0, 34), 22)); }
 
     function picker(s, v, rows) {
-      var r = rows.filter(function (x) { return x.key === sel; })[0], head;
-      if (!r) return forecast(s, v);
-      head = pickHead(r.label + (r.value && (r.kind || r.key === 'room') ? ': ' + r.value : ''));
+      var r = rows.filter(function (x) { return x.key === sel; })[0], head, body, nm = r ? r.label : T('card', 'theShow');
+      function bar(hd, on) {
+        return h('div', { class: 'cb-pickbar' }, [hd, D.act(on ? T('card', 'lookBack', { row: nm }) : T('card', 'look'), on ? T('card', 'lookBackL', { row: nm.toLowerCase() }) : T('card', 'lookL'), 'look',
+          function () { look = !on; keepFocus(root, render); }, { size: 11, tut: 'card-look', tutRef: showId })]);
+      }
+      if (look || !r) { body = forecast(s, v); return [bar(body[0], !!r)].concat(body.slice(1)); }
+      head = bar(pickHead(r.label + (r.value && (r.kind || r.key === 'room') ? ': ' + r.value : '')), false);
       switch (r.kind || r.key) {
         case 'night': case 'room': return [head, roomSection(s, v)];
         case 'slot': return [head, sheet(s, v, r.slot)];
         case 'band': return [head, bandPicker(s, v, r)];
         case 'ask': return [head, askPicker(s, v, r)];
         case 'offer': return [head, offerPicker(s, v, r)];
+        case 'lock': return [head, jobList(s, v, r.job ? [r.job] : [], 'prep-jobs')];
         case 'sound': return [head, piece('cb-crew', 'white', [crewRow(s, v, 'sound', 'sound')], { label: T('show', 'sound') })];
         case 'security': return [head, piece('cb-crew', 'white', [crewRow(s, v, 'security', 'security'), securityNote(s, v)], { label: T('show', 'security') })];
         case 'door': return [head, floorPicker(s, v, rows)];
-        case 'flyer': return [head, flyerSection(s, v)];
+        case 'flyer': return [head, flyerSection(s, v, r)];
         case 'promo': return [head, jobsSection(s, v, true)];
         case 'prep': return [head, jobsSection(s, v, false)];
         case 'price': return [head, doorSection(s, v)];
         case 'deal': return [head, dealSection(s, v), rows.some(function (x) { return x.key === 'offer'; }) ? h('div', { class: 'cb-under' }, [D.act(T('card', 'toOffer'), T('card', 'toOfferL'), 'to-offer', function () { pick('offer'); }, { size: 12 })]) : null];
       }
-      return forecast(s, v);
+      body = forecast(s, v);
+      return [bar(body[0], false)].concat(body.slice(1));
     }
 
     /* nothing picked: the night as it stands: your call against what the town expects, the room's size, what you do not know yet */
@@ -1349,16 +1855,16 @@
 
     /* an ask that is out (or about to go): how it stands; take what they came back with, or take the ask back */
     function askStatus(s, a, name) {
-      var t = a.status === 'QUEUED' ? T('show', 'queued', { name: name }) : (a.status === 'SENT' ? T('show', 'asked', { name: name }) : (a.status === 'COUNTER' ? name + ': ' + T('bill', 'counter') + '.' : (a.status === 'YES' ? name + ' ' + T('bill', 'yes') + '.' : name + ' ' + T('bill', 'no') + '.')));
+      var t = a.status === 'QUEUED' ? T('show', 'queued', { name: name }) : (a.status === 'SENT' ? T('card', 'askedSince', { name: name, day: SB.time.fmt(num(a.queuedDay) ? a.queuedDay : a.sentDay, 'dow') }) : (a.status === 'COUNTER' ? name + ': ' + T('bill', 'counter') + '.' : (a.status === 'YES' ? name + ' ' + T('bill', 'yes') + '.' : name + ' ' + T('bill', 'no') + '.')));
       return h('p', { class: 'cb-typed', text: t + (a.answer && a.answer.text && a.status !== 'QUEUED' && a.status !== 'SENT' ? ' “' + a.answer.text + '”' : '') });
     }
     function askActs(a, r) {
       return h('div', { class: 'cb-row' }, [
-        a.status === 'COUNTER' ? D.act(T('card', 'takeIt'), T('card', 'takeItL'), 'take-it', function () {
+        a.status === 'COUNTER' ? costAct({ text: T('card', 'takeIt'), label: T('card', 'takeItL'), fk: 'take-it', hours: mailH(), fn: function () {
           var p = Object.assign({}, a.payload || {}, { acceptCounter: a.id });
           delete p.inPerson;
-          act(function (x) { return SB.Mail.ask(x, a.kind, a.toId, p); });
-        }) : null,
+          doAct(function (x) { return SB.Mail.ask(x, a.kind, a.toId, p); });
+        } }) : null,
         r && r.kind === 'ask' ? D.act(T('card', 'another'), T('card', 'anotherL', { slot: r.label.toLowerCase() }), 'another', function () { pick('slot-' + r.slot); }, { size: 12 }) : null,
         OPEN_ASK[a.status] ? D.act(T('card', 'takeBack'), T('card', 'takeBackL'), 'take-back', function () { act(function (x) { return SB.Mail.withdraw(x, a.id); }); }, { size: 11 }) : null
       ]);
@@ -1395,11 +1901,8 @@
           D.tickThing({ on: !!d.lodging, text: I('lodging').toUpperCase(), label: I('lodging'), fk: 'lodging', onClick: function () { d.lodging = !d.lodging; render(); } })
         ]),
         ex ? h('p', { class: 'cb-typed cb-small', text: I('ifNobody') + ': ' + (num(ex.total) ? money(ex.total) : '?') + (num(ex.breakEven) ? '. ' + I('breakEven') + ': ' + I('paidN', { n: ex.breakEven }) : '') + '.' }) : null,
-        h('div', { class: 'cb-row' }, [D.act(I('sendOffer'), I('sendOffer') + ': ' + r.band.name, 'send-offer', function () {
-          var deal = { shape: d.shape, guarantee: withG ? d.guarantee : 0, pct: d.pct, lodging: !!d.lodging, meal: !!d.meal }, day = show.day;
-          var res = act(function (x) { return SB.Mail.reply(x, q.id, 'OFFER', { showId: showId, deal: deal, date: day }); });
-          if (res && res.ok !== false) ui.deal = null;
-        }, { size: 15 })])
+        h('div', { class: 'cb-row' }, [costAct({ text: I('sendOffer'), label: I('sendOffer') + ': ' + r.band.name, fk: 'send-offer', hours: mailH(), size: 15, tut: 'card-offer', tutRef: showId,
+          fn: function () { sendOffer(q, show); } })])
       ], { label: I('slip') });
     }
 
@@ -1431,7 +1934,7 @@
       ]);
     }
 
-    /* the room: hang a tag on a night: pick a key, pick a day, hang it */
+    /* the room: ask for a night: pick a key, pick a day, text the room to hold it */
     function holdForm(s, v) {
       var rooms = safe(function () { return SB.Rooms.list(s, { bookable: true }); }, []), lo, hi;
       if (ui.roomId == null || rooms.indexOf(ui.roomId) < 0) ui.roomId = (v.show.roomId && rooms.indexOf(v.show.roomId) >= 0) ? v.show.roomId : (rooms[0] || null);
@@ -1453,37 +1956,36 @@
           D.tabs({ label: SB.time.fmt(ui.day, 'short'), items: [{ text: '<', label: T('shows', 'earlier'), fk: 'hd-prev', onClick: function () { move(-1); } }] }),
           D.art(datePage(ui.day, 70), 70, 80),
           D.tabs({ label: SB.time.fmt(ui.day, 'short'), items: [{ text: '>', label: T('shows', 'later'), fk: 'hd-next', onClick: function () { move(1); } }] }),
-          D.act(T('show', 'holdRoom'), T('show', 'holdRoomL', { room: roomName(s, ui.roomId), d: SB.time.fmt(ui.day, 'short') }), 'hold', function () {
-            var rid = ui.roomId, day = ui.day; act(function (x) { return SB.Mail.ask(x, 'ROOM_HOLD', rid, { showId: showId, day: day }); });
-          })
+          costAct({ text: T('show', 'holdRoom'), label: T('show', 'holdRoomL', { room: roomName(s, ui.roomId), d: SB.time.fmt(ui.day, 'short') }), fk: 'hold', hours: mailH(), fn: doHold, tut: 'card-hold', tutRef: showId })
         ])
       ]);
     }
 
     function roomSection(s, v) {
-      var show = v.show, room = v.room, kids = [], asks = asksFor(s, showId), ha = askOf(asks, function (a) { return a.kind === 'ROOM_HOLD'; }), ca = askOf(asks, function (a) { return a.kind === 'ROOM_CONFIRM'; }), ar;
+      var show = v.show, room = v.room, kids = [], asks = asksFor(s, showId), ha = askOf(asks, function (a) { return a.kind === 'ROOM_HOLD'; }), ar;
       function takeBack(a) { return D.act(T('card', 'takeBack'), T('card', 'takeBackL'), 'take-back', function () { act(function (x) { return SB.Mail.withdraw(x, a.id); }); }, { size: 11 }); }
       if (!room && ha && OPEN_ASK[ha.status] && s.rooms && s.rooms[ha.toId]) {
         /* the hold is asked for: what was asked, how it stands, take it back; another night stays possible, folded away */
         ar = s.rooms[ha.toId];
         kids.push(D.art(keyTag(ar, 230), 230, 70));
-        kids.push(h('p', { class: 'cb-typed', text: T('card', 'holdAsked', { room: ar.name, d: SB.time.fmt(ha.payload && num(ha.payload.day) ? ha.payload.day : show.day, 'long') }) + ' ' + T('card', ha.status === 'QUEUED' ? 'holdQueued' : 'holdSent') }));
+        kids.push(h('p', { class: 'cb-typed', text: T('card', 'holdAsked', { room: ar.name, d: SB.time.fmt(ha.payload && num(ha.payload.day) ? ha.payload.day : show.day, 'long') }) + ' ' + T('card', ha.status === 'QUEUED' ? 'holdQueued' : 'holdSent', { day: SB.time.fmt(num(ha.queuedDay) ? ha.queuedDay : ha.sentDay, 'dow') }) }));
         kids.push(h('div', { class: 'cb-row' }, [takeBack(ha)]));
         kids.push(h('details', { class: 'cb-fold' }, [h('summary', { class: 'pz-hl' }, [D.stripArt(T('show', 'holdOther'), 11)]), holdForm(s, v)]));
       } else if (!room) {
-        kids.push(D.art(K().cutout([[14, 6], [26, 6], [26, 30], [36, 34], [36, 40], [14, 40]], '', { seed: 'hook', edge: 3 }) + D.marker(T('show', 'noRoom'), 48, 36, 20, { seed: 'nr' }), 260, 48));
+        kids.push(D.art(K().cutout([[14, 6], [26, 6], [26, 30], [36, 34], [36, 40], [14, 40]], '', { seed: 'hook', edge: 3 }) + D.marker(T('show', 'noRoom'), 48, 36, 20, { seed: 'nr' }), D.mw(T('show', 'noRoom'), 20) + 64, 48));
         kids.push(holdForm(s, v));
       } else {
         kids.push(D.thing({ cls: 'cb-roomkey', label: room.name + ', ' + word('room.' + room.kind + '.name', lower(room.kind)) + (num(room.cap) ? ', ' + room.cap : '') + (show.hold && num(show.hold.rank) ? ', ' + T('show', 'rank', { n: show.hold.rank }).toLowerCase() : ''),
           fk: 'roomkey', svg: keyTag(room, 230), w: 230, h: 70, onClick: function () { SB.UI.go('room', { roomId: room.id }); } }));
-        if (show.hold && num(show.hold.rank)) kids.push(D.art(D.marker(T('show', 'rank', { n: show.hold.rank }), 4, 24, 18, { seed: 'rk', fill: show.hold.rank > 1 ? D.hot() : D.TONER }), D.mw(T('show', 'rank', { n: show.hold.rank }), 18) + 12, 32));
+        if (show.hold && num(show.hold.rank)) { ar = show.hold.rank > 1 ? T('card', 'st.HELDN', { n: show.hold.rank }) : T('card', 'st.HELD'); kids.push(D.art(D.marker(ar, 4, 24, 18, { seed: 'rk', fill: show.hold.rank > 1 ? D.hot() : D.TONER }), D.mw(ar, 18) + 12, 32)); }
         if (show.status === 'DRAFT') {
+          if (v.needsToConfirm && v.needsToConfirm.some(function (n) { return !n.met; })) kids.push(h('p', { class: 'cb-typed cb-small', text: T('show', 'needs') + ':' }));
           if (v.needsToConfirm && v.needsToConfirm.length) kids.push(h('ul', { class: 'cb-needs', aria: { label: T('show', 'needs') } }, v.needsToConfirm.map(function (n) {
             return h('li', { class: n.met ? 'is-met' : '' }, [D.art(D.mark(n.met ? 'DONE' : 'TODO', 16), 18, 18), h('span', { class: 'cb-typed cb-small', text: n.text })]);
           })));
-          if (ca && OPEN_ASK[ca.status]) kids.push(h('p', { class: 'cb-typed', text: T('card', 'confAsked', { room: room.name }) + ' ' + T('card', ca.status === 'QUEUED' ? 'holdQueued' : 'holdSent') }));
+          /* no confirm ask: their yes books it the day they have what they asked for (Rooms.firmUp) */
+          if (show.hold && show.hold.rank === 1 && !(v.needsToConfirm || []).some(function (n) { return !n.met; })) kids.push(h('p', { class: 'cb-typed', text: T('show', 'needsMet') }));
           kids.push(h('div', { class: 'cb-row' }, [
-            ca && OPEN_ASK[ca.status] ? takeBack(ca) : D.act(T('show', 'confirm'), T('show', 'confirmL'), 'confirm', function () { act(function (x) { return SB.Mail.ask(x, 'ROOM_CONFIRM', show.roomId, { showId: showId }); }); }),
             D.act(T('show', 'release'), T('show', 'releaseL'), 'release', function () { act(function (x) { return SB.Rooms.release(x, showId); }); }, { size: 11 })
           ]));
         }
@@ -1545,46 +2047,51 @@
       ], { label: T('show', 'deal') });
     }
 
-    function flyerSection(s, v) {
-      var thumb = null;
-      if (SB.UI.parts.flyerThumb) thumb = safe(function () { return D.thumb({ recipe: (v.show.flyer && v.show.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, showId) }, 230); }, null);
+    function flyerSection(s, v, r) {
+      var thumb = null, j = r && r.job;
+      if (SB.UI.parts.flyerThumb) thumb = safe(function () { return D.thumb({ recipe: (v.show.flyer && v.show.flyer.recipe) || null, spec: SB.Jobs.flyerSpec(s, showId) }, 200); }, null);
+      /* what to do about it first (the words, then making it: a job), the paste-up itself under that */
       return h('div', { class: 'cb-flyerclip' }, [
+        h('p', { class: 'cb-typed cb-flyernote', text: T('card', v.show.promo && v.show.promo.flyer ? 'flyerMade' : (v.show.flyer && v.show.flyer.recipe ? 'flyerPasted' : 'flyerNone')) }),
+        j && j.status !== 'MOOT' && r.pasted ? h('ol', { class: 'cb-notes cb-flyerjob', data: { tut: 'promo-jobs', 'tut-ref': showId } }, [jobNote(s, j, 0)]) : null,
         h('button', { type: 'button', class: 'cb-thing pz-hl has-strip cb-flyerbtn', aria: { label: T('show', 'flyerDesk') }, data: { fk: 'flyer', tut: 'show-flyer', 'tut-ref': showId }, on: { click: function () { SB.UI.go('flyerdesk', { showId: showId }); } } },
-          [D.stripArt(T('show', 'flyerDeskT') || 'FLYER', 11), D.art(K().cutout([[46, 2], [96, 2], [100, 18], [42, 18]], '', { seed: 'bc', edge: 3 }) + K().path([[52, 16], [71, 34], [90, 16]], { seed: 'bcw', sw: 2.4, stroke: '#f4f2ea' }), 140, 36, 'cb-binder'), thumb]),
-        h('p', { class: 'cb-typed cb-flyernote', text: T('card', v.show.promo && v.show.promo.flyer ? 'flyerMade' : (v.show.flyer && v.show.flyer.recipe ? 'flyerPasted' : 'flyerNone')) })
+          [D.stripArt(T('show', 'flyerDeskT') || 'FLYER', 11), D.art(K().cutout([[46, 2], [96, 2], [100, 18], [42, 18]], '', { seed: 'bc', edge: 3 }) + K().path([[52, 16], [71, 34], [90, 16]], { seed: 'bcw', sw: 2.4, stroke: '#f4f2ea' }), 140, 36, 'cb-binder'), thumb])
       ]);
     }
 
-    function slotGrid(s, j) {
-      var w = s.clock.week * 7, cells = [], i, cur = s.clock.cursor || { dayIdx: 0, half: 'DAY' }, now = s.clock.phase === 'PLAY' ? cur.dayIdx * 2 + (cur.half === 'NIGHT' ? 1 : 0) : -1, taped = j.id !== tutJob;
-      for (i = 0; i < 7; i++) ['DAY', 'NIGHT'].forEach(function (half) {
-        var on = j.planned && j.planned.dayIdx === i && j.planned.half === half, d = i, hf = half, tape = false;
-        if (!taped && i * 2 + (half === 'NIGHT' ? 1 : 0) > now && safe(function () { return SB.Jobs.canDo(s, j.id, w + i, half).ok; }, false)) { taped = true; tape = true; }
-        cells.push(D.thing({ cls: 'cb-slot' + (half === 'NIGHT' ? ' is-night' : ''), pressed: on, fk: 'pl-' + j.id + '-' + i + half, tut: tape ? 'promo-slot' : null, tutRef: tape ? j.id : null,
-          label: T('show', 'planIn', { d: SB.time.fmt(w + i, 'dow'), half: word('half.' + half, lower(half)) }),
-          svg: D.tick(on ? 'DONE' : 'TODO', 20) + (half === 'NIGHT' ? '<path d="M10 3H17V10Z" fill="#141413"/>' : ''), w: 20, h: 20,
-          onClick: function () { act(function (x) { return SB.Week.plan(x, j.id, d, hf, {}); }); } }));
-      });
-      var heads = [];
-      for (i = 0; i < 7; i++) heads.push(h('span', { class: 'cb-slothead', aria: { hidden: 'true' }, text: SB.time.fmt(w + i, 'dow3').charAt(0) }));
-      return h('div', { class: 'cb-slotwrap' }, [h('div', { class: 'cb-slotheads' }, heads), h('div', { class: 'cb-slots', role: 'group', aria: { label: j.label } }, cells)]);
-    }
-
-    var tutJob = null, PROMO_JOBS = { FLYER_RUN: 1, ANNOUNCE: 1, BANDS_SHARE: 1, PRINT: 1, LISTINGS: 1, LOCAL_AD: 1, MAILING_LIST: 1, HAND_OUT: 1, INVITES: 1, WEEK_PUSH: 1, DAY_OF_POST: 1 };
+    var PROMO_JOBS = { MAKE_FLYER: 1, FLYER_RUN: 1, ANNOUNCE: 1, BANDS_SHARE: 1, PRINT: 1, LISTINGS: 1, LOCAL_AD: 1, MAILING_LIST: 1, HAND_OUT: 1, INVITES: 1, WEEK_PUSH: 1, DAY_OF_POST: 1 };
+    /* one job, as the calendar's note says it (js/ui/screens/week.js): what it costs, when it is due (late in hot ink),
+       and DO IT TONIGHT; crossed out with the reason when tonight cannot take it. The flyer picks how sharp first. */
     function jobNote(s, j, i) {
-      var planAble = j.mode === 'HOURS' && j.status === 'TODO' && (s.clock.phase === 'PLAN' || s.clock.phase === 'PLAY'), status = j.waived ? 'WAIVED' : j.status, kids,
-          late = j.status === 'TODO' && j.window && num(j.window.lateFrom) && s.clock.day >= j.window.lateFrom;
+      var status = j.waived ? 'WAIVED' : j.status, by = byOther(j), todo = j.mode === 'HOURS' && mine(j),
+          o = jobOpts(j), can = todo ? canNow(s, j.id, o) : null, hours = can && can.ok ? can.hours : (j.type === 'MAKE_FLYER' && SB.Config.FLYER && SB.Config.FLYER.HOURS ? SB.Config.FLYER.HOURS[effortOf()] : j.hours),
+          due = todo && CK() ? CK().due(j, { today: s.clock.day }) : null, effs = todo && j.type === 'MAKE_FLYER' && SB.Config.FLYER && SB.Config.FLYER.HOURS ? Object.keys(SB.Config.FLYER.HOURS) : null, kids;
       kids = [
         h('div', { class: 'cb-note-top' }, [D.art(D.mark(status, 18), 20, 20),
           h('span', { class: 'cb-typed cb-jobl', text: j.label }),
-          late ? D.art(D.bang(4, 24, 22), 30, 26) : null,
-          h('span', { class: 'cb-sr', text: ' ' + word('jobStatus.' + j.status, lower(j.status)) + (j.planned ? ', ' + SB.time.fmt(s.clock.week * 7 + j.planned.dayIdx, 'dow3') + ' ' + word('half.' + j.planned.half, '') : '') })]),
-        j.waived ? h('p', { class: 'cb-typed cb-small', text: j.text || word('jobs.waived', T('show', 'waived')) })
-          : h('div', { class: 'cb-hl', role: 'img', aria: { label: (j.window && j.window.label) || '' } }, [D.art(D.highlighter(j.window, s.clock.day, j.planned ? s.clock.week * 7 + j.planned.dayIdx : null, 200), 200, 18),
-              j.window && j.window.label ? h('span', { class: 'cb-typed cb-small', aria: { hidden: 'true' }, text: j.window.label }) : null]),
-        planAble ? slotGrid(s, j) : null
+          todo && costT(hours) ? h('span', { class: 'cc-note-cost', text: costT(hours) }) : null,
+          due ? h('span', { class: 'cc-note-due' + (due.late ? ' is-late' : ''), text: due.text }) : null,
+          h('span', { class: 'cb-sr', text: ' ' + word('jobStatus.' + j.status, lower(j.status)) + (j.window && j.window.label ? ', ' + j.window.label : '') })]),
+        j.waived ? h('p', { class: 'cb-typed cb-small', text: j.text || word('jobs.waived', T('show', 'waived')) }) : null,
+        by ? h('p', { class: 'cb-typed cb-small cb-hasit', text: T('card', 'hasIt', { name: j.planned.byName || first(s, by) || '' }) }) : null,
+        j.status === 'DONE' && j.text ? h('p', { class: 'cb-typed cb-small', text: j.text }) : null,
+        effs ? D.tabs({ label: T('card', 'effort'), title: T('card', 'effort'), size: 11, items: effs.map(function (k) {
+          return { text: tag(T('card', 'effortWord.' + k), SB.Config.FLYER.HOURS[k]), label: T('card', 'effortWord.' + k).toLowerCase() + ', ' + costT(SB.Config.FLYER.HOURS[k]).toLowerCase(), on: effortOf() === k, fk: 'eff-' + k,
+                   onClick: function () { ui.effort = k; render(); } };
+        }) }) : null,
+        todo ? h('div', { class: 'cb-row cb-donow' }, [
+          costAct({ text: T('card', 'doNow'), label: T('card', 'doNowL', { job: j.label }), fk: 'now-' + j.id, hours: hours, refusal: can, size: 12, tut: 'card-donow', tutRef: j.id, fn: function () { doJob(j); } }),
+          can && can.ok && can.overtime > 0 ? h('span', { class: 'cb-typed cb-small cb-stayup', text: T('card', 'stayUp', { n: costT(can.overtime).toLowerCase() }) }) : null
+        ]) : null
       ];
-      return piece('cb-note is-' + String(status).toLowerCase(), status === 'DONE' || status === 'WAIVED' ? 'newsprint' : (i % 2 ? 'bone' : 'white'), kids, { tag: 'li', data: j.type === 'LOCK_BILL' ? { tut: 'bill-lock', 'tut-ref': showId } : (PROMO_JOBS[j.type] ? { tut: 'promo-job', 'tut-ref': showId } : null) });
+      return piece('cb-note is-' + String(status).toLowerCase() + (due && due.late ? ' is-late' : ''), status === 'DONE' || status === 'WAIVED' ? 'newsprint' : (i % 2 ? 'bone' : 'white'), kids,
+        { tag: 'li', data: j.type === 'LOCK_BILL' ? { tut: 'bill-lock', 'tut-ref': showId } : (PROMO_JOBS[j.type] ? { tut: 'promo-job', 'tut-ref': j.id } : null) });
+    }
+    function jobList(s, v, list, tut) {
+      return h('section', { class: 'cb-jobs' }, [
+        h('ol', { class: 'cb-notes', data: { tut: tut, 'tut-ref': showId } }, list.map(function (j, i) { return jobNote(s, j, i); })),
+        !list.length ? h('p', { class: 'cb-typed cb-pickhint', text: T('card', 'noJobs') }) : null
+      ]);
     }
 
     function riders(list, labelKey, played) {
@@ -1611,26 +2118,24 @@
        takes hours, and what you promise on the advance and on the night. Booking jobs (answer, hold, ask, confirm) are the
        card's own rows, so they are in neither. The one the texts point at first, then what is to do, then what is done. */
     function jobsSection(s, v, promo) {
-      var all = (v.jobs || []).filter(function (j) { return (j.group === 'TELLING') === promo && (promo || j.mode === 'HOURS'); }), jobs = all.filter(function (j) { return !j.covered && !j.hidden; }),
+      var all = (v.jobs || []).filter(function (j) { return (j.group === 'TELLING') === promo && (promo || j.mode === 'HOURS') && j.type !== 'MAKE_FLYER' && j.type !== 'LOCK_BILL'; }), jobs = all.filter(function (j) { return !j.covered && !j.hidden; }),
           cov = all.filter(function (j) { return j.covered && j.status !== 'MOOT'; }),
           main = jobs.filter(function (j) { return !j.optional && j.mode !== 'PROMISE'; }),
           opt = jobs.filter(function (j) { return j.optional && j.mode !== 'PROMISE'; }), adv = [], night = [], played = !!(s.shows[showId] && s.shows[showId].status === 'PLAYED');
-      var tc = safe(function () { return SB.Tutorial && SB.Tutorial.current ? SB.Tutorial.current(s) : null; }, null);
       (v.jobs || []).forEach(function (j) { if (j.covered || j.hidden) return; (j.riders || []).forEach(function (r) { if ((r.group === 'TELLING') === promo) (j.type === 'ADVANCE' ? adv : night).push(r); }); });
-      tutJob = tc && tc.step === 'PROMO' && tc.showId === showId ? tc.jobId : null;
-      main = main.map(function (j, i) { return { j: j, k: (j.id === tutJob ? 0 : (j.status === 'DONE' || j.waived ? 2 : 1)) * 1000 + i }; }).sort(function (a, b) { return a.k - b.k; }).map(function (x) { return x.j; });
+      main = sortJobs(s, main);                                   // what is due soonest first (late before all); what is done last
       return h('section', { class: 'cb-jobs' }, [
         h('ol', { class: 'cb-notes', data: { tut: promo ? 'promo-jobs' : 'prep-jobs', 'tut-ref': showId } }, main.map(function (j, i) { return jobNote(s, j, i); })),
         cov.length ? coveredNote(cov) : null,
         adv.length ? riders(adv, 'advance', played) : null,
         night.length ? riders(night, 'night', played) : null,
-        opt.length ? h('details', { class: 'cb-fold' }, [h('summary', { class: 'pz-hl' }, [D.stripArt(T('show', 'ifYouWant'), 11)]), h('ul', { class: 'cb-notes is-optional' }, opt.map(function (j, i) { return jobNote(s, j, i); }))]) : null,
+        opt.length ? h('details', { class: 'cb-fold' }, [h('summary', { class: 'pz-hl' }, [D.stripArt(T('show', 'ifYouWant'), 11)]), h('ul', { class: 'cb-notes is-optional' }, sortJobs(s, opt).map(function (j, i) { return jobNote(s, j, i); }))]) : null,
         !main.length && !cov.length && !adv.length && !night.length && !opt.length ? h('p', { class: 'cb-typed cb-pickhint', text: T('card', 'noJobs') }) : null
       ]);
     }
 
     function crewRow(s, v, role, labelKey) {
-      var list = safe(function () { return SB.People.crew(s, role, showId); }, []), cur = v.show.crew[role], yes = {}, out = {}, said = {}, curName, flag;
+      var list = safe(function () { return SB.People.crew(s, role, showId); }, []), cur = v.show.crew[role], yes = {}, out = {}, said = {}, curName, flag, noMsg = !!canMsg && canMsg.ok === false, anyAsk = false;
       asksFor(s, showId).forEach(function (a) {
         if (a.kind !== 'CREW' || (a.payload && a.payload.role && a.payload.role !== role)) return;
         if (a.status === 'YES') yes[a.toId] = true;
@@ -1648,18 +2153,23 @@
           h('span', { class: 'cb-typed cb-small', text: curName })]),
         flag || null,
         list.length ? D.tabs({ label: T('show', labelKey), items: list.map(function (p) {
-          var isOn = cur === p.personId, canPut = !!yes[p.personId], waiting = out[p.personId], lab;
+          var isOn = cur === p.personId, canPut = !!yes[p.personId], waiting = out[p.personId], lab, asks;
           lab = isOn ? T('show', 'on', { name: p.name }) : (canPut ? T('show', 'put', { name: p.name }) : (waiting ? T('show', waiting === 'SENT' ? 'asked' : 'queued', { name: p.name }) :
                 (said[p.personId] ? T('show', 'saidNo', { name: p.name }) : (p.busy ? T('show', 'busy', { name: p.name }) : T('show', 'ask', { name: p.name, rate: money(p.rate || 0) })))));
           if (waiting) return { text: String(p.name || '').split(' ')[0] + ' · ' + T('show', waiting === 'SENT' ? 'askedShort' : 'queuedShort'), label: lab, on: false, disabled: true, fk: 'cr-' + role + p.personId,
                                 art: D.face(p.personId, 30), w: 30, ah: 32, onClick: function () {} };
-          return { text: (canPut && !isOn ? '+ ' : '') + String(p.name || '').split(' ')[0] + ' ' + money(p.rate || 0), label: lab, on: isOn, disabled: isOn || (!canPut && !!p.busy), fk: 'cr-' + role + p.personId,
+          asks = !isOn && !canPut && !p.busy;                    // pressing it writes a message: half an hour of tonight
+          if (asks) anyAsk = true;
+          return { text: (canPut && !isOn ? '+ ' : '') + String(p.name || '').split(' ')[0] + ' ' + money(p.rate || 0) + (asks && costT(mailH()) ? ' · ' + costT(mailH()) : ''),
+                   label: lab + (asks && costT(mailH()) ? ', ' + costT(mailH()).toLowerCase() : '') + (asks && noMsg ? '. ' + whyT(canMsg) : ''), on: isOn, disabled: isOn || (!canPut && !!p.busy) || (asks && noMsg), no: asks && noMsg,
+                   fk: 'cr-' + role + p.personId, tut: asks ? 'crew-ask' : null, tutRef: asks ? p.personId : null,
                    art: D.face(p.personId, 30), w: 30, ah: 32,
                    onClick: function () {
                      if (canPut) act(function (x) { return SB.Shows.setCrew(x, showId, role, p.personId); });
-                     else act(function (x) { return SB.Mail.ask(x, 'CREW', p.personId, { showId: showId, role: role, pay: { kind: 'CASH', amount: p.rate || 0 } }); });
+                     else doAct(function (x) { return SB.Mail.ask(x, 'CREW', p.personId, { showId: showId, role: role, pay: { kind: 'CASH', amount: p.rate || 0 } }); });
                    } };
-        }), size: 12 }) : null
+        }), size: 12 }) : null,
+        anyAsk && noMsg ? h('p', { class: 'cb-typed cb-small cb-whynot', text: whyT(canMsg) }) : null
       ]);
     }
 
@@ -1711,8 +2221,8 @@
             D.act(T('bill', 'listedGo'), T('bill', 'listedGo'), 'ls-go', function () { close(); askBand(st(), bandId, slot, true); })
           ])
         ]), { label: T('bill', 'listedTitle') });
-      } else if (!r || r.ok === false) render();
-      else if (sel === 'slot-' + slot) pick('ask-' + bandId);
+      } else if (!r || r.ok === false) { if (r && (r.code === 'NO_TIME' || r.code === 'BURNT_OUT' || r.code === 'PHASE')) ui.noTime = whyT(r); render(); }
+      else { ui.noTime = null; if (sel === 'slot-' + slot) pick('ask-' + bandId); }
     }
 
     function what(s, id) {
@@ -1758,6 +2268,7 @@
       cards.forEach(function (c) { (piles[c.genre] = piles[c.genre] || []).push(c); });
       keys = Object.keys(piles).sort();
       out.push(D.word(T('bill', 'cands'), 22, { cls: 'cb-head' }));
+      out.push(h('p', { class: 'cb-typed cb-small cb-msgcost' + (canMsg && canMsg.ok === false ? ' cb-whynot' : ''), text: canMsg && canMsg.ok === false ? whyT(canMsg) : T('card', 'msgCost', { cost: costT(mailH()).toLowerCase() }) }));
       out.push(D.tickThing({ on: fl.freeOnly, text: T('bill', 'freeOnly'), label: T('bill', 'freeOnlyL'), fk: 'free', onClick: function () { fl.freeOnly = !fl.freeOnly; render(); } }));
       if (keys.length > 1) out.push(D.tabs({ label: T('bill', 'allPiles'), items: keys.map(function (g) {
         var name = word('genre.' + g + '.name', g);
@@ -1780,7 +2291,7 @@
     function candidate(s, c, on, ask, i, slot) {
       var rw = safe(function () { return SB.Bands.replyWindow(s, c.id); }, null), fee = safe(function () { return SB.Bands.fee(s, c.id, showId); }, null), w = 200, ht = 112, out = '', peeled = on || (ask && ask.status !== 'NO' && ask.status !== 'SILENT'),
           wv = peeled ? null : what(s, c.id), feeT = fee ? (fee.amount ? money(fee.amount) : word('localPay.' + fee.pay + '.name', lower(fee.pay))) : '?', stg = c.trust && c.trust.stage, el, lab, sh = Math.round(w * 0.42),
-          fit = fitOf(s, c.genre, billTop), withOk = !!(wv && wv.call && num(wv.call.hi) && wv.call.hi > 0);
+          fit = fitOf(s, c.genre, billTop), withOk = !!(wv && wv.call && num(wv.call.hi) && wv.call.hi > 0), noMsg = false;
       var sty = c.style && c.style !== c.genre ? word('style.' + c.style + '.name', c.style) : '';
       if (fit) ht += 20;
       if (sty && !peeled) ht += 14;
@@ -1803,13 +2314,16 @@
         lab = (sty ? sty + '. ' : '') + T('bill', 'pick', { name: c.name, fee: feeT, lo: rw ? rw.lo : '?', hi: rw ? rw.hi : '?', with: withOk ? T('bill', 'withThem', { lo: Math.round(wv.call.lo), hi: Math.round(wv.call.hi) }) : '' }) +
           (fit ? '. ' + T('bill', 'fitL.' + fit) : '') + (c.listedMembers ? '. ' + T('bill', 'listed') : '') + (stg ? '. ' + word('stage.' + stg, lower(stg)) : '');
       }
-      el = D.thing({ cls: 'cb-cand' + (peeled ? ' is-peeled' : ''), label: lab, tut: 'bill-cand', tutRef: showId, fk: 'cand-' + c.id, svg: out, w: w, h: peeled ? sh + 4 : ht,
-        onClick: peeled ? function () { SB.UI.go('band', { bandId: c.id }); } : function () { askBand(st(), c.id, slot, false); } });
-      return el;
+      /* peeling a sticker writes a message: when tonight has no half hour left the sticker is crossed out and stays put */
+      if (!peeled && canMsg && canMsg.ok === false) { noMsg = true; out += K().line(8, sh - 4, w - 10, 12, { seed: 'cn' + c.id, sw: 3 }); lab += '. ' + whyT(canMsg); }
+      else if (!peeled && costT(mailH())) lab += ', ' + costT(mailH()).toLowerCase();
+      el = D.thing({ cls: 'cb-cand' + (peeled ? ' is-peeled' : '') + (noMsg ? ' cb-nofit' : ''), label: lab, tut: 'bill-cand', tutRef: showId, fk: 'cand-' + c.id, svg: out, w: w, h: peeled ? sh + 4 : ht, disabled: noMsg,
+        onClick: peeled ? function () { SB.UI.go('band', { bandId: c.id }); } : (noMsg ? function () {} : function () { askBand(st(), c.id, slot, false); }) });
+      return noMsg ? el : preview(el, peeled ? 0 : mailH());
     }
 
-    /* Escape puts the picked row down (back to the forecast) */
-    keyHandler = function (e) { if (e.key === 'Escape' && sel) { e.stopPropagation(); e.preventDefault(); pick(null); } };
+    /* Escape puts HOW IT LOOKS away (back to the picked row); otherwise it is the close-up's own */
+    keyHandler = function (e) { if (e.key === 'Escape' && look) { e.stopPropagation(); e.preventDefault(); look = false; keepFocus(root, render); } };
     if (root && typeof root.addEventListener === 'function') root.addEventListener('keydown', keyHandler);
     mode = safe(function () { var x = st().shows[showId]; return x && LIVE[x.status] ? 'card' : 'show'; }, 'show');
     var undress = dress(root, mode, st());

@@ -3,7 +3,7 @@
 SB.module('Week', function (SB) {
   'use strict';
   return {
-    view: function () { return { week: 0, phase: 'PLAN', days: [], hours: { used: 0, cap: 27, over: 0 }, runway: [], risks: [] }; },
+    view: function () { return { week: 0, phase: 'PLAY', days: [], hours: { used: 0, cap: 40, over: 0 }, runway: [], risks: [], tonight: { day: 0, dayIdx: 0, off: false, cap: 4, used: 0, left: 4, reserved: 0, spent: 0, stay: { max: 1, used: 0, left: 1 }, tired: 0, show: false, showId: null, open: false, called: false, burnt: false, phoneOff: false, message: 0.5, stop: null }, crunch: [] }; },
     plan: function () { return { ok: true, overtime: 0, timing: 'ON_TIME', answer: null }; },
     unplan: function () { return { ok: true }; },
     addJob: function () { return { ok: true, jobId: 'j0' }; },
@@ -20,6 +20,11 @@ SB.module('Week', function (SB) {
     payBills: function () { return { ok: true, records: [] }; },
     nextWeek: function () { return { ok: true, records: [] }; },
     log: function () { return undefined; },
-    raise: function () { return undefined; }
+    raise: function () { return undefined; },
+    tonight: function () { return { day: 0, dayIdx: 0, off: false, cap: 4, used: 0, left: 4, reserved: 0, spent: 0, stay: { max: 1, used: 0, left: 1 }, tired: 0, show: false, showId: null, open: false, called: false, burnt: false, phoneOff: false, message: 0.5, stop: null }; },
+    canDoNow: function () { return { ok: true, hours: 0, cost: 0, overtime: 0 }; },
+    doNow: function () { return { ok: true, records: [], hours: 0, overtime: 0, done: true, tonight: { day: 0, dayIdx: 0, off: false, cap: 4, used: 0, left: 4, reserved: 0, spent: 0, stay: { max: 1, used: 0, left: 1 }, tired: 0, show: false, showId: null, open: false, called: false, burnt: false, phoneOff: false, message: 0.5, stop: null } }; },
+    endNight: function () { return { ok: true }; },
+    crunch: function () { return []; }
   };
 });

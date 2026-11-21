@@ -38,7 +38,7 @@ SB.Cities.register('stockton-ca', {
     { id: 'modesto', kind: 'PEER', name: 'Modesto', minutes: 45, bearing: 160, slug: 'modesto-ca', note: 'The closest peer: the same town with a different chip on its shoulder. Bands and crowds trade all the time.' },
     { id: 'merced', kind: 'PEER', name: 'Merced', minutes: 75, bearing: 150, slug: 'merced-ca', note: 'A farm-valley college town down SR-99.' },
     { id: 'vallejo', kind: 'PEER', name: 'Vallejo', minutes: 75, bearing: 275, slug: 'vallejo-ca', note: 'A Bay-edge port city; occasional crowd trade.' },
-    { id: 'fresno', kind: 'PEER', name: 'Fresno', minutes: 105, bearing: 150, scene: 2200, note: 'Bigger but the same Valley kinship; some tours stop at both.' }
+    { id: 'fresno', kind: 'PEER', name: 'Fresno', slug: 'fresno', minutes: 105, bearing: 150, scene: 2200, note: 'Bigger but the same Valley kinship; some tours stop at both.' }
   ],
 
   hoods: [

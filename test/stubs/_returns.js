@@ -17,7 +17,7 @@ var RANGE = '{ lo: 0, hi: 0 }';
 var GENS3 = '[0, 0, 0]';
 var REL = "{ value: 50, stage: 'STRANGER' }";
 var WINDOW_VIEW = "{ state: 'NONE', opens: null, idealUntil: null, lateFrom: null, missedAt: null, label: '', loss: null }";
-var JOB_VIEW = "{ id: 'j0', type: 'ANSWER_REQUEST', group: 'GETTING', mode: 'MESSAGE', showId: null, key: '', label: '', why: '', hours: 0, half: 'ANY', status: 'TODO', timing: null, by: null, byName: null, planned: null, rides: null, riders: [], optional: false, waived: null, opt: null, window: " + WINDOW_VIEW + ", needs: [], helper: null, helperOk: false, cost: null, text: null }";
+var JOB_VIEW = "{ id: 'j0', type: 'ANSWER_REQUEST', group: 'GETTING', mode: 'MESSAGE', showId: null, key: '', label: '', why: '', hours: 0, half: 'ANY', status: 'TODO', timing: null, by: null, byName: null, planned: null, rides: null, riders: [], optional: false, waived: null, opt: null, window: " + WINDOW_VIEW + ", due: null, needs: [], helper: null, helperOk: false, cost: null, text: null }";
 var REACH_STRIP = '{ gens: [0, 1, 2].map(function () { return { heard: ' + RANGE + ', reachable: ' + RANGE + ', usual: 0, missed: 0 }; }) }';
 var SHOW_ACCOUNTS = '{ door: 0, offTop: [], guarantee: 0, locals: [], left: 0, touringShare: 0, playerCosts: [], player: 0 }';
 var CALL = '{ lo: 0, hi: 0, mid: 0, byGen: [' + RANGE + ', ' + RANGE + ', ' + RANGE + '], unknowns: [] }';
@@ -47,12 +47,12 @@ module.exports = {
 
   /* ---- E1a / E1b ---- */
   'Game.newGame': STATE,
-  'Game.strip': "{ week: 0, from: 0, to: 6, phase: 'PLAN', fund: 0, bank: null, hours: { used: 0, cap: 27, over: 0 }, stress: { value: 0, zone: 'STEADY' }, name: 10, word: 22, wordTier: 'SKIPPED', stage: 1, badges: { inbox: 0, late: 0 } }",
+  'Game.strip': "{ week: 0, from: 0, to: 6, phase: 'PLAY', fund: 0, bank: null, hours: { used: 0, cap: 40, over: 0 }, tonight: null, stress: { value: 0, zone: 'STEADY' }, name: 10, word: 22, wordTier: 'SKIPPED', stage: 1, badges: { inbox: 0, late: 0 } }",
   'Game.setSetting': OK,
   'Game.adjustName': "{ t: 'NAME', day: 0, half: 'DAY', showId: null, text: '', from: 10, to: 10, k: arguments[2], beat: null }",
   'Game.adjustFollowers': 'undefined',
 
-  'Week.view': "{ week: 0, phase: 'PLAN', days: [], hours: { used: 0, cap: 27, over: 0 }, runway: [], risks: [] }",
+  'Week.view': "{ week: 0, phase: 'PLAY', days: [], hours: { used: 0, cap: 40, over: 0 }, runway: [], risks: [], tonight: { day: 0, dayIdx: 0, off: false, cap: 4, used: 0, left: 4, reserved: 0, spent: 0, stay: { max: 1, used: 0, left: 1 }, tired: 0, show: false, showId: null, open: false, called: false, burnt: false, phoneOff: false, message: 0.5, stop: null }, crunch: [] }",
   'Week.plan': "{ ok: true, overtime: 0, timing: 'ON_TIME', answer: null }",
   'Week.unplan': OK,
   'Week.addJob': "{ ok: true, jobId: 'j0' }",
@@ -70,6 +70,11 @@ module.exports = {
   'Week.nextWeek': '{ ok: true, records: [] }',
   'Week.log': 'undefined',
   'Week.raise': 'undefined',
+  'Week.tonight': "{ day: 0, dayIdx: 0, off: false, cap: 4, used: 0, left: 4, reserved: 0, spent: 0, stay: { max: 1, used: 0, left: 1 }, tired: 0, show: false, showId: null, open: false, called: false, burnt: false, phoneOff: false, message: 0.5, stop: null }",
+  'Week.canDoNow': '{ ok: true, hours: 0, cost: 0, overtime: 0 }',
+  'Week.doNow': "{ ok: true, records: [], hours: 0, overtime: 0, done: true, tonight: { day: 0, dayIdx: 0, off: false, cap: 4, used: 0, left: 4, reserved: 0, spent: 0, stay: { max: 1, used: 0, left: 1 }, tired: 0, show: false, showId: null, open: false, called: false, burnt: false, phoneOff: false, message: 0.5, stop: null } }",
+  'Week.endNight': OK,
+  'Week.crunch': '[]',
 
   'Shows.create': "{ ok: true, showId: 's0' }",
   'Shows.get': "{ id: arguments[1], status: 'DRAFT', day: 0, roomId: null, bill: { slots: [], times: [], doors: 0, ends: 0, locked: false }, deal: null, door: {}, promo: {}, prep: {}, crew: {}, mods: {}, result: null }",
@@ -117,6 +122,7 @@ module.exports = {
   'Mail.post': "'m0'",
   'Mail.flush': '{ records: [], hours: 0 }',
   'Mail.deliver': '{ records: [], stops: [] }',
+  'Mail.unqueue': OK,
 
   'Money.spend': "{ ok: true, from: 'FUND' }",
   'Money.earn': 'undefined',

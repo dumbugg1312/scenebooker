@@ -1,6 +1,13 @@
 /* Scene Booker — engine/week/week.js
- * SB.Week: plan, play, close and the next week; the log; decisions raised outside content events.
- * Owner: E1a. Spec: design/spec/02-engine.md 2.2, 5.1, 5.3, 5.4; 01-state clock and week; 00-overview 6.5.
+ * SB.Week: the night clock, play, close and the next week; the log; decisions raised outside content events.
+ * Owner: E1a. Spec: design/spec/02-engine.md 2.2, 5.1, 5.3, 5.4; 01-state clock and week; 00-overview 6.5;
+ * design/spec/10-night-clock.md (the turn is one evening: hours are spent on the spot, then the night is called).
+ *
+ * The night clock keeps three things beside the old week object:
+ *   state.week.spent[i]   hours spent on the spot on day i (jobs done tonight, messages written), stay-up included
+ *   state.clock.evening   the last day whose EVENING stop was raised (once a day)
+ *   state.player.tired    { day, hours }: what was stayed up last night comes off that day's hours
+ * Week.plan / unplan / check / startPlay are the old calendar's and stay only until the interface stops calling them.
  */
 SB.module('Week', function (SB) {
   'use strict';
@@ -13,11 +20,7 @@ SB.module('Week', function (SB) {
                VET_HISTORY: 'requestId', VET_ASK_AROUND: 'requestId', EXTRA_SHIFT: null, HARM_ASK: null,
                HARM_WORD: 'bandId', TOUR_ROUTE: 'tourId', TOUR_ADVANCE: 'tourId', FLYER_RUN: 'route' };
 
-  /* "The usual" (Week.suggest): the HOURS jobs of a show that Par assumes done on time.
-   * SPEC?: Config.USUAL names promotion only; Par also assumes "every night-side preparation done" (7.8), so the
-   * lock, the house rules, the neighbors, the advance and the thanks are suggested too. Never an optional job. */
-  var USUAL_JOBS = ['LOCK_BILL', 'MAKE_FLYER', 'ANNOUNCE', 'PRINT', 'FLYER_RUN', 'LISTINGS', 'MAILING_LIST', 'INVITES',
-                    'WEEK_PUSH', 'HOUSE_RULES', 'NEIGHBORS', 'ADVANCE', 'THANKS'];
+  var EPS = 1e-9;                                         // half hours are sums of floats
 
   /* ------------------------------------------------------------------ */
   /* small helpers                                                       */
@@ -69,10 +72,10 @@ SB.module('Week', function (SB) {
     return out;
   }
 
-  /* cap from HOURS, less COUCH.hours spread over days off, less FRIED.hoursOffDay on days off when fried, zero
-   * until burnoutUntil (5.4). */
+  /* cap from HOURS, less COUCH.hours spread over days off, less FRIED.hoursOffDay on days off when fried, less what
+   * was stayed up the night before (player.tired), zero until burnoutUntil (5.4). */
   function capsFor(state, W, n) {
-    var cap = [], i, off, left, fried, z, d;
+    var cap = [], i, off, left, fried, z, d, tired;
     for (i = 0; i < 7; i++) {
       off = !W.shifts[i] || W.dropped.indexOf(i) >= 0;
       cap.push({ DAY: off ? C.HOURS.off.DAY : C.HOURS.shift.DAY, NIGHT: off ? C.HOURS.off.NIGHT : C.HOURS.shift.NIGHT });
@@ -88,18 +91,24 @@ SB.module('Week', function (SB) {
     }
     z = SB.Stress.zone(state);
     fried = z === E.STRESS_ZONE.FRIED || z === E.STRESS_ZONE.BURNING_OUT;
+    tired = state.player.tired;
     for (i = 0; i < 7; i++) {
       off = !W.shifts[i] || W.dropped.indexOf(i) >= 0;
       if (fried && off) cap[i].DAY = Math.max(0, cap[i].DAY + C.FRIED.hoursOffDay);
+      if (tired && tired.day === n * 7 + i && tired.hours > 0) {    // the night before ran late: that much less today
+        left = Math.min(cap[i].NIGHT, tired.hours);
+        cap[i].NIGHT -= left;
+        cap[i].DAY = Math.max(0, cap[i].DAY - (tired.hours - left));
+      }
       if (burnt(state, n * 7 + i)) cap[i] = { DAY: 0, NIGHT: 0 };
     }
     return cap;
   }
 
   function blankWeek(state, n) {
-    var W = { n: n, shifts: shiftsFor(state), dropped: [], cap: null, used: [], plan: [], phoneOff: [], log: [], logN: 0,
+    var W = { n: n, shifts: shiftsFor(state), dropped: [], cap: null, used: [], spent: [], plan: [], phoneOff: [], log: [], logN: 0,
               shows: [], report: null }, i;
-    for (i = 0; i < 7; i++) W.used.push({ DAY: 0, NIGHT: 0 });
+    for (i = 0; i < 7; i++) { W.used.push({ DAY: 0, NIGHT: 0 }); W.spent.push(0); }
     W.cap = capsFor(state, W, n);
     return W;
   }
@@ -113,11 +122,25 @@ SB.module('Week', function (SB) {
     return idx < state.clock.cursor.dayIdx;
   }
 
-  /* Can something still be placed in (idx, half)? PLAN: any. PLAY: strictly after the cursor. */
+  /* the evening of the day under the cursor is still the player's: the night has not been called */
+  function eveningOpen(state) {
+    var c = state.clock;
+    if (c.phase !== E.PHASE.PLAY || c.cursor.half !== 'NIGHT') return false;
+    return !!(c.stop && c.stop.kind === E.STOP.EVENING);
+  }
+  /* the night of the day under the cursor has been called: what is left of the day plays out by itself */
+  function nightCalled(state) {
+    var c = state.clock;
+    return c.phase === E.PHASE.PLAY && c.cursor.half === 'NIGHT' && c.evening === dayOf(state, c.cursor.dayIdx) && !eveningOpen(state);
+  }
+
+  /* Can something still be placed in (idx, half)? PLAN: any. PLAY: strictly after the cursor, and tonight itself
+   * while the evening is open (what is put there is done when the night is called). */
   function open(state, idx, half) {
     var ph = state.clock.phase, cur = state.clock.cursor;
     if (ph === E.PHASE.PLAN) return true;
     if (ph !== E.PHASE.PLAY || frozen(state, idx)) return false;
+    if (idx === cur.dayIdx && half === 'NIGHT' && eveningOpen(state)) return true;
     return slotOf(idx, half) > slotOf(cur.dayIdx, cur.half);
   }
 
@@ -138,30 +161,43 @@ SB.module('Week', function (SB) {
     return (z && z.kind === 'FEEDER' && typeof z.minutes === 'number') ? z.minutes : 0;
   }
 
-  /* What a confirmed show reserves on its day (5.1, last paragraph). */
-  function reservation(state, idx) {
-    var day = dayOf(state, idx), r = { DAY: 0, NIGHT: 0 }, shows = myShowsOn(state, day), i, s, id, j, cfg, h, mins;
+  /* The hours a show of the player's takes of its day (5.1, last paragraph): the night itself, the promises that
+   * ride on it, the drive to a feeder town. Uncapped; reservation() fits it to the day. A show already played
+   * tonight still holds its evening. */
+  function showHours(state, day) {
+    var n = 0, shows = myShowsOn(state, day), i, s, id, j, cfg, mins;
     for (i = 0; i < shows.length; i++) {
       s = shows[i];
-      if (s.status !== 'CONFIRMED') continue;
-      r.DAY += C.SHOW_NIGHT_HOURS.DAY; r.NIGHT += C.SHOW_NIGHT_HOURS.NIGHT;
+      if (s.status !== 'CONFIRMED' && s.status !== 'PLAYED') continue;
+      n += C.SHOW_NIGHT_HOURS.DAY + C.SHOW_NIGHT_HOURS.NIGHT;
       for (id in (state.jobs || {})) {
         j = state.jobs[id];
         if (!j || j.showId !== s.id || j.status !== 'PROMISED') continue;
         cfg = C.JOBS[j.type];
         if (!cfg || cfg.rides !== 'RUN_SHOW' || !cfg.hours) continue;
-        h = cfg.half === 'NIGHT' ? 'NIGHT' : 'DAY';
-        r[h] += cfg.hours;
+        n += cfg.hours;
       }
       mins = zoneMinutes(state, s.zoneId);
-      if (mins > 0) r.NIGHT += 2 * C.FEEDER_DRIVE_HOURS_PER_30MIN * Math.ceil(mins / 30);
+      if (mins > 0) n += 2 * C.FEEDER_DRIVE_HOURS_PER_30MIN * Math.ceil(mins / 30);
     }
+    return n;
+  }
+
+  /* What a show reserves on its day, never more than the day has: running the show takes the evening and is not
+   * overtime by itself (spec 10). It fills the night first, so on a day off the hours before doors stay free. */
+  function reservation(state, idx) {
+    var cap = state.week.cap[idx], n = Math.min(showHours(state, dayOf(state, idx)), dayTotal(cap)), r = { DAY: 0, NIGHT: 0 };
+    r.NIGHT = Math.min(n, cap.NIGHT);
+    r.DAY = Math.min(n - r.NIGHT, cap.DAY);
     return r;
   }
 
+  function spentOn(W, idx) { return (W.spent && typeof W.spent[idx] === 'number') ? W.spent[idx] : 0; }
+
   function playerHours(item) { return item.by === 'player' ? (item.hours || 0) : 0; }
 
-  /* Recompute `used` for every day not yet played: the show reservation plus the player's planned hours. */
+  /* Recompute `used` for every day not yet played: the show reservation, what was spent on the spot, and the hours
+   * of anything still pencilled in the old way. */
   function refreshHours(state) {
     var W = state.week, i, k, r, it;
     if (!W) return;
@@ -172,6 +208,7 @@ SB.module('Week', function (SB) {
         it = W.plan[k];
         if (it.dayIdx === i) r[it.half] += playerHours(it);
       }
+      r.NIGHT = U.round(r.NIGHT + spentOn(W, i), 2);
       W.used[i] = r;
     }
   }
@@ -207,8 +244,304 @@ SB.module('Week', function (SB) {
     state.clock.pending.push({ kind: E.STOP.DECISION, decision: decision });
   }
 
+  function overtimeOf(before, add, capT) { return Math.max(0, before + add - capT) - Math.max(0, before - capT); }
+
   /* ------------------------------------------------------------------ */
-  /* planning                                                            */
+  /* the night clock (spec 10)                                           */
+  /* ------------------------------------------------------------------ */
+
+  function isOff(W, idx) { return !W.shifts[idx] || W.dropped.indexOf(idx) >= 0; }
+  function todayIdx(state) { return state.clock.cursor.dayIdx; }
+
+  /* hours the way a booker says them: half an hour, an hour, 1½ hours */
+  function hoursText(n) {
+    var whole = Math.floor(n + EPS), half = n - whole > 0.25;
+    if (!whole && half) return label('clock.half');
+    if (whole === 1 && !half) return label('clock.one');
+    return label('clock.many', { n: whole + (half ? '½' : '') });
+  }
+
+  /* One day's clock: the pool, what a show takes of it, what the player has spent (and still has pencilled in the
+   * old way), what is left, and the stay-up hour. Reads only. */
+  function clockOf(state, idx) {
+    var W = state.week, cap = dayTotal(W.cap[idx]), res = dayTotal(reservation(state, idx)), mine = spentOn(W, idx), free, z, max, k, over;
+    for (k = 0; k < W.plan.length; k++) if (W.plan[k].dayIdx === idx) mine += playerHours(W.plan[k]);
+    free = cap - res;
+    z = SB.Stress.zone(state);
+    /* nobody burning out stays up (5.4) */
+    max = (burnt(state, dayOf(state, idx)) || z === E.STRESS_ZONE.BURNING_OUT || z === E.STRESS_ZONE.BURNT_OUT) ? 0 : C.OVERTIME_MAX;
+    over = Math.max(0, mine - free);
+    return { cap: cap, reserved: res, free: free, mine: U.round(mine, 2), left: U.round(Math.max(0, free - mine), 2),
+             stayMax: max, stayUsed: U.round(over, 2), stayLeft: U.round(Math.max(0, max - over), 2) };
+  }
+
+  /* The evening's clock, for the meter that is always on screen. A view. */
+  function tonight(state) {
+    var c = state.clock, W = state.week, idx = todayIdx(state), day = dayOf(state, idx), k = clockOf(state, idx), t = state.player.tired,
+        shows = myShowsOn(state, day), show = null, i;
+    for (i = 0; i < shows.length && !show; i++) if (shows[i].status === 'CONFIRMED') show = shows[i];
+    return { day: day, dayIdx: idx, off: isOff(W, idx), cap: k.cap, used: U.round(k.cap - k.left, 2), left: k.left,
+             reserved: k.reserved, spent: k.mine,
+             stay: { max: k.stayMax, used: k.stayUsed, left: k.stayLeft },
+             tired: t && t.day === day ? t.hours : 0,
+             show: !!show, showId: show ? show.id : null,
+             open: eveningOpen(state), called: nightCalled(state), burnt: burnt(state, day), phoneOff: W.phoneOff.indexOf(idx) >= 0,
+             message: C.MAIL.hours, stop: c.stop ? c.stop.kind : null };
+  }
+
+  /* null when `hours` fit what is left of the day plus what is left of the stay-up hour; else the refusal, which says
+   * what it takes and what there is (and carries the numbers: need, left, stay). */
+  function fitsNo(state, idx, hours) {
+    var k, r, room;
+    if (burnt(state, dayOf(state, idx))) return no(E.REFUSE.BURNT_OUT);
+    k = clockOf(state, idx);
+    if (k.mine + hours - k.free <= k.stayMax + EPS) return null;
+    room = U.round(k.left + k.stayLeft, 2);
+    r = U.no(E.REFUSE.NO_TIME, !has('clock.noTime') ? label('refuse.NO_TIME') :
+             (room > 0 ? label('clock.noTime', { need: hoursText(hours), left: hoursText(room), stay: k.stayLeft > 0 })
+                       : label('clock.noTimeNone', { need: hoursText(hours) })));
+    r.need = hours; r.left = k.left; r.stay = k.stayLeft;
+    return r;
+  }
+
+  /* Hours past the day's own: stress now, and tomorrow starts that much short. `ot` is negative when time is given
+   * back (a message taken back the same evening). */
+  function stayedUp(state, idx, ot, records) {
+    var P = state.player, W = state.week, day = dayOf(state, idx), before = P.stress, t, r;
+    SB.Stress.add(state, C.STRESS.UP.OVERTIME * ot, 'OVERTIME');
+    t = U.round(Math.max(0, (P.tired && P.tired.day === day + 1 ? P.tired.hours : 0) + ot), 2);
+    P.tired = t > 0 ? { day: day + 1, hours: t } : null;
+    if (idx < 6 && !frozen(state, idx + 1)) W.cap[idx + 1] = capsFor(state, W, W.n)[idx + 1];   // Sunday's is read when Monday's week is made
+    if (ot > 0 && records) {
+      r = rec(state, E.REC.OVERTIME, { hours: ot, tired: ot, stress: U.round(P.stress - before, 2) }, day, 'NIGHT', null);
+      if (!SB.text.off && has('clock.stayedUp')) r.text = label('clock.stayedUp', { hours: hoursText(ot) });
+      records.push(r);
+    }
+  }
+
+  /* Put `hours` on the day's clock (negative: give them back). -> the stay-up hours this added. */
+  function charge(state, idx, hours, records) {
+    var W = state.week, k = clockOf(state, idx), ot = U.round(overtimeOf(k.mine, hours, k.free), 2), i;
+    if (!W.spent) { W.spent = []; for (i = 0; i < 7; i++) W.spent.push(0); }
+    W.spent[idx] = U.round(Math.max(0, spentOn(W, idx) + hours), 2);
+    if (ot) stayedUp(state, idx, ot, records);
+    refreshHours(state);
+    return ot;
+  }
+
+  /* Would `hours` fit tonight? -> Result (NO_TIME with the numbers, BURNT_OUT, OVER). Reads only. */
+  function fits(state, hours) {
+    if (state.clock.phase === E.PHASE.OVER) return no(E.REFUSE.OVER);
+    if (!state.week) return U.yes();
+    return fitsNo(state, todayIdx(state), hours) || U.yes();
+  }
+
+  /* Spend `hours` of tonight on the spot (a message written: SB.Mail). Refused when they do not fit even staying up.
+   * -> Result & { day, hours, overtime, records }: `day` is the evening charged, for a refund the same evening. */
+  function spend(state, hours) {
+    var idx, refuse, records = [], ot;
+    if (state.clock.phase === E.PHASE.OVER) return no(E.REFUSE.OVER);
+    if (!state.week) return U.yes({ day: null, hours: 0, overtime: 0, records: records });
+    idx = todayIdx(state);
+    refuse = fitsNo(state, idx, hours);
+    if (refuse) return refuse;
+    ot = charge(state, idx, hours, records);
+    log(state, records);
+    return U.yes({ day: dayOf(state, idx), hours: hours, overtime: ot, records: records });
+  }
+
+  /* Give back hours spent on evening `day`, if that evening is still the one under the cursor. -> true when given back. */
+  function refund(state, hours, day) {
+    var idx;
+    if (!state.week || state.clock.phase === E.PHASE.OVER) return false;
+    idx = todayIdx(state);
+    if (typeof day === 'number' && day !== dayOf(state, idx)) return false;   // written another evening: that time is gone
+    hours = Math.min(hours, spentOn(state.week, idx));
+    if (!(hours > 0)) return false;
+    charge(state, idx, -hours, null);
+    return true;
+  }
+
+  /* A helper is asked at once, in person, to take a job. -> { yes, text, records }
+   * SPEC?: the ask goes through People.answerAsk directly, so it is a transient object, not in state.asks. */
+  function askHelper(state, j, by, pay) {
+    var ask = { id: null, kind: E.ASK.HELPER_JOB, toId: by, showId: j.showId || null, jobId: j.id, requestId: null,
+                payload: { jobId: j.id, pay: pay, inPerson: true }, status: 'SENT', queuedDay: state.clock.day,
+                sentDay: state.clock.day, needBy: null, window: { lo: 0, hi: 0 }, chased: 0, answer: null, hid: {} }, a1, a2, records = [];
+    a1 = SB.People.answerAsk(state, ask, 'SEND') || {};
+    ask.hid = { answerDay: state.clock.day, will: a1.will || 'NO' };
+    a2 = SB.People.answerAsk(state, ask, 'DELIVER') || {};
+    if (a2.records && a2.records.length) { records = a2.records; log(state, records); }
+    return { yes: a2.status === 'YES', text: a2.text || '', records: records };
+  }
+
+  /* What doing a job tonight would take, or why it cannot be done: the checks of doNow, without doing it.
+   * -> { no: refusal } or { j, idx, day, by, hours, opt, cost, pay, effort } */
+  function nowCheck(state, jobId, o, where) {
+    var c = state.clock, refuse = phaseNo(state, [E.PHASE.PLAN, E.PHASE.PLAY]), j, cfg, idx, day, by, r, jv, effort = null, hours, opt, cost = 0, pay, x, w;
+    if (refuse) return { no: refuse };
+    if (c.stop && c.stop.kind === E.STOP.END_OF_WEEK) return { no: no(E.REFUSE.PHASE) };
+    j = job(state, jobId, where);
+    cfg = C.JOBS[j.type];
+    if (!cfg) return { no: no(E.REFUSE.INVALID) };
+    if (j.status === 'DONE' || j.status === 'SKIPPED' || j.status === 'MOOT') return { no: no(E.REFUSE.ALREADY) };
+    idx = todayIdx(state); day = dayOf(state, idx);
+    if (burnt(state, day)) return { no: no(E.REFUSE.BURNT_OUT) };
+    if (nightCalled(state)) return { no: U.no(E.REFUSE.PHASE, label(has('clock.nightOver') ? 'clock.nightOver' : 'refuse.PHASE')) };
+    by = o.by || 'player';
+    if (by !== 'player') {
+      if (!state.people || !state.people[by]) SB.fail(where, 'unknown person ' + by);
+      if (!cfg.helper) return { no: no(E.REFUSE.INVALID) };
+      if ((cfg.helperStage || 1) > state.player.stage) return { no: no(E.REFUSE.STAGE) };
+    }
+    r = SB.Jobs.canDo(state, jobId, day, 'NIGHT');
+    jv = jobView(state, jobId);
+    if (!r.ok) {
+      /* not open yet: say when it is */
+      w = jv && jv.window;
+      if (r.code === E.REFUSE.WINDOW && w && w.state === 'EARLY' && typeof w.opens === 'number' && w.opens > day && has('clock.early')) {
+        r = U.no(E.REFUSE.WINDOW, label('clock.early', { day: SB.time.fmt(w.opens, w.opens - day <= 6 ? 'dow' : 'md') }));
+        r.opens = w.opens;
+      }
+      return { no: r };
+    }
+    if (j.type === 'MAKE_FLYER') {
+      effort = o.effort || C.USUAL.effort;
+      if (!E.EFFORT[effort]) SB.fail(where, 'unknown effort ' + effort);
+    }
+    /* a helper costs only the asking */
+    hours = by !== 'player' ? C.MAIL.hours : (effort ? C.FLYER.HOURS[effort] : (jv && typeof jv.hours === 'number' ? jv.hours : cfg.hours));
+    opt = o.opt === undefined ? defaultOpt(j.type) : o.opt;
+    if (opt !== null && opt !== undefined) {
+      cost = optCost(state, j.type, opt);
+      if (cost < 0) SB.fail(where, 'unknown choice ' + opt + ' for ' + j.type);
+      if (cost > 0 && !SB.Money.canCover(state, cost)) return { no: no(E.REFUSE.NO_MONEY) };
+    } else opt = null;
+    pay = by !== 'player' ? (o.pay || null) : null;
+    if (pay && pay.kind === 'CASH' && pay.amount > 0 && !SB.Money.canCover(state, pay.amount + Math.max(0, cost || 0))) return { no: no(E.REFUSE.NO_MONEY) };
+    x = fitsNo(state, idx, hours);
+    if (x) { x.hours = hours; return { no: x }; }
+    return { j: j, idx: idx, day: day, by: by, hours: hours, opt: opt, cost: cost, pay: pay, effort: effort, jobHours: jv && typeof jv.hours === 'number' ? jv.hours : cfg.hours };
+  }
+
+  /* Can this job be done tonight (opts as doNow)? -> Result & { hours, cost, overtime } : the hours it takes, the money
+   * of its priced choice, and how much of it would be staying up. A view: for the button that says what it costs,
+   * or why it will not act. */
+  function canDoNow(state, jobId, opts) {
+    var p = nowCheck(state, jobId, opts || {}, 'Week.canDoNow'), k;
+    if (p.no) return p.no;
+    k = clockOf(state, p.idx);
+    return U.yes({ hours: p.hours, cost: p.cost || 0, overtime: U.round(overtimeOf(k.mine, p.hours, k.free), 2) });
+  }
+
+  /* Do a job tonight: it resolves on the spot and its hours come off tonight's clock (spec 10).
+   * opts = { effort (MAKE_FLYER: ROUGH | STANDARD | SHARP), opt (the priced choice), by (a helper's person id), pay }.
+   * Handed to a helper (opts.by), the job costs only the half hour of asking: they do it tonight, and it is reported
+   * when the night is called.
+   * -> Result & { records, hours, overtime, done, tonight } ; with a helper also { handed, answer: { status, text } }.
+   * Refuses NO_TIME (need, left, stay) when it does not fit tonight plus the stay-up hour; WINDOW / NEEDS when the job
+   * is not open; NO_MONEY, BURNT_OUT, ALREADY, INVALID as Week.plan did. */
+  function doNow(state, jobId, opts) {
+    var o = opts || {}, p = nowCheck(state, jobId, o, 'Week.doNow'), W = state.week, i, old = null, recs, ot, k, h, code = null;
+    if (p.no) return p.no;
+    i = planIndex(state, jobId);
+    if (i >= 0) { old = W.plan.splice(i, 1)[0]; refreshHours(state); }   // pencilled in, or handed off: tonight replaces that
+
+    if (p.by !== 'player') {
+      h = askHelper(state, p.j, p.by, p.pay);
+      recs = h.records.slice();
+      ot = charge(state, p.idx, p.hours, recs);                         // the asking took the half hour either way
+      if (h.yes) W.plan.push({ jobId: jobId, dayIdx: p.idx, half: 'NIGHT', hours: p.jobHours, by: p.by, pay: p.pay, opt: p.opt, effort: null });
+      else if (old) W.plan.splice(i, 0, old);
+      refreshHours(state);
+      log(state, recs);
+      if (SB.Tutorial && SB.Tutorial.notify) SB.Tutorial.notify(state, 'STEP', null);
+      return U.yes({ records: recs, hours: p.hours, overtime: ot, done: false, handed: h.yes,
+                     answer: { status: h.yes ? 'YES' : 'NO', text: h.text }, tonight: tonight(state) });
+    }
+
+    recs = SB.Jobs.resolve(state, jobId, { day: p.day, half: 'NIGHT', by: 'player', pay: null, opt: p.opt, effort: p.effort, hours: p.hours }) || [];
+    for (k = 0; k < recs.length; k++) if (recs[k] && recs[k].t === E.REC.JOB_BLOCKED && recs[k].jobId === jobId) code = recs[k].code;
+    if (code) {                                                         // it could not be started: nothing is spent
+      if (old) { W.plan.splice(i, 0, old); refreshHours(state); }
+      return no(code);
+    }
+    ot = charge(state, p.idx, p.hours, recs);
+    log(state, recs);
+    if (SB.Tutorial && SB.Tutorial.notify) SB.Tutorial.notify(state, 'STEP', null);
+    return U.yes({ records: recs, hours: p.hours, overtime: ot, done: !!(state.jobs[jobId] && state.jobs[jobId].status === 'DONE'),
+                   tonight: tonight(state) });
+  }
+
+  /* Call it a night: the EVENING stop is cleared, and the next Week.step carries on with the rest of the day
+   * (what a helper took tonight, the show if there is one, the evening send, the next morning). */
+  function endNight(state) {
+    var c = state.clock;
+    if (c.phase === E.PHASE.OVER) return no(E.REFUSE.OVER);
+    if (!c.stop || c.stop.kind !== E.STOP.EVENING) return no(E.REFUSE.PHASE);
+    c.stop = null;
+    return U.yes();
+  }
+
+  /* ---- what is due when, and whether the hours are there ---- */
+
+  /* The hours still free on a day: tonight what is left; a later day its pool less its show (and anything already on
+   * it). A day past this week is read off this week's shift pattern: a shift torn off there is not known yet. */
+  function freeOn(state, day, memo) {
+    var W = state.week, idx = day - W.n * 7, wk, caps;
+    if (idx >= 0 && idx <= 6) return clockOf(state, idx).left;
+    wk = Math.floor(day / 7);
+    if (!memo[wk]) memo[wk] = capsFor(state, { shifts: W.shifts, dropped: [] }, wk);
+    caps = dayTotal(memo[wk][day - wk * 7]);
+    return Math.max(0, caps - Math.min(caps, showHours(state, day)));
+  }
+
+  /* the job views of every show the player still has work on: live shows, and a show just played (the thanks) */
+  function dueViews(state) {
+    var out = [], today = dayOf(state, todayIdx(state)), id, s;
+    for (id in (state.shows || {})) {
+      s = state.shows[id];
+      if (!s || !(s.status === 'DRAFT' || s.status === 'CONFIRMED' || (s.status === 'PLAYED' && s.day >= today - 8))) continue;
+      try { out = out.concat(SB.Jobs.forShow(state, id)); } catch (e) { /* a show with no jobs yet */ }
+    }
+    return out;
+  }
+
+  function crunchOf(state, views) {
+    var today = dayOf(state, todayIdx(state)), until = today + C.CRUNCH_DAYS, due = {}, days, out = [], memo = {}, need = 0, have = 0,
+        at = today, jobs = [], i, k, v, d;
+    if (state.clock.phase !== E.PHASE.PLAN && state.clock.phase !== E.PHASE.PLAY) return out;
+    for (i = 0; i < views.length; i++) {
+      v = views[i];
+      if (!v || v.mode !== 'HOURS' || v.optional || v.hidden || v.covered || v.status !== 'TODO' || v.planned) continue;   // PLANNED: on a day, or somebody has it
+      if (!v.window || typeof v.window.idealUntil !== 'number' || v.window.state === 'MISSED' || v.window.state === 'DONE' || v.window.state === 'NONE') continue;
+      if (v.type === 'FLYER_RUN' && String(v.key || '').indexOf('#') >= 0) continue;   // a second run is an extra
+      if (state.jobs[v.id] && usualSkips(state, state.jobs[v.id])) continue;
+      if (v.showId && state.shows[v.showId] && state.shows[v.showId].status === 'DRAFT') continue;   // no room yet: nothing to tell anybody
+      /* Due by its last on-time day; already late (a show booked at short notice is late from its first day), by the
+       * last day it still does any good, so a late flyer is not "twelve hours due tonight" */
+      d = v.window.idealUntil >= today ? v.window.idealUntil :
+          (typeof v.window.missedAt === 'number' ? Math.max(today, v.window.missedAt - 1) : today);
+      if (d > until) continue;
+      (due[d] = due[d] || []).push(v);
+    }
+    days = Object.keys(due).map(Number).sort(function (a, b) { return a - b; });
+    for (i = 0; i < days.length; i++) {
+      d = days[i];
+      for (; at <= d; at++) have += freeOn(state, at, memo);
+      for (k = 0; k < due[d].length; k++) { need += due[d][k].hours || 0; jobs.push(due[d][k].id); }
+      if (need > have + EPS) out.push({ day: d, need: U.round(need, 2), have: U.round(have, 2), short: U.round(need - have, 2), jobs: jobs.slice() });
+    }
+    return out;
+  }
+
+  /* The due days coming up (the next CRUNCH_DAYS days) with more work than hours: for each, the player's own open,
+   * uncovered, non-optional work due by that day (`need`) against the hours free from tonight through it (`have`).
+   * -> [{ day, need, have, short, jobs: [jobId] }], soonest first; empty when everything fits. A view. */
+  function crunch(state) { return crunchOf(state, dueViews(state)); }
+
+  /* ------------------------------------------------------------------ */
+  /* planning (the old calendar: kept until the interface stops calling it) */
   /* ------------------------------------------------------------------ */
 
   function planIndex(state, jobId) {
@@ -266,7 +599,7 @@ SB.module('Week', function (SB) {
 
   function plan(state, jobId, dayIdx, half, opts) {
     var o = opts || {}, refuse = phaseNo(state, [E.PHASE.PLAN, E.PHASE.PLAY]), j, cfg, jv, day, r, by, hours, used, capT,
-        over, opt, cost, z, timing = null, w, ask, a1, a2, prev = -1, item, pay, records = [];
+        over, opt, cost, z, timing = null, w, a2, prev = -1, item, pay;
     if (refuse) return refuse;
     if (state.clock.stop && state.clock.stop.kind === E.STOP.END_OF_WEEK) return no(E.REFUSE.PHASE);
     j = job(state, jobId, 'Week.plan');
@@ -321,15 +654,8 @@ SB.module('Week', function (SB) {
 
     // a helper is asked at once, in person
     if (by !== 'player') {
-      ask = { id: null, kind: E.ASK.HELPER_JOB, toId: by, showId: j.showId || null, jobId: jobId, requestId: null,
-              payload: { jobId: jobId, pay: pay, inPerson: true }, status: 'SENT', queuedDay: state.clock.day,
-              sentDay: state.clock.day, needBy: null, window: { lo: 0, hi: 0 }, chased: 0, answer: null, hid: {} };
-      // SPEC?: Week.plan asks through People.answerAsk directly, so the ask is a transient object, not in state.asks.
-      a1 = SB.People.answerAsk(state, ask, 'SEND') || {};
-      ask.hid = { answerDay: state.clock.day, will: a1.will || 'NO' };
-      a2 = SB.People.answerAsk(state, ask, 'DELIVER') || {};
-      if (a2.records && a2.records.length) { records = a2.records; log(state, records); }
-      if (a2.status !== 'YES') {
+      a2 = askHelper(state, j, by, pay);
+      if (!a2.yes) {
         if (item) { state.week.plan.splice(prev, 0, item); refreshHours(state); }
         return U.yes({ overtime: 0, timing: null, answer: { status: 'NO', text: a2.text || '' }, planned: false });
       }
@@ -437,10 +763,10 @@ SB.module('Week', function (SB) {
   }
 
   /* ------------------------------------------------------------------ */
-  /* the usual                                                           */
+  /* the usual (retired)                                                 */
   /* ------------------------------------------------------------------ */
 
-  /* Jobs the usual leaves out on purpose (Config.USUAL), so the check does not count them late either. */
+  /* Jobs Par does not assume (Config.USUAL), so neither the check nor the crunch counts them. */
   function usualSkips(state, j) {
     if (j.type === 'LISTINGS' && !C.USUAL.listings) return true;
     if (j.type === 'WEEK_PUSH' && !C.USUAL.push) return true;
@@ -448,72 +774,9 @@ SB.module('Week', function (SB) {
     return false;
   }
 
-  function suggest(state) {
-    var out = [], W = state.week, load = [], cands = [], placed = [], wk0 = state.clock.week * 7, i, id, j, jv, w, h,
-        type, k, s, ideal, d, slot, found, halves, it, r, lowest;
-    if (state.clock.phase !== E.PHASE.PLAN && state.clock.phase !== E.PHASE.PLAY) return out;
-    refreshHours(state);                                  // the hours a show confirmed since the last look reserves
-    for (i = 0; i < 7; i++) load.push(dayTotal(W.used[i]));
-    for (k = 0; k < W.plan.length; k++) {
-      it = W.plan[k];
-      if (!it.resolved) placed.push({ jobId: it.jobId, slot: slotOf(it.dayIdx, it.half) });
-    }
-    for (id in (state.jobs || {})) {
-      j = state.jobs[id];
-      if (!j || !j.showId || USUAL_JOBS.indexOf(j.type) < 0) continue;
-      if (j.status !== 'TODO') continue;
-      if (planIndex(state, id) >= 0) continue;
-      if (C.JOBS[j.type].optional) continue;
-      if (j.type === 'FLYER_RUN' && String(j.key || '').indexOf('#') >= 0) continue;
-      if (usualSkips(state, j)) continue;
-      s = state.shows && state.shows[j.showId];
-      if (!s || (s.status !== 'DRAFT' && s.status !== 'CONFIRMED' && !(s.status === 'PLAYED' && j.type === 'THANKS'))) continue;
-      jv = jobView(state, id);
-      w = jv && jv.window;
-      if (!w || w.state === 'DONE' || w.state === 'MISSED' || w.state === 'NONE' || typeof w.idealUntil !== 'number') continue;
-      cands.push({ id: id, j: j, jv: jv, w: w });
-    }
-    cands.sort(function (a, b) {
-      return (a.w.idealUntil - b.w.idealUntil) || (JOB_ORDER.indexOf(a.j.type) - JOB_ORDER.indexOf(b.j.type));
-    });
-    lowest = state.clock.phase === E.PHASE.PLAN ? 0 : slotOf(state.clock.cursor.dayIdx, state.clock.cursor.half) + 1;
-    for (i = 0; i < cands.length; i++) {
-      j = cands[i].j; w = cands[i].w; type = j.type;
-      ideal = w.idealUntil - wk0;                         // the ideal day as a dayIdx of this week (may be outside)
-      if (ideal > 6) continue;                            // its week has not come
-      h = type === 'MAKE_FLYER' ? C.FLYER.HOURS[C.USUAL.effort] : (typeof cands[i].jv.hours === 'number' ? cands[i].jv.hours : C.JOBS[type].hours);
-      halves = C.JOBS[type].half === 'DAY' ? ['DAY'] : (C.JOBS[type].half === 'NIGHT' ? ['NIGHT'] : ['NIGHT', 'DAY']);
-      found = null;
-      if (ideal >= 0) {                                   // on or before the ideal day, as late as fits
-        for (d = Math.min(6, ideal); d >= 0 && !found; d--) found = tryDay(d);
-      }
-      if (!found) {                                       // already late, or nothing fit before: as soon as it fits
-        for (d = Math.max(0, ideal + 1); d <= 6 && !found; d++) found = tryDay(d);
-      }
-      if (!found) continue;
-      load[found.dayIdx] += h;
-      placed.push({ jobId: cands[i].id, slot: slotOf(found.dayIdx, found.half) });
-      out.push({ jobId: cands[i].id, type: type, args: null, dayIdx: found.dayIdx, half: found.half, hours: h, by: 'player',
-                 opt: defaultOpt(type), why: (cands[i].jv && cands[i].jv.why) || '' });
-    }
-    return out;
-
-    function tryDay(d) {
-      var x, hf, sl, res, dy = wk0 + d;
-      if (load[d] + h > dayTotal(W.cap[d])) return null;
-      if (burnt(state, dy)) return null;
-      if (typeof w.opens === 'number' && dy < w.opens) return null;
-      if (typeof w.missedAt === 'number' && dy >= w.missedAt) return null;
-      for (x = 0; x < halves.length; x++) {
-        hf = halves[x]; sl = slotOf(d, hf);
-        if (sl < lowest || !open(state, d, hf)) continue;
-        res = SB.Jobs.canDo(state, cands[i].id, dy, hf);
-        if (!res.ok && !(res.code === E.REFUSE.NEEDS && needsPlacedEarlier(state, j, sl, placed))) continue;
-        return { dayIdx: d, half: hf };
-      }
-      return null;
-    }
-  }
+  /* "The usual" stamped every job onto the calendar by itself. It is retired from play (spec 10): the hours are
+   * the player's to fit, night by night. Kept as a name the interface may still call; it suggests nothing. */
+  function suggest(state) { return []; }
 
   /* The asks that are part of the usual (02-engine 2.2, "the usual"): sound for every show whose room is confirmed, and
    * security as soon as a room that requires it is held. Each to the crew person the booker knows best who is free that
@@ -633,7 +896,7 @@ SB.module('Week', function (SB) {
 
   function view(state) {
     var W = state.week, days = [], i, d, k, it, jv, items, outbox = 0, other, hours = { used: 0, cap: 0, over: 0 }, runway = [],
-        shows, id, s, jobs, next, risks = [], strip, room;
+        shows, id, s, jobs, next, risks = [], strip, room, all = [];
     try { outbox = SB.Mail.outbox(state).length; } catch (e) { outbox = 0; }
     refreshHours(state);
     for (i = 0; i < 7; i++) {
@@ -668,6 +931,7 @@ SB.module('Week', function (SB) {
     for (i = 0; i < shows.length; i++) {
       s = shows[i];
       try { jobs = SB.Jobs.forShow(state, s.id); } catch (e) { jobs = []; }
+      all = all.concat(jobs);
       next = null;
       for (k = 0; k < jobs.length; k++) {
         if (jobs[k].status !== 'TODO' || jobs[k].optional || !jobs[k].window || typeof jobs[k].window.lateFrom !== 'number') continue;
@@ -679,7 +943,13 @@ SB.module('Week', function (SB) {
                     jobs: jobs, reach: strip, next: next });
     }
     try { risks = SB.Director.risks(state); } catch (e) { risks = []; }
-    return { week: state.clock.week, phase: state.clock.phase, days: days, hours: hours, runway: runway, risks: risks };
+    /* the crunch reads the runway's own job views, plus a show just played (its thanks is still due) */
+    for (id in (state.shows || {})) {
+      s = state.shows[id];
+      if (s && s.status === 'PLAYED' && s.day >= state.clock.day - 8) { try { all = all.concat(SB.Jobs.forShow(state, id)); } catch (e) { /* no jobs */ } }
+    }
+    return { week: state.clock.week, phase: state.clock.phase, days: days, hours: hours, runway: runway, risks: risks,
+             tonight: tonight(state), crunch: crunchOf(state, all) };
   }
 
   function isToday(state, idx) {
@@ -690,7 +960,6 @@ SB.module('Week', function (SB) {
   function issue(state, code, jobId, key, slots, fix) {
     return { code: code, jobId: jobId || null, text: say(state, 'strings.check.' + key, slots, label('refuse.' + code)), fix: fix || null };
   }
-  function hoursText(n) { return n === 1 ? 'an hour' : n + ' hours'; }
   function showLabel(state, s) {
     var room = s && s.roomId && state.rooms ? state.rooms[s.roomId] : null;
     return s ? SB.time.fmt(s.day, 'short') + (room && room.name ? ' at ' + room.name : '') : '';
@@ -707,7 +976,7 @@ SB.module('Week', function (SB) {
   }
 
   function check(state) {
-    var W = state.week, issues = [], i, tray, k, jv, n = 0, needs, id, s, req, dow, over, what;
+    var W = state.week, issues = [], i, tray, k, jv, needs, id, s, req, dow, over, what;
     refreshHours(state);
     for (i = 0; i < 7; i++) {
       if (frozen(state, i)) continue;
@@ -729,8 +998,6 @@ SB.module('Week', function (SB) {
       s = jv.showId && state.shows ? state.shows[jv.showId] : null;
       issues.push(issue(state, E.REFUSE.WINDOW, jv.id, 'late', { job: jv.label, show: showLabel(state, s) }, { type: 'PLAN', args: { jobId: jv.id } }));
     }
-    try { n = SB.Mail.outbox(state).length; } catch (e) { n = 0; }
-    if (n > C.MAIL.freePerDay) issues.push(issue(state, E.REFUSE.TOO_MANY, null, 'mail', { n: n, free: C.MAIL.freePerDay }));
     for (id in (state.shows || {})) {
       s = state.shows[id];
       if (s && s.status === 'DRAFT' && s.hold && typeof s.hold.expires === 'number' &&
@@ -757,9 +1024,12 @@ SB.module('Week', function (SB) {
   /* play                                                                */
   /* ------------------------------------------------------------------ */
 
+  /* A week plays from its first morning by itself (spec 10): nobody sits in PLAN. This is still here for a caller of
+   * the old calendar and for a save made while planning; in a week already playing it changes nothing. */
   function startPlay(state) {
-    var refuse = phaseNo(state, [E.PHASE.PLAN]);
+    var refuse = phaseNo(state, [E.PHASE.PLAN, E.PHASE.PLAY]);
     if (refuse) return refuse;
+    if (state.clock.phase === E.PHASE.PLAY) return U.yes();
     state.clock.phase = E.PHASE.PLAY;
     state.clock.cursor = { dayIdx: 0, half: E.HALF.DAY };
     state.clock.done = 0;
@@ -795,17 +1065,17 @@ SB.module('Week', function (SB) {
     return out;
   }
 
-  function overtimeOf(before, add, capT) { return Math.max(0, before + add - capT) - Math.max(0, before - capT); }
-
   function addAll(list, more) { var i; if (more) for (i = 0; i < more.length; i++) if (more[i]) list.push(more[i]); }
 
   function step(state) {
     var c = state.clock, W = state.week, records = [], idx, half, day, off, phoneDay, r, i, items, it, j, ctx, recs, stops,
-        before, ot, shows, s, run, id, d, quiet, capT, base, k, dowT, weather, before2;
+        before, ot, shows, s, run, id, d, quiet, capT, base, k, dowT, weather;
     if (c.phase === E.PHASE.OVER) return refusedStep(state, E.REFUSE.OVER);
+    if (c.phase === E.PHASE.PLAN) startPlay(state);       // a save made while planning: the week just plays
     if (c.phase !== E.PHASE.PLAY) return refusedStep(state, E.REFUSE.PHASE);
     if (c.stop) {
       if (c.stop.kind === E.STOP.DECISION) return refusedStep(state, E.REFUSE.STOP_PENDING);
+      if (c.stop.kind === E.STOP.EVENING) return refusedStep(state, E.REFUSE.STOP_PENDING);   // the evening is the player's until Week.endNight
       if (c.stop.kind === E.STOP.SETTLE && !showDone(state, c.stop.showId)) return refusedStep(state, E.REFUSE.STOP_PENDING);
       if (c.stop.kind === E.STOP.SHOW_NIGHT && !showDone(state, c.stop.showId)) return refusedStep(state, E.REFUSE.STOP_PENDING);
       if (c.stop.kind === E.STOP.END_OF_WEEK) return stepResult(state, records);
@@ -854,10 +1124,22 @@ SB.module('Week', function (SB) {
       return stepResult(state, records);
     }
 
-    // 4. The plan items of this half-day, in plan order
+    // 3b. The evening: once a day, when the day reaches its night, the hours are the player's (spec 10). Nothing
+    // of the night runs until Week.endNight. A burnt-out day has no hours to spend, so it does not stop.
+    if (half === 'NIGHT' && !(c.evening >= day)) {
+      c.evening = day;
+      if (!burnt(state, day)) {
+        refreshHours(state);
+        c.stop = { kind: E.STOP.EVENING, day: day, dayIdx: idx };
+        return stepResult(state, records);
+      }
+    }
+
+    // 4. What was left for this half-day: a job a helper took tonight, anything pencilled in the old way; in order
     items = [];
     for (i = 0; i < W.plan.length; i++) if (W.plan[i].dayIdx === idx && W.plan[i].half === half) items.push(W.plan[i]);
     capT = dayTotal(W.cap[idx]);
+    /* what was pencilled in counts first, and what was spent on the spot on top of it (charge): staying up is charged once */
     base = dayTotal(reservation(state, idx));
     if (half === 'NIGHT') for (i = 0; i < W.plan.length; i++) if (W.plan[i].dayIdx === idx && W.plan[i].half === 'DAY') base += playerHours(W.plan[i]);
     for (i = 0; i < c.done && i < items.length; i++) base += playerHours(items[i]);
@@ -876,10 +1158,7 @@ SB.module('Week', function (SB) {
       it.resolved = true;
       ot = overtimeOf(base, playerHours(it), capT);
       base += playerHours(it);
-      if (ot > 0) {
-        records.push(rec(state, E.REC.OVERTIME, { hours: ot }, day, half, null));
-        SB.Stress.add(state, C.STRESS.UP.OVERTIME * ot, 'OVERTIME');
-      }
+      if (ot > 0) stayedUp(state, idx, ot, records);
       stops = stopsFrom(state, recs);
       if (stops.length) {
         for (k = 0; k < stops.length; k++) c.pending.push(stops[k]);
@@ -918,21 +1197,12 @@ SB.module('Week', function (SB) {
       }
     }
 
-    // 6. Evening
+    // 6. Evening: what was written goes out. Each message took its half hour when it was written; the send is free.
     if (half === 'NIGHT' && c.sent < day) {
       c.sent = day;
       if (!off) {
         r = SB.Mail.flush(state, day) || {};
         addAll(records, r.records);
-        if (r.hours > 0) {
-          before2 = dayTotal(W.used[idx]);
-          W.used[idx].NIGHT += r.hours;
-          ot = overtimeOf(before2, r.hours, capT);
-          if (ot > 0) {
-            records.push(rec(state, E.REC.OVERTIME, { hours: ot }, day, half, null));
-            SB.Stress.add(state, C.STRESS.UP.OVERTIME * ot, 'OVERTIME');
-          }
-        }
       }
       if (phoneDay) {
         before = state.player.stress;
@@ -949,7 +1219,8 @@ SB.module('Week', function (SB) {
       }
     }
 
-    // 7. Advance the cursor
+    // 7. Advance the cursor (the day's hours are last counted here: a played day is frozen)
+    refreshHours(state);
     if (half === 'DAY') { c.cursor = { dayIdx: idx, half: E.HALF.NIGHT }; c.done = 0; }
     else if (idx < 6) { c.cursor = { dayIdx: idx + 1, half: E.HALF.DAY }; c.done = 0; }
     else c.stop = { kind: E.STOP.END_OF_WEEK };
@@ -1130,7 +1401,7 @@ SB.module('Week', function (SB) {
     }
 
     n = c.week + 1;
-    c.week = n; c.day = n * 7; c.phase = E.PHASE.PLAN;
+    c.week = n; c.day = n * 7; c.phase = E.PHASE.PLAY;      // the new week plays from Monday morning by itself (spec 10)
     c.cursor = { dayIdx: 0, half: E.HALF.DAY }; c.done = 0; c.stop = null;
     if (typeof P.burnoutUntil === 'number' && P.burnoutUntil <= c.day) P.burnoutUntil = null;
     state.week = blankWeek(state, n);                     // clock.pending is kept: it opens Monday morning
@@ -1150,7 +1421,10 @@ SB.module('Week', function (SB) {
     view: view, plan: plan, unplan: unplan, addJob: addJob, removeJob: removeJob, suggest: suggest, suggestAsks: suggestAsks, dropShift: dropShift,
     setDayJob: setDayJob, phoneOff: phoneOff, check: check, startPlay: startPlay, step: step, decide: decide, close: close,
     payBills: payBills, nextWeek: nextWeek, log: log, raise: raise,
-    /* not in the manifest: E1a's own helpers, used by Game */
-    blankWeek: blankWeek, refreshHours: refreshHours, resetShape: resetShape, recap: recap
+    /* the night clock (spec 10) */
+    tonight: tonight, canDoNow: canDoNow, doNow: doNow, endNight: endNight, crunch: crunch,
+    /* not in the manifest: E1a's own helpers, used by Game; fits / spend / refund are the clock as SB.Mail charges it */
+    blankWeek: blankWeek, refreshHours: refreshHours, resetShape: resetShape, recap: recap,
+    fits: fits, spend: spend, refund: refund
   };
 });

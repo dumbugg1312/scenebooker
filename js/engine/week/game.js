@@ -40,15 +40,16 @@ SB.module('Game', function (SB) {
       rng: SB.rng.init(),
       ids: {},
       flags: {},
-      clock: { day: 0, week: 0, phase: E.PHASE.PLAN, cursor: { dayIdx: 0, half: E.HALF.DAY },
-               opened: -1, done: 0, sent: -1, stop: null, pending: [] },
+      /* a game is in play from its first morning (spec 10): nobody sits in PLAN. evening: the last day whose EVENING stop was raised */
+      clock: { day: 0, week: 0, phase: E.PHASE.PLAY, cursor: { dayIdx: 0, half: E.HALF.DAY },
+               opened: -1, done: 0, sent: -1, evening: -1, stop: null, pending: [] },
       player: {
         bookingName: o.bookingName, mark: o.mark || null,
         houseStyle: { templates: {}, inks: {}, papers: {}, treatments: {} },
         name: C.NAME_START, nameLine: [C.NAME_START], followers: C.FOLLOWERS_START, stage: 1,
         stress: C.STRESS.START, stressLog: [],
         dayJob: bills ? E.DAY_JOB.FULL : E.DAY_JOB.NONE, dayJobNext: null, dayJobLater: null, shiftDrops: 0,
-        couch: false, strikes: 0, burnoutUntil: null, houseRules: false, mailingList: 0,
+        couch: false, strikes: 0, burnoutUntil: null, tired: null, houseRules: false, mailingList: 0,
         showsPlayed: 0, lastShowWeek: null, recentGenres: [],
         focus: { value: 0, kind: E.FOCUS.BETWEEN, genres: [] },
         usual: { sound: null, security: null, floor: null }
@@ -83,8 +84,8 @@ SB.module('Game', function (SB) {
     }
     // The month the game starts in counts as paid: the first bills are those of the next month.
     state.money.billsMonth = { y: SB.time.date(0).y, m: SB.time.date(0).m };
-    /* a guided start puts the day job and the rent off until the desk has filled in (SB.Rungs.BILLS_AT) */
-    if (state.settings.ladder && bills) { state.player.dayJobLater = state.player.dayJob; state.player.dayJob = E.DAY_JOB.NONE; }
+    /* a guided start puts the rent off until the desk has filled in (SB.Rungs.billsWaiting); the day job starts on day one,
+       so the night clock has work nights from the first show (user, 2026-11-21) */
 
     state.week = SB.Week.blankWeek(state, 0);
 
@@ -108,7 +109,7 @@ SB.module('Game', function (SB) {
   /* ------------------------------------------------------------------ */
 
   function strip(state) {
-    var W = state.week || {}, used = 0, capH = 0, i, word = (state.town && state.town.word) || 0, tier, inbox = 0, late = 0;
+    var W = state.week || {}, used = 0, capH = 0, i, word = (state.town && state.town.word) || 0, tier, inbox = 0, late = 0, night = null;
     for (i = 0; i < 7; i++) {
       if (W.used && W.used[i]) used += (W.used[i].DAY || 0) + (W.used[i].NIGHT || 0);
       if (W.cap && W.cap[i]) capH += (W.cap[i].DAY || 0) + (W.cap[i].NIGHT || 0);
@@ -116,10 +117,11 @@ SB.module('Game', function (SB) {
     try { tier = SB.Territory.tier(word); } catch (e) { tier = E.WORD_TIER.SKIPPED; }
     try { inbox = SB.Mail.needsYou(state).length; } catch (e) { inbox = 0; }
     try { late = SB.Jobs.tray(state).late.length; } catch (e) { late = 0; }
+    try { night = SB.Week.tonight(state); } catch (e) { night = null; }   // the evening's clock, always on screen (spec 10)
     return {
       week: state.clock.week, from: state.clock.week * 7, to: state.clock.week * 7 + 6, phase: state.clock.phase,
       fund: state.money.fund, bank: state.money.bank,
-      hours: { used: used, cap: capH, over: Math.max(0, used - capH) },
+      hours: { used: used, cap: capH, over: Math.max(0, used - capH) }, tonight: night,
       stress: { value: Math.round(state.player.stress), zone: SB.Stress.zone(state) },
       name: Math.round(state.player.name), word: Math.round(word), wordTier: tier, stage: state.player.stage,
       badges: { inbox: inbox, late: late }
@@ -137,7 +139,8 @@ SB.module('Game', function (SB) {
       case 'bills':
         if (typeof value !== 'boolean') return U.no(E.REFUSE.INVALID, label('refuse.INVALID'));
         if (value === S.bills) return U.yes();
-        if (state.clock.week > 0 || state.clock.phase !== E.PHASE.PLAN) return U.no(E.REFUSE.LOCKED, label('refuse.LOCKED'));
+        /* open until the first morning has been played */
+        if (state.clock.week > 0 || state.clock.opened >= 0) return U.no(E.REFUSE.LOCKED, label('refuse.LOCKED'));
         S.bills = value;
         pack = SB.Cities.pack(state);
         if (value) {

@@ -3,7 +3,7 @@
  * what it is; a padlock when you cannot ask yet, a red tag when one of your shows is there, a rusty key when it closed.
  * `room`: the key picked up: the room as a small drawn card: how many it holds as heads, what it costs as bills, its
  * rules as stamps, how sketchy it is as scuffs and a flickering bulb, the owner, and its calendar as a tear-off month
- * where held nights carry tags with who holds them. Asking for a night is hanging your own tag on it.
+ * where held nights carry tags with who holds them. Asking for a night is a text to the room: can I hold it?
  * Reads Rooms.list / card / calendar / rel / otherShows and Shows.list. Actions: Mail.ask('ROOM_HOLD' / 'HOLDER_RELEASE'),
  * Rooms.challenge, Rooms.release, Week.addJob('VISIT'). Whether a room can be held, and why not, is the engine's
  * sentence (card.canHold.why); nothing is decided here.
@@ -59,12 +59,12 @@
     nightL: '{d}: {state}{holds}',
     holdsBy: ', tags: {list}',
     someone: 'someone',
-    hang: 'HANG MY TAG',
-    hangL: 'Hang your tag on {d}: ask to hold it',
+    hang: 'ASK THEM TO HOLD IT',
+    hangL: 'Message the room and ask them to hold {d}',
     bump: 'ASK TO GO FIRST',
     bumpL: 'Challenge the hold on {d}',
-    takeDown: 'TAKE MY TAG DOWN',
-    takeDownL: 'Let your hold on {d} go',
+    takeDown: 'LET THE NIGHT GO',
+    takeDownL: 'Tell the room you do not need {d} anymore',
     askOff: 'ASK THEM TO LET GO',
     askOffL: 'Ask whoever holds {d} to let it go',
     rankOf: '#{n} {who} · {state}{exp}',
@@ -434,7 +434,7 @@
           } } });
       }
 
-      /* the night picked: the tags hanging on it, in line; your own tag to hang, or to take down */
+      /* the night picked: the tags hanging on it, in line; ask the room to hold it, or let it go */
       function holdTags(s, card, cell) {
         var dd = D(), holds = (cell.holds || []).slice().sort(function (a, b) { return (a.rank || 0) - (b.rank || 0); }), m = mine(cell), kids = [], d = cell.day, ds = SB.time.fmt(d, 'short'), canHold = card.open !== false, acts = [];
         kids.push(dd.art(dd.marker(ds.toUpperCase(), 4, 28, 24, { seed: 'hd' + d, maxWidth: 300 }) + (cell.label ? dd.type(String(cell.label).toUpperCase(), 6, 46, 10, { bold: true }) : ''), 320, 52));

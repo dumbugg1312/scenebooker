@@ -167,7 +167,7 @@
     }
 
     function gameSec(s) {
-      var S = s.settings || {}, billsOpen = s.clock.week === 0 && s.clock.phase === 'PLAN';
+      var S = s.settings || {}, billsOpen = s.clock.week === 0 && !(s.clock.opened >= 0);   // before the first morning (Game.setSetting)
       function set(k, v) { SB.UI.act(function (x) { return SB.Game.setSetting(x, k, v); }); render(); }
       return [Kt().card({ tag: 'section', paper: 'white', tape: ['tl', 'tr'], rot: -0.4, seed: 'sf-game', cls: 'sf-form' }, formHead(1, L('game')).concat([
         choices('fog', L('fog'), S.fog, Object.keys(SB.Enums.FOG).map(function (k) { return [k, word('fog.' + k, k.toLowerCase())]; }), function (v) { set('fog', v); }),

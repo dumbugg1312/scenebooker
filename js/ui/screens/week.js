@@ -1,17 +1,19 @@
-/* Scene Booker — ui/screens/week.js (the calendar close-up, 07-desk.md sections 2 and 2b)
+/* Scene Booker — ui/screens/week.js (the calendar close-up, 07-desk.md sections 2 and 2b; the night clock, 10-night-clock.md)
  * Picked up, the calendar is this week's page, torn off the pad and lying on the black table, photocopied like the
- * flyers. Seven day columns under a black band, each with a day half and a night half; the hours you have are empty
- * pencil boxes that fill; the day job is a rubber-stamped WORK with a tear-off tab to drop the shift; weather is a toner
- * doodle; the phone is a drawn box you tick to turn it off. Beside the page, on the table, the jobs waiting are a pad of
- * sticky notes with a lifted corner: drag one onto a day half, or tap it and then the day (or Enter, arrows, Enter).
- * While a note is held its window is a strip of highlighter over the days, and a late half shows the heads that won't
- * hear in time, crossed out, before you let go. "The usual" is a rubber stamp. Under the page: the shows coming up,
- * the answers you are waiting on, what is on the phone.
- * One sign per kind of action (2b): a lifted corner drags, a tear-off tab chooses, a drawn box ticks, a label strip
- * opens. Reading matter carries none of them. The city's hot ink is only for what needs the player now.
- * Playing: the days are crossed off as they run and what happened is jotted into each day; a decision arrives as a note
- * slapped on top with its choices as tear-off tabs showing their costs. The tape deck on the desk starts the week; the
- * play loop below is unchanged and also runs while this screen is mounted hidden at the desk (js/desk/scene.js).
+ * flyers. It is reference now, not a planner: seven day columns under a black band, each with the hours that day has
+ * (work 4, off 10, a show night, tired from staying up) as empty pencil boxes that fill as they are spent (SB.Clock),
+ * what is due that day, and what got done. The day job is a rubber-stamped WORK with a tear-off tab to drop a coming
+ * shift; weather is a toner doodle; the phone is a drawn box you tick to turn it off. Beside the page, on the table, the
+ * jobs waiting are a pad of notes, each with what it costs, when it is due (late in hot ink) and a DO IT TONIGHT tab:
+ * it is done on the spot and its hours come off tonight's clock. Tap a note for its choices and who does it. Under the
+ * page: the shows coming up, the answers you are waiting on, what is on the phone.
+ * One sign per kind of action (2b): a tear-off tab chooses or acts, a drawn box ticks, a label strip opens. Reading
+ * matter carries none of them. The city's hot ink is only for what needs the player now.
+ * Time: the turn is one evening. The engine stops at each evening (E.STOP.EVENING); CALL IT A NIGHT (the tape deck on
+ * the desk, or the tab under tonight's clock here) is Week.endNight, and the play loop below then plays the night out:
+ * the show if there is one, the evening send, the next morning, up to the next evening, a decision, a show night or
+ * the end of the week. A decision arrives as a note slapped on top with its choices as tear-off tabs showing their
+ * costs. The loop also runs while this screen is mounted hidden at the desk (js/desk/scene.js).
  * Reads views, calls actions through SB.UI.act, computes no rule.
  */
 (function (SB) {
@@ -21,13 +23,11 @@
     title: 'The week',
     weekOf: 'week of {date}',
     weekN: 'week {n}',
-    day: 'Day', night: 'Night',
-    over: '{n}h over',
     shift: 'work',
     dropShift: 'Tear off the shift',
     dropShiftQ: 'Tear off {dow}\'s shift?',
-    dropShiftCost: 'You lose that day\'s pay, {pay}, and get the hours back.',
-    dropShiftCostNo: 'You lose that day\'s pay and get the hours back.',
+    dropShiftCost: 'You lose that day\'s pay, {pay}, and get the day back: 10 hours instead of 4.',
+    dropShiftCostNo: 'You lose that day\'s pay and get the day back: 10 hours instead of 4.',
     dropsLeft: '{n} left to drop this month',
     tearIt: 'tear it off', keepIt: 'keep it', tear: 'tear off',
     shiftDropped: 'shift dropped',
@@ -35,9 +35,7 @@
     phoneTurnOff: 'Turn the phone off on {dow}',
     phoneTurnOn: 'Turn the phone back on on {dow}',
     queued: '{n} go out tonight',
-    queuedCost: 'more than a few: it takes time',
     tray: 'Jobs',
-    todo: 'to do',
     late: 'late!!',
     thisWeek: 'this week',
     soon: 'soon',
@@ -45,21 +43,15 @@
     ifYouWant: 'if you want',
     free: 'people and shows',
     add: 'Add',
-    firstWeek: 'drag a note onto a day, or tap a note then a day',
-    emptyTray: 'nothing to plan',
-    usual: 'the usual',
-    usualSay: 'Press the usual: fill the week with the ordinary plan',
-    usualLine: 'what the town expects of you. the rest is yours.',
-    usualNone: 'Nothing more to add the usual way.',
-    usualAsked: 'Asked {name} to do {role}. The ask goes out tonight.',
-    picked: 'Holding',
-    pickHelp: 'drop it on a day half. arrows + enter work too. esc puts it back.',
-    cancel: 'put it back',
-    unplan: 'peel it off',
+    firstWeek: 'do a job tonight, then call it a night',
+    emptyTray: 'nothing to do',
+    doNow: 'do it tonight',
+    doNowSay: 'Do {job} tonight',
+    askThem: 'ask {name}',
+    has: '{name} has it',
     remove: 'crumple it',
+    putBack: 'put it down',
     openShow: 'Open the show',
-    showStrip: 'show',
-    canHere: 'fits',
     runway: 'coming up',
     noRunway: 'no shows on the way yet',
     nextJob: 'next: {job}, late from {day}',
@@ -73,6 +65,8 @@
     withdraw: 'drop it',
     withdrawSay: 'Withdraw the ask to {who}',
     outbox: 'goes out tonight',
+    takeBack: 'take it back',
+    takeBackSay: 'Take back the message to {who}',
     needsYou: 'on the phone',
     noNeeds: 'nothing needs you',
     phoneStrip: 'phone',
@@ -83,8 +77,10 @@
     dayLog: 'What happened on {day}',
     moreLines: '+{n} more',
     closeWeek: 'tear off the week',
+    callNight: 'call it a night',
+    callNightSay: 'Call it a night: the night plays out to tomorrow evening',
     burnt: 'You\'re burnt out. The days are handed over.',
-    running: 'the week is running. the tape deck pauses it.',
+    running: 'the night plays out. the tape deck pauses it.',
     replyTitle: 'An answer came back',
     answerNow: 'answer now',
     later2: 'later',
@@ -99,15 +95,23 @@
     weatherCalled: 'the day\'s weather: {w} (the forecast said {f})',
     vetFor: 'check out {band}',
     vetHelp: 'before you answer their request',
-    addOne: 'Add {job} for {who}',
+    addOne: 'Do {job} for {who} tonight',
     pile: '{n} more',
     owns: 'runs {room}',
     showOn: '{room}, {day}',
-    lostHeads: 'late: these won\'t hear in time',
     who: 'who does it',
+    whoHelp: 'asking somebody takes half an hour. they do it tonight.',
     me: 'me',
-    noteSay: '{job}, {h} hours. {win}',
-    halfSay: '{dow} {half}: {used} of {cap} hours',
+    effort: 'how sharp',
+    effortWord: { ROUGH: 'rough', STANDARD: 'standard', SHARP: 'sharp' },
+    stayUp: 'means staying up {n}',
+    noteSay: '{job}. {cost}. {due}',
+    work: 'work · {h}',
+    off: 'off · {h}',
+    showDay: 'show night',
+    tired: 'tired',
+    due: 'due',
+    did: 'done',
     likely: 'likely:',
     heroDays: 'days to go',
     heroDay: 'day to go',
@@ -116,9 +120,9 @@
   };
 
   var STAGES_SHOWN = {};            // stage cards already shown (display memory)
+  var SEEN = { stop: null };        // the reply or need-by stop already shown, across the desk's loop and the calendar's
   var LT = {};                      // lettering already drawn (display memory)
   var GRAIN = null, GRAINRES = 0;   // the copier's grit for the page, drawn once per raster scale
-  var HALVES = ['DAY', 'NIGHT'];
   var TONER = '#141413', PENCIL = '#6d6a62';
 
   function h(t, a, k) { return SB.UI.h(t, a, k); }
@@ -194,11 +198,12 @@
   }
   /** The open sign: a label-maker strip, white embossed capitals on black tape. */
   function strip(text, hot) { return h('span', { class: 'cc-strip' + (hot ? ' is-hot' : ''), aria: { hidden: 'true' }, text: String(text).toUpperCase() }); }
-  /** The choose sign: a tear-off tab. o: { label, cost, likely, why, disabled, on, n, hot, fk, id, say } */
+  /** The choose sign: a tear-off tab. o: { label, cost, likely, why, note, disabled, on, n, hot, fk, id, say, tut, ref }
+   *  cost is what it takes (money, or hours from SB.Clock.cost); why says why it is crossed out; note is a small line under it. */
   function tab(o) {
-    var say = (o.n ? o.n + '. ' : '') + (o.say || o.label) + (o.cost ? ', ' + o.cost : '') + (o.likely ? ', ' + L('likely') + ' ' + o.likely : '') + (o.disabled && o.why ? ', ' + o.why : '');
+    var say = (o.n ? o.n + '. ' : '') + (o.say || o.label) + (o.cost ? ', ' + o.cost : '') + (o.likely ? ', ' + L('likely') + ' ' + o.likely : '') + (o.note ? ', ' + o.note : '') + (o.disabled && o.why ? ', ' + o.why : '');
     return h('button', { type: 'button', class: 'cc-tab pz-hl' + (o.hot ? ' is-hot' : '') + (o.on2 ? ' is-on' : '') + (o.cls ? ' ' + o.cls : ''), disabled: !!o.disabled,
-                         role: o.role || null, data: { fk: o.fk || null, option: o.id || null, tut: o.tut || null }, title: o.disabled && o.why ? o.why : null,
+                         role: o.role || null, data: { fk: o.fk || null, option: o.id || null, tut: o.tut || null, 'tut-ref': o.ref || null }, title: o.disabled && o.why ? o.why : null,
                          aria: { label: say, checked: o.role === 'radio' ? (o.on2 ? 'true' : 'false') : null },
                          on: { click: function (e) { e.stopPropagation(); if (!o.disabled) o.on(e); } } }, [
       o.n ? h('span', { class: 'cc-tab-n', aria: { hidden: 'true' }, text: String(o.n) }) : null,
@@ -206,6 +211,7 @@
       h('span', { class: 'cc-tab-l', text: o.label }),
       o.cost ? h('span', { class: 'cc-tab-cost', text: o.cost }) : null,
       o.likely ? h('span', { class: 'cc-tab-likely', text: L('likely') + ' ' + o.likely }) : null,
+      o.note ? h('span', { class: 'cc-tab-likely', text: o.note }) : null,
       o.disabled && o.why ? h('span', { class: 'cc-tab-why', text: o.why }) : null,
       h('span', { class: 'cc-tab-foot', aria: { hidden: 'true' } }),
       o.cls && o.cls.indexOf('cc-tab--sign') >= 0 ? h('span', { class: 'cc-tab-tape', aria: { hidden: 'true' } }) : null
@@ -217,12 +223,6 @@
     var k = K();
     return k.rect(3, 3, 15, 15, { seed: 'bx' + seed, sw: 2.4, wob: 0.7, over: 1.5, fill: '#f4f2ea' }) +
            (on ? k.path([[5, 10], [10, 17], [22, 1]], { seed: 'bt' + seed, sw: 3.2, stroke: hot || TONER, wob: 0.6 }) : '');
-  }
-  /** Small black squares for hours on a note. */
-  function ticks(n) {
-    var out = '', i, c = Math.max(0, Math.round(n || 0));
-    for (i = 0; i < c; i++) out += '<rect x="' + (1 + i * 9) + '" y="1" width="7" height="7" fill="' + TONER + '" transform="rotate(' + ((i % 3) - 1) * 4 + ' ' + (4 + i * 9) + ' 4)"/>';
-    return c ? h('span', { class: 'cc-ticks', role: 'img', aria: { label: SB.text.label('ui.c.hours', { n: c }) } }, pic(c * 9 + 2, 10, out)) : null;
   }
   /** A head and shoulders, xeroxed: gen 0 solid toner, 1 halftone, 2 open; crossed out in hot ink. */
   function headArt(cx, by, s, gen, crossed, hot) {
@@ -304,13 +304,12 @@
   function grainEl() { var g = grain(); return h('span', { class: 'cc-grain', aria: { hidden: 'true' }, style: g ? { backgroundImage: 'url(' + g + ')' } : null }); }
 
   function mount(root) {
-    var picked = null,                // { jobId, opt, by } or { free: FreeJob } for a note not yet a job
-        cur = { dayIdx: 0, half: 'DAY' },
-        dropWhy = null,               // { dayIdx, half, text }
-        running = false, timer = null, cardOpen = false, seenStop = null, offPlay, offKeys, offResize, alive = true,
+    var running = false, timer = null, kickT = null, cardOpen = false, offPlay, offResize, alive = true,
+        syncing = false,              // the night is being played out in one go ('next'): nothing else starts the loop meanwhile
+        userPaused = false,           // the player paused the play-out on the tape deck: it does not start again by itself
         openFolds = {},               // which piles on the pad are fanned open
-        drag = null,                  // { el, ghost, x0, y0, on, start() }
-        justDragged = false, HOT = TONER;
+        held = null,                  // the note picked up, open on a card: { jobId, box, close, opt, effort, by }
+        HOT = TONER;
 
     function st() { return SB.UI.game(); }
     function act(f) { return SB.UI.act(f); }
@@ -321,24 +320,25 @@
     function render() {
       var s = st(), v, a, key = null, el, sc = null, top = 0;
       if (!alive) return;
+      kick();
       if (hidden()) { SB.UI.clear(root); return; }      // at the desk this screen only keeps the loop running
       if (!s) { SB.UI.clear(root); root.appendChild(C().Empty({})); return; }
       HOT = cityInk(s, 0);
       a = (typeof document !== 'undefined') ? document.activeElement : null;
       if (a && a.getAttribute) key = a.getAttribute('data-fk');
-      if (picked && picked.jobId && !(s.jobs && s.jobs[picked.jobId])) picked = null;
       v = safe(function () { return SB.Week.view(s); }, null);
       sc = root.closest ? root.closest('.cu-in') : null;
       if (sc) top = sc.scrollTop;
       SB.UI.clear(root);
       if (!v) { root.appendChild(C().Empty({})); return; }
-      root.appendChild(h('div', { class: 'cc-week is-' + String(v.phase).toLowerCase() + (picked ? ' is-picking' : '') + (running ? ' is-running' : ''), style: { '--hot': HOT } }, [
+      root.appendChild(h('div', { class: 'cc-week is-' + String(v.phase).toLowerCase() + (running ? ' is-running' : ''), style: { '--hot': HOT } }, [
         defsEl(),
         h('div', { class: 'cc-table' }, [page(s, v), pad(s, v)]),
         bottom(s, v)
       ]));
       if (sc) sc.scrollTop = top;
       safe(function () { moves(); }, null);
+      if (held) safe(function () { fillNote(); }, null);
       if (key) {
         el = safe(function () { return root.querySelector('[data-fk="' + key + '"]'); }, null);
         if (el && el.focus) { try { el.focus({ preventScroll: true }); } catch (e) { /* fine */ } }
@@ -371,11 +371,6 @@
       firstShow = false;
     }
 
-    function focusCell() {
-      var el = safe(function () { return root.querySelector('[data-fk="cell-' + cur.dayIdx + '-' + cur.half + '"]'); }, null);
-      if (el && el.focus) { try { el.focus({ preventScroll: true }); } catch (e) { /* fine */ } }
-    }
-
     /* ---------------- the page: its head and the days ---------------- */
 
     function page(s, v) {
@@ -387,8 +382,10 @@
       ]);
     }
 
+    /** The head: the week, the next show, the heads-up; tonight's clock with CALL IT A NIGHT under it (or, at the end of
+     *  the week, the tab that tears the week off). */
     function head(s, v) {
-      var stop = s.clock.stop, endOfWeek = stop && stop.kind === 'END_OF_WEEK', k = K(), planning = v.phase === 'PLAN' || v.phase === 'PLAY',
+      var stop = s.clock.stop, endOfWeek = stop && stop.kind === 'END_OF_WEEK', t = v.tonight, evening = !!(t && t.open),
           from = s.clock.week * 7, to = from + 6, same = SB.time.month(from) === SB.time.month(to),
           range = SB.time.fmt(from, 'md') + '-' + (same ? SB.time.date(to).d : SB.time.fmt(to, 'md'));
       var nx = nextShow(s);
@@ -403,15 +400,12 @@
           h('span', { class: 'cc-risks-k' }, [mk('!!', 20, { fill: HOT, say: false }), h('span', { text: L('risks') })]),
           h('ul', null, v.risks.slice(0, 3).map(function (r) { return r.text ? h('li', { text: r.text }) : null; }))
         ]) : null,
-        running ? h('p', { class: 'cc-run', text: L('running') }) : null,
-        planning && !endOfWeek && !running ? h('div', { class: 'cc-usual' }, [
-          h('button', { type: 'button', class: 'cc-stamp pz-hl', data: { fk: 'usual' }, aria: { label: L('usualSay') },
-                        on: { click: function (e) { thunk(e.currentTarget); usual(); } } }, [
-            pic(124, 104, usualArt(), 'cc-stamp-art')
-          ]),
-          h('span', { class: 'cc-usual-line', text: L('usualLine') })
-        ]) : null,
-        endOfWeek && v.phase === 'PLAY' ? tab({ label: L('closeWeek'), hot: true, fk: 'closeweek', tut: 'week-play', cls: 'cc-tab--big', on: closeWeek }) : null
+        h('div', { class: 'cc-tonight' }, [
+          v.phase === 'PLAY' && t && SB.Clock ? SB.Clock.slip(s, { tonight: t, list: v.crunch || [], crunch: 2, hot: HOT }) : null,
+          running ? h('p', { class: 'cc-run', text: L('running') }) : null,
+          evening && !running ? tab({ label: L('callNight'), say: L('callNightSay'), hot: t.left <= 0, fk: 'callnight', tut: 'week-night', cls: 'cc-tab--big', n: false, on: callNight }) : null,
+          endOfWeek && v.phase === 'PLAY' ? tab({ label: L('closeWeek'), hot: true, fk: 'closeweek', tut: 'week-play', cls: 'cc-tab--big', on: closeWeek }) : null
+        ])
       ]);
     }
     /** The next show after today: { show, days } (days 0 is tonight), or null when none is booked. */
@@ -437,65 +431,104 @@
         room && room.name ? h('span', { class: 'cc-hero-r', text: room.name }) : null
       ]);
     }
-    /** The rubber stamp, a xeroxed cut-out, over the impression it leaves. */
-    function usualArt() {
-      var k = K();
-      return '<g transform="rotate(-6 62 70)">' + stampArt(L('usual').toUpperCase(), 116, 44, 'usual', TONER).replace('<g opacity=".88">', '<g opacity=".88" transform="translate(2 54)">') + '</g>' +
-             k.cutout([[40, 4], [84, 4], [86, 26], [96, 30], [98, 50], [26, 50], [28, 30], [38, 26]],
-                      k.dotsRect(44, 8, 14, 16, 2, { white: true }) + '<rect x="30" y="44" width="64" height="5" fill="#f4f2ea" fill-opacity=".5"/>', { seed: 'stampc', edge: 5 });
-    }
     function thunk(el) {
       if (!el || !el.classList || !SB.Finish) return;
       SB.Finish.move(el, 'stamp', { cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: el } });
     }
 
     function burnt(s) { return safe(function () { return SB.Game.strip(s).stress.zone === 'BURNT_OUT'; }, false); }
-    function cellPos(i, half) { return i * 2 + (half === 'NIGHT' ? 1 : 0); }
-    function nowPos(s) { var c = s.clock.cursor || { dayIdx: 0, half: 'DAY' }; return cellPos(c.dayIdx, c.half); }
-    /* real pixels per stage unit and per --p, for the pointer: the dragged note's place is written in stage units */
-    function unitPx() { return (SB.UI.unit ? SB.UI.unit() : 1) || 1; }
-    function pxp() { return unitPx() * 1.25; }
-    function heldId() { return picked ? (picked.jobId || null) : null; }
+    function todayOf(s, v) { return v && v.tonight ? v.tonight.day : s.clock.day; }
 
     function grid(s, v) {
-      var win = windowStrip(s);
-      return h('div', { class: 'cc-days' + (burnt(s) ? ' is-burnt' : ''), role: 'grid', aria: { label: L('title') }, on: { keydown: gridKey } }, [
-        v.days.map(function (d) { return dayBox(s, v, d, win[d.dayIdx]); }),
+      var dues = dueByDay(s, v), crunchDays = {};
+      (v.crunch || []).forEach(function (c) { crunchDays[c.day] = true; });
+      return h('div', { class: 'cc-days' + (burnt(s) ? ' is-burnt' : ''), role: 'list', aria: { label: L('title') } }, [
+        v.days.map(function (d) { return dayBox(s, v, d, dues[d.day] || [], !!crunchDays[d.day]); }),
         burnt(s) ? h('p', { class: 'cc-burnt', text: L('burnt') }) : null
       ]);
     }
 
-    /** The held job's window, day by day (Jobs.window on each day): 'open', 'late' or null. */
-    function windowStrip(s) {
-      var out = [], id = heldId(), i, w;
-      for (i = 0; i < 7; i++) {
-        if (!id) { out.push(null); continue; }
-        w = safe(function () { return SB.Jobs.window(s, id, s.clock.week * 7 + i); }, null);
-        out.push(!w ? null : (w.state === 'OPEN' || w.state === 'CLOSING' ? 'open' : (w.state === 'LATE' ? 'late' : null)));
-      }
-      if (picked && picked.free) for (i = 0; i < 7; i++) out[i] = 'open';
+    /** What is due on each day of the page and what got done on it, from the job views of the shows coming up (and one
+     *  just played): { day: [{ label, late, done }] }. A late job is written on today. */
+    function dueByDay(s, v) {
+      var out = {}, today = todayOf(s, v), from = s.clock.week * 7, to = from + 6, seen = {};
+      function put(day, it) { if (day >= from && day <= to) (out[day] = out[day] || []).push(it); }
+      (v.runway || []).forEach(function (r) {
+        (r.jobs || []).forEach(function (j) {
+          var job = s.jobs && s.jobs[j.id], w = j.window || {}, d;
+          if (!j || seen[j.id] || j.mode !== 'HOURS' || j.optional || j.hidden) return;
+          seen[j.id] = true;
+          if (j.status === 'DONE') { if (job && num(job.doneDay)) put(job.doneDay, { label: j.label, done: true }); return; }
+          if (j.status !== 'TODO') return;
+          if (w.state === 'LATE') { put(today, { label: j.label, late: true }); return; }
+          d = num(j.due) ? j.due : (num(w.idealUntil) ? w.idealUntil : null);
+          if (d !== null) put(d, { label: j.label });
+        });
+      });
       return out;
     }
 
-    function dayBox(s, v, d, win) {
-      var i = d.dayIdx, play = v.phase === 'PLAY', np = play ? nowPos(s) : -1, gone = play && cellPos(i, 'NIGHT') < np,
-          planPhase = (v.phase === 'PLAN' || v.phase === 'PLAY') && !running, real = actualWeather(s, d.day), w = real || d.forecast, k = K(), wt, dow = SB.time.fmt(d.day, 'dow');
+    /** A day's clock for the boxes: tonight's own view for today; another day read off the week view (its pool, what
+     *  was spent or is taken, the hours stayed up). */
+    function dayClock(s, v, d, isToday) {
+      var cap, used, over, tired = 0;
+      if (isToday && v.tonight) return v.tonight;
+      cap = (d.cap.DAY || 0) + (d.cap.NIGHT || 0); used = Math.min(cap, (d.used.DAY || 0) + (d.used.NIGHT || 0)); over = d.over || 0;
+      if (s.player && s.player.tired && s.player.tired.day === d.day) tired = s.player.tired.hours || 0;
+      return { day: d.day, cap: cap, used: used, spent: used + over, left: Math.max(0, cap - used), reserved: 0, tired: tired,
+               stay: { max: over, used: over, left: 0 }, show: d.shows.length > 0, off: !d.shift || d.dropped };
+    }
+    function dayWord(t) {
+      var w = t.show ? L('showDay') : L(t.off ? 'off' : 'work', { h: SB.Clock ? SB.Clock.cost(t.cap) || '0' : t.cap });
+      return w + (t.tired > 0 ? ' · ' + L('tired') : '');
+    }
+
+    function dayBox(s, v, d, dues, crunch) {
+      var i = d.dayIdx, today = todayOf(s, v), isToday = d.day === today, gone = d.day < today, ahead = d.day > today,
+          real = actualWeather(s, d.day), w = real || d.forecast, k = K(), wt, dow = SB.time.fmt(d.day, 'dow'),
+          t = dayClock(s, v, d, isToday), shiftOn = d.shift && !d.dropped, bills = !!(s.settings && s.settings.bills), open = v.phase === 'PLAY' && !running;
       if (w) wt = !real ? L('weather', { w: wword(w) }) : (d.forecast && d.forecast !== real ? L('weatherCalled', { w: wword(real), f: wword(d.forecast) }) : L('weatherWas', { w: wword(real) }));
-      return h('div', { class: 'cc-day' + (gone ? ' is-gone' : '') + (d.phoneOff ? ' is-phone-off' : '') + (win ? ' is-win-' + win : '') + (i >= 5 ? ' is-weekend' : ''), role: 'row',
-                        aria: { label: dow } }, [
-        win ? h('span', { class: 'cc-hl', aria: { hidden: 'true' } }) : null,
+      return h('div', { class: 'cc-day' + (gone ? ' is-gone' : '') + (isToday ? ' is-today' : '') + (crunch ? ' is-crunch' : '') + (d.phoneOff ? ' is-phone-off' : '') + (i >= 5 ? ' is-weekend' : ''),
+                        role: 'listitem', data: { fk: 'day-' + i }, aria: { label: dow + ': ' + dayWord(t) + (isToday && SB.Clock ? ', ' + SB.Clock.line(t).toLowerCase() : '') } }, [
         h('div', { class: 'cc-dband', aria: { hidden: 'true' } }, mk(SB.time.fmt(d.day, 'dow3').toUpperCase(), 15, { fill: '#f4f2ea', say: false })),
         h('div', { class: 'cc-dhead' }, [
           mk(String(SB.time.date(d.day).d), 26, { cls: 'cc-date', say: false }),
           h('span', { class: 'sb-vh', text: SB.time.fmt(d.day, 'long') }),
           w ? h('span', { class: 'cc-weather' + (real ? ' is-actual' : ''), role: 'img', title: wt, aria: { label: wt } }, pic(28, 28, weatherArt(w))) : null,
-          planPhase ? h('button', { type: 'button', role: 'checkbox', class: 'cc-phone pz-hl' + (d.phoneOff ? ' is-off' : ''), title: L('phone'),
-                                    aria: { checked: d.phoneOff ? 'true' : 'false', label: L(d.phoneOff ? 'phoneTurnOn' : 'phoneTurnOff', { dow: dow }) }, data: { fk: 'phone-' + i },
-                                    on: { click: function () { act(function (x) { return SB.Week.phoneOff(x, i, !d.phoneOff); }); } } }, pic(24, 24, phoneArt(d.phoneOff)))
-                    : (d.phoneOff ? h('span', { class: 'cc-phone is-off', role: 'img', aria: { label: L('phone') } }, pic(24, 24, phoneArt(true))) : null)
+          open && !gone ? h('button', { type: 'button', role: 'checkbox', class: 'cc-phone pz-hl' + (d.phoneOff ? ' is-off' : ''), title: L('phone'),
+                                        aria: { checked: d.phoneOff ? 'true' : 'false', label: L(d.phoneOff ? 'phoneTurnOn' : 'phoneTurnOff', { dow: dow }) }, data: { fk: 'phone-' + i },
+                                        on: { click: function () { act(function (x) { return SB.Week.phoneOff(x, i, !d.phoneOff); }); } } }, pic(24, 24, phoneArt(d.phoneOff)))
+                        : (d.phoneOff ? h('span', { class: 'cc-phone is-off', role: 'img', aria: { label: L('phone') } }, pic(24, 24, phoneArt(true))) : null)
         ]),
-        HALVES.map(function (half) { return halfBox(s, v, d, half); }),
-        play ? jots(s, d) : null,
+        h('div', { class: 'cc-dayhrs', aria: { hidden: 'true' } }, [
+          h('span', { class: 'cc-dayword' + (t.show ? ' is-show' : ''), text: dayWord(t) }),
+          SB.Clock ? SB.Clock.boxes(t, { hot: HOT, say: false }) : null
+        ]),
+        h('div', { class: 'cc-dbody' }, [
+          shiftOn ? h('div', { class: 'cc-work' }, [
+            h('span', { class: 'cc-work-stamp', role: 'img', aria: { label: L('shift') } }, pic(86, 34, stampArt(L('shift').toUpperCase(), 86, 34, 'wk' + i, TONER))),
+            bills && open && ahead ? h('button', { type: 'button', class: 'cc-tab cc-tab--mini pz-hl', data: { fk: 'tear-' + i },
+                                                   aria: { label: L('dropShift') + ', ' + dow },
+                                                   on: { click: function (e) { e.stopPropagation(); askDropShift(s, d); } } }, h('span', { class: 'cc-tab-l', text: L('tear') })) : null
+          ]) : null,
+          d.dropped ? h('span', { class: 'cc-dropped', text: L('shiftDropped') }) : null,
+          (d.town || []).length ? h('div', { class: 'cc-town' }, d.town.map(function (x) { return h('span', { class: 'cc-town-tape', text: x.label }); })) : null,
+          d.queued > 0 ? h('span', { class: 'cc-queued', role: 'img', title: L('queued', { n: d.queued }), aria: { label: L('queued', { n: d.queued }) } }, [
+            pic(24, 18, '<rect x="2" y="2" width="20" height="14" fill="#f4f2ea" stroke="' + TONER + '" stroke-width="2"/><path d="M2 2L12 10L22 2" fill="none" stroke="' + TONER + '" stroke-width="2"/>'),
+            h('span', { text: 'x' + d.queued })
+          ]) : null,
+          d.shows.length ? h('div', { class: 'cc-flyers' }, d.shows.map(function (id) { return flyerOn(s, id, 50); })) : null,
+          d.other && d.other.length ? h('span', { class: 'cc-other', role: 'img', title: L('otherSay', { n: d.other.length }), aria: { label: L('otherSay', { n: d.other.length }) } },
+            d.other.slice(0, 3).map(function (o, j) {
+              return pic(34, 24, '<rect x="2" y="2" width="30" height="20" fill="#f4f2ea" stroke="' + TONER + '" stroke-width="2"/>' + k.scribble(3, 4, 28, 16, { seed: 'ob' + i + j, sw: 2.6, n: 6 }));
+            })) : null,
+          dues.length ? h('ul', { class: 'cc-dues', aria: { label: L('due') } }, dues.map(function (x) {
+            return h('li', { class: 'cc-due' + (x.late ? ' is-late' : '') + (x.done ? ' is-done' : ''), text: x.label + (x.late ? ' !!' : '') });
+          })) : null,
+          (d.items || []).length ? h('div', { class: 'cc-toks' }, d.items.map(function (it) { return token(s, it); })) : null,
+          jots(s, d)
+        ]),
+        isToday && v.phase === 'PLAY' ? pic(44, 22, k.arrow(2, 11, 40, 11, { seed: 'now' + i, sw: 3.6, stroke: HOT, head: 10 }), 'cc-now') : null,
         gone ? h('span', { class: 'cc-pic cc-gone', aria: { hidden: 'true' }, html: svg(100, 100, k.xout(8, 6, 84, 88, { seed: 'gone' + i, sw: 5 }), ' preserveAspectRatio="none"') }) : null
       ]);
     }
@@ -506,66 +539,6 @@
       return null;
     }
     function wword(w) { return word('weather.' + w, String(w).toLowerCase()); }
-
-    /** The pencil boxes: one per hour you have; toner as jobs take them; hatched for the note you hold; hot past the line. */
-    function hourBoxes(cap, used, extra) {
-      var n = Math.max(cap, used + extra), out = '', i, x, over, fill;
-      for (i = 0; i < n; i++) {
-        over = i >= cap; x = 2 + i * 17;
-        fill = i < used ? (over ? HOT : TONER) : (i < used + extra ? 'url(#dk-hatch)' : '#f4f2ea');
-        out += '<rect x="' + x + '" y="2" width="13" height="13" fill="' + fill + '" stroke="' + (over ? HOT : '#3d3b36') + '" stroke-width="' + (over ? 2.2 : 1.6) + '" transform="rotate(' + ((i * 7) % 5 - 2) + ' ' + (x + 6) + ' 8)"/>';
-      }
-      return pic(Math.max(1, n) * 17 + 4, 17, out, 'cc-hours');
-    }
-
-    function halfBox(s, v, d, half) {
-      var i = d.dayIdx, items = d.items.filter(function (it) { return it.half === half; }), pos = cellPos(i, half),
-          play = v.phase === 'PLAY', np = play ? nowPos(s) : -1, past = play && pos < np, now = play && pos === np,
-          isCur = cur.dayIdx === i && cur.half === half, prev = null, why = dropWhy && dropWhy.dayIdx === i && dropWhy.half === half ? dropWhy.text : null,
-          cap = d.cap[half], used = d.used[half], shiftOn = d.shift && !d.dropped, bills = !!(s.settings && s.settings.bills),
-          planPhase = (v.phase === 'PLAN' || v.phase === 'PLAY') && !running, k = K(), label, extra = 0, held = null;
-      if (picked) {
-        prev = preview(s, d.day, half);
-        held = heldView(s);
-        if (isCur && prev && prev.ok && held && num(held.hours)) extra = held.hours;
-      }
-      label = L('halfSay', { dow: SB.time.fmt(d.day, 'dow'), half: L(half === 'DAY' ? 'day' : 'night').toLowerCase(), used: used, cap: cap }) +
-              (shiftOn && half === 'DAY' ? ', ' + L('shift') : '') + (prev ? ', ' + prev.text : '');
-      return h('div', { role: 'gridcell', tabindex: isCur ? '0' : '-1', data: { fk: 'cell-' + i + '-' + half, cell: i + '-' + half },
-                        class: ['cc-half pz-hl', 'cc-half--' + half.toLowerCase(), past ? 'is-past' : '', now ? 'is-now' : '',
-                                isCur && picked ? 'is-cursor' : '', prev ? (prev.ok ? 'is-ok' : 'is-no') : ''],
-                        aria: { label: label },
-                        on: { click: function (e) { if (picked && !(e.target && e.target.closest && e.target.closest('.cc-tok, .cc-tab, .cc-flyer'))) { cur = { dayIdx: i, half: half }; drop(); } },
-                              focus: function () { if (cur.dayIdx !== i || cur.half !== half) cur = { dayIdx: i, half: half }; } } }, [
-        h('span', { class: 'cc-half-k', aria: { hidden: 'true' } }, [
-          half === 'NIGHT' ? pic(12, 12, '<path d="M9 1L4 2L1 6L2 10L7 12L11 11L7 8L6 4Z" fill="' + TONER + '"/>') : null,
-          hourBoxes(cap, used, extra)
-        ]),
-        shiftOn && half === 'DAY' ? h('div', { class: 'cc-work' }, [
-          h('span', { class: 'cc-work-stamp', role: 'img', aria: { label: L('shift') } }, pic(86, 34, stampArt(L('shift').toUpperCase(), 86, 34, 'wk' + i, TONER))),
-          bills && planPhase && !past && !now ? h('button', { type: 'button', class: 'cc-tab cc-tab--mini pz-hl', data: { fk: 'tear-' + i },
-                                                              aria: { label: L('dropShift') + ', ' + SB.time.fmt(d.day, 'dow') },
-                                                              on: { click: function (e) { e.stopPropagation(); askDropShift(s, d); } } }, h('span', { class: 'cc-tab-l', text: L('tear') })) : null
-        ]) : null,
-        d.dropped && half === 'DAY' ? h('span', { class: 'cc-dropped', text: L('shiftDropped') }) : null,
-        half === 'DAY' && (d.town || []).length ? h('div', { class: 'cc-town' }, d.town.map(function (t) { return h('span', { class: 'cc-town-tape', text: t.label }); })) : null,
-        half === 'NIGHT' && d.queued > 0 ? h('span', { class: 'cc-queued', title: L('queued', { n: d.queued }) + (num(SB.Config.MAIL && SB.Config.MAIL.freePerDay) && d.queued > SB.Config.MAIL.freePerDay ? ' · ' + L('queuedCost') : ''),
-                                   role: 'img', aria: { label: L('queued', { n: d.queued }) } }, [
-          pic(24, 18, '<rect x="2" y="2" width="20" height="14" fill="#f4f2ea" stroke="' + TONER + '" stroke-width="2"/><path d="M2 2L12 10L22 2" fill="none" stroke="' + TONER + '" stroke-width="2"/>'),
-          h('span', { text: 'x' + d.queued })
-        ]) : null,
-        half === 'NIGHT' && d.shows.length ? h('div', { class: 'cc-flyers' }, d.shows.map(function (id) { return flyerOn(s, id, 50); })) : null,
-        half === 'NIGHT' && d.other && d.other.length ? h('span', { class: 'cc-other', role: 'img', title: L('otherSay', { n: d.other.length }), aria: { label: L('otherSay', { n: d.other.length }) } },
-          d.other.slice(0, 3).map(function (o, j) {
-            return pic(34, 24, '<rect x="2" y="2" width="30" height="20" fill="#f4f2ea" stroke="' + TONER + '" stroke-width="2"/>' + k.scribble(3, 4, 28, 16, { seed: 'ob' + i + j, sw: 2.6, n: 6 }));
-          })) : null,
-        h('div', { class: 'cc-toks' }, items.map(function (it) { return token(s, it); })),
-        prev && isCur ? previewBubble(s, prev) : null,
-        why ? h('p', { class: 'cc-why', text: why }) : null,
-        now ? pic(44, 22, k.arrow(2, 11, 40, 11, { seed: 'now' + pos, sw: 3.6, stroke: HOT, head: 10 }), 'cc-now') : null,
-        past && !(cellPos(i, 'NIGHT') < np) ? pic(100, 60, k.line(6, 54, 94, 6, { seed: 'p' + pos, sw: 4 }), 'cc-pastx') : null
-      ]);
-    }
 
     function flyerOn(s, id, width) {
       var sh = s.shows[id], thumb = null;
@@ -596,209 +569,21 @@
       ]), { label: L('dayLog', { day: SB.time.fmt(d.day, 'dow') }) });
     }
 
-    /** A planned job on a day: a small sticky note with its corner lifted (it can be picked up again). */
+    /** A job somebody has on a day (a friend you handed it to, or one pencilled in the old way): a small note, read only. */
     function token(s, it) {
-      var jv = safe(function () { return SB.Jobs.get(s, it.jobId); }, null) || { id: it.jobId, label: it.label, window: it.window, riders: [] }, sub, stt, late, el, stk;
-      sub = subjectOf(s, jv);
-      stt = (it.window && it.window.state) || 'NONE'; late = stt === 'LATE' || stt === 'MISSED';
-      stk = it.by && it.by !== 'player' ? 'mint' : 'goldenrod';
-      el = h('button', { type: 'button', class: 'cc-tok cc-lift pz-hl' + (heldId() === it.jobId ? ' is-held' : '') + (late ? ' is-late' : ''), data: { fk: 'tok-' + it.jobId, job: it.jobId },
-                         aria: { label: L('noteSay', { job: (jv.label || '') + (sub ? ': ' + sub : ''), h: it.hours, win: (it.window && it.window.label) || '' }) },
-                         on: { click: function (e) { e.stopPropagation(); if (justDragged || running) return; pick(it.jobId, it.dayIdx, it.half); } } }, [
-        sheet(stk, 'tok' + it.jobId, { ear: 10 }), ear(stk, 10),
-        hand(jv.label || '', 11, { max: 92, say: false }),
+      var jv = safe(function () { return SB.Jobs.get(s, it.jobId); }, null) || { id: it.jobId, label: it.label, window: it.window }, sub = subjectOf(s, jv),
+          stt = (it.window && it.window.state) || 'NONE', late = stt === 'LATE' || stt === 'MISSED', stk = it.by && it.by !== 'player' ? 'mint' : 'goldenrod';
+      return h('div', { class: 'cc-tok' + (late ? ' is-late' : ''), data: { job: it.jobId }, role: 'note' }, [
+        sheet(stk, 'tok' + it.jobId),
+        hand(jv.label || '', 11, { max: 92 }),
         sub ? h('span', { class: 'cc-tok-who', text: sub }) : null,
-        h('span', { class: 'cc-tok-foot' }, [ticks(it.hours), it.by && it.by !== 'player' && it.byName ? h('span', { class: 'cc-tok-by', text: it.byName }) : null]),
+        h('span', { class: 'cc-tok-foot' }, [SB.Clock ? h('span', { class: 'cc-note-cost', text: SB.Clock.cost(it.hours) }) : null,
+          it.by && it.by !== 'player' && it.byName ? h('span', { class: 'cc-tok-by', text: L('has', { name: it.byName }) }) : null]),
         late ? h('span', { class: 'cc-hotmark', aria: { hidden: 'true' }, text: '!!' }) : null
       ]);
-      draggable(el, function () { return { jobId: it.jobId }; });
-      return el;
     }
-
-    function heldView(s) {
-      if (!picked) return null;
-      if (picked.free) return { label: picked.free.label, hours: picked.free.hours };
-      return safe(function () { return SB.Jobs.get(s, picked.jobId); }, null);
-    }
-
-    function preview(s, day, half) {
-      var r, w;
-      if (picked && picked.free) {
-        if (picked.free.half && picked.free.half !== 'ANY' && picked.free.half !== half) return { ok: false, text: SB.text.label('refuse.WRONG_HALF') };
-        return { ok: true, text: L('canHere') };
-      }
-      r = safe(function () { return SB.Jobs.canDo(s, picked.jobId, day, half); }, null);
-      if (!r) return null;
-      if (!r.ok) return { ok: false, text: (r.why || '') + (r.missingLabel ? ' (' + r.missingLabel + ')' : '') };
-      w = safe(function () { return SB.Jobs.window(s, picked.jobId, day); }, null);
-      return { ok: true, text: L('canHere') + (w && w.label ? ': ' + w.label : ''), late: !!(w && w.state === 'LATE'), loss: w && w.loss };
-    }
-
-    /** Under the cursor while a note is held: fits or not, and when late, the heads that won't hear in time, crossed out. */
-    function previewBubble(s, prev) {
-      var heads = '', x = 2, g, n, j, pct = [];
-      if (prev.ok && Array.isArray(prev.loss)) {
-        for (g = 0; g < 3; g++) {
-          n = Math.abs(prev.loss[g] || 0) > 0.005 ? Math.min(5, Math.max(1, Math.round(Math.abs(prev.loss[g]) * 20))) : 0;
-          for (j = 0; j < n; j++) { heads += headArt(x + 7, 24, 7, g, true, HOT); x += 14; }
-          if (n) { x += 6; pct.push(word('gen.' + ['KIDS', 'MIDDLE', 'OLD'][g] + '.short', '') + ' -' + Math.round(Math.abs(prev.loss[g]) * 100) + '%'); }
-        }
-      }
-      return h('div', { class: 'cc-prev' + (prev.ok ? ' is-ok' : ' is-no'), role: 'status' }, [
-        h('span', { class: 'cc-prev-text', text: prev.text }),
-        heads ? h('div', { class: 'cc-lost', role: 'img', aria: { label: L('lostHeads') + ': ' + pct.join(', ') } }, [
-          h('span', { class: 'cc-lost-k', text: L('lostHeads') }), pic(x + 2, 26, heads), h('span', { class: 'cc-lost-n', text: pct.join(' · ') })
-        ]) : null
-      ]);
-    }
-
-    function gridKey(e) {
-      var k = e.key, d = cur.dayIdx, half = cur.half;
-      if (e.target && e.target.getAttribute && e.target.getAttribute('role') !== 'gridcell') return;
-      if (k === 'ArrowRight') d = Math.min(6, d + 1);
-      else if (k === 'ArrowLeft') d = Math.max(0, d - 1);
-      else if (k === 'ArrowDown') half = 'NIGHT';
-      else if (k === 'ArrowUp') half = 'DAY';
-      else if ((k === 'Enter' || k === ' ') && picked) { e.preventDefault(); drop(); return; }
-      else if (k === 'Escape' && picked) { e.preventDefault(); e.stopPropagation(); cancelPick(); return; }
-      else return;
-      e.preventDefault();
-      cur = { dayIdx: d, half: half };
-      render();
-      focusCell();
-    }
-
-    /* ---------------- picking, dragging and dropping ---------------- */
-
-    function bestCell(s, jobId, half) {
-      var i, p, base = s.clock.week * 7;
-      for (i = 0; i < 14; i++) {
-        p = { dayIdx: Math.floor(i / 2), half: HALVES[i % 2] };
-        if (s.clock.phase === 'PLAY' && cellPos(p.dayIdx, p.half) <= nowPos(s)) continue;
-        if (jobId && safe(function () { return SB.Jobs.canDo(s, jobId, base + p.dayIdx, p.half).ok; }, false)) return p;
-        if (!jobId && (!half || half === 'ANY' || half === p.half)) return p;
-      }
-      return { dayIdx: 0, half: half === 'NIGHT' ? 'NIGHT' : 'DAY' };
-    }
-
-    function pick(jobId, dayIdx, half, quiet) {
-      var s = st(), jv = safe(function () { return SB.Jobs.get(s, jobId); }, null);
-      if (!jv) return;
-      if (picked && picked.jobId === jobId && !quiet && typeof dayIdx !== 'number') { cancelPick(); return; }
-      picked = { jobId: jobId, opt: jv.opt ? jv.opt.chosen : undefined, by: (jv.planned && jv.planned.by) || 'player' };
-      dropWhy = null;
-      cur = typeof dayIdx === 'number' ? { dayIdx: dayIdx, half: half || 'DAY' } : bestCell(s, jobId, jv.half);
-      render();
-      if (!quiet) focusCell();
-    }
-    function pickFree(f, quiet) {
-      if (picked && picked.free === f && !quiet) { cancelPick(); return; }
-      picked = { free: f };
-      dropWhy = null;
-      cur = bestCell(st(), null, f.half);
-      render();
-      if (!quiet) focusCell();
-    }
-    function cancelPick() { var had = !!picked; picked = null; dropWhy = null; render(); if (had) focusCell(); }
-
-    function drop() {
-      var s = st(), p = picked, opts = {}, r, jv, id, at = { dayIdx: cur.dayIdx, half: cur.half };
-      if (!p) return;
-      if (p.free) {
-        r = act(function (x) { return SB.Week.addJob(x, p.free.type, p.free.args); });
-        if (!r || r.ok === false || !r.jobId) { dropWhy = { dayIdx: at.dayIdx, half: at.half, text: (r && r.why) || '' }; picked = null; render(); return; }
-        id = r.jobId;
-        p = picked = { jobId: id, by: 'player' };
-        s = st();
-      }
-      jv = safe(function () { return SB.Jobs.get(s, p.jobId); }, null);
-      if (jv && jv.opt && p.opt) opts.opt = p.opt;
-      if (p.by && p.by !== 'player') opts.by = p.by;
-      r = act(function (x) { return SB.Week.plan(x, p.jobId, at.dayIdx, at.half, opts); });
-      if (!r) return;
-      if (r.ok === false) { dropWhy = { dayIdx: at.dayIdx, half: at.half, text: r.why || '' }; cur = at; render(); focusCell(); return; }
-      if (r.answer && r.answer.status === 'NO' && r.answer.text) SB.UI.toast(r.answer.text, 'no');
-      picked = null; dropWhy = null; cur = at;
-      render();
-      focusCell();
-    }
-
-    /** Pointer dragging for a note: past a few pixels it becomes a drag; over a day half it previews; let go to drop. */
-    function draggable(el, what) {
-      el.addEventListener('pointerdown', function (e) {
-        if (running || (e.button !== undefined && e.button !== 0) || st().clock.phase === 'CLOSE') return;
-        drag = { el: el, x0: e.clientX, y0: e.clientY, on: false, what: what, ghost: null, cell: null };
-        document.addEventListener('pointermove', onMove);
-        document.addEventListener('pointerup', onUp);
-        document.addEventListener('pointercancel', onCancel);
-      });
-    }
-    function startDrag(e) {
-      var w = drag.what(), r = drag.el.getBoundingClientRect(), g = drag.el.cloneNode(true);
-      drag.on = true;
-      g.className += ' cc-ghost';
-      g.removeAttribute('data-fk');
-      g.style.width = 'calc(var(--p) * ' + r.width / pxp() + ')'; g.style.height = 'calc(var(--p) * ' + r.height / pxp() + ')';
-      g.style.setProperty('--hot', HOT);
-      drag.dx = e.clientX - r.left; drag.dy = e.clientY - r.top;
-      document.body.appendChild(g);
-      drag.ghost = g;
-      moveGhost(e);
-      if (w.free) pickFree(w.free, true); else pick(w.jobId, undefined, undefined, true);
-    }
-    function moveGhost(e) { if (drag && drag.ghost) { drag.ghost.style.left = 'calc(var(--u) * ' + (e.clientX - drag.dx) / unitPx() + ')'; drag.ghost.style.top = 'calc(var(--u) * ' + (e.clientY - drag.dy) / unitPx() + ')'; } }
-    function cellAt(e) {
-      var t = null, c;
-      if (drag && drag.ghost) drag.ghost.style.display = 'none';
-      try { t = document.elementFromPoint(e.clientX, e.clientY); } catch (x) { t = null; }
-      if (drag && drag.ghost) drag.ghost.style.display = '';
-      c = t && t.closest ? t.closest('[data-cell]') : null;
-      return c && root.contains(c) ? c.getAttribute('data-cell') : null;
-    }
-    function onMove(e) {
-      var c, parts;
-      if (!drag) return;
-      if (!drag.on) { if (Math.abs(e.clientX - drag.x0) + Math.abs(e.clientY - drag.y0) < 7) return; startDrag(e); }
-      moveGhost(e);
-      c = cellAt(e);
-      if (c && c !== drag.cell) { drag.cell = c; parts = c.split('-'); cur = { dayIdx: +parts[0], half: parts[1] }; dropWhy = null; render(); }
-    }
-    function endDrag() {
-      document.removeEventListener('pointermove', onMove);
-      document.removeEventListener('pointerup', onUp);
-      document.removeEventListener('pointercancel', onCancel);
-      if (drag && drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
-    }
-    function onUp(e) {
-      var was = drag, c;
-      endDrag(); drag = null;
-      if (!was || !was.on) return;
-      justDragged = true; setTimeout(function () { justDragged = false; }, 0);
-      c = cellAt(e);
-      if (c && picked) { cur = { dayIdx: +c.split('-')[0], half: c.split('-')[1] }; drop(); }
-      else { picked = null; dropWhy = null; render(); }
-    }
-    function onCancel() { var was = drag; endDrag(); drag = null; if (was && was.on) { picked = null; render(); } }
 
     function promise(jobId, on) { act(function (x) { return SB.Jobs.promise(x, jobId, on); }); }
-
-    function usual() {
-      var s = st(), list = safe(function () { return SB.Week.suggest(s); }, []), asks = safe(function () { return SB.Week.suggestAsks ? SB.Week.suggestAsks(s) : []; }, []), n = 0;
-      /* lining up sound (and security where the room wants it) is part of the usual: the asks go out with this evening's send */
-      asks.forEach(function (a) {
-        var r = act(function (x) { return SB.Mail.ask(x, a.kind, a.toId, a.payload); });
-        if (r && r.ok !== false) { n++; SB.UI.toast(L('usualAsked', { name: a.name || '', role: a.role }), 'info'); }
-      });
-      if (!list.length) { if (!n) SB.UI.toast(L('usualNone'), 'info'); return; }
-      list.forEach(function (e) {
-        var opts = {}, r;
-        if (e.opt) opts.opt = e.opt;
-        if (e.by && e.by !== 'player') opts.by = e.by;
-        r = act(function (x) { return SB.Week.plan(x, e.jobId, e.dayIdx, e.half, opts); });
-        if (r && r.ok !== false) n++;
-      });
-      if (!n) SB.UI.toast(L('usualNone'), 'info');
-    }
 
     /** Tearing off a shift: what it costs is said first, then the tabs. */
     function askDropShift(s, d) {
@@ -814,6 +599,37 @@
           { label: L('keepIt'), on: function () { close(); } }
         ])
       ]), { label: L('dropShift') });
+    }
+
+    /* ---------------- doing things tonight ---------------- */
+
+    /** Do a job now (Week.doNow). Refusals are said by SB.UI.act; a friend's no and a late night are said here. */
+    function doNow(id, o) {
+      var r = act(function (x) { return SB.Week.doNow(x, id, o || {}); });
+      if (!r || r.ok === false) return r;
+      stageCards(r.records || []);
+      if (r.answer && r.answer.text) SB.UI.toast(r.answer.text, r.answer.status === 'NO' ? 'no' : 'info');
+      (r.records || []).forEach(function (x) { if (x && x.t === 'OVERTIME' && x.text) SB.UI.toast(x.text, 'info'); });
+      return r;
+    }
+    function canNow(s, id, o) { return safe(function () { return SB.Week.canDoNow(s, id, o || {}); }, null) || { ok: false, why: '' }; }
+    function fitsNow(s, hours) { return safe(function () { return SB.Week.fits(s, hours); }, null) || { ok: true }; }
+    function msgHours() { return (SB.Config.MAIL && num(SB.Config.MAIL.hours)) ? SB.Config.MAIL.hours : 0.5; }
+    function cost(n) { return SB.Clock ? SB.Clock.cost(n) : String(n); }
+
+    /** A free job (a visit, a check on a band...): it becomes a job and is done on the spot; if it cannot be done tonight
+     *  the job is taken off again. */
+    function doFree(f) {
+      var r = act(function (x) { return SB.Week.addJob(x, f.type, f.args); }), id, d;
+      if (!r || r.ok === false || !r.jobId) return;
+      id = r.jobId;
+      d = doNow(id);
+      if (!d || d.ok === false) act(function (x) { return SB.Week.removeJob(x, id); });
+    }
+
+    function callNight() {
+      var r = act(function (x) { return SB.Week.endNight(x); });
+      if (r && r.ok !== false) { userPaused = false; resume(); }
     }
 
     /* ---------------- the pad of notes, on the table beside the page ---------------- */
@@ -868,8 +684,8 @@
     }
 
     function pad(s, v) {
-      var t = safe(function () { return SB.Jobs.tray(s); }, { late: [], thisWeek: [], soon: [], later: [] }), opt = [], free, rows, now, rest,
-          first = s.clock.week === 0 && s.clock.phase === 'PLAN' && !(s.week.plan || []).length, groups = [], any = false, frozen = running || v.phase === 'CLOSE' || v.phase === 'OVER';
+      var t = safe(function () { return SB.Jobs.tray(s); }, { late: [], thisWeek: [], soon: [], later: [] }), opt = [], free, rows, now, rest, tn = v.tonight,
+          first = s.clock.week === 0 && tn && tn.open && !(tn.spent > 0), groups = [], any = false, frozen = running || v.phase === 'CLOSE' || v.phase === 'OVER';
       function main(list) { return list.filter(function (j) { if (j.optional) { opt.push(j); return false; } return j.mode === 'HOURS' || !!j.showId; }); }
       var late = main(t.late || []), week = main(t.thisWeek || []), soon = main(t.soon || []), later = main(t.later || []);
       if (late.length) groups.push(group('late', L('late'), late, 'goldenrod', 6, true));
@@ -883,14 +699,13 @@
       now = rows.filter(function (r) { return r.prio; });
       rest = rows.filter(function (r) { return !r.prio; });
       return h('aside', { class: 'cc-pad' + (frozen ? ' is-frozen' : ''), aria: { label: L('tray') } }, [
-        picked ? held(s) : null,
-        first && !picked ? h('p', { class: 'cc-hint' }, [h('span', { class: 'cc-hint-arrow', aria: { hidden: 'true' } }, pic(40, 22, K().arrow(38, 14, 4, 8, { seed: 'hint', sw: 3, stroke: '#f4f2ea', head: 9 }))), L('firstWeek')]) : null,
+        first ? h('p', { class: 'cc-hint' }, [h('span', { class: 'cc-hint-arrow', aria: { hidden: 'true' } }, pic(40, 22, K().arrow(38, 14, 4, 8, { seed: 'hint', sw: 3, stroke: '#f4f2ea', head: 9 }))), L('firstWeek')]) : null,
         groups,
         !any && !rows.length ? h('p', { class: 'cc-empty', text: L('emptyTray') }) : null,
         rows.length ? h('section', { class: 'cc-group cc-group--free' }, [
           h('span', { class: 'cc-group-k', text: L('free') }),
-          now.map(freeNote),
-          rest.length ? pile('free', rest.length, rest.map(freeNote), 'mint', rest[0].sub && rest[0].sub.text) : null
+          now.map(function (r) { return freeNote(s, r, frozen); }),
+          rest.length ? pile('free', rest.length, rest.map(function (r) { return freeNote(s, r, frozen); }), 'mint', rest[0].sub && rest[0].sub.text) : null
         ]) : null
       ]);
 
@@ -903,9 +718,9 @@
           c.push(j);
         });
         function one(c) {
-          if (c.length === 1) return padNote(s, c[0], stk, 0, hot);
-          return h('div', { class: 'cc-cluster' }, [padNote(s, c[0], stk, c.length, hot),
-            pile(key + ':' + c[0].type + ':' + (c[0].showId || ''), c.length - 1, c.slice(1).map(function (j) { return padNote(s, j, stk, 0, hot); }), stk, c[1].label)]);
+          if (c.length === 1) return padNote(s, c[0], stk, 0, hot, frozen);
+          return h('div', { class: 'cc-cluster' }, [padNote(s, c[0], stk, c.length, hot, frozen),
+            pile(key + ':' + c[0].type + ':' + (c[0].showId || ''), c.length - 1, c.slice(1).map(function (j) { return padNote(s, j, stk, 0, hot, frozen); }), stk, c[1].label)]);
         }
         top = clusters.slice(0, show); restL = clusters.slice(show);
         return h('section', { class: 'cc-group cc-group--' + key }, [
@@ -930,30 +745,47 @@
       ]);
     }
 
-    function padNote(s, j, stk, stack, hot) {
-      var sub = subjectOf(s, j), sh = j.showId && s.shows ? s.shows[j.showId] : null, isHeld = heldId() === j.id, el, stt = (j.window && j.window.state) || 'NONE',
-          hours = num(j.hours) ? j.hours : 0, canPlan = j.mode === 'HOURS';
+    /** A job's note: what it is, who for, what it costs and when it is due (late in hot ink); under it the DO IT TONIGHT
+     *  tab, or who has it. Tap the note for its choices (js: openNote). A job that is not done with hours opens its show. */
+    function padNote(s, j, stk, stack, hot, frozen) {
+      var sub = subjectOf(s, j), sh = j.showId && s.shows ? s.shows[j.showId] : null, el, stt = (j.window && j.window.state) || 'NONE',
+          hours = num(j.hours) ? j.hours : 0, canDo = j.mode === 'HOURS', due = SB.Clock ? SB.Clock.due(j, { today: s.clock.day }) : null;
       (j.riders || []).forEach(function (r) { if ((r.status === 'PROMISED' || r.planned) && num(r.hours)) hours += r.hours; });
-      el = h('button', { type: 'button', class: 'cc-note pz-hl' + (canPlan ? ' cc-lift' : ' is-show-only') + (isHeld ? ' is-held' : '') + (j.planned ? ' is-planned' : '') + (stack > 1 ? ' is-stacked' : ''),
+      el = h('button', { type: 'button', class: 'cc-note pz-hl' + (canDo ? '' : ' is-show-only') + (j.planned ? ' is-planned' : '') + (stack > 1 ? ' is-stacked' : ''),
                          data: { fk: 'note-' + j.id, job: j.id },
-                         aria: { label: L('noteSay', { job: (j.label || '') + (sub ? ': ' + sub : ''), h: hours, win: (j.window && j.window.label) || '' }), pressed: isHeld ? 'true' : 'false' },
-                         on: { click: function () { if (justDragged) return; if (canPlan) pick(j.id); else if (j.showId) SB.UI.go('show', { showId: j.showId }); } } }, [
+                         aria: { label: L('noteSay', { job: (j.label || '') + (sub ? ': ' + sub : ''), cost: canDo ? cost(hours) : '', due: due ? due.text.toLowerCase() : ((j.window && j.window.label) || '') }) },
+                         on: { click: function () { if (canDo) openNote(j.id); else if (j.showId) SB.UI.go('show', { showId: j.showId }); } } }, [
         stack > 1 ? h('span', { class: 'cc-under-note', aria: { hidden: 'true' } }, sheet(stk, 'stk' + j.id)) : null,
-        sheet(stk, 'n' + j.id, canPlan ? { ear: 14 } : null), canPlan ? ear(stk, 14) : null,
+        sheet(stk, 'n' + j.id),
         sh ? h('span', { class: 'cc-note-thumb' }, flyerThumbOnly(s, j.showId, 26)) : null,
         h('span', { class: 'cc-note-txt' }, [
           hand(j.label || '', 13, { max: 150, say: false }),
           sub ? h('span', { class: 'cc-note-who', text: sub }) : null
         ]),
-        h('span', { class: 'cc-note-foot' }, [canPlan ? ticks(hours) : null,
+        h('span', { class: 'cc-note-foot' }, [
+          canDo && hours ? h('span', { class: 'cc-note-cost', text: cost(hours) }) : null,
+          due ? h('span', { class: 'cc-note-due' + (due.late ? ' is-late' : ''), text: due.text }) : null,
           stack > 1 ? h('span', { class: 'cc-note-x', text: 'x' + stack }) : null,
-          j.planned ? h('span', { class: 'cc-note-on', text: '> ' + SB.time.fmt(s.clock.week * 7 + j.planned.dayIdx, 'dow3') }) : null,
           j.opt ? h('span', { class: 'cc-note-cash', text: '$' }) : null]),
         stt === 'LATE' || hot ? h('span', { class: 'cc-hotmark', aria: { hidden: 'true' }, text: '!!' }) : null
       ]);
-      if (canPlan) draggable(el, function () { return { jobId: j.id }; });
-      return el;
+      if (!canDo) return el;
+      return h('div', { class: 'cc-notewrap' }, [el, nowRow(s, j, frozen)]);
     }
+    /* the tab under a note: DO IT TONIGHT with its hours, or why it cannot be done tonight; or who has it */
+    function nowRow(s, j, frozen) {
+      var by = j.planned && j.planned.by && j.planned.by !== 'player' ? j.planned.by : null, r;
+      if (by) return h('p', { class: 'cc-has', text: L('has', { name: (j.planned.byName || personLabel(s, by) || '') }) });
+      if (j.status !== 'TODO') return null;
+      r = canNow(s, j.id);
+      return h('div', { class: 'cc-tabs' }, [tab({
+        label: L('doNow'), say: L('doNowSay', { job: j.label || '' }), n: false, cost: cost(r.ok ? r.hours : j.hours), disabled: frozen || !r.ok,
+        why: r.ok ? null : SB.Clock.why(r), note: r.ok && r.overtime > 0 ? L('stayUp', { n: cost(r.overtime) }) : null,
+        fk: 'now-' + j.id, tut: 'do-tonight', ref: j.id, cls: 'cc-tab--mini cc-tab--now',
+        on: function () { doNow(j.id); }
+      })]);
+    }
+
     function flyerThumbOnly(s, id, width) {
       var sh = s.shows[id];
       if (!sh || !(SB.UI.parts && SB.UI.parts.flyerThumb)) return null;
@@ -970,105 +802,133 @@
       });
       return rows;
     }
-    function freeNote(row) {
+    /* a free job's note, or a band's checks as small notes on one card: tapping one does it tonight */
+    function freeNote(s, row, frozen) {
       var sub = row.sub, who = sub && sub.text;
+      function ok(f) { return fitsNow(s, f.hours); }
       if (sub && sub.vet) {
         return h('div', { class: 'cc-vet' }, [
           sheet('blue', 'v' + row.id),
           h('span', { class: 'cc-vet-head' }, [hand(L('vetFor', { band: who }), 13, { max: 210 }), h('span', { class: 'cc-note-who', text: L('vetHelp') })]),
           h('span', { class: 'cc-vet-tabs' }, row.jobs.map(function (f, i) {
-            var isHeld = picked && picked.free === f, el = h('button', { type: 'button', class: 'cc-mini cc-lift pz-hl' + (isHeld ? ' is-held' : ''), data: { fk: 'free-' + row.id + '-' + i },
-                                    aria: { label: L('addOne', { job: f.label, who: who }) + ', ' + SB.text.label('ui.c.hours', { n: f.hours }), pressed: isHeld ? 'true' : 'false' },
-                                    on: { click: function () { if (!justDragged) pickFree(f); } } }, [
-              sheet('white', 'vt' + i + row.id, { ear: 9 }), ear('white', 9),
-              h('span', { class: 'cc-mini-l', text: f.label }), ticks(f.hours)
+            var r = ok(f);
+            return h('button', { type: 'button', class: 'cc-mini pz-hl', disabled: frozen || r.ok === false, data: { fk: 'free-' + row.id + '-' + i },
+                                 title: r.ok === false ? SB.Clock.why(r) : null,
+                                 aria: { label: L('addOne', { job: f.label, who: who }) + ', ' + cost(f.hours) + (r.ok === false ? ', ' + SB.Clock.why(r) : '') },
+                                 on: { click: function () { doFree(f); } } }, [
+              sheet('white', 'vt' + i + row.id),
+              h('span', { class: 'cc-mini-l', text: f.label }), h('span', { class: 'cc-note-cost', text: cost(f.hours) })
             ]);
-            draggable(el, function () { return { free: f }; });
-            return el;
           }))
         ]);
       }
       return h('div', { class: 'cc-freewrap' }, row.jobs.map(function (f, i) {
-        var isHeld = picked && picked.free === f, el = h('button', { type: 'button', class: 'cc-note cc-lift pz-hl' + (isHeld ? ' is-held' : ''), data: { fk: 'free-' + row.id + '-' + i },
-                         aria: { label: who ? L('addOne', { job: f.label, who: who }) + ', ' + SB.text.label('ui.c.hours', { n: f.hours }) : L('add') + ' ' + f.label, pressed: isHeld ? 'true' : 'false' },
-                         on: { click: function () { if (!justDragged) pickFree(f); } } }, [
-          sheet('mint', 'f' + row.id + i, { ear: 14 }), ear('mint', 14),
-          h('span', { class: 'cc-note-txt' }, [
-            hand(f.label, 12, { max: 150, say: false }),
-            who ? h('span', { class: 'cc-note-who', text: who + (sub.more ? ' · ' + sub.more : '') }) : null
+        var r = ok(f);
+        return h('div', { class: 'cc-notewrap' }, [
+          h('div', { class: 'cc-note', role: 'note' }, [
+            sheet('mint', 'f' + row.id + i),
+            h('span', { class: 'cc-note-txt' }, [
+              hand(f.label, 12, { max: 150 }),
+              who ? h('span', { class: 'cc-note-who', text: who + (sub.more ? ' · ' + sub.more : '') }) : null
+            ]),
+            h('span', { class: 'cc-note-foot' }, [h('span', { class: 'cc-note-cost', text: cost(f.hours) })])
           ]),
-          h('span', { class: 'cc-note-foot' }, [ticks(f.hours)])
+          h('div', { class: 'cc-tabs' }, [tab({ label: L('doNow'), say: who ? L('addOne', { job: f.label, who: who }) : L('doNowSay', { job: f.label }), n: false, cost: cost(f.hours),
+                                               disabled: frozen || r.ok === false, why: r.ok === false ? SB.Clock.why(r) : null, fk: 'free-' + row.id + '-' + i, cls: 'cc-tab--mini cc-tab--now',
+                                               on: function () { doFree(f); } })])
         ]);
-        draggable(el, function () { return { free: f }; });
-        return el;
       }));
     }
 
-    /** The held note, lifted off the pad: what it is, why, its price tags, who does it, its promises, and the tabs. */
-    function held(s) {
-      var jv, people, w, day = s.clock.week * 7 + cur.dayIdx, sub, job;
-      if (picked.free) {
-        return h('section', { class: 'cc-held', role: 'region', aria: { label: L('picked'), live: 'polite' } }, [
-          sheet('mint', 'heldf'), h('span', { class: 'cc-held-tape', aria: { hidden: 'true' } }),
-          hand(picked.free.label, 16, { max: 220 }),
-          ticks(picked.free.hours),
-          h('p', { class: 'cc-held-help', text: L('pickHelp') }),
-          h('div', { class: 'cc-tabs cc-tabs--held' }, [tab({ label: L('cancel'), fk: 'ptab-put', on: cancelPick })])
-        ]);
-      }
-      jv = safe(function () { return SB.Jobs.get(s, picked.jobId); }, null);
-      if (!jv) return null;
-      job = s.jobs[jv.id];
-      sub = subjectOf(s, jv);
+    /* ---------------- a note picked up: its choices, who does it, and DO IT TONIGHT ---------------- */
+
+    function openNote(id) {
+      var s = st(), jv = safe(function () { return SB.Jobs.get(s, id); }, null), box;
+      if (!jv || running) return;
+      if (held && held.close) held.close();
+      held = { jobId: id, opt: jv.opt ? jv.opt.chosen : undefined, effort: jv.type === 'MAKE_FLYER' ? ((SB.Config.USUAL && SB.Config.USUAL.effort) || 'STANDARD') : null,
+               by: (jv.planned && jv.planned.by) || 'player' };
+      box = h('div', { class: 'mv-slap cc-slap cc-slap--note', style: { '--hot': HOT } });
+      held.box = box;
+      fillNote();
+      held.close = SB.UI.card(box, { label: jv.label || L('tray'), onClose: function () { held = null; } });
+    }
+    function noteOpts() {
+      var o = {};
+      if (!held) return o;
+      if (held.opt !== undefined && held.opt !== null) o.opt = held.opt;
+      if (held.effort) o.effort = held.effort;
+      if (held.by && held.by !== 'player') o.by = held.by;
+      return o;
+    }
+    function shut() { var c = held && held.close; held = null; if (c) c(); }
+    function fillNote() {
+      var s = st(), jv, job, sub, people, o, r, by, byName, effs, box = held && held.box;
+      if (!box || !s) return;
+      jv = safe(function () { return SB.Jobs.get(s, held.jobId); }, null);
+      if (!jv || jv.status !== 'TODO') { shut(); return; }
+      job = s.jobs[jv.id]; sub = subjectOf(s, jv); o = noteOpts(); r = canNow(s, jv.id, o);
       people = safe(function () { return SB.People.circle(s).people || []; }, []);
-      w = safe(function () { return SB.Jobs.window(s, jv.id, day); }, jv.window);
-      return h('section', { class: 'cc-held', role: 'region', aria: { label: L('picked') + ': ' + (jv.label || ''), live: 'polite' } }, [
-        sheet('goldenrod', 'held'), h('span', { class: 'cc-held-tape', aria: { hidden: 'true' } }),
+      by = held.by && held.by !== 'player' ? held.by : null;
+      byName = by ? (personLabel(s, by) || '') : '';
+      effs = jv.type === 'MAKE_FLYER' && SB.Config.FLYER && SB.Config.FLYER.HOURS ? Object.keys(SB.Config.FLYER.HOURS) : null;
+      SB.UI.clear(box);
+      [
         h('div', { class: 'cc-held-top' }, [
           jv.showId && s.shows[jv.showId] ? h('span', { class: 'cc-note-thumb' }, flyerThumbOnly(s, jv.showId, 36)) : null,
-          h('span', null, [hand(jv.label || '', 17, { max: 200 }), sub ? h('span', { class: 'cc-note-who', text: sub }) : null])
+          h('span', null, [hand(jv.label || '', 17, { max: 260 }), sub ? h('span', { class: 'cc-note-who', text: sub }) : null])
         ]),
-        h('div', { class: 'cc-held-row' }, [ticks(jv.hours), w && w.label ? h('span', { class: 'cc-held-win cc-held-win--' + String(w.state || '').toLowerCase(), text: w.label }) : null]),
+        SB.Clock ? SB.Clock.slip(s, { crunch: 0, hot: HOT, extra: r.ok ? r.hours : 0 }) : null,
+        h('div', { class: 'cc-held-row' }, [
+          (function () { var d = SB.Clock ? SB.Clock.due(jv, { today: s.clock.day }) : null; return d ? h('span', { class: 'cc-note-due' + (d.late ? ' is-late' : ''), text: d.text }) : null; })(),
+          jv.window && jv.window.label && jv.window.state !== 'LATE' ? h('span', { class: 'cc-held-win cc-held-win--' + String(jv.window.state || '').toLowerCase(), text: jv.window.label }) : null
+        ]),
         jv.why ? h('p', { class: 'cc-held-why', text: jv.why }) : null,
         jv.opt ? h('div', { class: 'cc-tabs cc-tabs--opts', role: 'radiogroup', aria: { label: SB.text.label('ui.c.priced') } }, jv.opt.choices.map(function (c) {
-          var on = (picked.opt || jv.opt.chosen) === c.key;
-          return tab({ role: 'radio', on2: on, label: c.label || c.key, cost: num(c.cost) && c.cost ? SB.text.money(c.cost) : null, disabled: c.enabled === false, why: c.why || null,
-                       on: function () { picked.opt = c.key; render(); } });
+          var on = (held.opt || jv.opt.chosen) === c.key;
+          return tab({ role: 'radio', on2: on, n: false, label: c.label || c.key, cost: num(c.cost) && c.cost ? SB.text.money(c.cost) : null, disabled: c.enabled === false, why: c.why || null,
+                       on: function () { held.opt = c.key; fillNote(); } });
         })) : null,
         jv.opt && jv.showId ? h('p', { class: 'cc-held-why' }, C().ExposureLine({ exposure: safe(function () { return SB.Money.exposure(s, jv.showId); }, null) })) : null,
+        effs && !by ? h('div', { class: 'cc-who' }, [
+          h('span', { class: 'cc-who-k', text: L('effort') }),
+          h('div', { class: 'cc-tabs cc-tabs--opts', role: 'radiogroup', aria: { label: L('effort') } }, effs.map(function (k) {
+            return tab({ role: 'radio', on2: held.effort === k, n: false, label: L('effortWord.' + k), cost: cost(SB.Config.FLYER.HOURS[k]),
+                         on: function () { held.effort = k; fillNote(); } });
+          }))
+        ]) : null,
         jv.helperOk ? h('div', { class: 'cc-who' }, [
           h('span', { class: 'cc-who-k', text: L('who') }),
           h('div', { class: 'cc-tabs cc-tabs--who', role: 'radiogroup', aria: { label: L('who') } }, [{ id: 'player', name: L('me') }].concat(people).map(function (x) {
-            var on = (picked.by || 'player') === x.id, name = x.name || [x.first, x.last].filter(Boolean).join(' ');
-            return tab({ role: 'radio', on2: on, label: name, lead: x.id === 'player' ? null : C().PersonStamp({ person: x, size: 24 }), on: function () { picked.by = x.id; render(); } });
-          }))
+            var on = (held.by || 'player') === x.id, name = x.name || [x.first, x.last].filter(Boolean).join(' ');
+            return tab({ role: 'radio', on2: on, n: false, label: name, lead: x.id === 'player' ? null : C().PersonStamp({ person: x, size: 24 }), on: function () { held.by = x.id; fillNote(); } });
+          })),
+          h('p', { class: 'cc-held-help', text: L('whoHelp') })
         ]) : null,
-        jv.riders && jv.riders.length ? h('ul', { class: 'cc-promises' }, jv.riders.map(function (r) {
-          var on = r.status === 'PROMISED' || r.status === 'DONE' || !!r.planned;
+        jv.riders && jv.riders.length ? h('ul', { class: 'cc-promises' }, jv.riders.map(function (rd) {
+          var on = rd.status === 'PROMISED' || rd.status === 'DONE' || !!rd.planned;
           return h('li', null, [
-            h('button', { type: 'button', role: 'checkbox', class: 'cc-tick pz-hl' + (on ? ' is-on' : ''), disabled: r.status === 'DONE', aria: { checked: on ? 'true' : 'false', label: r.label || '' },
-                          on: { click: function () { promise(r.id, !on); } } }, [
-              pic(24, 22, boxArt(on, 'pb' + r.id)),
-              h('span', { class: 'cc-tick-l', text: r.label || '' }),
-              num(r.hours) && r.hours ? ticks(r.hours) : null,
-              r.cost ? h('span', { class: 'cc-tick-cost', text: r.cost.lo === r.cost.hi ? SB.text.money(r.cost.lo) : SB.text.money(r.cost.lo) + '-' + SB.text.money(r.cost.hi) }) : null
+            h('button', { type: 'button', role: 'checkbox', class: 'cc-tick pz-hl' + (on ? ' is-on' : ''), disabled: rd.status === 'DONE', aria: { checked: on ? 'true' : 'false', label: rd.label || '' },
+                          on: { click: function () { promise(rd.id, !on); } } }, [
+              pic(24, 22, boxArt(on, 'pb' + rd.id)),
+              h('span', { class: 'cc-tick-l', text: rd.label || '' }),
+              num(rd.hours) && rd.hours ? h('span', { class: 'cc-note-cost', text: cost(rd.hours) }) : null,
+              rd.cost ? h('span', { class: 'cc-tick-cost', text: rd.cost.lo === rd.cost.hi ? SB.text.money(rd.cost.lo) : SB.text.money(rd.cost.lo) + '-' + SB.text.money(rd.cost.hi) }) : null
             ]),
-            !on && (r.text || r.why) ? h('p', { class: 'cc-tick-why', text: r.text || r.why }) : null
+            !on && (rd.text || rd.why) ? h('p', { class: 'cc-tick-why', text: rd.text || rd.why }) : null
           ]);
         })) : null,
-        h('p', { class: 'cc-held-help', text: L('pickHelp') }),
         h('div', { class: 'cc-tabs cc-tabs--held' }, [
-          tab({ label: L('cancel'), fk: 'ptab-put', on: cancelPick }),
-          jv.planned ? tab({ label: L('unplan'), fk: 'ptab-peel', on: function () {
-            var id = picked.jobId, r = act(function (x) { return SB.Week.unplan(x, id); });
-            if (r && r.ok !== false) { picked = null; render(); }
+          tab({ label: by ? L('askThem', { name: byName }) : L('doNow'), n: false, hot: r.ok, cost: cost(r.ok ? r.hours : (by ? msgHours() : jv.hours)), disabled: !r.ok || running,
+                why: r.ok ? null : SB.Clock.why(r), fk: 'held-now', tut: 'do-tonight-card', ref: jv.id,
+                on: function () { var id = jv.id, x = doNow(id, noteOpts()); if (x && x.ok !== false) shut(); } }),
+          job && job.free ? tab({ label: L('remove'), n: false, fk: 'held-crumple', on: function () {
+            var id = jv.id, x = act(function (y) { return SB.Week.removeJob(y, id); });
+            if (x && x.ok !== false) shut();
           } }) : null,
-          job && job.free && jv.status !== 'DONE' ? tab({ label: L('remove'), fk: 'ptab-crumple', on: function () {
-            var id = picked.jobId, r = act(function (x) { return SB.Week.removeJob(x, id); });
-            if (r && r.ok !== false) { picked = null; render(); }
-          } }) : null
+          tab({ label: L('putBack'), n: false, fk: 'held-down', on: shut })
         ])
-      ]);
+      ].forEach(function (el) { if (el) box.appendChild(el); });
     }
 
     /* ---------------- under the page, on the table: coming up, waiting on, the phone ---------------- */
@@ -1103,8 +963,11 @@
       })) : h('p', { class: 'cc-none', text: L('noRunway') }));
     }
 
+    /** The answers you are waiting on, and what goes out tonight. A chase is a message: it costs its half hour, and says
+     *  so; a message written tonight can be taken back, and the half hour comes back with it. */
     function waiting(s) {
-      var list = safe(function () { return SB.Mail.waiting(s); }, []), out = safe(function () { return SB.Mail.outbox(s); }, []), end = s.clock.week * 7 + 6;
+      var list = safe(function () { return SB.Mail.waiting(s); }, []), out = safe(function () { return SB.Mail.outbox(s); }, []), end = s.clock.week * 7 + 6,
+          mh = msgHours(), fit = fitsNow(s, mh);
       return scrap('cc-waiting', 'bone', 'waiting', L('waiting'), [
         list.length ? h('ul', { class: 'cc-slips' }, list.map(function (a) {
           var who = a.toName || '';
@@ -1113,7 +976,8 @@
             a.what ? h('span', { class: 'cc-slip-what', text: a.what }) : null,
             a.overdue ? h('span', { class: 'cc-slip-late', text: L('overdue') }) : null,
             h('div', { class: 'cc-tabs cc-tabs--slip' }, [
-              !a.chased ? tab({ label: L('chase'), say: L('chaseSay', { who: who }), on: function () { act(function (x) { return SB.Mail.chase(x, a.id); }); } }) : null,
+              !a.chased ? tab({ label: L('chase'), say: L('chaseSay', { who: who }), cost: cost(mh), disabled: fit.ok === false, why: fit.ok === false ? SB.Clock.why(fit) : null,
+                                on: function () { act(function (x) { return SB.Mail.chase(x, a.id); }); } }) : null,
               a.needBy == null ? tab({ label: L('needBy'), say: L('needBySay', { who: who }), on: function () { act(function (x) { return SB.Mail.setNeedBy(x, a.id, end); }); } }) : null,
               tab({ label: L('withdraw'), say: L('withdrawSay', { who: who }), on: function () { act(function (x) { return SB.Mail.withdraw(x, a.id); }); } })
             ])
@@ -1122,7 +986,14 @@
         out.length ? h('div', { class: 'cc-outbox' }, [
           pic(30, 22, '<rect x="2" y="4" width="24" height="16" fill="#f4f2ea" stroke="' + TONER + '" stroke-width="2"/><path d="M2 4L14 13L26 4" fill="none" stroke="' + TONER + '" stroke-width="2"/>'),
           h('span', { class: 'cc-outbox-k', text: L('outbox') }),
-          h('ul', null, out.map(function (o) { return h('li', { text: (o.toName || '') + (o.what ? ': ' + o.what : '') }); }))
+          h('ul', null, out.map(function (o) {
+            var who = o.toName || '';
+            return h('li', null, [
+              h('span', { text: who + (o.what ? ': ' + o.what : '') }),
+              o.id && SB.Mail.unqueue ? tab({ label: L('takeBack'), say: L('takeBackSay', { who: who }), n: false, cls: 'cc-tab--mini',
+                                              on: function () { act(function (x) { return SB.Mail.unqueue(x, o.id); }); } }) : null
+            ]);
+          }))
         ]) : null
       ]);
     }
@@ -1164,11 +1035,18 @@
       return homes[r.t] === 'day log';
     }
 
-    /* ---------------- the play loop ---------------- */
+    /* ---------------- the play loop: the night played out ---------------- */
 
-    function delay() { var sp = SB.UI.prefs ? SB.UI.prefs.get('speed') : 'normal'; return sp === 'fast' ? 300 : 900; }
+    function delay() { var sp = SB.UI.prefs ? SB.UI.prefs.get('speed') : 'normal'; return sp === 'fast' ? 220 : 620; }
     function schedule(ms) { if (timer) clearTimeout(timer); timer = setTimeout(tick, ms); }
-    function resume() { if (!alive) return; running = true; picked = null; render(); schedule(0); }
+    /* resume: play on to the next stop; the shell hears it (the lamp, the reels) */
+    function resume() {
+      if (!alive || running) return;
+      running = true; userPaused = false;
+      if (held) shut();
+      SB.UI.fire('sb-play', { cmd: 'resume' });
+      render(); schedule(0);
+    }
     function pause(tell) { running = false; if (timer) { clearTimeout(timer); timer = null; } if (tell) SB.UI.fire('sb-play', { cmd: 'pause' }); if (alive) render(); }
     function tick() {
       var res;
@@ -1180,33 +1058,63 @@
     }
     function stopKey(stop) { return stop ? stop.kind + ':' + (stop.messageId || stop.askId || stop.showId || (stop.decision && stop.decision.id) || '') : null; }
 
+    /* Between stops: the clock is in the middle of a night or a morning, with nothing waiting on the player. Time does
+     * not sit there: the loop plays on by itself (kick). */
+    function between(s) {
+      var stop = s && s.clock.stop;
+      if (s && s.clock.phase === 'PLAN') return true;                 // an old save made while planning: Week.step plays it
+      if (!s || s.clock.phase !== 'PLAY') return false;
+      if (!stop) return true;
+      if (stop.kind === 'SHOW_NIGHT' || stop.kind === 'SETTLE') return showDone(s, stop.showId);
+      if (stop.kind === 'REPLY' || stop.kind === 'NEED_BY') return SEEN.stop === stopKey(stop);
+      return false;
+    }
+    function busyElsewhere() {
+      var ov = typeof document !== 'undefined' && document.getElementById ? document.getElementById('overlay') : null;
+      if (SB.Cutscene && SB.Cutscene.playing && safe(function () { return SB.Cutscene.playing(); }, false)) return true;
+      return !!(ov && ov.classList && ov.classList.contains('is-open'));
+    }
+    /* checked a moment after a redraw, so a cutscene or a card that is about to open has opened */
+    function kick() {
+      if (running || syncing || userPaused || cardOpen || kickT) return;
+      kickT = setTimeout(function () {
+        kickT = null;
+        if (!alive || running || syncing || userPaused || cardOpen || busyElsewhere()) return;
+        if (between(st())) resume();
+      }, 30);
+    }
+
     /** One step of the loop. Returns 'go' (keep going), 'wait' (a card or another screen has it), 'end' or 'stop'. */
     function stepOnce() {
-      var s = st(), stop, r, was;
-      if (!s || s.clock.phase !== 'PLAY') return 'stop';
+      var s = st(), stop, r;
+      if (!s || (s.clock.phase !== 'PLAY' && s.clock.phase !== 'PLAN')) return 'stop';
       if (cardOpen) return 'wait';
       stop = s.clock.stop;
       if (stop) {
+        if (stop.kind === 'EVENING') return 'stop';
         if (stop.kind === 'END_OF_WEEK') return 'end';
         if (stop.kind === 'DECISION') { openDecision(stop.decision); return 'wait'; }
         if ((stop.kind === 'SHOW_NIGHT' || stop.kind === 'SETTLE') && !showDone(s, stop.showId)) { SB.UI.go('night', { showId: stop.showId }); return 'wait'; }
-        if ((stop.kind === 'REPLY' || stop.kind === 'NEED_BY') && seenStop !== stopKey(stop)) { handleStop(stop); return 'wait'; }
+        if ((stop.kind === 'REPLY' || stop.kind === 'NEED_BY') && SEEN.stop !== stopKey(stop)) { handleStop(stop); return 'wait'; }
       }
-      was = guideKey(s);
       r = act(function (x) { return SB.Week.step(x); });
       if (!r || r.ok === false) return 'stop';
       stageCards(r.records || []);
       if (!alive) return 'wait';
       if (r.stop) return handleStop(r.stop);
-      /* the guided first show: time stops when there is something new to do, so the next text is read (js/ui/story.js) */
-      if (was !== guideKey(st())) return 'stop';
       return 'go';
     }
 
-    /* where the walkthrough stands: its step and what to do inside it; '' when it is off */
-    function guideKey(s) {
-      var c = safe(function () { return s && s.story && s.story.tutorial && s.story.tutorial.on && SB.Tutorial ? SB.Tutorial.current(s) : null; }, null);
-      return c ? c.step + ':' + (c.stage || '') : '';
+    /** The night played out in one go, up to the next stop (the 'next' command: the tests, and a new game sitting down). */
+    function playOut() {
+      var res = 'go', i;
+      if (running) pause(true);
+      syncing = true;
+      try { for (i = 0; i < 400 && res === 'go' && alive; i++) res = stepOnce(); }
+      finally { syncing = false; }
+      if (res === 'end' || res === 'stop') SB.UI.fire('sb-play', { cmd: 'pause' });
+      render();
+      return res;
     }
 
     function showDone(s, id) { var x = s.shows && s.shows[id]; return !x || x.status === 'PLAYED' || x.status === 'CANCELLED'; }
@@ -1214,9 +1122,10 @@
     function handleStop(stop) {
       var s = st();
       switch (stop.kind) {
+        case 'EVENING': return 'stop';
         case 'DECISION': openDecision(stop.decision); return 'wait';
-        case 'REPLY': seenStop = stopKey(stop); openReply(stop); return 'wait';
-        case 'NEED_BY': seenStop = stopKey(stop); openNeedBy(stop); return 'wait';
+        case 'REPLY': SEEN.stop = stopKey(stop); openReply(stop); return 'wait';
+        case 'NEED_BY': SEEN.stop = stopKey(stop); openNeedBy(stop); return 'wait';
         case 'SHOW_NIGHT': case 'SETTLE':
           if (!showDone(s, stop.showId)) { SB.UI.go('night', { showId: stop.showId }); return 'wait'; }
           return 'go';
@@ -1311,18 +1220,14 @@
 
     /* ---------------- wiring ---------------- */
 
+    /* 'sb-play': resume and pause the play-out (the tape deck, js/ui/app.js); 'next' plays the night out in one go.
+     * detail.by === 'player' is the player pausing it on the deck: then it waits for them. */
     offPlay = SB.UI.on(document, 'sb-play', function (e) {
       var cmd = e && e.detail && e.detail.cmd;
       if (cmd === 'resume') { if (!running) resume(); }
-      else if (cmd === 'pause') { if (running) pause(false); }
-      else if (cmd === 'next') {
-        if (running) pause(true);
-        var res = stepOnce();
-        if (res === 'end' || res === 'stop') SB.UI.fire('sb-play', { cmd: 'pause' });
-        render();
-      }
+      else if (cmd === 'pause') { if (e.detail.by === 'player') userPaused = true; if (running) pause(false); }
+      else if (cmd === 'next') { userPaused = false; playOut(); }
     });
-    offKeys = SB.UI.keys({ Escape: function () { if (picked) cancelPick(); } });
     if (typeof window !== 'undefined' && window.addEventListener) {
       var rz = null, onRz = function () { if (rz) clearTimeout(rz); rz = setTimeout(function () { rz = null; if (alive && !hidden()) render(); }, 200); };
       window.addEventListener('resize', onRz);
@@ -1333,8 +1238,7 @@
     (function onMount() {
       var s = st();
       if (!s || s.clock.phase !== 'PLAY') return;
-      if (s.clock.stop && s.clock.stop.kind === 'DECISION') { openDecision(s.clock.stop.decision); return; }
-      if (SB.UI.playing && SB.UI.playing()) resume();
+      if (s.clock.stop && s.clock.stop.kind === 'DECISION') openDecision(s.clock.stop.decision);
     })();
 
     return {
@@ -1342,9 +1246,9 @@
       unmount: function () {
         alive = false; running = false;
         if (timer) { clearTimeout(timer); timer = null; }
-        if (drag) { endDrag(); drag = null; }
+        if (kickT) { clearTimeout(kickT); kickT = null; }
+        if (held && held.close) { var c = held.close; held = null; c(); }
         if (offPlay) offPlay();
-        if (offKeys) offKeys();
         if (offResize) offResize();
       }
     };

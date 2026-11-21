@@ -337,7 +337,7 @@ SB.module('Harm', function (SB) {
           if (!res || !res.ok) return res || U.no(E.REFUSE.INVALID, '');
           return U.yes({ records: [], jobId: res.jobId });
         }
-        res = SB.Mail.ask(state, E.ASK.QUIET_WORD, o.bandId, {});
+        res = SB.Mail.ask(state, E.ASK.QUIET_WORD, o.bandId, { noClock: true });   // the HARM_WORD job's hour covers it
         if (!res || !res.ok) return res || U.no(E.REFUSE.INVALID, '');
         o.wordSent = true;
         break;

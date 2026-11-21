@@ -51,7 +51,7 @@ const GROUPS = {
     ['card-deal', click('#main [data-fk="row-deal"]')]
   ] },
   cardnew: { views: [
-    ['card-new', "(document.querySelector('#desk .dk-hit[data-obj=\"phone\"]') || { click: function () {} }).click(); (document.querySelector('#main .ph-row[data-tut=\"req-row\"]') || document.querySelector('#main .ph-row')).click(); " + click('#main [data-fk="tab-HOLD"]')],
+    ['card-new', "(document.querySelector('#desk .dk-hit[data-obj=\"phone\"]') || { click: function () {} }).click(); (document.querySelector('#main .ph-row[data-tut=\"req-row\"]') || document.querySelector('#main .ph-row')).click(); " + click('#main [data-fk="tab-BOOK"]')],
     ['card-offer', click('#main [data-fk="row-offer"]')],
     ['card-hold-asked', click('#main [data-fk="row-room"]') + '; ' + click('#main [data-fk="hold"]')],
     ['card-offer-asked', click('#main [data-fk="row-offer"]') + '; ' + click('#main [data-fk="send-offer"]')]

@@ -37,7 +37,7 @@ SB.Cities.register('cape-coral-fl', {
     { id: 'bonita-springs', kind: 'FEEDER', name: 'Bonita Springs and Estero', minutes: 55, bearing: 145, note: 'Wealthy and old, with golf and beach tourism. The few kids come north.', beyond: 'river-bridges' },
     { id: 'labelle', kind: 'FEEDER', name: 'LaBelle', minutes: 70, bearing: 85, pop: 4966, note: 'A rural ranching county seat, a long drive east.' },
     { id: 'naples', kind: 'PEER', name: 'Naples', state: 'FL', minutes: 70, bearing: 150, slug: 'naples-fl', note: 'The wealthy edge of the region, down the interstate.' },
-    { id: 'sarasota', kind: 'PEER', name: 'Sarasota', state: 'FL', minutes: 105, bearing: 350, scene: 700, note: 'An arts town up the interstate that sees the Cape as retiree sprawl.' },
+    { id: 'sarasota', kind: 'PEER', name: 'Sarasota', slug: 'sarasota-fl', state: 'FL', minutes: 105, bearing: 350, scene: 700, note: 'An arts town up the interstate that sees the Cape as retiree sprawl.' },
     { id: 'lakeland', kind: 'PEER', name: 'Lakeland', state: 'FL', minutes: 150, bearing: 15, slug: 'lakeland-fl', note: 'A mid-size inland city, a rare stop on a route north.' }
   ],
 

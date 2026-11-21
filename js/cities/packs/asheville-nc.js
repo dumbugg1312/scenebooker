@@ -39,10 +39,10 @@ SB.Cities.register('asheville-nc', {
     { id: 'marion', kind: 'FEEDER', name: 'Marion and Old Fort', minutes: 45, bearing: 100, note: 'Furniture and textile mill country; some metal and punk kids with basements and halls.' },
     { id: 'sylva', kind: 'FEEDER', name: 'Sylva and Cullowhee', minutes: 55, bearing: 255, note: 'A real college scene of its own whose students sometimes come east.', bands: 1 },
     { id: 'morganton', kind: 'FEEDER', name: 'Morganton', minutes: 70, bearing: 95, note: 'A small furniture and prison town with a small scene.' },
-    { id: 'greenville', kind: 'PEER', name: 'Greenville', state: 'SC', minutes: 70, bearing: 190, scene: 600, note: 'Richer and more suburban, with a long DIY memory; strong band trade.' },
+    { id: 'greenville', kind: 'PEER', name: 'Greenville', slug: 'greenville-sc', state: 'SC', minutes: 70, bearing: 190, scene: 600, note: 'Richer and more suburban, with a long DIY memory; strong band trade.' },
     { id: 'johnson-city', kind: 'PEER', name: 'Johnson City', state: 'TN', minutes: 90, bearing: 320, slug: 'johnson-city-tn', note: 'A college and railroad town with its own long-running punk crowd.' },
     { id: 'hickory', kind: 'PEER', name: 'Hickory', minutes: 90, bearing: 95, slug: 'hickory-nc', note: 'A furniture and factory town down I-40.' },
-    { id: 'knoxville', kind: 'PEER', name: 'Knoxville', state: 'TN', minutes: 120, bearing: 280, scene: 1500, note: 'The nearest big college scene, two hours west through the gorge.' }
+    { id: 'knoxville', kind: 'PEER', name: 'Knoxville', slug: 'knoxville-tn', state: 'TN', minutes: 120, bearing: 280, scene: 1500, note: 'The nearest big college scene, two hours west through the gorge.' }
   ],
 
   hoods: [

@@ -6,10 +6,12 @@
  * Adds to SB.UI: go, back, act, game, toast, start, card, popover, keys, lamp (and playing, see below). Loads last;
  * boots on DOMContentLoaded. Touches no DOM while loading except to listen for that event.
  *
- * The play loop belongs to the week screen (05-interface 4.2); the desk route keeps a hidden one mounted. The lamp's
- * pull chain talks to it through one DOM event on document: 'sb-play' with detail { cmd: 'pause' | 'resume' | 'next' }.
- * The week screen listens for it, and fires it itself ({ cmd: 'pause' }) when the loop stops on its own, so the lamp
- * follows. SB.UI.playing() says whether the loop should be running.
+ * The play loop belongs to the week screen (05-interface 4.2); the desk route keeps a hidden one mounted. The turn is
+ * one evening (design/spec/10-night-clock.md): the tape deck (the old lamp) calls it a night (Week.endNight) and the
+ * loop plays the night out to the next stop. They talk through one DOM event on document: 'sb-play' with detail
+ * { cmd: 'pause' | 'resume' | 'next', by }: 'next' plays the night out in one go, by: 'player' is the player pausing.
+ * The week screen fires 'resume' and 'pause' itself when the loop starts and stops on its own, so the deck follows.
+ * SB.UI.playing() says whether the loop is running.
  */
 (function (SB) {
   'use strict';
@@ -24,16 +26,13 @@
     hours: '{used} of {cap} hours',
     hoursOver: '{n} over',
     stress: 'Stress',
-    play: 'Play the week',
+    callNight: 'Call it a night',
     pause: 'Pause',
-    resume: 'Resume',
+    resume: 'Play on',
     next: 'Next',
     closeWeek: 'Close the week',
     startWeek: 'Start week {n}',
     theEnd: 'How it ended',
-    checkTitle: 'Before you play',
-    playAnyway: 'Play anyway',
-    keepPlanning: 'Keep planning',
     stressTitle: 'How you are holding up',
     causes: 'What is wearing on you',
     easing: 'What helps',
@@ -397,6 +396,7 @@
     trail = [];
     current = current ? (unmountCurrent(), null) : null;
     mount('desk', {});
+    sendPlay('next');            // sit down at this evening: a new game, a new week or a save between stops plays on to it
     autosave();
   }
 
@@ -418,46 +418,16 @@
   }
 
   /* ---------------------------------------------------------------- */
-  /* the lamp: play, pause and close the week                         */
+  /* the lamp (the tape deck): call it a night, pause, close the week */
   /* ---------------------------------------------------------------- */
 
   function setPlaying(v) { playing = !!v; renderShell(); }
   function sendPlay(cmd) { SB.UI.fire('sb-play', { cmd: cmd }); }
 
-  function playWeek() {
-    var r = act(function (s) { return SB.Week.check(s); }), list;
-    if (!r) return;
-    if (r.issues && r.issues.length && SB.UI.calKit) {
-      /* the paste-up note the decisions use: a slapped-on note, '!!', marker title, a typed line per warning, tear-off tabs */
-      var Kt = SB.UI.calKit, hot = state ? Kt.cityInk(state, 0) : Kt.TONER, closeNote;
-      list = h('div', { class: 'cc-slap cc-slap--decision sb-decision sb-check', role: 'group', tabindex: '-1', style: { '--hot': hot }, aria: { label: S('checkTitle') } }, [
-        h('span', { class: 'cc-hotmark cc-hotmark--big', aria: { hidden: 'true' }, text: '!!' }),
-        h('h2', { class: 'cc-slap-title' }, Kt.mk(S('checkTitle').toUpperCase(), 24, { max: 380 })),
-        h('ul', { class: 'sb-check-list' }, r.issues.map(function (i) { return h('li', { class: 'cc-slap-body', text: i.text || '' }); })),
-        Kt.tabsRow([
-          { label: S('keepPlanning'), on: function () { closeNote(); } },
-          { label: S('playAnyway'), on: function () { closeNote(); begin(); } }
-        ])
-      ]);
-      closeNote = card(list, { label: S('checkTitle') });
-      return;
-    }
-    if (r.issues && r.issues.length) {
-      list = h('div', { class: 'sb-check' }, [
-        h('h2', { text: S('checkTitle') }),
-        h('ul', { class: 'sb-check-list' }, r.issues.map(function (i) { return h('li', { text: i.text || '' }); })),
-        h('div', { class: 'sb-actions' }, [
-          C().Button({ kind: 'primary', label: S('keepPlanning'), onClick: function () { closeCheck(); } }),
-          C().Button({ label: S('playAnyway'), onClick: function () { closeCheck(); begin(); } })
-        ])
-      ]);
-      var closeCheck = card(list, { label: S('checkTitle') });
-      return;
-    }
-    begin();
-  }
-  function begin() {
-    var r = act(function (s) { return SB.Week.startPlay(s); });
+  /* Call it a night: the evening's hours are done with; the loop plays the night out to the next evening (or a
+   * decision, a show night, the end of the week). */
+  function callNight() {
+    var r = act(function (s) { return SB.Week.endNight(s); });
     if (!r || r.ok === false) return;
     if (!current || (current.name !== 'week' && current.name !== 'desk')) go('desk');
     sendPlay('resume');
@@ -468,7 +438,7 @@
   }
   function nextWeek() {
     var r = act(function (s) { return SB.Week.nextWeek(s); });
-    if (r && r.ok !== false) go('desk');
+    if (r && r.ok !== false) { go('desk'); sendPlay('resume'); }      // the new week plays on to its first evening
   }
 
   /** What pulling the lamp chain does now: { key, text } or null with no game. */
@@ -477,9 +447,10 @@
     if (!state || !state.clock) return null;
     ph = state.clock.phase; stop = state.clock.stop;
     switch (ph) {
-      case 'PLAN': return { key: 'play', text: S('play') };
+      case 'PLAN': return { key: 'resume', text: S('resume') };          // an old save made while planning: it just plays on
       case 'PLAY':
         if (stop && stop.kind === 'END_OF_WEEK') return { key: 'close', text: S('closeWeek') };
+        if (stop && stop.kind === 'EVENING') return { key: 'night', text: S('callNight') };
         return playing ? { key: 'pause', text: S('pause') } : { key: 'resume', text: S('resume') };
       case 'CLOSE':
         n = (typeof state.clock.week === 'number' ? state.clock.week : 0) + 2;   // weeks are shown counting from 1
@@ -488,13 +459,13 @@
       default: return null;
     }
   }
-  /** Pull the lamp chain: play the week, pause or keep going, close the week, start the next one. */
+  /** Pull the lamp chain (press the tape deck): call it a night, pause or play on, close the week, start the next one. */
   function lampPull() {
     var l = lampLabel();
     if (!l) return;
     switch (l.key) {
-      case 'play': playWeek(); break;
-      case 'pause': sendPlay('pause'); break;
+      case 'night': callNight(); break;
+      case 'pause': SB.UI.fire('sb-play', { cmd: 'pause', by: 'player' }); break;
       case 'resume':
         if (!current || (current.name !== 'week' && current.name !== 'desk')) go('desk');
         sendPlay('resume'); break;

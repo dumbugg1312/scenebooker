@@ -39,7 +39,7 @@ SB.Cities.register('york-pa', {
     { id: 'lancaster', kind: 'PEER', name: 'Lancaster', minutes: 45, bearing: 95, slug: 'lancaster-pa', note: 'The old rival across the river: bigger, artier, with more rooms.' },
     { id: 'harrisburg', kind: 'PEER', name: 'Harrisburg', minutes: 45, bearing: 340, slug: 'harrisburg-pa', note: 'The capital up I-83 and the nearest bigger booking circuit.' },
     { id: 'reading', kind: 'PEER', name: 'Reading', minutes: 75, bearing: 70, slug: 'reading-pa', note: 'A bigger, poorer city to the northeast; shows trade now and then.' },
-    { id: 'hagerstown', kind: 'PEER', name: 'Hagerstown', state: 'MD', minutes: 75, bearing: 255, note: 'A warehouse and rail town out west; the occasional band trades.' }
+    { id: 'hagerstown', kind: 'PEER', name: 'Hagerstown', slug: 'hagerstown-md', state: 'MD', minutes: 75, bearing: 255, note: 'A warehouse and rail town out west; the occasional band trades.' }
   ],
 
   hoods: [

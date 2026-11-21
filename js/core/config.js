@@ -136,7 +136,7 @@
   };
   C.FLYER = {                      // >>> ASK THE BOOKER (F)
     QUALITY: { ROUGH: 0.85, STANDARD: 1.0, SHARP: 1.15 },
-    HOURS:   { ROUGH: 1, STANDARD: 3, SHARP: 5 },
+    HOURS:   { ROUGH: 1, STANDARD: 2, SHARP: 4 },   // the night clock (spec 10): rough / standard / sharp
     HELPER: { base: 0.8, perSkill: 0.4 },
     FRIED: -0.15,
     TBA: 0.85,
@@ -301,16 +301,19 @@
 
   /* ============================== 3. THE WEEK (mechanics 3) ============================== */
 
-  C.HOURS = { shift: { DAY: 1, NIGHT: 2 }, off: { DAY: 3, NIGHT: 3 } };
+  /* The night clock (spec 10). One pool of hours a day, spent on the spot: a work day leaves 4, a day off has 10.
+   * The DAY / NIGHT split is only how the pool is drawn; nothing is tied to a half any more. Half hours are legal. */
+  C.HOURS = { shift: { DAY: 0, NIGHT: 4 }, off: { DAY: 5, NIGHT: 5 } };
   C.SHIFTS = { FULL: [0, 1, 2, 3, 4], PART: [0, 2, 4], NONE: [] };   // weekdays worked (0 = Monday)
-  C.BILLS_OFF_BUSY = [0, 2, 4];    // with bills off, three short days stand in for a life: 33 hours a week
-  C.OVERTIME_MAX = 3;
+  C.BILLS_OFF_BUSY = [0, 2, 4];    // with bills off, three short days stand in for a life: 52 hours a week
+  C.OVERTIME_MAX = 1;              // staying up: at most this far past tonight's hours; it costs stress, and tomorrow that much
   C.SHIFT_DROPS_PER_MONTH = 2;
   C.SHOW_NIGHT_HOURS = { DAY: 2, NIGHT: 3 };   // what RUN_SHOW reserves on a show day; the only source for its hours
-  /* R2. Messages. Everything written goes out that evening for nothing, up to freePerDay items; each further
-   * perHour items (or part) cost one Night hour. A phone-off day sends and delivers nothing and eases stress
-   * (STRESS.DOWN.PHONE_OFF); at most phoneOffPerWeek. */
-  C.MAIL = { freePerDay: 5, perHour: 5, phoneOffPerWeek: 2 };
+  /* Messages (spec 10). Every text, ask or reply takes `hours` of the evening it is written (taking it back the same
+   * evening gives the time back); none is free, and the evening send itself costs nothing more. A phone-off day
+   * sends and delivers nothing and eases stress (STRESS.DOWN.PHONE_OFF); at most phoneOffPerWeek. */
+  C.MAIL = { hours: 0.5, freePerDay: 0, perHour: 2, phoneOffPerWeek: 2 };
+  C.CRUNCH_DAYS = 14;              // how far ahead Week.crunch looks for a due day with more work than hours
   C.FEEDER_DRIVE_HOURS_PER_30MIN = 1;   // each way, for a show in a feeder town
 
   /* 3.3 Waiting on other people: [min, max] days and the chance of no answer at all. */
@@ -363,7 +366,7 @@
                       needs: ['ASK_LOCALS'] },
     CONFIRM_ROOM:   { mode: 'MESSAGE', group: 'GETTING', hours: 0, half: 'ANY', clock: 'HOLD', needs: ['HOLD_ROOM'] },
 
-    MAKE_FLYER:     { mode: 'HOURS', group: 'TELLING', hours: 3, half: 'ANY', clock: 'SHOW', opens: null, ideal: 28, missed: 0,
+    MAKE_FLYER:     { mode: 'HOURS', group: 'TELLING', hours: 2, half: 'ANY', clock: 'SHOW', opens: null, ideal: 28, missed: 0,
                       by: { HOUSE: { ideal: 21 }, SHOP: { ideal: 21 }, OUTDOOR: { ideal: 21 }, CLUB: { ideal: 42 } },
                       needs: ['CONFIRM_ROOM'], helper: 'ARTIST', cost: [0, 40] },
     ANNOUNCE:       { mode: 'HOURS', group: 'TELLING', hours: 1, half: 'ANY', clock: 'SHOW', opens: 70, ideal: 28, missed: -1,
@@ -377,7 +380,7 @@
      * to freshen it (FLYER_STALE). A town route costs a paid runner PAY.HELPER_RUN_TOWN. */
     FLYER_RUN:      { mode: 'HOURS', group: 'TELLING', hours: 2, half: 'DAY', clock: 'SHOW', opens: 42, ideal: 18, missed: 1,
                       needs: ['PRINT'], helper: 'RUNNER', repeat: 'ROUTE', again: 1, cost: [15, 40] },
-    LISTINGS:       { mode: 'HOURS', group: 'TELLING', hours: 1, half: 'ANY', clock: 'SHOW', opens: 49, ideal: 12, missed: 11,
+    LISTINGS:       { mode: 'HOURS', group: 'TELLING', hours: 0.5, half: 'ANY', clock: 'SHOW', opens: 49, ideal: 12, missed: 11,
                       needs: ['CONFIRM_ROOM'], helper: 'CIRCLE', helperStage: 3 },
     LOCAL_AD:       { mode: 'HOURS', group: 'TELLING', hours: 1, half: 'ANY', clock: 'SHOW', opens: 42, ideal: 12, missed: 4,
                       needs: ['CONFIRM_ROOM'], opt: 'AD', cost: [40, 60], optional: true },
@@ -402,7 +405,7 @@
                       thenPromise: { rides: 'ADVANCE', hours: 0 } },
     NEIGHBORS:      { mode: 'HOURS', group: 'RUNNING', hours: 1, half: 'DAY', clock: 'SHOW', opens: 2, ideal: 1, missed: -1,
                       kinds: ['HOUSE', 'OUTDOOR', 'DIY'] },
-    ADVANCE:        { mode: 'HOURS', group: 'RUNNING', hours: 2, half: 'ANY', clock: 'SHOW', opens: 14, ideal: 10, missed: 0,
+    ADVANCE:        { mode: 'HOURS', group: 'RUNNING', hours: 1, half: 'ANY', clock: 'SHOW', opens: 14, ideal: 10, missed: 0,
                       needs: ['LOCK_BILL'], helper: 'CIRCLE', helperStage: 3 },
     LODGING:        { mode: 'MESSAGE', group: 'RUNNING', hours: 0, half: 'ANY', clock: 'SHOW', opens: null, ideal: 7, missed: -1 },
     DAY_BEFORE:     { mode: 'PROMISE', rides: 'ADVANCE', group: 'RUNNING', hours: 0, half: 'ANY', clock: 'SHOW', opens: 1, ideal: 1, missed: 0 },

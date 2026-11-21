@@ -63,7 +63,7 @@ module.exports = function (t) {
     SB.Notebook.init(st);
     const hasSecret = (n) => typeof n === 'number' && secret.some(s => Math.abs(s - n) < 1e-9);
     const calls = [
-      ['Game.strip', s => [s]], ['Week.view', s => [s]], ['Week.suggest', s => [s]], ['Week.check', s => [s]],
+      ['Game.strip', s => [s]], ['Week.view', s => [s]], ['Week.suggest', s => [s]], ['Week.check', s => [s]], ['Week.tonight', s => [s]], ['Week.crunch', s => [s]],
       ['Shows.get', s => [s, 's1']], ['Shows.list', s => [s, {}]], ['Shows.view', s => [s, 's1']],
       ['Jobs.catalog', s => ['MAKE_FLYER']], ['Jobs.tray', s => [s]], ['Jobs.freeJobs', s => [s]], ['Jobs.flyerSpec', s => [s, 's1']],
       ['Mail.inbox', s => [s, 'ALL']], ['Mail.waiting', s => [s]], ['Mail.needsYou', s => [s]], ['Mail.outbox', s => [s]],

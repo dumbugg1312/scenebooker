@@ -9,8 +9,8 @@
 // runGame(opts) plays one game and returns a plain result; it never throws for a failed game, it records the failure:
 //   opts   { seed, bot (name | bot object), weeks | years, city, bills (true | false | 'on' | 'off'), text, guard, strict,
 //            resume ({ state, startWeek }: continue that game up to week `weeks`), stubs (default true: a missing engine file is its stub), stubsOnly (every engine module from its stub), sb (an already loaded SB), dump, hooks }
-// A bot may also have replan(state, SB, records): called after any Week.step that returned records, mid-week, so it can act on
-// an answer the day it arrives (the interface lets a player replan whenever the play loop is paused).
+// A bot may also have evening(state, SB, stop): called at every EVENING stop (the night clock, spec 10), where it sends its asks and
+// does tonight's jobs; the runner then calls Week.endNight. planWeek is called once at the start of each week (day job, phone, shifts).
 //   hooks  { afterShow(state, SB, showId, row), afterWeek(state, SB, weekRow), afterClose(state, SB, report, week) }   for balance.js; they may read anything
 //   result { ok, error, seed, bot, city, bills, weeks (played), rows: [per week], shows: [per show], counts, ms, state, dump }
 const path = require('path');
@@ -119,13 +119,9 @@ function note(result, code) { result.refusals[code] = (result.refusals[code] || 
 
 function playWeek(SB, bsb, bot, state, view, week, result) {
   bot.planWeek(view, bsb);
-  const s = SB.Week.startPlay(state);
-  if (s && s.ok === false) {                            // a week that cannot be played is a dead end only if it is not already played
-    result.deadEnds++; note(result, 'startPlay:' + s.code);
-    if (s.code !== 'PHASE') return;
-  }
   let guard = 0, stop = null, last = '';
   const nightTries = {};
+  if (get(state, 'clock.phase') !== 'PLAY') { result.deadEnds++; note(result, 'phase:' + get(state, 'clock.phase')); }
   for (;;) {
     if (++guard > 1500) {
       result.deadEnds++;
@@ -143,12 +139,18 @@ function playWeek(SB, bsb, bot, state, view, week, result) {
       }
     }
     const st = r && r.stop;
-    // "Replanning is allowed whenever the loop is paused" (05-interface 4.2): a bot with a `replan` hook gets the half-day's
-    // records and may plan the days not yet played, exactly as planWeek does.
-    if (bot.replan && r && r.records && r.records.length && (!st || st.kind !== 'END_OF_WEEK') && get(state, 'clock.phase') === 'PLAY') bot.replan(view, bsb, r.records);
     if (!st) continue;
     last = st.kind;
     if (st.kind === 'END_OF_WEEK') break;
+    if (st.kind === 'EVENING') {                        // the bot spends tonight's hours, then calls the night
+      if (bot.evening) bot.evening(view, bsb, st);
+      const en = SB.Week.endNight(state);
+      if (en && en.ok === false) {
+        note(result, 'endNight:' + en.code); result.deadEnds++;
+        const e = new Error('Week.endNight refused: ' + en.code + ' ' + (en.why || '')); e.name = 'StuckError'; throw e;
+      }
+      continue;
+    }
     if (st.kind === 'DECISION') {
       const d = st.decision;
       let choice = bot.onStop ? bot.onStop(view, bsb, st) : null;

@@ -178,7 +178,8 @@
   E.REPLY = en(['INTERESTED', 'OFFER', 'PASS']);                     // the player's reply to a request
 
   /* ---------------- Stops: why Week.step or Night.next handed control back ---------------- */
-  E.STOP = en(['DECISION', 'REPLY', 'SHOW_NIGHT', 'SETTLE', 'NEED_BY', 'END_OF_WEEK']);
+  /* EVENING: the day has reached its night and the hours are the player's to spend, until Week.endNight (spec 10). */
+  E.STOP = en(['DECISION', 'REPLY', 'SHOW_NIGHT', 'SETTLE', 'NEED_BY', 'EVENING', 'END_OF_WEEK']);
   E.DECISION = en(['INTERRUPT', 'NIGHT_STOP', 'DOORS', 'COUNT', 'SHORTFALL', 'HARM', 'OFFER', 'BURNOUT']);
   E.TIER = en(['GENTLE', 'REAL', 'HARD']);                           // event tiers; HARD is mechanics' "major"
   E.EVENT_WHEN = en(['WEEK', 'NIGHT', 'EITHER']);
@@ -355,7 +356,7 @@
   /* ---------------- Refusals: Result.code when an action says no ---------------- */
   E.REFUSE = en(['PHASE', 'STOP_PENDING', 'NO_HOURS', 'WRONG_HALF', 'WINDOW', 'NEEDS', 'TAKEN', 'LOCKED', 'STAGE',
                  'RELATIONSHIP', 'NO_MONEY', 'ALREADY', 'TOO_MANY', 'BUSY', 'CONFIRM_LIST', 'BILLS_FIRST', 'PLAN',
-                 'BURNT_OUT', 'INVALID', 'OVER']);
+                 'BURNT_OUT', 'INVALID', 'OVER', 'NO_TIME']);   // NO_TIME: it does not fit tonight, even staying up
 
   /* ---------------- Events as data (design/spec/03-content.md section 8) ---------------- */
   /* Who an event is about. The director binds these before an event fires; effects and text refer to them. */

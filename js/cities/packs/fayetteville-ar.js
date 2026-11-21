@@ -43,7 +43,7 @@ SB.Cities.register('fayetteville-ar', {
     { id: 'eureka-springs', kind: 'FEEDER', name: 'Eureka Springs', minutes: 60, bearing: 80, note: 'A tourist and arts town with a weird, welcoming crowd and high rents.', season: { months: [5, 6, 7, 8, 9, 10], mul: 1.3 } },
     { id: 'fort-smith', kind: 'PEER', name: 'Fort Smith', minutes: 60, bearing: 175, scene: 500, note: 'A rougher, cheaper river and rail town with a scrappier metal and hardcore crowd.' },
     { id: 'joplin', kind: 'PEER', name: 'Joplin', state: 'MO', minutes: 90, bearing: 40, scene: 250, note: 'A smaller blue-collar town; a pass-through on tours.' },
-    { id: 'tulsa', kind: 'PEER', name: 'Tulsa', state: 'OK', minutes: 120, bearing: 285, scene: 1200, note: 'The nearest big music town; touring bands pick it and skip you.' },
+    { id: 'tulsa', kind: 'PEER', name: 'Tulsa', slug: 'tulsa', state: 'OK', minutes: 120, bearing: 285, scene: 1200, note: 'The nearest big music town; touring bands pick it and skip you.' },
     { id: 'springfield', kind: 'PEER', name: 'Springfield', state: 'MO', minutes: 150, bearing: 55, slug: 'springfield-mo', note: 'The other Ozarks college city, with a deep punk and hardcore tradition.' }
   ],
 

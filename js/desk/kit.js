@@ -661,60 +661,116 @@
         '</defs>';
     }
 
-    /** photocopy(ctx, cw, ch, seed, o): the copier, on a canvas already drawn: the toner layer (near-gray pixels) gets
-     *  contrast gain, noise and a soft threshold, as in js/art/flyer.js; colored stock keeps its color and takes grain;
-     *  toner specks land on light paper and dust on the blacks. o.gain, o.amp, o.strength, o.floor. Returns true if it ran. */
-    function photocopy(ctx, cw, ch, seed, o) {
+    /* copyJob: the copier's set-up for one canvas (the pixels read back, the noise grid and streaks drawn from the seed);
+       its rows() does the work. null if the canvas cannot be read. */
+    function copyJob(ctx, cw, ch, seed, o) {
       o = o || {};
-      if (!ctx || !ctx.getImageData || !ctx.putImageData || cw < 2 || ch < 2) return false;
+      if (!ctx || !ctx.getImageData || !ctx.putImageData || cw < 2 || ch < 2) return null;
       var img;
-      try { img = ctx.getImageData(0, 0, cw, ch); } catch (e) { return false; }
-      if (!img || !img.data) return false;
+      try { img = ctx.getImageData(0, 0, cw, ch); } catch (e) { return null; }
+      if (!img || !img.data) return null;
       var d = img.data, rng = SB.rng.make('copy:' + seed), gain = opt(o, 'gain', 1.55), amp = opt(o, 'amp', 0.2), strength = opt(o, 'strength', 0.64),
           floor = opt(o, 'floor', 11), cell = Math.max(6, Math.round(opt(o, 'cell', 9) * opt(o, 'px', 1))), gw = Math.ceil(cw / cell) + 2, gh = Math.ceil(ch / cell) + 2,
-          grid = new Float32Array(gw * gh), s0 = rng.int(1, 100000), s1 = rng.int(1, 100000), i, x, y, idx, r, g, b, mx, mn, L, gx, gy, x0, y0, fx, fy, nl, nh, hv, v, t, out, dl, sp;
+          grid = new Float32Array(gw * gh), s0 = rng.int(1, 100000), s1 = rng.int(1, 100000), i;
       var streak = new Float32Array(cw), bands = opt(o, 'streaks', 7), bx, bw2, bi, q;
       for (i = 0; i < grid.length; i++) grid[i] = rng.next() * 2 - 1;
       for (i = 0; i < bands; i++) {
         bx = rng.int(0, cw - 1); bw2 = rng.int(1, Math.max(2, Math.round(cw / 60))); bi = rng.range(10, 34);
         for (q = bx; q < bx + bw2 && q < cw; q++) streak[q] += bi * (0.6 + 0.4 * Math.sin((q - bx) / bw2 * Math.PI));
       }
-      for (y = 0; y < ch; y++) {
-        gy = y / cell; y0 = gy | 0; fy = gy - y0;
-        for (x = 0; x < cw; x++) {
-          idx = (y * cw + x) * 4;
-          r = d[idx]; g = d[idx + 1]; b = d[idx + 2];
-          mx = r > g ? (r > b ? r : b) : (g > b ? g : b); mn = r < g ? (r < b ? r : b) : (g < b ? g : b);
-          L = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-          gx = x / cell; x0 = gx | 0; fx = gx - x0;
-          nl = (grid[y0 * gw + x0] * (1 - fx) + grid[y0 * gw + x0 + 1] * fx) * (1 - fy) + (grid[(y0 + 1) * gw + x0] * (1 - fx) + grid[(y0 + 1) * gw + x0 + 1] * fx) * fy;
-          hv = Math.imul(x + s0, 374761393) ^ Math.imul(y + s1, 668265263);
-          hv = Math.imul(hv ^ (hv >>> 13), 1274126177);
-          nh = ((hv ^ (hv >>> 16)) >>> 0) / 4294967296;
-          if (mx - mn <= 44) {
-            v = (L - 0.5) * gain + 0.5 + amp * (0.6 * (nh * 2 - 1) + 0.4 * nl);
-            v = v < 0 ? 0 : v > 1 ? 1 : v;
-            t = (v - 0.42) / 0.16; t = t < 0 ? 0 : t > 1 ? 1 : t; t = t * t * (3 - 2 * t);
-            out = v + (t - v) * strength;
-            dl = (out - L) * 255;
-          } else {
-            dl = amp * 0.3 * (nh * 2 - 1) * 255 + (nl > 0.6 ? -(nl - 0.6) * 40 : 0);
+      /* rows ya..yb-1; nothing random is drawn in here (the noise is hashed from x and y), so the rows can be done in any
+         number of slices and the copy comes out the same */
+      function rows(ya, yb) {
+        var x, y, idx, r, g, b, mx, mn, L, gx, gy, x0, y0, fx, fy, nl, nh, hv, v, t, out, dl, sp;
+        for (y = ya; y < yb; y++) {
+          gy = y / cell; y0 = gy | 0; fy = gy - y0;
+          for (x = 0; x < cw; x++) {
+            idx = (y * cw + x) * 4;
+            r = d[idx]; g = d[idx + 1]; b = d[idx + 2];
+            mx = r > g ? (r > b ? r : b) : (g > b ? g : b); mn = r < g ? (r < b ? r : b) : (g < b ? g : b);
+            L = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            gx = x / cell; x0 = gx | 0; fx = gx - x0;
+            nl = (grid[y0 * gw + x0] * (1 - fx) + grid[y0 * gw + x0 + 1] * fx) * (1 - fy) + (grid[(y0 + 1) * gw + x0] * (1 - fx) + grid[(y0 + 1) * gw + x0 + 1] * fx) * fy;
+            hv = Math.imul(x + s0, 374761393) ^ Math.imul(y + s1, 668265263);
+            hv = Math.imul(hv ^ (hv >>> 13), 1274126177);
+            nh = ((hv ^ (hv >>> 16)) >>> 0) / 4294967296;
+            if (mx - mn <= 44) {
+              v = (L - 0.5) * gain + 0.5 + amp * (0.6 * (nh * 2 - 1) + 0.4 * nl);
+              v = v < 0 ? 0 : v > 1 ? 1 : v;
+              t = (v - 0.42) / 0.16; t = t < 0 ? 0 : t > 1 ? 1 : t; t = t * t * (3 - 2 * t);
+              out = v + (t - v) * strength;
+              dl = (out - L) * 255;
+            } else {
+              dl = amp * 0.3 * (nh * 2 - 1) * 255 + (nl > 0.6 ? -(nl - 0.6) * 40 : 0);
+            }
+            sp = L > 0.45 ? -streak[x] * (0.6 + 0.4 * nl) - (L > 0.7 && nl > 0.15 ? (nl - 0.15) * 34 : 0) : 0;
+            hv = Math.imul((x >> 1) + s1, 668265263) ^ Math.imul((y >> 1) + s0, 374761393);
+            hv = Math.imul(hv ^ (hv >>> 15), 2246822519);
+            t = ((hv ^ (hv >>> 13)) >>> 0) / 4294967296;
+            if (t < 0.007 + (nl > 0.35 ? 0.009 : 0) && L > 0.55) sp = -150 - t * 9000;
+            else if (t > 0.996 && L < 0.25) sp = 50 + (1 - t) * 14000;
+            r = r + dl + sp; g = g + dl + sp; b = b + dl + sp;
+            d[idx] = r < floor ? floor : r > 255 ? 255 : r;
+            d[idx + 1] = g < floor ? floor : g > 255 ? 255 : g;
+            d[idx + 2] = b < floor + 1 ? floor + 1 : b > 255 ? 255 : b;
           }
-          sp = L > 0.45 ? -streak[x] * (0.6 + 0.4 * nl) - (L > 0.7 && nl > 0.15 ? (nl - 0.15) * 34 : 0) : 0;
-          hv = Math.imul((x >> 1) + s1, 668265263) ^ Math.imul((y >> 1) + s0, 374761393);
-          hv = Math.imul(hv ^ (hv >>> 15), 2246822519);
-          t = ((hv ^ (hv >>> 13)) >>> 0) / 4294967296;
-          if (t < 0.007 + (nl > 0.35 ? 0.009 : 0) && L > 0.55) sp = -150 - t * 9000;
-          else if (t > 0.996 && L < 0.25) sp = 50 + (1 - t) * 14000;
-          r = r + dl + sp; g = g + dl + sp; b = b + dl + sp;
-          d[idx] = r < floor ? floor : r > 255 ? 255 : r;
-          d[idx + 1] = g < floor ? floor : g > 255 ? 255 : g;
-          d[idx + 2] = b < floor + 1 ? floor + 1 : b > 255 ? 255 : b;
         }
       }
-      ctx.putImageData(img, 0, 0);
+      return { img: img, rows: rows };
+    }
+    /** photocopy(ctx, cw, ch, seed, o): the copier, on a canvas already drawn: the toner layer (near-gray pixels) gets
+     *  contrast gain, noise and a soft threshold, as in js/art/flyer.js; colored stock keeps its color and takes grain;
+     *  toner specks land on light paper and dust on the blacks. o.gain, o.amp, o.strength, o.floor. Returns true if it ran. */
+    function photocopy(ctx, cw, ch, seed, o) {
+      var j = copyJob(ctx, cw, ch, seed, o);
+      if (!j) return false;
+      j.rows(0, ch);
+      ctx.putImageData(j.img, 0, 0);
       return true;
     }
+    /** photocopyAsync(ctx, cw, ch, seed, o, cb): the same copy as photocopy, done in slices of about 10 ms with the page
+     *  free between them (a big copy in one go holds every click and frame for a third of a second); cb(true) once the
+     *  copy is on the canvas, cb(false) if it could not run. Copy onto a canvas nobody is looking at: it is half done
+     *  in between. */
+    function photocopyAsync(ctx, cw, ch, seed, o, cb) {
+      var j = copyJob(ctx, cw, ch, seed, o), y = 0, step = Math.max(1, Math.round(40000 / Math.max(1, cw)));
+      var now = typeof performance !== 'undefined' && performance.now ? function () { return performance.now(); } : function () { return Date.now(); };
+      if (!j) { cb(false); return; }
+      (function slice() {
+        var t0 = now(), yb;
+        try {
+          while (y < ch) { yb = Math.min(ch, y + step); j.rows(y, yb); y = yb; if (now() - t0 > 10) break; }
+          if (y < ch) { setTimeout(slice, 0); return; }
+          ctx.putImageData(j.img, 0, 0);
+        } catch (e) { cb(false); return; }
+        cb(true);
+      })();
+    }
+
+    /** copyCanvas(w, h): a canvas of its own and its 2D context, for a drawing that goes through the copier off the page.
+     *  It stays a plain (GPU) canvas: the drawings are SVG with turbulence filters, which the GPU rasters several times
+     *  faster than a willReadFrequently (CPU) canvas does, read-back included (measured 2026-11-21). */
+    function copyCanvas(w, h) {
+      var cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(w)); cv.height = Math.max(1, Math.round(h));
+      return { cv: cv, ctx: cv.getContext('2d') };
+    }
+    /** copyUrl(cv, cb): the finished copy as an image URL, cb(url or null). The PNG is made with toBlob, which encodes off
+     *  the main thread (toDataURL stalls the page while it encodes); the URL is a blob: URL, so whoever keeps it in a
+     *  cache revokes it with dropUrl when the cache lets it go. Falls back to a data: URL where toBlob is missing. */
+    function copyUrl(cv, cb) {
+      if (cv && typeof cv.toBlob === 'function' && typeof URL !== 'undefined' && URL.createObjectURL) {
+        try {
+          cv.toBlob(function (b) { var u = null; try { u = b ? URL.createObjectURL(b) : null; } catch (e) { u = null; } cb(u); }, 'image/png');
+          return;
+        } catch (e) { /* tainted or unsupported: try the old way */ }
+      }
+      var u = null;
+      try { u = cv.toDataURL('image/png'); } catch (e) { u = null; }
+      cb(u);
+    }
+    /** dropUrl(u): let a copy's URL go (a blob: URL from copyUrl is revoked; a data: URL needs nothing). */
+    function dropUrl(u) { if (u && /^blob:/.test(u) && typeof URL !== 'undefined' && URL.revokeObjectURL) { try { URL.revokeObjectURL(u); } catch (e) { /* fine */ } } }
 
     /** ink(name): a flyer ink's hex (city inks are names like 'bayouTeal'); unknown names give toner. */
     function ink(name) { return INK[name] || (/^#/.test(String(name)) ? name : INK.toner); }
@@ -731,7 +787,7 @@
       paper: paper, photo: photo, cutPts: cutPts, cutout: cutout, cutouts: cutouts, keyShape: keyShape, scissors: scissors, dots: dots, dotsRect: dotsRect, regmark: regmark, glue: glue,
       circle3: circle3, under3: under3, arrow: arrow, scribble: scribble, xout: xout,
       marker: marker, markerWidth: markerWidth, ransom: ransom, ransomWidth: ransomWidth, type: type, typeWidth: typeWidth, typeLines: typeLines,
-      photocopy: photocopy, stock: stock, polyD: polyD, id: id,
+      photocopy: photocopy, photocopyAsync: photocopyAsync, copyCanvas: copyCanvas, copyUrl: copyUrl, dropUrl: dropUrl, stock: stock, polyD: polyD, id: id,
       defs: defs, ink: ink, mat: mat, rng: rng, esc: esc, smooth: smooth
     };
   });

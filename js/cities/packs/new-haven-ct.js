@@ -40,9 +40,9 @@ SB.Cities.register('new-haven-ct', {
     { id: 'shoreline', kind: 'FEEDER', name: 'Guilford and Madison', minutes: 30, bearing: 80, note: 'Small, affluent beach towns of kids with cars and money.' },
     { id: 'waterbury', kind: 'FEEDER', name: 'Waterbury', minutes: 40, bearing: 320, pop: 114000, scene: 400, note: 'An old brass city with big Italian, Puerto Rican and Albanian communities.' },
     { id: 'middletown', kind: 'FEEDER', name: 'Middletown', minutes: 35, bearing: 30, pop: 47000, note: 'A river city with a liberal arts college, a college radio station and a lively art scene.' },
-    { id: 'hartford', kind: 'PEER', name: 'Hartford', state: 'CT', minutes: 45, bearing: 15, scene: 800, note: 'The capital, called dull and corporate by New Haven. The two trade crowds all the time.' },
+    { id: 'hartford', kind: 'PEER', name: 'Hartford', slug: 'hartford', state: 'CT', minutes: 45, bearing: 15, scene: 800, note: 'The capital, called dull and corporate by New Haven. The two trade crowds all the time.' },
     { id: 'springfield', kind: 'PEER', name: 'Springfield', state: 'MA', minutes: 60, bearing: 5, slug: 'springfield-ma', note: 'An hour up I-91, on the circuit that tours link.' },
-    { id: 'providence', kind: 'PEER', name: 'Providence', state: 'RI', minutes: 90, bearing: 70, scene: 1200, note: 'A bigger college and arts city up I-95.' },
+    { id: 'providence', kind: 'PEER', name: 'Providence', slug: 'providence', state: 'RI', minutes: 90, bearing: 70, scene: 1200, note: 'A bigger college and arts city up I-95.' },
     { id: 'worcester', kind: 'PEER', name: 'Worcester', state: 'MA', minutes: 100, bearing: 40, slug: 'worcester-ma', note: 'A bigger mill city on the same regional circuit.' }
   ],
 

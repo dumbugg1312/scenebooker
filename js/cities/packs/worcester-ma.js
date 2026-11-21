@@ -37,9 +37,9 @@ SB.Cities.register('worcester-ma', {
     { id: 'putnam', kind: 'FEEDER', name: 'Putnam and Killingly', state: 'CT', minutes: 40, bearing: 190, note: 'A corner of mill villages over the Connecticut line.' },
     { id: 'gardner', kind: 'FEEDER', name: 'Gardner and Athol', minutes: 50, bearing: 320, note: 'Cold, isolated furniture and mill towns; kids drive far for a show.' },
     { id: 'northampton', kind: 'FEEDER', name: 'Amherst and Northampton', minutes: 60, bearing: 270, note: 'A college valley with its own scene; trades with the city both ways.' },
-    { id: 'providence', kind: 'PEER', name: 'Providence', state: 'RI', minutes: 50, bearing: 185, note: 'The nearest real peer: artier, with a bigger DIY base. Bands trade steadily.' },
+    { id: 'providence', kind: 'PEER', name: 'Providence', slug: 'providence', state: 'RI', minutes: 50, bearing: 185, note: 'The nearest real peer: artier, with a bigger DIY base. Bands trade steadily.' },
     { id: 'springfield', kind: 'PEER', name: 'Springfield', minutes: 55, bearing: 255, slug: 'springfield-ma', note: 'A tougher, more run-down peer city out the Pike.' },
-    { id: 'hartford', kind: 'PEER', name: 'Hartford', state: 'CT', minutes: 70, bearing: 235, note: 'A city of similar size down I-84.' },
+    { id: 'hartford', kind: 'PEER', name: 'Hartford', slug: 'hartford', state: 'CT', minutes: 70, bearing: 235, note: 'A city of similar size down I-84.' },
     { id: 'manchester', kind: 'PEER', name: 'Manchester', state: 'NH', minutes: 75, bearing: 5, slug: 'manchester-nh', note: 'A smaller mill city to the north.' }
   ],
 

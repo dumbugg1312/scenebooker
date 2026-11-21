@@ -40,7 +40,7 @@ SB.Cities.register('athens-ga', {
       note: 'The northeast Atlanta suburbs down GA-316. More kids than all the small towns together, and they come for the weekend.' },
     { id: 'augusta', kind: 'PEER', name: 'Augusta', minutes: 105, bearing: 120, slug: 'augusta-ga', note: 'A harder, bigger, base-and-hospital city. A place to play once a year and leave.' },
     { id: 'macon', kind: 'PEER', name: 'Macon', minutes: 115, bearing: 190, scene: 3000, note: 'An older, soulful river city with a reviving downtown. A real trading partner of crowds.' },
-    { id: 'greenville', kind: 'PEER', name: 'Greenville', state: 'SC', minutes: 120, bearing: 55, scene: 4000, note: 'A gentrifying college-adjacent city with a restaurant boom. A genuine two-way partner.' },
+    { id: 'greenville', kind: 'PEER', name: 'Greenville', slug: 'greenville-sc', state: 'SC', minutes: 120, bearing: 55, scene: 4000, note: 'A gentrifying college-adjacent city with a restaurant boom. A genuine two-way partner.' },
     { id: 'columbia', kind: 'PEER', name: 'Columbia', state: 'SC', minutes: 165, bearing: 100, slug: 'columbia-sc', note: 'A statehouse and college city. A decent peer on the long road.' }
   ],
 

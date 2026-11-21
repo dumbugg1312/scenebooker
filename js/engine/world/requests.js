@@ -930,15 +930,17 @@ SB.module('Requests', function (SB) {
       var q = state.requests[id];
       if (!OPEN[q.status]) return;
       var held = playerHoldsFor(state, q);
+      /* the guided first show's band waits for the player (SB.Tutorial.keeps): no race, no lapse */
+      var kept = !!(SB.Tutorial && SB.Tutorial.keeps && SB.Tutorial.keeps(state, q));
       /* the race: a rival booker holds a room first */
-      if (q.hid && q.hid.raced && q.hid.gone === null && !held && q.kind !== 'LOCAL_ASK') {
+      if (q.hid && q.hid.raced && q.hid.gone === null && !held && !kept && q.kind !== 'LOCAL_ASK') {
         var b0 = band(state, q.bandId), rival = 1 - shareFor(state, b0 ? b0.genre : 'hardcore');
         /* SPEC?: "with chance by their name share each day" would end most raced requests within a day or two, well
          * inside REPLY_BY. Read as that share x 0.15 a day, the smaller behavior. */
         if (r.chance(rival * 0.15)) q.hid.gone = day;
       }
       var gone = q.hid && typeof q.hid.gone === 'number' && q.hid.gone <= day;
-      if (gone || (day > q.replyBy && !termsOut(state, id))) {
+      if (gone || (day > q.replyBy && !termsOut(state, id) && !kept)) {
         var never = q.status === 'NEW';
         q.status = never ? 'IGNORED' : 'LAPSED'; q.closedDay = day;
         records.push(rec(state, 'REQUEST_GONE', { requestId: id, why: gone ? 'TOOK_OTHER' : 'LAPSED' }, ''));

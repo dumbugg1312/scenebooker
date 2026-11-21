@@ -5,9 +5,12 @@
  * Owner: SYSTEMS. Spec: design/spec/09-tutorial-story-patches.md 1; 09a-build-contract.md.
  * Pure on state, no DOM, and it draws from no random stream.
  * A step can have stages (what to do right now inside it): current() says which, and where on the desk to go for it.
+ * The night clock (design/spec/10-night-clock.md) keeps the stage names and changes what three of them ask for:
+ *   PROMO:PLAN   do the job (jobId) tonight (SB.Week.doNow), where it used to be pencilled in on a day
+ *   *:WAIT, WAIT:PLAY, DOOR:PLAY   call it a night (SB.Week.endNight), where the tape deck used to be left running
  * The first show is rigged so that doing what the texts say works: the people the texts name say yes (rig), and the
  * big local draw plays for a cut of the door (ask).
- * Beyond the manifest: STEPS, TARGET, showOf, cast, rig, ask.
+ * Beyond the manifest: STEPS, TARGET, showOf, cast, rig, ask, keeps.
  */
 SB.module('Tutorial', function (SB) {
   'use strict';
@@ -16,8 +19,11 @@ SB.module('Tutorial', function (SB) {
    * calendar (scene ids clip0, clip1, ...: the one whose params.showId is current().showId); 'night' is the night screen. */
   var TARGET = { ANSWER: 'phone', HOLD: 'clip', BILL: 'clip', SOUND: 'clip', FLYER: 'clip', PROMO: 'clip', WAIT: 'lamp',
                  DOOR: 'night', SETTLE: 'night', CLOSEOUT: 'lamp' };
-  /* where a stage sends the player, when it is not the step's own target ('lamp' is the tape deck: let the days go by).
-   * The whole show is built on its clipboard (the card); until the show exists there is no clip, so the phone it is. */
+  /* where a stage sends the player, when it is not the step's own target ('lamp' is calling it a night: the card's own
+   * CALL IT A NIGHT while the card is open, the tape deck on the desk when it is not; the interface picks). The whole
+   * show is built on its card (design/spec/11-booking-pipeline.md): ANSWER is BOOK IT on the band's message, which
+   * makes the show; until the show exists there is no clip, so the phone it is. A stage can also say `wait: true`
+   * (HOLD:HELD with nothing left to get): then it is 'lamp' too, so nobody is sent to a row with nothing to press. */
   var STAGE_TARGET = { WAIT: 'lamp', PLAY: 'lamp' };
   var RIG_DAYS = 2;
   var NUDGE_DAYS = 2, BILL_MIN = 3, PROMO_MIN = 2, LATE_FLYER_DAYS = 3;
@@ -122,33 +128,58 @@ SB.module('Tutorial', function (SB) {
     return false;
   }
   function onBill(s, bandId) { return !!s && ((s.bill && s.bill.slots) || []).some(function (x) { return x.bandId === bandId; }); }
-  /* the telling jobs of the show (not the flyer itself): how many are done or on the calendar, and the next one to
-   * put on a day (the flyer job first; then one whose window is open and that takes hours) */
+  /* the telling jobs of the show (not the flyer itself): how many are done or with somebody, and the next one to do
+   * (the flyer job first; then one whose window is open and that takes hours), and whether that one can be done
+   * tonight: there is time for it, even staying up (SB.Week.canDoNow). One that fits tonight goes before one that
+   * does not. */
   function telling(state, s) {
-    var n = 0, next = null, push = null, flyer = null, jobs = state.jobs || {}, C = SB.Config;
+    var n = 0, next = {}, push = {}, flyer = {}, jobs = state.jobs || {}, C = SB.Config, pick;
+    function take(slot, id, fits) {
+      if (fits && !slot.fit) slot.fit = id;
+      if (!slot.any) slot.any = id;
+    }
+    function now(id) {
+      var r = null;
+      if (!SB.Week.canDoNow) return true;
+      try { r = SB.Week.canDoNow(state, id); } catch (e) { r = null; }
+      return !!r && r.ok !== false;
+    }
     (s.jobs || []).forEach(function (id) {
       var j = jobs[id], c = j && C.JOBS[j.type], v = null, open;
       if (!j || !c || c.group !== 'TELLING') return;
       try { v = SB.Jobs.get(state, id); } catch (e) { v = null; }
       if (!v) return;
-      open = v.status === 'TODO' && !v.planned && v.mode === 'HOURS' && v.window && (v.window.state === 'OPEN' || v.window.state === 'LATE') &&
-             !(v.needs || []).some(function (x) { return x && x.met === false; });
-      if (j.type === 'MAKE_FLYER') { if (open) flyer = id; return; }
+      open = v.status === 'TODO' && !v.planned && !v.hidden && v.mode === 'HOURS' && v.window &&
+             (v.window.state === 'OPEN' || v.window.state === 'CLOSING' || v.window.state === 'LATE');
+      if (j.type === 'MAKE_FLYER') { if (open) take(flyer, id, now(id)); return; }
       if (v.status === 'DONE' || v.planned) n++;
-      else if (open && !next && !(v.opt && v.opt.kind)) next = id;
-      else if (open && !push && v.opt && v.opt.kind === 'PUSH') push = id;
+      else if (open && !(v.opt && v.opt.kind)) take(next, id, now(id));
+      else if (open && v.opt && v.opt.kind === 'PUSH') take(push, id, now(id));
     });
-    return { n: n, next: flyer || next || push };
+    pick = flyer.any ? flyer : (next.fit ? next : (push.fit ? push : (next.any ? next : push)));
+    return { n: n, next: pick.fit || pick.any || null, fits: !!pick.fit };
   }
 
-  /* what to do right now inside the step: { stage, bandId, slot, personId, jobId } */
+  /* a held night: is there anything the room still wants that the player can go and get? Second in line there is
+   * not (the room ahead has to fall through); first in line with every need met there is not either (it is theirs in
+   * the morning, SB.Rooms.firmUp). Only first in line with a need unmet is something to do. */
+  function heldWants(state, s) {
+    var v = null;
+    if (!s || !s.hold || (typeof s.hold.rank === 'number' && s.hold.rank > 1)) return false;
+    try { v = SB.Shows.view(state, s.id); } catch (e) { v = null; }
+    return !!v && (v.needsToConfirm || []).some(function (n) { return !n.met; });
+  }
+
+  /* what to do right now inside the step: { stage, bandId, slot, personId, jobId, wait } */
   function stageOf(state, t, step, s) {
     var c = cast(state), o;
     switch (step) {
       case 'ANSWER': return { stage: 'REPLY' };
       case 'HOLD':
         if (!s || (!s.hold && s.status !== 'CONFIRMED')) return { stage: s && pending(state, 'ROOM_HOLD', s.id) ? 'WAIT' : 'ASK' };
-        return { stage: pending(state, 'ROOM_CONFIRM', s.id) ? 'WAIT' : 'CONFIRM' };
+        /* held, not booked yet (no confirm ask): yours in the morning or second in line (wait: call it a night), or
+         * the room wants something first (the card's ROOM step says what) */
+        return { stage: 'HELD', wait: s.status !== 'CONFIRMED' && !heldWants(state, s) };
       case 'BILL':
         if (!s) return { stage: 'OFFER' };
         o = SB.Chapters.billOrder(state, s);
@@ -161,8 +192,11 @@ SB.module('Tutorial', function (SB) {
       case 'SOUND': return s && c.sound && pending(state, 'CREW', s.id, c.sound) ? { stage: 'WAIT', personId: c.sound } : { stage: 'ASK', personId: c.sound };
       case 'FLYER': return { stage: 'MAKE' };
       case 'PROMO':
-        o = s ? telling(state, s) : { n: 0, next: null };
-        return o.next && (o.n < PROMO_MIN || state.jobs[o.next].type === 'MAKE_FLYER') ? { stage: 'PLAN', jobId: o.next } : { stage: 'WAIT' };
+        /* PLAN: do this job tonight. WAIT: nothing more fits tonight (or nothing is open yet): call it a night; the
+         * job that is waiting for tomorrow's hours is still named */
+        o = s ? telling(state, s) : { n: 0, next: null, fits: false };
+        if (!o.next || !(o.n < PROMO_MIN || state.jobs[o.next].type === 'MAKE_FLYER')) return { stage: 'WAIT' };
+        return o.fits ? { stage: 'PLAN', jobId: o.next } : { stage: 'WAIT', jobId: o.next };
       case 'WAIT': return { stage: 'PLAY' };
       case 'DOOR': return { stage: s && s.night ? 'DOOR' : 'PLAY' };
       case 'SETTLE': return { stage: 'SETTLE' };
@@ -201,6 +235,16 @@ SB.module('Tutorial', function (SB) {
     if (!s) return null;
     c = cast(state);
     return bandId === c.closer ? { pay: 'SHARE', amount: 0 } : null;
+  }
+
+  /* keeps(state, q): the band the texts name waits for the player. While the walkthrough is on and no show has been
+   * played, its request does not lapse and no rival booker takes the band, as long as one of its dates is still ahead
+   * (the player can be slow to make the offer without losing the tutorial). -> bool. Reads only. */
+  function keeps(state, q) {
+    var t = peek(state), d = today(state);
+    if (!q || !t || !t.on || !t.requestId || q.id !== t.requestId) return false;
+    if (((state.player && state.player.showsPlayed) || 0) > 0) return false;
+    return (q.dates || []).some(function (x) { return typeof x === 'number' && x > d; });
   }
 
   function advance(state, t) {
@@ -261,7 +305,7 @@ SB.module('Tutorial', function (SB) {
     }
     base = 'story.tutorial.steps.' + step;
     tx = g.stage ? say(base + '.stages.' + g.stage, ctx) : '';
-    return { step: step, n: STEPS.indexOf(step) + 1, of: STEPS.length, target: STAGE_TARGET[g.stage] || (TARGET[step] === 'clip' && !s ? 'phone' : TARGET[step]),
+    return { step: step, n: STEPS.indexOf(step) + 1, of: STEPS.length, target: (g.wait ? 'lamp' : STAGE_TARGET[g.stage]) || (TARGET[step] === 'clip' && !s ? 'phone' : TARGET[step]),
              stage: g.stage, bandId: g.bandId || null, slot: g.slot || null, personId: g.personId || null, jobId: g.jobId || null,
              showId: s ? s.id : null, requestId: (s && s.requestId) || t.requestId || null,
              text: say(base + '.text', ctx), more: tx || null,
@@ -288,5 +332,5 @@ SB.module('Tutorial', function (SB) {
   return { start: start, skip: skip, current: current, notify: notify,
            /* beyond the manifest */
            STEPS: STEPS, TARGET: TARGET, showOf: function (state) { var t = peek(state); return t ? showOf(state, t) : null; },
-           cast: cast, rig: rig, ask: ask };
+           cast: cast, rig: rig, ask: ask, keeps: keeps };
 });

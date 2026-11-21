@@ -13,7 +13,7 @@
  * covers(state, type)   does the friend do this job type for the player right now (the bill lock: only once it is ready)
  * hides(state, type)    is this (optional) job kept off the player's list for now
  * mentor(state)         the person id who covers
- * billsWaiting(state)   rent and the day job have not started yet
+ * billsWaiting(state)   the rent has not started yet (the day job has: it starts on day one)
  * cover(state, day)     the daily pass: the friend does every covered job that is due and doable -> records
  * weekly(state)         at the week's turn: starts the day job once the rung for it is reached -> records
  */
@@ -25,9 +25,10 @@ SB.module('Rungs', function (SB) {
   var AT = [0, 1, 2, 4, 5, 8];
   /* the rung each desk object comes out at (absent: always out) */
   var DESK = { notebook: 1, stickers: 2, keys: 2, tin: 3, mug: 4, map: 5, book: 5, flyers: 5, jacket: 5 };
-  /* the friend does these until the rung named: then they are the player's */
-  var COVER = { LOCK_BILL: 2, PRINT: 4, FLYER_RUN: 4, LISTINGS: 4, MAILING_LIST: 4, HOUSE_RULES: 4, NEIGHBORS: 4, ADVANCE: 4, THANKS: 4,
-                INVITES: 2, WEEK_PUSH: 2 };
+  /* the friend does these until the rung named: then they are the player's. Getting the word out is the player's from
+   * the first show (user, 2026-11-21: the night clock should bite from night one): the friend only does the bill lock
+   * and the running-the-night chores a first-timer would not know about. */
+  var COVER = { LOCK_BILL: 2, HOUSE_RULES: 4, NEIGHBORS: 4, ADVANCE: 4, THANKS: 4 };
   /* optional extras kept off the list until the rung named */
   var HIDE = { LOCAL_AD: 4, HAND_OUT: 4 };
   var BILLS_AT = 4;
@@ -76,8 +77,10 @@ SB.module('Rungs', function (SB) {
     return id && state.people && state.people[id] ? id : null;
   }
 
+  /* The rent waits for the desk to fill in; the day job does not (user, 2026-11-21: the clock bites from night one, so
+   * a guided start works its shifts from day one). A save from before that still has the job put off (dayJobLater). */
   function billsWaiting(state) {
-    return on(state) && !!(state.player && state.player.dayJobLater) && rung(state) < BILLS_AT;
+    return on(state) && !!(state.settings && state.settings.bills) && rung(state) < BILLS_AT;
   }
 
   /* The friend does a covered job on the first day it is doable: its window open and what it needs done. */
@@ -108,7 +111,7 @@ SB.module('Rungs', function (SB) {
     return o.n >= 2 && (windowState === 'CLOSING' || windowState === 'LATE');
   }
 
-  /* Once the rung for it comes round, the job the player put off starts with the next week. */
+  /* Saves from before 2026-11-21 put the day job off: once the rung comes round it starts with the next week. */
   function weekly(state) {
     var P = state.player;
     if (!on(state) || !P || !P.dayJobLater || rung(state) < BILLS_AT) return [];

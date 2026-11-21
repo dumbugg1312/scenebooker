@@ -35,7 +35,7 @@ SB.Cities.register('syracuse-ny', {
     { id: 'utica', kind: 'PEER', name: 'Utica', minutes: 50, bearing: 85, slug: 'utica-ny', note: 'A Mohawk Valley mill town with a small scene of its own.' },
     { id: 'ithaca', kind: 'PEER', name: 'Ithaca', minutes: 60, bearing: 185, slug: 'ithaca-ny', note: 'A smaller college town with a respected scene; people travel between the two.' },
     { id: 'binghamton', kind: 'PEER', name: 'Binghamton', minutes: 65, bearing: 175, scene: 800, note: 'A university town down I-81 that links Syracuse to the Pennsylvania side of the circuit.' },
-    { id: 'rochester', kind: 'PEER', name: 'Rochester', minutes: 85, bearing: 265, scene: 2400, note: 'The other upstate city and a long-standing rival that trades bands.' }
+    { id: 'rochester', kind: 'PEER', name: 'Rochester', slug: 'rochester', minutes: 85, bearing: 265, scene: 2400, note: 'The other upstate city and a long-standing rival that trades bands.' }
   ],
 
   hoods: [

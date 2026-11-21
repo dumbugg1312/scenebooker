@@ -33,7 +33,7 @@ SB.Cities.register('naples-fl', {
     { id: 'everglades-city', kind: 'FEEDER', name: 'Everglades City', minutes: 55, bearing: 130, pop: 350, note: 'A fishing village at the end of the road. A few kids come up for a show.' },
     { id: 'lehigh-acres', kind: 'FEEDER', name: 'Lehigh Acres', minutes: 60, bearing: 15, pop: 114300, note: 'A huge young exurb of cheap lots and vacant land. Backyard shows and a lot of kids.' },
     { id: 'fort-myers', kind: 'PEER', name: 'Fort Myers and Cape Coral', state: 'FL', minutes: 45, bearing: 345, slug: 'cape-coral-fl', note: 'Bigger and scruffier with more rooms. Crowds go both ways, mostly south to north.' },
-    { id: 'sarasota', kind: 'PEER', name: 'Sarasota', state: 'FL', minutes: 135, bearing: 345, scene: 400, note: 'A pricier arts town up the coast with a small, separate scene.' }
+    { id: 'sarasota', kind: 'PEER', name: 'Sarasota', slug: 'sarasota-fl', state: 'FL', minutes: 135, bearing: 345, scene: 400, note: 'A pricier arts town up the coast with a small, separate scene.' }
   ],
 
   hoods: [

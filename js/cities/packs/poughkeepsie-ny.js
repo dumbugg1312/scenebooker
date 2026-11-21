@@ -36,7 +36,7 @@ SB.Cities.register('poughkeepsie-ny', {
     { id: 'pawling', kind: 'FEEDER', name: 'Pawling', minutes: 40, bearing: 120, note: 'A commuter and farm town on the Connecticut line.' },
     { id: 'kingston', kind: 'PEER', name: 'Kingston', minutes: 45, bearing: 350, note: 'A county seat with an artists\' community; artsier and more hippie, and it trades bands and crowds.' },
     { id: 'danbury', kind: 'PEER', name: 'Danbury', state: 'CT', minutes: 55, bearing: 120, note: 'A bigger Connecticut city down the interstate that trades crowds.' },
-    { id: 'albany', kind: 'PEER', name: 'Albany', minutes: 90, bearing: 5, note: 'The capital up the road, with a bigger circuit that pulls college-bound kids.' }
+    { id: 'albany', kind: 'PEER', name: 'Albany', slug: 'albany-ny', minutes: 90, bearing: 5, note: 'The capital up the road, with a bigger circuit that pulls college-bound kids.' }
   ],
 
   hoods: [

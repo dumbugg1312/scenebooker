@@ -1,0 +1,66 @@
+/* Scene Booker — css/clock.css: the night clock (js/ui/clock.js, SB.Clock), prefix ck-.
+ * The boxes are sized in em, so the clock is as big as the type around it: on the desk, the calendar and the card.
+ * Only the stay-up hour and a crunch warning wear the city's hot ink (--ck-hot, set by SB.Clock). */
+
+.ck-boxes { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .14em .3em; line-height: 0; vertical-align: middle; }
+.ck-hr { display: inline-block; line-height: 0; }
+.ck-hr svg { height: 1.25em; display: block; overflow: visible; }
+.ck-hr--stay { margin-left: .25em; }
+.ck-hr--tired { opacity: .75; }
+
+.ck-slip { --ck-hot: var(--hot, #d8392b); position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 5);
+  padding: calc(var(--p) * 8) calc(var(--p) * 10) calc(var(--p) * 9); background: var(--pp-white); color: var(--toner);
+  font: 400 calc(var(--fs) * 13)/1.2 var(--f-type); box-shadow: var(--sh-s) 0 rgba(0, 0, 0, .55); transform: rotate(-.8deg); }
+.ck-line { display: inline-block; padding: calc(var(--p) * 3) calc(var(--p) * 7) calc(var(--p) * 2); background: var(--toner); color: var(--pp-bond);
+  font: 400 calc(var(--fs) * 13)/1.1 var(--f-mono); letter-spacing: .06em; white-space: normal; }
+.ck-slip .ck-boxes { font-size: calc(var(--fs) * 15); }
+.ck-crunch { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: calc(var(--p) * 3); max-width: calc(var(--p) * 330);
+  font: 400 calc(var(--fs) * 12)/1.25 var(--f-type); text-transform: uppercase; }
+.ck-crunch li { display: flex; gap: calc(var(--p) * 5); align-items: baseline; }
+.ck-bang { font: 400 calc(var(--fs) * 16)/1 var(--f-gothic); color: var(--ck-hot); transform: rotate(8deg); flex: 0 0 auto; }
+
+/* on the desk: a slip of paper taped under the tape deck (js/desk/scene.js puts it in the deck's button). Big (user,
+   2026-11-21: "make the desk clock bigger"): the night's hours are the game, so the slip reads across the table. */
+.dk-clock { position: absolute; z-index: 3; pointer-events: none; display: flex; justify-content: center; }
+.dk-clock .ck-slip { padding: calc(var(--u) * 12) calc(var(--u) * 16) calc(var(--u) * 14); gap: calc(var(--u) * 9); font-size: calc(var(--u) * 22 * var(--scale, 1));
+  box-shadow: calc(var(--u) * 5) calc(var(--u) * 6) 0 var(--pitch); transform: rotate(-1.6deg); }
+.dk-clock .ck-line { font-size: calc(var(--u) * 22 * var(--scale, 1)); padding: calc(var(--u) * 5) calc(var(--u) * 10) calc(var(--u) * 4); }
+.dk-clock .ck-line--split { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 calc(var(--u) * 12); padding: calc(var(--u) * 7) calc(var(--u) * 12) calc(var(--u) * 5); }
+.dk-clock .ck-head { font: 400 calc(var(--u) * 46)/.95 var(--f-gothic); letter-spacing: .01em; }
+.dk-clock .ck-rest { font: 400 calc(var(--u) * 21)/1.1 var(--f-mono); letter-spacing: .06em; }
+.dk-clock .ck-boxes { font-size: calc(var(--u) * 34); gap: calc(var(--u) * 6) calc(var(--u) * 9); }
+.dk-clock .ck-slip.is-long .ck-boxes { font-size: calc(var(--u) * 24); gap: calc(var(--u) * 5) calc(var(--u) * 7); }   /* a day off: two rows, not three */
+.dk-clock .ck-crunch { font-size: calc(var(--u) * 18 * var(--scale, 1)); max-width: none; }
+.dk-clock .ck-bang { font-size: calc(var(--u) * 26); }
+.dk-clock .ck-slip::before { content: ""; position: absolute; left: 40%; top: calc(var(--u) * -12); width: calc(var(--u) * 96); height: calc(var(--u) * 24);
+  background: var(--tape, rgba(236, 228, 200, .78)); transform: rotate(-3deg); }
+
+/* on the calendar: tonight's slip beside the week's title, and the CALL IT A NIGHT tab under it */
+.cc-tonight { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 8); margin-left: auto; }
+.cc-dayhrs { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 3); padding: calc(var(--p) * 5) calc(var(--p) * 5) calc(var(--p) * 4); border-top: calc(var(--p) * 2) solid var(--toner); }
+.cc-dayhrs .ck-boxes { font-size: calc(var(--fs) * 10); }
+.cc-dayword { font: 400 calc(var(--fs) * 12)/1 var(--f-mono); text-transform: uppercase; letter-spacing: .04em; }
+.cc-dayword.is-show { padding: calc(var(--p) * 1) calc(var(--p) * 4); background: var(--toner); color: var(--paper, #f4f2ea); }
+.cc-day.is-today { box-shadow: inset 0 0 0 calc(var(--p) * 4) var(--toner); }
+.cc-day.is-crunch .cc-dband::after { content: "!!"; margin-left: auto; font: 400 calc(var(--fs) * 16)/1 var(--f-gothic); color: var(--hot); }
+.cc-dbody { flex: 1 1 auto; display: flex; flex-direction: column; gap: calc(var(--p) * 5); min-height: calc(var(--p) * 150); padding: calc(var(--p) * 4) calc(var(--p) * 5) calc(var(--p) * 8); border-top: calc(var(--p) * 2) solid var(--toner); }
+.cc-dues { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: calc(var(--p) * 2); }
+.cc-due { font: 400 calc(var(--fs) * 12)/1.15 var(--f-type); padding-left: calc(var(--p) * 9); text-indent: calc(var(--p) * -9); }
+.cc-due::before { content: "> "; }
+.cc-due.is-late { color: var(--hot); }
+.cc-due.is-done { text-decoration: line-through; color: var(--toner-mid); }
+.cc-due.is-done::before { content: "x "; }
+
+/* a job note: what it costs, when it is due, and DO IT TONIGHT */
+.cc-note-cost { padding: 0 calc(var(--p) * 4); background: var(--toner); color: var(--paper, #f4f2ea); font-family: var(--f-mono); white-space: nowrap; }
+.cc-note-due { font-family: var(--f-mono); text-transform: uppercase; white-space: nowrap; }
+.cc-note-due.is-late { color: var(--hot); }
+.cc-note-due.is-late::after { content: " !!"; }
+.cc-notewrap { position: relative; display: flex; flex-direction: column; gap: 0; }
+.cc-notewrap > .cc-tabs { margin: calc(var(--p) * -4) 0 0 calc(var(--p) * 10); position: relative; z-index: 2; }
+.cc-tab--now .cc-tab-l { white-space: nowrap; }
+.cc-tab--now:disabled { text-decoration: none; }
+.cc-tab--now:disabled .cc-tab-l { text-decoration: line-through; }
+.cc-has { font: 400 calc(var(--fs) * 12)/1.2 var(--f-type); text-transform: uppercase; color: var(--pp-gray); margin: calc(var(--p) * 2) 0 0 calc(var(--p) * 12); }
+.cc-slap .ck-slip { align-self: stretch; transform: none; box-shadow: none; padding-left: 0; background: transparent; }
+.cc-outbox li { display: flex; align-items: center; gap: calc(var(--p) * 8); flex-wrap: wrap; }

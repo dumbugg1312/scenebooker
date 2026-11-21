@@ -55,7 +55,7 @@ module.exports = function (t) {
 
   /* ---- the index ---- */
   const idx = SB.CityIndex;
-  t.eq(idx.length, 166, 'the index has 166 entries');
+  t.eq(idx.length, 216, 'the index has 216 entries');
   const slugs = idx.map(e => e.slug);
   t.eq(slugs.length, new Set(slugs).size, 'slugs are unique');
   t.eq(slugs.filter(s => !/^[a-z0-9-]+$/.test(s)), [], 'slugs are lower case, digits and hyphens');

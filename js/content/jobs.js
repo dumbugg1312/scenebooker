@@ -130,7 +130,7 @@ SB.Content.jobs = {
   HOLD_ROOM: {
     label: 'Hold a room',
     verb: 'Hold room',
-    card: 'Ask {room} to hold {dow} the {date:ord}. A hold is a handshake: whoever confirms first gets the night.',
+    card: 'Ask {room} for {dow} the {date:ord}. Their yes makes it yours, once they have what they ask for.',
     why: 'You can\'t offer a band a date you don\'t have. Check the town\'s calendar while you\'re at it.',
     ON_TIME: [
       '{room} is held for {dow} the {date:ord}. Soft hold. They\'ll want a yes before long.',
@@ -208,10 +208,10 @@ SB.Content.jobs = {
   },
 
   CONFIRM_ROOM: {
-    label: 'Confirm the room',
-    verb: 'Confirm',
-    card: 'Confirm {room} for the {date:ord}. Once it\'s confirmed, every day you wait to announce costs you people.',
-    why: 'A hold is a maybe. A confirmed night is a show, and the promotion clock starts.',
+    label: 'The room says yes',
+    verb: 'Booked',
+    card: '{room} books the {date:ord} once they have what they want. Then every day you wait to announce costs you people.',
+    why: 'A hold is a maybe. A booked night is a show, and the promotion clock starts.',
     ON_TIME: [
       'Confirmed: {room}, {dow} the {date:ord}. The show is real now.',
       '{room} is yours for the {date:ord}. Confirmed. (?house: {host} wrote "ok" and nothing else, which is how you know.)'
@@ -221,7 +221,7 @@ SB.Content.jobs = {
       'Confirmed, late. The room had to hold the night longer than they wanted to.'
     ],
     SKIPPED: [
-      'You didn\'t confirm in time. {room} gave the {date:ord} to someone else.',
+      '{room} never got what they asked for. They gave the {date:ord} to someone else.',
       'The hold ran out. There\'s no show on the {date:ord} anymore.'
     ]
   },

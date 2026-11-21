@@ -3,6 +3,13 @@
  * Spec: design/spec/02-engine.md 2.5, 5.1 (steps 1 and 6), 5.2 (the evening slip); 01-state 2.7.
  * Streams: MAIL (the evening slip), TEXT (only as the rng of SB.text.line).
  *
+ * The night clock (design/spec/10-night-clock.md): every message the player writes (an ask of any kind, a reply to a
+ * request, a chase) takes Config.MAIL.hours of the evening it is written, through SB.Week.spend, and is refused when
+ * that does not fit tonight even staying up. Taking it back the same evening (withdraw, unqueue) gives the time back.
+ * What was charged is kept on the item as `paid: { day, hours }`. The evening send itself costs nothing more.
+ * An ask the engine makes inside something already paid for (payload.noClock: the dates of a tour route, a quiet
+ * word, a loan asked while paying the bills) is not charged.
+ *
  * state.mail = { messages: [Message], out: [OutItem], replied: { requestId: day }, extended: { requestId: true } }
  *   out:      what was written that is not an ask and goes out with the evening send: a reply to a request
  *             (INTERESTED, PASS) or a chase. OutItem = { id, kind: 'REPLY' | 'CHASE', action, requestId, askId, args, queuedDay }
@@ -74,6 +81,26 @@ SB.module('Mail', function (SB) {
     return SB.text.line(path, slots || {}, useRng === false ? null : SB.rng.stream(state, E.STREAM.TEXT));
   }
   function burnt(state, day) { return !!(state.player && state.player.burnoutUntil != null && state.player.burnoutUntil > day); }
+
+  /* ---- the half hour a message takes (spec 10) ---- */
+  function clock() { return SB.Week && SB.Week.spend && SB.Week.fits ? SB.Week : null; }
+  /* would one more message fit tonight? -> null, or the refusal (NO_TIME with what it takes and what is left) */
+  function noTime(state) {
+    var r = clock() ? clock().fits(state, C.MAIL.hours) : null;
+    return r && r.ok === false ? r : null;
+  }
+  /* charge it to tonight and remember it on the item; -> the records of the charge (staying up says so) */
+  function pay(state, item) {
+    var r = clock() ? clock().spend(state, C.MAIL.hours) : null;
+    if (!r || r.ok === false || !r.hours) return [];
+    item.paid = { day: r.day, hours: r.hours };
+    return r.records || [];
+  }
+  /* taken back the evening it was written: the time comes back */
+  function unpay(state, item) {
+    if (item && item.paid && SB.Week && SB.Week.refund) SB.Week.refund(state, item.paid.hours, item.paid.day);
+    if (item) item.paid = null;
+  }
   function phoneOff(state, day) {
     var w = state.week, idx;
     if (!w || !w.phoneOff || !state.clock) return false;
@@ -307,6 +334,7 @@ SB.module('Mail', function (SB) {
       if (counterOf.status !== 'COUNTER') return no('INVALID');
     }
     if (payload.inPerson && burnt(state, today(state))) return no('BURNT_OUT');
+    if (!payload.noClock) { o = noTime(state); if (o) return o; }
 
     id = U.newId(state, 'a');
     a = { id: id, kind: kind, toId: toId == null ? null : toId, showId: payload.showId || null, jobId: null,
@@ -314,6 +342,7 @@ SB.module('Mail', function (SB) {
           needBy: typeof payload.needBy === 'number' ? payload.needBy : null, window: null, chased: 0, answer: null, hid: {} };
     a.window = windowOf(state, a);
     state.asks[id] = a;
+    if (!payload.noClock) records = pay(state, a);
     /* a counter is answered by the next ask of its kind to the same person: it keeps its status and its answer
        (nothing is lost) and no longer needs the player */
     for (k in state.asks) {
@@ -336,9 +365,9 @@ SB.module('Mail', function (SB) {
       /* accepting a counter: an ask with the counter's payload, answered YES at once */
       a.status = 'SENT'; a.sentDay = today(state);
       a.hid = { answerDay: today(state), will: 'YES', counter: null };
-      records = deliverOne(state, a, today(state), state.clock && state.clock.cursor ? state.clock.cursor.half : null).records;
+      records = records.concat(deliverOne(state, a, today(state), state.clock && state.clock.cursor ? state.clock.cursor.half : null).records);
     } else if (payload.inPerson) {
-      records = answerInPerson(state, id, today(state), state.clock && state.clock.cursor ? state.clock.cursor.half : null);
+      records = records.concat(answerInPerson(state, id, today(state), state.clock && state.clock.cursor ? state.clock.cursor.half : null));
     }
     if (kind === 'TERMS' && a.status !== 'QUEUED') mail(state).replied[a.requestId] = mail(state).replied[a.requestId] == null ? today(state) : mail(state).replied[a.requestId];
     records = log(state, records);
@@ -351,9 +380,10 @@ SB.module('Mail', function (SB) {
     if (over(state)) return no('OVER');
     if (!OPEN[a.status]) return no('ALREADY');
     wasSent = a.status === 'SENT';
+    if (!wasSent) unpay(state, a);                       // never went out: the half hour comes back (the same evening)
     a.status = 'WITHDRAWN';
     a.answer = { status: 'WITHDRAWN', day: today(state), counter: null, text: '' };
-    mail(state).out = mail(state).out.filter(function (o) { return o.askId !== a.id; });
+    mail(state).out = mail(state).out.filter(function (o) { if (o.askId === a.id) unpay(state, o); return o.askId !== a.id; });
     if (wasSent && !quiet && (a.kind === 'BAND_PLAY' || a.kind === 'TERMS') && SB.Bands && SB.Bands.addTrust) {
       records.push(SB.Bands.addTrust(state, a.toId, 'DROPPED_ASK', { showId: a.showId, scale: 1 }));
     }
@@ -363,13 +393,15 @@ SB.module('Mail', function (SB) {
   }
 
   function chase(state, askId) {
-    var a = getAsk(state, askId, 'Mail.chase');
+    var a = getAsk(state, askId, 'Mail.chase'), o;
     if (over(state)) return no('OVER');
     if (a.status !== 'SENT') return no('INVALID');
     if (a.chased) return no('ALREADY');
+    o = noTime(state); if (o) return o;
     a.chased = 1;
-    mail(state).out.push({ id: U.newId(state, 'mo'), kind: 'CHASE', askId: a.id, requestId: null, action: null, args: null, queuedDay: today(state) });
-    return U.yes();
+    o = { id: U.newId(state, 'mo'), kind: 'CHASE', askId: a.id, requestId: null, action: null, args: null, queuedDay: today(state) };
+    mail(state).out.push(o);
+    return U.yes({ records: log(state, pay(state, o)) });
   }
 
   function setNeedBy(state, askId, day) {
@@ -388,7 +420,7 @@ SB.module('Mail', function (SB) {
   /* ------------------------------------------------------------------ */
 
   function reply(state, requestId, action, args) {
-    var req = state.requests ? state.requests[requestId] : null, m = mail(state), r;
+    var req = state.requests ? state.requests[requestId] : null, m = mail(state), r, o;
     if (over(state)) return no('OVER');
     if (!req) SB.fail('Mail.reply', 'unknown request "' + requestId + '"');
     if (!E.REPLY[action]) SB.fail('Mail.reply', 'unknown reply "' + action + '"');
@@ -405,15 +437,33 @@ SB.module('Mail', function (SB) {
     }
     if (action === 'INTERESTED' && m.extended[requestId]) return no('ALREADY');
     if (action === 'PASS' && args.tone && !E.PASS_TONE[args.tone]) SB.fail('Mail.reply', 'unknown pass tone "' + args.tone + '"');
-    m.out.push({ id: U.newId(state, 'mo'), kind: 'REPLY', action: action, requestId: requestId, askId: null, args: U.copy(args), queuedDay: today(state) });
+    r = noTime(state); if (r) return r;
+    o = { id: U.newId(state, 'mo'), kind: 'REPLY', action: action, requestId: requestId, askId: null, args: U.copy(args), queuedDay: today(state) };
+    m.out.push(o);
+    r = log(state, pay(state, o));
     if (SB.Jobs && SB.Jobs.refreshAll) syncAnswerJob(state, requestId);
     story(state, 'REPLY', { requestId: requestId, action: action });
-    return U.yes();
+    return U.yes({ records: r });
   }
 
   function syncAnswerJob(state, requestId) {
     var k, s;
     if (state.shows) for (k in state.shows) { s = state.shows[k]; if (s.requestId === requestId && (s.status === 'DRAFT' || s.status === 'CONFIRMED')) SB.Jobs.ensure(state, s.id); }
+  }
+
+  /* Take back something written that has not gone out yet: a queued ask (by its ask id), or a reply or a chase (by the
+   * id Mail.outbox gives it). Written tonight, its half hour comes back. */
+  function unqueue(state, id) {
+    var m = mail(state), a = state.asks ? state.asks[id] : null, i, o, c;
+    if (over(state)) return no('OVER');
+    if (a) return a.status === 'QUEUED' ? withdraw(state, id, true) : no('ALREADY');
+    for (i = 0; i < m.out.length; i++) if (m.out[i].id === id) break;
+    if (i >= m.out.length) return no('INVALID');
+    o = m.out.splice(i, 1)[0];
+    unpay(state, o);
+    if (o.kind === 'CHASE') { c = state.asks ? state.asks[o.askId] : null; if (c) c.chased = 0; }
+    else if (o.requestId && SB.Jobs && SB.Jobs.refreshAll) syncAnswerJob(state, o.requestId);
+    return U.yes();
   }
 
   /* ------------------------------------------------------------------ */
@@ -433,36 +483,23 @@ SB.module('Mail', function (SB) {
     if (a.requestId && (a.kind === 'TERMS') && mail(state).replied[a.requestId] == null) mail(state).replied[a.requestId] = day;
   }
 
-  function capacity(state, day) {
-    var w = state.week, idx, cap, used;
-    if (!w || !w.cap || !w.used || !state.clock) return Infinity;
-    idx = day - state.clock.week * 7;
-    if (idx < 0 || idx > 6 || !w.cap[idx] || !w.used[idx]) return Infinity;
-    cap = (w.cap[idx].DAY || 0) + (w.cap[idx].NIGHT || 0);
-    used = (w.used[idx].DAY || 0) + (w.used[idx].NIGHT || 0);
-    /* hours the evening may add: whatever is left of the day, plus overtime up to OVERTIME_MAX */
-    return Math.max(0, cap + C.OVERTIME_MAX - used);
-  }
-  /* hours a send of n items costs */
-  function costOf(n) { return Math.ceil(Math.max(0, n - C.MAIL.freePerDay) / C.MAIL.perHour); }
-
   function queue(state) {
     var items = [], k, a, m = mail(state);
     for (k in asks(state)) { a = state.asks[k]; if (a.status === 'QUEUED') items.push({ ask: a, day: a.queuedDay }); }
     m.out.forEach(function (o, i) { items.push({ out: o, day: o.queuedDay, i: i }); });
-    /* an ask for a show in the coming week (sound on Monday for a Thursday) goes out first, so the evening's limit never holds it */
+    /* an ask for a show in the coming week (sound on Monday for a Thursday) goes out first */
     function soon(it) { var s = it.ask ? showOf(state, it.ask.showId) : null; return s && s.day - today(state) <= 7 ? 0 : 1; }
     return items.sort(function (x, y) { return (soon(x) - soon(y)) || (x.day - y.day); });
   }
 
+  /* Everything written goes out. Each message took its half hour when it was written (spec 10), so the send costs
+   * nothing and holds nothing back: `hours` is always 0. */
   function flush(state, day, half) {
-    var records = [], items, room, n = 0, sent = [], m = mail(state), done = [], slips;
+    var records = [], items, n = 0, sent = [], m = mail(state), done = [], slips;
     half = half || 'NIGHT';
     if (phoneOff(state, day) || burnt(state, day)) return { records: records, hours: 0 };
     items = queue(state);
-    room = capacity(state, day);
     items.forEach(function (it) {
-      if (costOf(n + 1) > room) return;          // waits for the next evening
       n++;
       if (it.ask) { send(state, it.ask, day); sent.push(it.ask); ensureShow(state, it.ask.showId); }
       else { records = records.concat(sendOut(state, it.out, day, half)); done.push(it.out.id); }
@@ -472,7 +509,7 @@ SB.module('Mail', function (SB) {
       slips = eveningSlip(state, sent, day, half);
       records = records.concat(slips);
     }
-    return { records: records, hours: costOf(n) };
+    return { records: records, hours: 0 };
   }
 
   function sendOut(state, o, day, half) {
@@ -584,6 +621,7 @@ SB.module('Mail', function (SB) {
             hold = holdOf(state, a.toId, p.day, show.id) || (res.counter && res.counter.hold) || { rank: 1, expires: null };
             r = SB.Shows.move(state, show.id, { roomId: a.toId, day: p.day == null ? show.day : p.day, slot: p.slot, hold: hold });
             if (r && r.records) records = records.concat(r.records);
+            records = records.concat(SB.Rooms.firmUp(state, show.id, day) || []);   // their yes books it when nothing is missing
           }
           break;
         case 'ROOM_CONFIRM':
@@ -595,6 +633,7 @@ SB.module('Mail', function (SB) {
             hold.rank = 1;
             r = SB.Shows.move(state, show.id, { roomId: p.roomId || show.roomId, day: p.day == null ? show.day : p.day, hold: hold });
             if (r && r.records) records = records.concat(r.records);
+            records = records.concat(SB.Rooms.firmUp(state, show.id, day) || []);
           }
           break;
         case 'CREW':
@@ -749,6 +788,7 @@ SB.module('Mail', function (SB) {
   return {
     inbox: inbox, message: message, markRead: markRead, reply: reply, ask: ask, withdraw: withdraw, chase: chase,
     setNeedBy: setNeedBy, waiting: waiting, needsYou: needsYou, outbox: outbox, post: post, flush: flush, deliver: deliver,
+    unqueue: unqueue,
     /* internal outside the manifest (see the header) */
     answerInPerson: answerInPerson
   };

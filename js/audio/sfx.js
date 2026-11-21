@@ -154,7 +154,7 @@
     'Shows.setDoor': 'write', 'Shows.setCrew': 'write', 'Shows.setLabel': 'write', 'Shows.setInsurance': 'write', 'Shows.setBilling': 'write',
     'Week.plan': 'write', 'Week.addJob': 'write', 'Week.decide': 'tick', 'Week.unplan': 'erase', 'Week.removeJob': 'erase',
     'Week.close': 'pageTear', 'Week.nextWeek': 'flip', 'Week.payBills': 'cash', 'Week.setDayJob': 'write', 'Week.dropShift': 'erase',
-    'Week.phoneOff': 'down.phone',
+    'Week.phoneOff': 'down.phone', 'Week.doNow': 'write', 'Mail.unqueue': 'erase',
     'Rooms.release': 'down.keys', 'Rooms.challenge': 'write',
     'Money.move': 'cash',
     'Jobs.setFlyer': 'glue', 'Jobs.promise': 'write',
@@ -421,7 +421,7 @@
     if (n !== null) lastNeeds = n;
   }
   function wrapVerbs() {
-    var all = Object.keys(VERBS).concat(['Week.step', 'Week.startPlay', 'Week.check', 'Mail.markRead']);
+    var all = Object.keys(VERBS).concat(['Week.step', 'Week.endNight', 'Mail.markRead']);
     all.forEach(function (full) {
       var m = full.split('.'), mod = SB[m[0]], fn = mod && mod[m[1]];
       if (typeof fn !== 'function' || fn.__sfx) return;

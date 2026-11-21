@@ -194,7 +194,7 @@ SB.module('Jobs', function (SB) {
     else if (job.type === 'FLYER_RUN') { r = routeById(state, routeKey(job.key)); h = r && r.hours ? r.hours : c.hours; }
     else if (job.type === 'SORT_GEAR') h = fam ? 0 : c.hours;
     else if (job.type === 'HOUSE_RULES' && modeOf(state, job) === 'PROMISE') h = c.thenPromise.hours;
-    else if (job.type === 'ADVANCE' && fam) h = Math.ceil(c.hours / 2);
+    else if (job.type === 'ADVANCE' && fam) h = c.hours / 2;          // a room you know: half the calls (half hours are legal)
     if (job.type === 'ADVANCE' || job.type === 'RUN_SHOW') {
       ridersOf(state, job).forEach(function (rj) { if (rj.status === 'PROMISED') h += hoursOf(state, rj); });
     }
@@ -718,7 +718,7 @@ SB.module('Jobs', function (SB) {
   function jobView(state, job, onDay) {
     var c = cfg(job.type), show = showOf(state, job), mode = modeOf(state, job), plan = plannedItem(state, job.id),
         status = job.status, nd = needsOf(state, job), riders = [], helperOk, slots, cov = coveredJob(state, job),
-        coverBy = cov ? SB.Rungs.mentor(state) : null;
+        coverBy = cov ? SB.Rungs.mentor(state) : null, win = computeWindow(state, job, onDay == null ? today(state) : onDay);
     if (status === 'TODO' && plan) status = 'PLANNED';
     if (job.type === 'ADVANCE' || job.type === 'RUN_SHOW') riders = ridersOf(state, job).map(function (r) { return jobView(state, r, onDay); });
     helperOk = !!c.helper && stage(state) >= (c.helperStage || C.STAGE_HELPERS);
@@ -731,7 +731,7 @@ SB.module('Jobs', function (SB) {
       planned: plan ? { dayIdx: plan.dayIdx, half: plan.half, by: plan.by } : null,
       rides: ridesOn(state, job), riders: riders, optional: !!c.optional, waived: job.waived || null,
       opt: optMenu(state, job, show),
-      window: computeWindow(state, job, onDay == null ? today(state) : onDay),
+      window: win, due: win.idealUntil == null ? null : win.idealUntil,   // due: the last on-time day, as a day number (spec 10)
       needs: nd.list, helper: c.helper || null, helperOk: helperOk,
       cost: c.cost ? { lo: dollars(state, c.cost[0]), hi: dollars(state, c.cost[1]) } : null,
       text: job.text, covered: cov, coveredBy: coverBy, coveredName: coverBy ? personName(state, coverBy) : null,
@@ -839,7 +839,7 @@ SB.module('Jobs', function (SB) {
     if (modeOf(state, job) !== 'HOURS') return U.no('INVALID', SB.text.label('refuse.INVALID'));
     if (!LIVE[job.status]) return U.no('ALREADY', SB.text.label('refuse.ALREADY'));
     if (state.player && state.player.burnoutUntil != null && state.player.burnoutUntil > day) return U.no('BURNT_OUT', SB.text.label('refuse.BURNT_OUT'));
-    if (c.half !== 'ANY' && half && c.half !== half) return U.no('WRONG_HALF', SB.text.label('refuse.WRONG_HALF'));
+    /* a job's half no longer restricts the player: the day is one pool of hours (spec 10) */
     nd = needsOf(state, job);
     if (!nd.met) {
       /* names the missing job: `missing` is its type ('BANDS' when LOCK_BILL lacks two confirmed bands), `missingLabel` its name */
@@ -1251,7 +1251,7 @@ SB.module('Jobs', function (SB) {
         /* SPEC?: tour status and stop.askId belong to Territory; this job only queues the date asks */
         var tour = state.tours ? state.tours[job.key] : null;
         if (tour) (tour.stops || []).forEach(function (s) {
-          SB.Mail.ask(state, 'TOUR_DATE', s.contactId || null, { tourId: tour.id, stop: s.n });
+          SB.Mail.ask(state, 'TOUR_DATE', s.contactId || null, { tourId: tour.id, stop: s.n, noClock: true });   // the job's own hours cover the writing
         });
         return out;
       case 'TOUR_ADVANCE':

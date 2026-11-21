@@ -1,7 +1,8 @@
 'use strict';
 // test/bots/checklist.js — the Checklist bot (06-harness section 4): "Par walking around".
-// Every usual job on time and nothing else: it applies Week.suggest in full each week, leaves every promise ticked, plans no
-// optional job, no second run and no priced choice beyond the usual print run, and never overspends hours.
+// Every usual job on time and nothing else: each evening it sends its asks, then does the open jobs in due-day order while
+// they fit tonight (Week.doNow), leaves every promise ticked, does no optional job, no second run and no priced choice beyond
+// the usual print run, and never stays up (the stay-up hour is for the Gambler and the Random bot).
 //   * answers every request inside its window; takes a request when a bookable room is open on one of its dates, the Par is at
 //     least 0.4 of the room's capacity, and the exposure is covered by the fund (or by a third of the bank);
 //   * chooses the room whose capacity is nearest 1.3 x Par;
@@ -74,11 +75,14 @@ function make(cfg) {
           if (cfg.onTaken) cfg.onTaken(state, SB, q, ev, M);
           return;
         }
+        if (L.noTime(r)) return;                       // no hours left tonight: the draft waits, the request is looked at again tomorrow
       }
-      // pass, politely and with a reason; drop the draft
+      // pass, politely and with a reason; drop the draft once the reply is out
+      const r = SB.Mail.reply(state, q.requestId, 'PASS', { tone: 'REASON', referTo: null });
+      if (L.noTime(r)) return;
       if (ev && ev.showId) SB.Shows.cancel(state, ev.showId, 'PLAYER');
       else if (M.drafts[q.requestId]) SB.Shows.cancel(state, M.drafts[q.requestId], 'PLAYER');
-      const r = SB.Mail.reply(state, q.requestId, 'PASS', { tone: 'REASON', referTo: null });
+      delete M.drafts[q.requestId];
       M.decided[q.requestId] = L.ok(r) ? 'passed' : 'tried';
     });
   }
@@ -123,17 +127,10 @@ function make(cfg) {
     });
     const cands = free.filter(f => capOf[f.args.personId] !== undefined).sort((a, b) => capOf[a.args.personId] - capOf[b.args.personId]);
     if (!cands.length) return;
-    const j = SB.Week.addJob(state, 'VISIT', cands[0].args);
-    if (!L.ok(j)) return;
-    for (let d = 0; d < 7; d++) {
-      const halves = cands[0].half === 'DAY' ? ['DAY'] : (cands[0].half === 'NIGHT' ? ['NIGHT'] : ['NIGHT', 'DAY']);
-      for (let h = 0; h < halves.length; h++) if (L.ok(SB.Week.plan(state, j.jobId, d, halves[h], { by: 'player' }))) { M.lastVisit = week; return; }
-    }
-    SB.Week.removeJob(state, j.jobId);
+    if (L.doFreeNow(state, SB, 'VISIT', cands[0].args, {})) M.lastVisit = week;
   }
 
-  // Everything the bot does to move its shows along and place the usual. Called at the start of the week and again
-  // whenever the play loop pauses with news (05-interface 4.2: "Replanning is allowed whenever the loop is paused").
+  // Everything the bot does in an evening: move its shows along (the asks, half an hour each), then the usual jobs, due first.
   function work(state, SB) {
     handleRequests(state, SB);
     dropDead(state, SB);
@@ -142,18 +139,16 @@ function make(cfg) {
       L.setUsualBill(state, SB, show);
       if (cfg.onShow) cfg.onShow(state, SB, show, M, acts);
     });
-    const week = state.clock && typeof state.clock.week === 'number' ? state.clock.week : 0;
-    const skip = e => {
-      if (cfg.skipSuggest && cfg.skipSuggest(state, SB, e, week, M)) return true;
-      if (cfg.lateTelling && TELLING[e.type]) {
-        const j = e.jobId ? SB.Jobs.get(state, e.jobId) : null;
-        const showId = (j && j.showId) || (e.args && e.args.showId);
-        const sh = showId ? SB.Shows.get(state, showId) : null;
-        if (sh && sh.day - (week * 7 + e.dayIdx) > cfg.lateTelling) return true;
+    const today = state.clock && typeof state.clock.day === 'number' ? state.clock.day : 0;
+    const skip = j => {
+      if (cfg.skipSuggest && cfg.skipSuggest(state, SB, j, today, M)) return true;
+      if (cfg.lateTelling && TELLING[j.type]) {
+        const sh = j.showId ? SB.Shows.get(state, j.showId) : null;
+        if (sh && sh.day - today > cfg.lateTelling) return true;
       }
       return false;
     };
-    L.applySuggest(state, SB, { skip: skip, opt: cfg.optFor });
+    L.doTonight(state, SB, { skip: skip, opt: cfg.optFor, effort: cfg.effortFor, stay: !!cfg.stayUp, optional: !!cfg.optionalJobs });
     visit(state, SB);
   }
 
@@ -169,21 +164,18 @@ function make(cfg) {
 
     setup: function (opts) { M = fresh(); if (cfg.setup) cfg.setup(M, opts); return { bills: opts && opts.bills, dayJob: 'FULL' }; },
 
+    // the week's own choices (the day job); the booking work is done in the evenings
     planWeek: function (state, SB) {
       if (!M) M = fresh();
       dayJob(state, SB);
+    },
+
+    // The EVENING stop: the asks, then the jobs, then whatever the bot's own hook adds. The runner calls Week.endNight after.
+    evening: function (state, SB) {
+      if (!M) M = fresh();
       if (cfg.beforeRequests) cfg.beforeRequests(state, SB, M);
       work(state, SB);
       if (cfg.afterPlan) cfg.afterPlan(state, SB, M);
-    },
-
-    // Mid-week, after a morning that brought news (an answer, a message, a hold): the same work again, for the days not yet played.
-    replan: function (state, SB, records) {
-      if (!M) M = fresh();
-      const news = L.arr(records).some(r => r && (r.t === 'ASK_ANSWERED' || r.t === 'MESSAGE' || r.t === 'HOLD' || r.t === 'REQUEST_GONE'));
-      if (!news) return;
-      if (cfg.beforeRequests) cfg.beforeRequests(state, SB, M);
-      work(state, SB);
     },
 
     onStop: function (state, SB, stop) { return cfg.onStop ? cfg.onStop(state, SB, stop, M) : { optionId: 'FIRST' }; },

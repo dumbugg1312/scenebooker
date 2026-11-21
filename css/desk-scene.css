@@ -14,7 +14,7 @@ body.at-desk { overflow: hidden; background: var(--pitch); }
 .dk-stage { position: relative; width: min(100vw, 160vh); aspect-ratio: 16 / 10; max-height: 100vh; background: var(--pitch); }
 .dk-art, .dk-art > svg, .dk-copy { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
 .dk-stage.is-copied > .dk-art { visibility: hidden; }
-.dk-hits { position: absolute; inset: 0; }
+.dk-hits { position: absolute; inset: 0; z-index: 0; }   /* its own stack: the deck's clock slip (z 3) lies over the objects, never over what opens above the desk */
 body.at-desk:not(.is-closeup) .sb-main { display: none; }
 
 /* each object is a button holding its own drawing; the button's box includes a margin of bare table */

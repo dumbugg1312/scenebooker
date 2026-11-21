@@ -53,8 +53,9 @@
     o = o || {};
     if (!el || !el.classList) return el;
     if (o.delay) el.style.setProperty('--mv-d', o.delay + 'ms');
-    el.classList.remove('mv-' + name);
-    void el.offsetWidth;                             // start it again if it was already playing
+    /* start it again if it was already playing; only then is the reflow needed (a forced layout per call during a
+       screen's mount costs a whole-page layout each time) */
+    if (el.classList.contains('mv-' + name)) { el.classList.remove('mv-' + name); void el.offsetWidth; }
     el.classList.add('mv-' + name);
     if (o.cue) setTimeout(function () { sfx(o.cue, o.cueOpts); }, reduced() ? 0 : (o.delay || 0) + (o.cueAt || 0));
     if (o.done) setTimeout(o.done, reduced() ? 0 : (o.delay || 0) + (DUR[name] || 250));

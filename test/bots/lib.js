@@ -8,8 +8,8 @@
 //                       that succeeded (one "player decision" each);
 //   * guardState(state) a Proxy that throws when a bot reads `hid`, `state.truth`, `state.rng` or `state.director`,
 //                       or writes anywhere.
-// and the helpers the five bots share: read the inbox, list bookable rooms on a date, rank candidate bands, apply
-// Week.suggest, advance a show by its jobs.
+// and the helpers the five bots share: read the inbox, list bookable rooms on a date, rank candidate bands, do
+// tonight's jobs (Week.doNow), advance a show by its jobs.
 //
 // Everything here is written from 02-engine; where the engine file does not exist yet the bots run against the stubs.
 // Every engine call is defensive: a refusal ({ ok: false }) is an outcome, never an exception; the only thing that throws
@@ -22,10 +22,10 @@ const H = require('../helpers.js');
 const ALLOWED = {
   Game:      ['newGame', 'strip', 'setSetting'],
   Week:      ['view', 'plan', 'unplan', 'addJob', 'removeJob', 'suggest', 'dropShift', 'setDayJob', 'phoneOff', 'check',
-              'startPlay', 'step', 'decide', 'close', 'payBills', 'nextWeek'],
+              'startPlay', 'step', 'decide', 'close', 'payBills', 'nextWeek', 'tonight', 'canDoNow', 'doNow', 'endNight', 'crunch'],
   Shows:     ['create', 'get', 'list', 'view', 'setBill', 'setBilling', 'setDoor', 'setLabel', 'setCrew', 'setInsurance', 'dropBand', 'move', 'cancel'],
   Jobs:      ['catalog', 'get', 'forShow', 'tray', 'freeJobs', 'window', 'canDo', 'promise', 'flyerSpec', 'setFlyer'],
-  Mail:      ['inbox', 'message', 'markRead', 'reply', 'ask', 'withdraw', 'chase', 'setNeedBy', 'waiting', 'needsYou', 'outbox'],
+  Mail:      ['inbox', 'message', 'markRead', 'reply', 'ask', 'withdraw', 'chase', 'setNeedBy', 'waiting', 'needsYou', 'outbox', 'unqueue'],
   Money:     ['canCover', 'exposure', 'owedAhead', 'showAccounts', 'ledger', 'billsView', 'payBills', 'move'],
   Stress:    ['zone', 'view'],
   Save:      ['save', 'load', 'list', 'remove', 'exportText', 'importText'],
@@ -50,10 +50,10 @@ const ALLOWED = {
 
 // The ones that change state: a successful call is one player decision (06-harness 5.2, "player decisions per week").
 const ACTIONS = {
-  Week:      ['plan', 'unplan', 'addJob', 'removeJob', 'dropShift', 'setDayJob', 'phoneOff', 'decide'],
+  Week:      ['plan', 'unplan', 'addJob', 'removeJob', 'dropShift', 'setDayJob', 'phoneOff', 'decide', 'doNow'],
   Shows:     ['create', 'setBill', 'setBilling', 'setDoor', 'setLabel', 'setCrew', 'setInsurance', 'dropBand', 'move', 'cancel'],
   Jobs:      ['promise', 'setFlyer'],
-  Mail:      ['reply', 'ask', 'withdraw', 'chase', 'setNeedBy'],
+  Mail:      ['reply', 'ask', 'withdraw', 'chase', 'setNeedBy', 'unqueue'],
   Money:     ['move'],
   Territory: ['startTour'],
   Harm:      ['act', 'add', 'remove'],
@@ -216,29 +216,61 @@ function rankLocals(state, SB, day, touringGenre, exclude) {
   return out;
 }
 
-/* ---------------- applying the usual ---------------- */
+/* ---------------- doing the evening's jobs ---------------- */
 
-// Plan every entry of Week.suggest. Returns { planned, refused: [why] }.
-function applySuggest(state, SB, opts) {
+// Do open jobs tonight, soonest due day first, while they fit (spec 10: Week.canDoNow / Week.doNow). Replaces the old
+// Week.suggest + Week.plan. opts:
+//   skip(view) -> true to leave a job alone       opt(view) -> a priced choice key (else the engine's default)
+//   effort(view) -> MAKE_FLYER effort             stay: true lets a job run into the stay-up hour (default: it must fit the night)
+//   optional: true also does optional jobs        only(view) -> false to leave a job (an extra filter, after skip)
+// Returns { done, refused: [why] }.
+function doTonight(state, SB, opts) {
   opts = opts || {};
-  const list = arr(SB.Week.suggest(state)), res = { planned: 0, refused: [] };
-  list.forEach(e => {
-    if (opts.skip && opts.skip(e)) return;
-    let jobId = e.jobId;
-    if (!jobId) {
-      const a = SB.Week.addJob(state, e.type, e.args || {});
-      if (!ok(a)) { res.refused.push(e.type + ': ' + (a && a.code)); return; }
-      jobId = a.jobId;
+  const res = { done: 0, refused: [] }, tries = {};
+  for (let guard = 0; guard < 40; guard++) {
+    const tray = SB.Jobs.tray(state) || {};
+    const cands = [].concat(arr(tray.late), arr(tray.thisWeek), arr(tray.later), arr(tray.soon)).filter(j => {
+      if (!j || j.mode !== 'HOURS' || j.status !== 'TODO' || j.hidden || j.covered) return false;
+      if (j.optional && !opts.optional) return false;
+      if (!j.window || j.window.state === 'EARLY' || j.window.state === 'MISSED' || j.window.state === 'DONE' || j.window.state === 'NONE') return false;
+      if (j.type === 'FLYER_RUN' && String(j.key || '').indexOf('#') >= 0) return false;       // a second run is an extra
+      if ((tries[j.id] || 0) >= 2) return false;
+      if (opts.skip && opts.skip(j)) return false;
+      return true;
+    });
+    cands.sort((a, b) => (a.due === null || a.due === undefined ? 1e9 : a.due) - (b.due === null || b.due === undefined ? 1e9 : b.due) || (a.id < b.id ? -1 : 1));
+    let acted = false;
+    for (let i = 0; i < cands.length && !acted; i++) {
+      const j = cands[i], o = {};
+      const opt = opts.opt ? opts.opt(j) : undefined;
+      if (opt !== undefined && opt !== null) o.opt = opt;
+      const eff = opts.effort ? opts.effort(j) : undefined;
+      if (eff) o.effort = eff;
+      const c = SB.Week.canDoNow(state, j.id, o);
+      if (!ok(c)) { res.refused.push(j.type + ': ' + (c && c.code)); tries[j.id] = 9; continue; }
+      if (!opts.stay && num(c.overtime) > 0) continue;
+      tries[j.id] = (tries[j.id] || 0) + 1;
+      const r = SB.Week.doNow(state, j.id, o);
+      if (ok(r)) { res.done++; acted = true; } else { res.refused.push(j.type + ': ' + (r && r.code)); tries[j.id] = 9; }
     }
-    const o = { by: e.by || 'player' };
-    if (e.hours) o.hours = e.hours;
-    const opt = opts.opt ? opts.opt(e) : e.opt;
-    if (opt !== undefined) o.opt = opt;
-    const r = SB.Week.plan(state, jobId, e.dayIdx, e.half, o);
-    if (ok(r)) res.planned++; else res.refused.push(e.type + ': ' + (r && r.code));
-  });
+    if (!acted) break;
+  }
   return res;
 }
+
+// Do a job that is not in the tray (a free job: a visit, a show to go to; or one made with Week.addJob) tonight, or take it
+// back off the list when it will not go (or would mean staying up, unless `stay`). -> true when it was done.
+function doFreeNow(state, SB, type, args, o, stay) {
+  const a = SB.Week.addJob(state, type, args || {});
+  if (!ok(a)) return false;
+  const c = SB.Week.canDoNow(state, a.jobId, o || {});
+  if (ok(c) && (stay || !(num(c.overtime) > 0)) && ok(SB.Week.doNow(state, a.jobId, o || {}))) return true;
+  SB.Week.removeJob(state, a.jobId);
+  return false;
+}
+
+// a message that was refused for want of time is tried again tomorrow, not given up on
+function noTime(r) { return !!r && r.ok === false && (r.code === 'NO_TIME' || r.code === 'BURNT_OUT'); }
 
 /* ---------------- advancing a show by its jobs ---------------- */
 
@@ -331,14 +363,7 @@ function advanceShow(state, SB, show, memo, cfg) {
   if (rules && rules.insurance && rules.insurance.required && !rules.insurance.on && !note.insured) {
     if (ok(SB.Shows.setInsurance(state, show.id, true))) { note.insured = true; acts.push('insure'); }
   }
-  const secWait = !!(rules && rules.security && rules.security.required && !(show.crew && show.crew.security));
-  if (todo('CONFIRM_ROOM').length && note.roomId && !note.confirmAsked && !secWait) {
-    const hold = arr(byType.HOLD_ROOM)[0];
-    if (!hold || hold.status === 'DONE') {
-      const r = SB.Mail.ask(state, 'ROOM_CONFIRM', note.roomId, { showId: show.id });
-      if (ok(r)) { note.confirmAsked = true; acts.push('confirm'); }
-    }
-  }
+  // no confirm ask: the room's yes books the night once it has what it asked for (Rooms.firmUp, daily)
   // 5. crew: sound always; security where the room needs it (the player works the door)
   if (todo('LINE_UP_CREW').length || (rules && rules.security && rules.security.required && !(show.crew && show.crew.security))) {
     ['sound', 'security'].forEach(role => {
@@ -429,6 +454,6 @@ function playNight(state, SB, showId, keep) {
 module.exports = {
   ALLOWED, ACTIONS, BotError, guardState, guardValue, wrapSB,
   ok, num, arr, firstEnabled, monthlyBills, bankOf, fundOf, baseAff,
-  openRequests, bookableRooms, rankLocals, applySuggest, liveShows, dealFromRequest, advanceShow, defaultDoor,
+  openRequests, bookableRooms, rankLocals, doTonight, doFreeNow, noTime, liveShows, dealFromRequest, advanceShow, defaultDoor,
   usualOrder, setUsualBill, playNight
 };

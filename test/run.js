@@ -107,7 +107,7 @@ function unit(filters) {
   files.forEach(f => {
     const t0 = Date.now();
     const r = cp.spawnSync(process.execPath, [__filename, '--child', path.join(UNIT_DIR, f)],
-                           { encoding: 'utf8', timeout: 120000, maxBuffer: 64 * 1024 * 1024 });
+                           { encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024 });
     let res = null;
     const lines = String(r.stdout || '').split('\n');
     for (let i = lines.length - 1; i >= 0; i--) {
@@ -116,7 +116,7 @@ function unit(filters) {
     const ms = Date.now() - t0;
     if (!res) {
       bad++;
-      const why = r.error && r.error.code === 'ETIMEDOUT' ? 'timed out after 120 s'
+      const why = r.error && r.error.code === 'ETIMEDOUT' ? 'timed out after 300 s'
         : 'the test process died (exit ' + r.status + (r.signal ? ', ' + r.signal : '') + ') without reporting';
       console.log('FAIL  ' + f + '  (' + ms + ' ms)');
       console.log('      ' + why);

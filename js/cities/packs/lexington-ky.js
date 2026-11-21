@@ -42,7 +42,7 @@ SB.Cities.register('lexington-ky', {
     { id: 'dayton', kind: 'PEER', name: 'Dayton', state: 'OH', minutes: 135, bearing: 350, slug: 'dayton-oh', note: 'A smaller city with a deeper garage reputation than it gets credit for.' },
     { id: 'huntington', kind: 'PEER', name: 'Huntington', state: 'WV', minutes: 135, bearing: 85, slug: 'huntington-wv', note: 'A river and college town; the two trade bands along I-64.' },
     { id: 'bowling-green', kind: 'PEER', name: 'Bowling Green', minutes: 120, bearing: 225, scene: 900, note: 'A smaller college town to the southwest.' },
-    { id: 'knoxville', kind: 'PEER', name: 'Knoxville', state: 'TN', minutes: 170, bearing: 175, scene: 2500, note: 'Bigger, with the same university-and-mountains feel; the two trade bands on I-75.' }
+    { id: 'knoxville', kind: 'PEER', name: 'Knoxville', slug: 'knoxville-tn', state: 'TN', minutes: 170, bearing: 175, scene: 2500, note: 'Bigger, with the same university-and-mountains feel; the two trade bands on I-75.' }
   ],
 
   hoods: [

@@ -40,7 +40,7 @@ SB.Cities.register('santa-rosa-ca', {
     { id: 'ukiah', kind: 'FEEDER', name: 'Ukiah', minutes: 60, bearing: 340, note: 'The next county\'s seat, with a community college and a small scene. A classic north-of-Cloverdale band.' },
     { id: 'napa', kind: 'PEER', name: 'Napa', minutes: 55, bearing: 105, scene: 250, note: 'A fancier wine tourist city with a working side.' },
     { id: 'vallejo', kind: 'PEER', name: 'Vallejo', state: 'CA', minutes: 65, bearing: 125, slug: 'vallejo-ca', note: 'The grittier, cheaper neighbor across the hills.' },
-    { id: 'sacramento', kind: 'PEER', name: 'Sacramento', minutes: 105, bearing: 80, scene: 900, note: 'A bigger capital city where Santa Rosa kids go for shows.' }
+    { id: 'sacramento', kind: 'PEER', name: 'Sacramento', slug: 'sacramento', minutes: 105, bearing: 80, scene: 900, note: 'A bigger capital city where Santa Rosa kids go for shows.' }
   ],
 
   hoods: [

@@ -37,7 +37,7 @@ SB.Cities.register('huntsville-al', {
     { id: 'cullman', kind: 'FEEDER', name: 'Cullman', minutes: 60, bearing: 200, note: 'A conservative farm and small-city town; its teenagers drive an hour for a show.' },
     { id: 'albertville', kind: 'FEEDER', name: 'Albertville and Boaz', minutes: 60, bearing: 145, note: 'Poultry towns on Sand Mountain; regional Mexican music is bigger than rock.' },
     { id: 'shoals', kind: 'PEER', name: 'Florence and Muscle Shoals', minutes: 70, bearing: 265, scene: 1200, note: 'The Shoals: a real music scene of its own that trades shows both ways.' },
-    { id: 'birmingham', kind: 'PEER', name: 'Birmingham', minutes: 110, bearing: 200, scene: 3500, note: 'Older, grittier and more musical; the city Huntsville measures itself against.' },
+    { id: 'birmingham', kind: 'PEER', name: 'Birmingham', slug: 'birmingham', minutes: 110, bearing: 200, scene: 3500, note: 'Older, grittier and more musical; the city Huntsville measures itself against.' },
     { id: 'chattanooga', kind: 'PEER', name: 'Chattanooga', minutes: 110, bearing: 90, slug: 'chattanooga-tn', note: 'A similar-size peer with more small rooms and a natural next tour stop.' }
   ],
 

@@ -37,8 +37,8 @@ SB.Cities.register('springfield-ma', {
     { id: 'greenfield', kind: 'FEEDER', name: 'Greenfield', minutes: 45, bearing: 0, note: 'The northern anchor of the valley: rural and countercultural.' },
     { id: 'worcester', kind: 'PEER', name: 'Worcester', minutes: 55, bearing: 85, slug: 'worcester-ma', note: 'The east-west pipeline for bands, with a bigger scene and more rooms.' },
     { id: 'new-haven', kind: 'PEER', name: 'New Haven', state: 'CT', minutes: 60, bearing: 190, slug: 'new-haven-ct', note: 'A college and arts city that shares some touring bands.' },
-    { id: 'albany', kind: 'PEER', name: 'Albany', state: 'NY', minutes: 85, bearing: 290, scene: 1500, note: 'The mirror image to the west and the next stop on a tour.' },
-    { id: 'providence', kind: 'PEER', name: 'Providence', state: 'RI', minutes: 90, bearing: 110, scene: 2500, note: 'A bigger, arts-heavy scene.' }
+    { id: 'albany', kind: 'PEER', name: 'Albany', slug: 'albany-ny', state: 'NY', minutes: 85, bearing: 290, scene: 1500, note: 'The mirror image to the west and the next stop on a tour.' },
+    { id: 'providence', kind: 'PEER', name: 'Providence', slug: 'providence', state: 'RI', minutes: 90, bearing: 110, scene: 2500, note: 'A bigger, arts-heavy scene.' }
   ],
 
   hoods: [

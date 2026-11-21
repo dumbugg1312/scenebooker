@@ -3,7 +3,7 @@
 // Checklist, plus:
 //   * chooses the bill, the night and the room by Forecast.what: the Call's midpoint, less a penalty of half its width;
 //   * vets every request with HISTORY and, when it has a contact, asks a booker (CONTACT_VET);
-//   * spends free Night hours on GO_TO_SHOW at shows whose genres it has least knowledge of;
+//   * spends a free night on GO_TO_SHOW at shows whose genres it has least knowledge of;
 //   * changes one thing at a time: prefers a bill with at most one band it has never booked;
 //   * runs a DEBRIEF after any show outside its Call;
 //   * books toward a genre when Trends.arrow is UP, and away from one its last two shows were.
@@ -50,13 +50,12 @@ function make(name, variant) {
       return !g || ranked.slice(0, 3).indexOf(g) >= 0;
     },
 
-    // vet every request: HISTORY planned in the first half-day that has an hour, and a booker asked when the player knows one
+    // vet every request: HISTORY done tonight if it fits (else tomorrow), and a booker asked when the player knows one
     beforeRequests: function (state, SB, M) {
       L.openRequests(state, SB).forEach(q => {
         if (M.vetted[q.requestId]) return;
+        if (!L.doFreeNow(state, SB, 'VET_HISTORY', { requestId: q.requestId }, {})) return;      // no hours left: tomorrow
         M.vetted[q.requestId] = true;
-        const j = SB.Week.addJob(state, 'VET_HISTORY', { requestId: q.requestId });
-        if (L.ok(j)) for (let d = 0; d < 7; d++) { if (L.ok(SB.Week.plan(state, j.jobId, d, 'DAY', { by: 'player' }))) break; }
         const contacts = L.arr(SB.Territory.contacts(state)).filter(c => L.num(c.strength) >= 40);
         if (contacts.length) SB.Mail.ask(state, 'CONTACT_VET', contacts[0].id, { requestId: q.requestId });
       });
@@ -76,29 +75,21 @@ function make(name, variant) {
       return out.length ? out : ranked.slice(0, 3).map(x => x.bandId);
     },
 
-    // free Night hours go to somebody else's show, in the genres it knows least
+    // a free night goes to somebody else's show, in the genres it knows least: only a show that is on tonight
     afterPlan: function (state, SB, M) {
-      const view = SB.Week.view(state);
       const free = L.arr(SB.Jobs.freeJobs(state)).filter(f => f.type === 'GO_TO_SHOW' && f.args && f.args.otherShowId);
-      if (!free.length) { debrief(state, SB, M); return; }
+      const tn = SB.Week.tonight(state);
+      if (!free.length || tn.show || tn.left < 3) { debrief(state, SB, M); return; }   // only a free night
       const known = genreCounts(state);
-      const rooms = L.arr(SB.Rooms.otherShows(state, state.clock.day, state.clock.day + 7));
+      const rooms = L.arr(SB.Rooms.otherShows(state, state.clock.day, state.clock.day));
       const byId = {}; rooms.forEach(o => { byId[o.id] = o; });
-      free.sort((a, b) => {
+      free.filter(f => byId[f.args.otherShowId] && !M.scouted[f.args.otherShowId]).sort((a, b) => {
         const ga = L.arr((byId[a.args.otherShowId] || {}).genres), gb = L.arr((byId[b.args.otherShowId] || {}).genres);
         const ka = ga.reduce((s, g) => s + (known[g] || 0), 0) / Math.max(1, ga.length), kb = gb.reduce((s, g) => s + (known[g] || 0), 0) / Math.max(1, gb.length);
         return ka - kb;
+      }).slice(0, 1).forEach(f => {
+        if (L.doFreeNow(state, SB, 'GO_TO_SHOW', { otherShowId: f.args.otherShowId }, {})) M.scouted[f.args.otherShowId] = true;
       });
-      let went = 0;
-      for (let i = 0; i < free.length && went < 1; i++) {
-        const o = byId[free[i].args.otherShowId];
-        const dayIdx = o ? o.day - state.clock.week * 7 : null;
-        if (dayIdx === null || dayIdx < 0 || dayIdx > 6) continue;
-        const d = view.days[dayIdx];
-        if (!d || (d.cap.NIGHT - d.used.NIGHT) < 3 || M.scouted[o.id]) continue;     // only a free night
-        const a = SB.Week.addJob(state, 'GO_TO_SHOW', { otherShowId: o.id });
-        if (L.ok(a) && L.ok(SB.Week.plan(state, a.jobId, dayIdx, 'NIGHT', { by: 'player' }))) { M.scouted[o.id] = true; went++; }
-      }
       debrief(state, SB, M);
     },
 
@@ -112,7 +103,7 @@ function make(name, variant) {
   });
 }
 
-// a DEBRIEF for any show outside its Call, the week after it (the job is optional)
+// a DEBRIEF for any show outside its Call, the evening it has the hours for (the job is optional)
 function debrief(state, SB, M) {
   Object.keys(M.debrief || {}).forEach(id => {
     if (M.debrief[id] === 'done') return;
@@ -122,7 +113,7 @@ function debrief(state, SB, M) {
     if (!sh || sh.day < state.clock.day - 28) { M.debrief[id] = 'done'; return; }
     const job = L.arr(SB.Jobs.forShow(state, id)).filter(j => j.type === 'DEBRIEF' && j.status === 'TODO')[0];
     if (!job) return;
-    for (let d = 0; d < 7; d++) { if (L.ok(SB.Week.plan(state, job.id, d, 'DAY', { by: 'player' }))) { M.debrief[id] = 'done'; break; } }
+    if (L.ok(SB.Week.canDoNow(state, job.id, {})) && L.ok(SB.Week.doNow(state, job.id, {}))) M.debrief[id] = 'done';
   });
 }
 

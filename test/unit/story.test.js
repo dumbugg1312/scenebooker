@@ -57,6 +57,24 @@ module.exports = function (t) {
     t.ok(!s.story.tutorial.on, 'a skipped walkthrough does not start again');
   });
 
+  /* ---------------- the guided band waits for a slow offer ---------------- */
+  H.section(t, 'the guided band waits', () => {
+    const s = H.newGame(sb, { seed: 'story-wait' });
+    const rid = s.story.tutorial.requestId, q = rid && s.requests && s.requests[rid];
+    t.ok(q && q.dates && q.dates.length, 'the walkthrough follows a request with dates (' + rid + ')');
+    if (!q) return;
+    q.hid.raced = true; q.hid.gone = null;          // a rival booker is after them too
+    const last = q.dates[0] - 1, before = copy(s);
+    for (let d = q.day; d <= last; d++) { s.clock.day = d; sb.Requests.daily(s, d); }
+    t.ok(['NEW', 'REPLIED', 'NEGOTIATING'].indexOf(q.status) >= 0 && q.hid.gone === null,
+         'never answered, past reply-by (' + q.replyBy + '), it is still open on day ' + last + ' (' + q.status + ')');
+    // the same days with the walkthrough off: the request goes, as any other does
+    const o = before, oq = o.requests[rid];
+    o.story.tutorial.on = false;
+    for (let d = oq.day; d <= last; d++) { o.clock.day = d; sb.Requests.daily(o, d); }
+    t.ok(['IGNORED', 'LAPSED'].indexOf(oq.status) >= 0, 'with the walkthrough off it lapses or goes to a rival (' + oq.status + ')');
+  });
+
   /* ---------------- the walkthrough, played ---------------- */
   let played = null;
   H.section(t, 'the first show, start to finish', () => {

@@ -6,9 +6,11 @@
  *   env: { flush() }   flush runs the timers that are waiting (the fake DOM's never fire by themselves); a browser passes nothing.
  * A new Pensacola game must already be at the desk with the opening cutscenes over (step ANSWER).
  * Everything is a click on the thing the masking tape points at: tap(selector) first checks that the one tape on the
- * page is on that element (it carries data-taped), then clicks it. Only time is moved another way: the tape deck is
- * clicked to start and close a week, and inside a week the days are stepped with the 'sb-play' { cmd: 'next' } event
- * the deck's own keys send. A phase throws on the first thing that is wrong. `shot` names the picture to take after it.
+ * page is on that element (it carries data-taped), then clicks it. The show is booked on its card
+ * (design/spec/11-booking-pipeline.md): BOOK IT on the band's message, then the hold, the offer, the asks and the jobs
+ * (DO IT TONIGHT) on the card, and CALL IT A NIGHT on the card's foot wherever the guide says to wait. Only the play-out
+ * is moved another way: a called night is played to the next stop with the 'sb-play' { cmd: 'next' } event
+ * (js/ui/screens/week.js); from the desk an evening is called on the tape deck (the end of a week closed there). A phase throws on the first thing that is wrong. `shot` names the picture to take after it.
  */
 (function (root) {
   'use strict';
@@ -59,16 +61,51 @@
       for (i = 0; i < objs.length; i++) if (/^clip\d/.test(objs[i].id) && objs[i].params && objs[i].params.showId === c.showId) return hit(objs[i].id);
       fail('the show has no clip on the desk');
     }
-    function down() { if (SB.UI.route() !== 'desk') tap('#main .cu-down'); if (SB.UI.route() !== 'desk') fail('putting it down did not go back to the desk'); }
+    /* back to the desk. The tape is on "put it down" only when the thing to press is not here; on the show's card it is
+     * on the card's own button (CALL IT A NIGHT while waiting), so putting the card down is a plain click. */
+    function down() {
+      var e;
+      if (SB.UI.route() === 'desk') return;
+      e = q('#main .cu-down');
+      if (!e) fail('nothing here goes back to the desk');
+      if (tapedEl() === e) tap('#main .cu-down'); else e.click();
+      if (SB.UI.route() !== 'desk') fail('putting it down did not go back to the desk');
+    }
+    /* the guided show's card, from wherever the walk is: the clip on the desk (where the tape is) opens it */
+    function toCard() {
+      if (SB.UI.route() === 'show' && q(fk('card-night'))) return card();
+      down();
+      tap(clip());
+      if (SB.UI.route() !== 'show') fail('the clip did not open the show\'s card');
+      return card();
+    }
+    /* CALL IT A NIGHT on the card's foot, where the tape is while the guide says wait. The card asks to be picked up
+     * again at the next evening; the walk drives the play-out itself, so it stops the deck as the player would. */
+    function cardNight() {
+      tap(fk('card-night'));
+      if (SB.UI.route() !== 'desk') fail('CALL IT A NIGHT on the card did not go to the desk');
+      if (SB.UI.playing()) SB.UI.fire('sb-play', { cmd: 'pause', by: 'player' });
+    }
     function show() { return S().shows[cur().showId]; }
     /* the card (js/ui/screens/shows.js): its root, the count on its foot, and its rows all on the sheet (a real browser only) */
     function card() { var e = q('#main .cb-card'); if (!e) fail('the show\'s card is not up'); return e; }
     function outN() { var e = q('#main .cb-asksout'); return e ? Number(e.getAttribute('data-n')) : -1; }
-    function rowsFit() {
-      var rows = d.querySelectorAll('#main .cb-cardrow'), box = q('#main .cu-in'), b = box && box.getBoundingClientRect ? box.getBoundingClientRect() : null, i, r;
-      if (rows.length < 9) fail('the card has ' + rows.length + ' rows');
+    /* the seven steps, one of them unfolded to its rows (the one named), the NEXT line, tonight's clock and
+     * CALL IT A NIGHT on the foot; all of it on the sheet (a real browser only) */
+    function cardFits(step) {
+      var heads = d.querySelectorAll('#main .cb-stephead'), rows = d.querySelectorAll('#main .cb-cardrow'), box = q('#main .cu-in'),
+          b = box && box.getBoundingClientRect ? box.getBoundingClientRect() : null, all = [], i, r;
+      if (heads.length !== 7) fail('the card has ' + heads.length + ' steps, not seven');
+      if (!rows.length) fail('the card has no step unfolded');
+      if (step && card().getAttribute('data-step') !== step) fail('the card is unfolded on ' + card().getAttribute('data-step') + ', not ' + step);
+      if (!q('#main .cb-next .cb-nexttext') || !/\S/.test(q('#main .cb-next .cb-nexttext').textContent)) fail('the card has no NEXT line');
+      if (!q(fk('card-night'))) fail('the card\'s foot has no CALL IT A NIGHT');
+      if (!q('#main .cb-clockslot .ck-boxes')) fail('the card\'s foot has no clock');
       if (!b || !b.height) return;
-      for (i = 0; i < rows.length; i++) { r = rows[i].getBoundingClientRect(); if (r.height && (r.top < b.top - 1 || r.bottom > b.bottom + 1)) fail('the card\'s row ' + describe(rows[i]) + ' is off the sheet'); }
+      for (i = 0; i < heads.length; i++) all.push(heads[i]);
+      for (i = 0; i < rows.length; i++) all.push(rows[i]);
+      all.push(q(fk('card-night')));
+      for (i = 0; i < all.length; i++) { r = all[i].getBoundingClientRect(); if (r.height && (r.top < b.top - 1 || r.bottom > b.bottom + 1)) fail('on the card, ' + describe(all[i]) + ' is off the sheet'); }
     }
     function text() { var c = cur(); return (c.text || '') + ' ' + (c.more || ''); }
     function clean() { var t = text(); if (!/\S/.test(t) || /\{|\}|undefined|  |\.,|, ,| \./.test(t)) fail('the step text has a hole in it: "' + t + '"'); }
@@ -98,8 +135,16 @@
           if (cur().target === 'lamp') taped(e.classList.contains('is-hot') ? '#main .cc-tab--big.is-hot' : '#main .cc-tab--big');
           e.click(); continue;
         }
+        /* the show's card is up at an evening: CALL IT A NIGHT is on its foot (the tape is there while the guide waits) */
+        if (SB.UI.route() === 'show' && q(fk('card-night')) && s.clock.stop && s.clock.stop.kind === 'EVENING') {
+          if (cur().target === 'lamp') taped(fk('card-night'));
+          q(fk('card-night')).click();
+          if (SB.UI.playing()) SB.UI.fire('sb-play', { cmd: 'pause', by: 'player' });
+          continue;
+        }
         if (SB.UI.route() !== 'desk') { down(); continue; }
-        if (s.clock.phase === 'PLAN' || (s.clock.stop && s.clock.stop.kind === 'END_OF_WEEK')) {
+        /* an evening: call it a night on the tape deck (where the tape is, when the step points there); the end of a week: close it */
+        if (s.clock.stop && (s.clock.stop.kind === 'EVENING' || s.clock.stop.kind === 'END_OF_WEEK')) {
           if (cur().target === 'lamp' || cur().target === 'night') taped(hit('lamp'));
           q(hit('lamp')).click();
           if (SB.UI.playing()) SB.UI.fire('sb-play', { cmd: 'pause' });
@@ -123,49 +168,53 @@
       tap(hit('phone'));
       taped('#main .ph-row[data-fk="c-q:' + cur().requestId + '"]');
     });
-    phase('answer: interested', null, function () {
+    /* BOOK IT is the one yes on a band's message: it says you are interested (a message: half an hour), makes the
+     * show and opens its card on the room */
+    phase('answer: book it', null, function () {
+      var e, left0 = SB.Week.tonight(S()).left;
       tap('#main .ph-row[data-fk="c-q:' + cur().requestId + '"]');
-      tap(fk('tab-INTERESTED'));
+      e = taped('#main [data-tut="req-book"]');
+      if (q(fk('tab-INTERESTED')) || q(fk('tab-HOLD')) || q(fk('tab-OFFER'))) fail('the request still has more than one way to say yes');
+      if (!q(fk('tab-PASS'))) fail('the request has no PASS');
+      if (!/\u00bd HR/.test(e.textContent)) fail('BOOK IT does not say what it costs: "' + e.textContent + '"');
+      tap('#main [data-tut="req-book"]');
+      if (SB.UI.route() !== 'show') fail('BOOK IT did not open the show\'s card');
+      if (left0 - SB.Week.tonight(S()).left !== SB.Config.MAIL.hours) fail('BOOK IT took ' + (left0 - SB.Week.tonight(S()).left) + ' hours of the night, not the one message');
       expect('HOLD', 'ASK'); clean();
     });
-    /* 2 HOLD: the request's HOLD tab makes the show and opens its card on the room row */
+    /* 2 HOLD: the card opens on the ROOM step */
     phase('hold: hold a room, ask for the hold', '02-HOLD', function () {
-      tap(fk('tab-HOLD'));
-      if (SB.UI.route() !== 'show') fail('HOLD did not open the show\'s card');
       if (card().getAttribute('data-sel') !== 'room') fail('the card did not open on the room row');
-      rowsFit();
+      cardFits('ROOM');
       taped(fk('hold'));
     });
     phase('hold: sent, the host answers, confirm', null, function () {
       tap(fk('hold'));
       expect('HOLD', 'WAIT'); clean();
       if (outN() !== 1) fail('the card\'s foot counts ' + outN() + ' asks going out tonight, not the one hold');
-      down();
+      /* waiting is CALL IT A NIGHT, on the card: nobody goes looking for the tape deck */
+      taped(fk('card-night'));
+      cardNight();
       taped(hit('lamp'));
       if (env.autoPause) env.autoPause(hit('lamp')); else until('HOLD:WAIT', 'the hold');
-      expect('HOLD', 'CONFIRM'); clean();
-      if (!show().hold) fail('the room is not held');
-      if (S().clock.stop && S().clock.stop.kind === 'END_OF_WEEK') fail('time ran to the end of the week past the hold');
-      tap(clip());
-      tap(fk('row-room'));
-      tap(fk('confirm'));
-      expect('HOLD', 'WAIT');
-      down();
-      until('HOLD:WAIT', 'the room to confirm');
+      if (at() === 'HOLD:HELD') { if (cur().target !== 'lamp') fail('the room is held with something still wanted: ' + text()); until('HOLD:HELD', 'the held night to be booked'); }
+      /* a yes is a yes: the host's answer books the night, no second message */
       expect('BILL', 'OFFER'); clean();
-      if (show().status !== 'CONFIRMED') fail('the show is not confirmed');
+      if (show().status !== 'CONFIRMED') fail('the host said yes but the show is not booked');
+      if (S().clock.stop && S().clock.stop.kind === 'END_OF_WEEK') fail('time ran to the end of the week past the hold');
     });
-    /* 3 BILL: all of it on the card: the touring band's row is the offer, an empty slot's row is the sticker sheet */
+    /* 3 BILL: all of it on the card, which stands on the row the guide is about: the offer slip, then the sticker sheet */
     phase('bill: the offer to the touring band', null, function () {
       var touring = cur().bandId, name = S().bands[touring].name;
       if (text().indexOf(name) < 0 || !/offer/i.test(text())) fail('the BILL text does not say how ' + name + ' gets on the bill: "' + text() + '"');
-      tap(clip());
-      tap(fk('row-offer'));
+      toCard();
+      if (card().getAttribute('data-sel') !== 'offer') fail('the card did not open on the offer');
       tap(fk('send-offer'));
       expect('BILL', 'KIDS'); clean();
     });
     phase('bill: the sticker sheet', '03-BILL', function () {
-      tap(fk('row-slot-' + cur().slot));
+      if (card().getAttribute('data-sel') !== 'slot-' + cur().slot) fail('the card did not move on to the ' + cur().slot + ' slot');
+      cardFits('BILL');
       taped(fk('cand-' + cur().bandId));
     });
     phase('bill: kids open, the draw closes', null, function () {
@@ -175,22 +224,23 @@
       c = cur();
       fee = SB.Bands.fee(S(), c.bandId, c.showId);
       if (fee.pay === 'FLAT' || fee.amount > 0) fail('the local draw the texts name asks ' + fee.pay + ' $' + fee.amount + ' for a ' + show().door.price + ' dollar door');
-      tap(fk('row-slot-CLOSE')); tap(fk('cand-' + c.bandId));
+      if (card().getAttribute('data-sel') !== 'slot-CLOSE') fail('the card did not move on to the headliner');
+      tap(fk('cand-' + c.bandId));
       /* everybody on the bill is asked: sound next, in the same sitting, before any wait */
       expect('SOUND', 'ASK'); clean();
-      if (outN() !== 3) fail('the card\'s foot counts ' + outN() + ' asks going out tonight, not the offer and the two locals');
+      if (outN() !== 3) fail('the card\'s foot counts ' + outN() + ' messages going out tonight, not the offer and the two locals');
     });
     /* 4 SOUND: asked while the bands answer, so bands and sound come back over one wait */
     phase('sound: the row, the crew', '04-SOUND', function () {
-      rowsFit();
-      tap(fk('row-sound'));
+      if (card().getAttribute('data-sel') !== 'sound') fail('the card did not move on to sound');
+      cardFits('CREW');
       taped(fk('cr-sound' + cur().personId));
     });
     phase('sound: asked; the bands and sound answer over one wait', null, function () {
       tap(fk('cr-sound' + cur().personId));
       expect('BILL', 'WAIT'); clean();
-      if (outN() !== 4) fail('the card\'s foot counts ' + outN() + ' asks going out tonight, not the offer, the two locals and sound');
-      down();
+      if (outN() !== 4) fail('the card\'s foot counts ' + outN() + ' messages going out tonight, not the offer, the two locals and sound');
+      cardNight();
       until('BILL:WAIT', 'the bands and sound to answer');
       if (cur().step === 'SOUND') until('SOUND:WAIT', 'sound to answer');
       expect('FLYER'); clean();
@@ -201,8 +251,8 @@
     });
     /* 5 FLYER: the card's flyer row, into the flyer desk, and USE THIS FLYER comes back to the card */
     phase('flyer: the flyer desk', '05-FLYER', function () {
-      tap(clip());
-      tap(fk('row-flyer'));
+      toCard();
+      if (card().getAttribute('data-sel') !== 'flyer') fail('the card did not open on the flyer');
       tap(fk('flyer'));
       if (SB.UI.route() !== 'flyerdesk') fail('the flyer row did not open the flyer desk');
       taped('#main [data-tut="flyer-make"]');
@@ -212,28 +262,39 @@
       expect('PROMO', 'PLAN'); clean();
       if (SB.UI.route() !== 'show' || card().getAttribute('data-sel') !== 'flyer') fail('USE THIS FLYER did not come back to the card\'s flyer row');
     });
-    /* 6 PROMO: the card's promo row: the show's jobs, pencilled in on days */
+    /* 6 PROMO: the ANNOUNCE step: each job with what it takes and when it is due, and DO IT TONIGHT */
     phase('promo: the calendar, a job', '06-PROMO', function () {
-      tap(fk('row-promo'));
-      taped('#main [data-tut="promo-slot"][data-tut-ref="' + cur().jobId + '"]');
+      cardFits('ANNOUNCE');
+      taped('#main [data-tut="card-donow"][data-tut-ref="' + cur().jobId + '"]');
     });
     phase('promo: jobs on days, done', null, function () {
-      var i, e, n = 0;
-      for (i = 0; i < 40 && at() === 'PROMO:PLAN'; i++) {
-        e = tapedEl();
-        if (!e || d.querySelectorAll('.sy-tape').length !== 1) fail('no tape on the card');
-        if (e.getAttribute('data-tut') !== 'promo-slot') fail('the tape is on ' + describe(e) + ', not on a day for a job');
-        n++;
-        e.click();
+      var i, e, n = 0, nights = 0, k;
+      for (i = 0; i < 80 && cur().step === 'PROMO'; i++) {
+        if (at() === 'PROMO:PLAN') {
+          /* the job the guide names: its DO IT TONIGHT, or the row (or folded step) it is under */
+          toCard();
+          e = tapedEl();
+          if (!e || d.querySelectorAll('.sy-tape').length !== 1) fail('no tape on the card');
+          k = e.getAttribute('data-tut');
+          if (k === 'card-donow') { if (e.getAttribute('data-tut-ref') !== cur().jobId) fail('the tape is on another job\'s DO IT TONIGHT'); n++; }
+          else if (k !== 'card-row' && k !== 'card-step') fail('the tape is on ' + describe(e) + ', not on a job to do tonight');
+          if (e.disabled) fail(describe(e) + ' is disabled');
+          e.click();
+        } else {
+          /* nothing more fits tonight: call it a night, on the card */
+          if (nights++ > 12) fail('the promo jobs never got done');
+          if (SB.UI.route() === 'show') cardNight();
+          until('PROMO:WAIT', 'tomorrow\'s hours');
+        }
       }
-      if (at() === 'PROMO:PLAN') fail('the jobs never got planned');
-      if (n < 2) fail('fewer than two jobs were put on days');
-      if (cur().step === 'PROMO') { down(); until('PROMO:WAIT', 'the jobs to get done'); }
+      if (cur().step === 'PROMO') fail('the jobs never got done');
+      if (n < 3) fail('fewer than the flyer and two promo jobs were done from the card (' + n + ')');
       expect('WAIT', 'PLAY'); clean();
     });
     /* 7 WAIT */
     phase('wait: the tape deck', '07-WAIT', function () {
-      if (SB.UI.route() !== 'desk') down();
+      if (SB.UI.route() === 'show') taped(fk('card-night'));     // on the card, waiting is CALL IT A NIGHT
+      down();
       taped(hit('lamp'));
     });
     phase('wait: the weeks go by', null, function () {

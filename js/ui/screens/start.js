@@ -561,8 +561,10 @@
       return best;
     }
     function rack() {
-      var n = String(q || '').toLowerCase(), items = cities().filter(function (e) {
-        return !n || (e.name + ' ' + e.state).toLowerCase().indexOf(n) >= 0;
+      /* `aka` in the index holds the other names people type for a town (NYC, San Francisco, St. Paul) */
+      var fold = function (s) { return String(s || '').toLowerCase().replace(/[.,']/g, '').replace(/\s+/g, ' ').trim(); };
+      var n = fold(q), items = cities().filter(function (e) {
+        return !n || fold(e.name + ' ' + e.state + ' ' + (e.aka || '')).indexOf(n) >= 0;
       });
       if (!items.length) return h('p', { class: 'st-typed st-none', text: L('city', 'none') });
       return h('ul', { class: 'st-rack', role: 'listbox', aria: { label: L('city', 'title') } }, items.map(function (e, i) {

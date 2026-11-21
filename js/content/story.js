@@ -37,68 +37,68 @@ SB.Content.story = {
     steps: {
       ANSWER: {
         text: "{touring} from {touringHome} want {dow}, {date}. That's a week and a half out. Tight, but plenty for {room}. Say yes. And put {local} on it, they bring forty people.",
-        nudge: "you there? {touring} are waiting on an answer. just say yes.",
+        nudge: "you there? {touring} are waiting on an answer. just book it.",
         stages: {
-          REPLY: "It's the message from {sender}. Open it and tell them you're interested."
+          REPLY: "It's the message from {sender}. Open it and press BOOK IT. That tells them you're in and starts the show's card."
         }
       },
       HOLD: {
-        text: "Text {host} for {room}. {dow}, {date}. Get it held, then get it confirmed, before you tell anybody it's happening.",
+        text: "Room first. Nobody hears about this show till {host} says {room} is yours that night.",
         nudge: "did {host} say yes? a show without a room is a rumor.",
         stages: {
-          ASK: "On the clipboard, the ROOM row: pick {room}, {dow}, hang your tag. No clipboard yet? HOLD on {sender}'s message starts one.",
-          WAIT: "Asked. Nobody answers until the days go by. Press play on the tape deck.",
-          CONFIRM: "{host} is holding {dow} for you. A hold isn't a show. On the clipboard, the ROOM row. Ask to confirm."
+          ASK: "On the show's card, step 2, ROOM: {room}, {dow}. Press ASK THEM TO HOLD IT. That's a text to {host}, half an hour of your night. No card yet? BOOK IT on {sender}'s message.",
+          WAIT: "Asked. Nobody answers till morning. Press CALL IT A NIGHT, at the foot of the card.",
+          HELD: "{host} is holding {dow} for you. It's yours in the morning once they have what they asked for, and the ROOM step says if that's anything. Then CALL IT A NIGHT."
         }
       },
       BILL: {
         text: "Three bands. {touring} get on the bill when you make them an offer and they take it. The locals you ask yourself. Kids open: {kids} go first, they bring their friends early. {touring} goes second to last, while everybody's still there. {local} goes last so nobody leaves before {touring} is done. {local} will play for a cut of the door. I asked.",
-        nudge: "set list. kids, then {touring}, then {local}. that's the whole trick.",
+        nudge: "running order. kids, then {touring}, then {local}. that's the whole trick.",
         wrong: "Look at the order again. If {local} plays before {touring}, half the room goes home before the band that drove here. Touring second to last. {local} last.",
         stages: {
-          OFFER: "Start with {touring}. They're already on the clipboard. Tap their row and make the offer. The door deal they asked for is fine. Send it.",
-          KIDS: "Offer's out. Now the OPENER row. Pick {kids} off the sticker sheet.",
-          LOCAL: "Now {local}. The HEADLINER row. A cut of the door, no flat fee.",
-          WAIT: "Bands and sound are all asked. Press play. Everybody answers when they answer.",
-          ORDER: "Tap a band's row and move them until it reads {kids}, {touring}, {local}."
+          OFFER: "Start with {touring}: step 3, THE DEAL. The door deal they asked for is fine. Press SEND THE OFFER.",
+          KIDS: "Offer's out. Now step 4, BILL. {kids} open, so press their sticker on the sheet.",
+          LOCAL: "Now {local} for the HEADLINER slot. Press their sticker. A cut of the door, no flat fee.",
+          WAIT: "Bands and sound are all asked. Press CALL IT A NIGHT. Everybody answers when they answer.",
+          ORDER: "In the BILL step, pick a band and press EARLIER or LATER till it reads {kids}, {touring}, {local}."
         }
       },
       SOUND: {
         text: "{sound} for sound. {soundRate:money}. Late every time, never misses. Unless a wedding calls. Weddings pay better than we do.",
         nudge: "you need sound. {sound} answers texts faster than calls.",
         stages: {
-          ASK: "The SOUND row on the clipboard. Ask {sound}. Sound doesn't have to wait on the bands.",
-          WAIT: "Asked. Press play. {sound} will say yes, {sound} always says yes."
+          ASK: "Step 5, CREW: press {sound} under SOUND. It's a text, half an hour. Sound doesn't have to wait on the bands.",
+          WAIT: "Asked. Press CALL IT A NIGHT. {sound} will say yes, {sound} always says yes."
         }
       },
       FLYER: {
-        text: "Make the flyer today. The room's confirmed and the bands said yes, so there's nothing left to wait on. Every day it sits, somebody makes other plans.",
-        nudge: "flyer. today. every day it waits is people making other plans.",
+        text: "Do the flyer tonight. The room's confirmed and the bands said yes, so there's nothing left to wait on. Every day it sits, somebody makes other plans.",
+        nudge: "flyer. tonight. every day it waits is people making other plans.",
         wrong: "That flyer's late. Every day it sat in your head, somebody made other plans. It'll still help. Next time, the day you confirm.",
         stages: {
-          MAKE: "The FLYER row on the clipboard takes you to the paste-up. Change whatever you want on it, then press USE THIS FLYER."
+          MAKE: "Step 6, ANNOUNCE: press FLYER DESK. Change whatever you want on it, then press USE THIS FLYER."
         }
       },
       PROMO: {
-        text: "Now get it out. The record store counter, the coffee place, and send it to the bands so they share it. Two places at least.",
+        text: "Now get it out. Printing, a poster run, the listings, the mailing list, invites, the week-of push. That's all yours, and a work night is four hours. Do whatever's due soonest tonight. The rest fit on later nights.",
         nudge: "a flyer nobody sees is a drawing. put it somewhere.",
         stages: {
-          PLAN: "The PROMO row on the clipboard. Pencil a job in on a day. Two of them.",
-          WAIT: "Planned. Press play and they get done."
+          PLAN: "Step 6, ANNOUNCE. Each job says its hours and the day it's due. Flyer first if it isn't made: pick how sharp, then DO IT TONIGHT. After that, DO IT TONIGHT on the one due soonest.",
+          WAIT: "Nothing else fits tonight. Press CALL IT A NIGHT. The rest fit on later nights."
         }
       },
       WAIT: {
         text: "Now you wait. Answer the rest of your mail. Everybody gets an answer, even if it's no.",
         nudge: "still mail in there. a no takes a minute.",
         stages: {
-          PLAY: "Keep the tape deck running. It stops on the night of the show."
+          PLAY: "Now it's one night at a time. Do what fits, then call it a night, till the night of the show."
         }
       },
       DOOR: {
         text: "You're the door now. Stamp hands, count twice, and don't let your friends in free.",
         nudge: "doors. tin, stamp, the count. that's the job.",
         stages: {
-          PLAY: "Keep the tape deck running till the night of the show. Then press OPEN THE DOORS.",
+          PLAY: "Keep calling it a night till the night of the show. Then press OPEN THE DOORS.",
           DOOR: "Doors are open. Watch the night play out."
         }
       },

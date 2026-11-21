@@ -206,6 +206,9 @@
     return null;
   }
   function fk(v) { return '[data-fk="' + v + '"]'; }
+  /* a row of the card that is not the open one; a step of the card that is folded */
+  function rowSel(key) { return '.cb-card:not([data-sel="' + key + '"]) ' + fk('row-' + key); }
+  function stepSel(key) { return '.cb-card:not([data-step="' + key + '"]) ' + fk('step-' + key); }
 
   /* spot(cur, route): the element to point at now -> { el, key } or null */
   function spot(cur, r) {
@@ -215,31 +218,43 @@
     if (r === 'desk') { id = targetOf(cur); return id ? first(desk, ['.dk-hit[data-obj="' + id + '"]']) : null; }
     switch (r) {
       case 'inbox':
-        /* the request's HOLD and OFFER tabs open the show's card at the right row */
-        if (cur.step === 'ANSWER') list.push(fk('tab-INTERESTED'));
-        else if (cur.step === 'HOLD' && st === 'ASK') list.push(fk('tab-HOLD'));
-        else if (cur.step === 'BILL' && st === 'OFFER') list.push(fk('tab-OFFER'));
+        /* a band's message has one yes, BOOK IT: it makes the show and opens its card on the room. While the guided
+         * show has no card yet, that is the thing to press (whatever the step: an offer needs the show too). */
+        if (cur.step === 'ANSWER' || (!cur.showId && t === 'phone')) list.push('[data-tut="req-book"][data-tut-ref="' + cur.requestId + '"]');
         if (t === 'phone') list.push('.ph-row' + fk('c-q:' + cur.requestId), fk('back'));
         break;
       case 'shows': if (t === 'clip') list.push(fk('clip-' + cur.showId)); break;
       case 'show': case 'bill':
-        /* the card: the thing to press in the picker when the right row is open, else the row */
+        /* the card (js/ui/screens/shows.js) of the guided show. It stands on the row the guide is about, so the thing
+         * to press is in the picker; if the player picked another row, the row (or its folded step) comes first.
+         * Whatever else: the card's NEXT button says the same thing the guide does, and waiting is CALL IT A NIGHT,
+         * here on the card. Nothing on this list is ever a thing that cannot be pressed (first() skips the disabled). */
+        if (!main || !main.querySelector || !safe(function () { return main.querySelector('[data-tut="card-night"][data-tut-ref="' + cur.showId + '"]'); }, null)) break;
+        if (wait) { list.push(fk('card-night')); break; }
         if (t !== 'clip') break;
-        if (cur.step === 'HOLD') list.push(fk(st === 'CONFIRM' ? 'confirm' : 'hold'), fk('row-room'));
-        else if (cur.step === 'BILL' && st === 'OFFER') list.push(fk('send-offer'), fk('row-offer'));
-        else if (cur.step === 'BILL' && st === 'ORDER') list.push('[data-tut="bill-move"]:not([disabled])', '[data-tut="card-row"][data-tut-ref="band"]');
-        else if (cur.step === 'BILL') list.push('.cb-card[data-sel="slot-' + cur.slot + '"] ' + fk('cand-' + cur.bandId), '.cb-card[data-sel="slot-' + cur.slot + '"] ' + fk('free'), fk('row-slot-' + cur.slot));
-        else if (cur.step === 'SOUND') list.push(fk('cr-sound' + cur.personId), fk('row-sound'));
-        else if (cur.step === 'FLYER') list.push(fk('flyer'), fk('row-flyer'));
-        else if (cur.step === 'PROMO' && st === 'PLAN') list.push('[data-tut="promo-slot"][data-tut-ref="' + cur.jobId + '"]', '.cb-card:not([data-sel="promo"]) ' + fk('row-promo'));
+        if (cur.step === 'HOLD' && st === 'ASK') list.push(fk('hold'), rowSel('room'), stepSel('ROOM'));
+        else if (cur.step === 'HOLD') list.push(rowSel('room'), stepSel('ROOM'));                       // held, and the room wants something first
+        else if (cur.step === 'BILL' && st === 'OFFER') list.push(fk('send-offer'), rowSel('offer'), stepSel('DEAL'));
+        else if (cur.step === 'BILL' && st === 'ORDER') list.push('[data-tut="bill-move"]:not([disabled])', '.cb-cardrow:not(.is-on)[data-tut-ref="band"]', stepSel('BILL'));
+        else if (cur.step === 'BILL') list.push('.cb-card[data-sel="slot-' + cur.slot + '"] ' + fk('cand-' + cur.bandId), '.cb-card[data-sel="slot-' + cur.slot + '"] ' + fk('free'), rowSel('slot-' + cur.slot), stepSel('BILL'));
+        else if (cur.step === 'SOUND') list.push(fk('cr-sound' + cur.personId), rowSel('sound'), stepSel('CREW'));
+        else if (cur.step === 'FLYER') list.push(fk('flyer'), rowSel('flyer'), stepSel('ANNOUNCE'));
+        else if (cur.step === 'PROMO' && st === 'PLAN') {
+          /* do this job tonight: its DO IT TONIGHT, under the flyer row (the flyer job) or the promo row */
+          id = safe(function () { var j = SB.UI.game().jobs[cur.jobId]; return j && j.type === 'MAKE_FLYER' ? 'flyer' : 'promo'; }, 'promo');
+          list.push('[data-tut="card-donow"][data-tut-ref="' + cur.jobId + '"]', rowSel(id), stepSel('ANNOUNCE'));
+        }
+        list.push(fk('next'), fk('card-night'));
+        down = null;
         break;
       case 'flyerdesk': if (cur.step === 'FLYER') list.push('[data-tut="flyer-make"]'); break;
       case 'week':
+        /* the calendar's pad (the same job can be done from there): its DO IT TONIGHT tab, or the pile it is folded into */
         if (cur.step === 'PROMO' && st === 'PLAN') {
-          if (main && main.querySelector('.cc-half.is-cursor')) list.push('.cc-half.is-cursor');
-          list.push('.cc-note[data-job="' + cur.jobId + '"]', '.cc-pile-top[data-fk="pile-thisWeek"][aria-expanded="false"]', '.cc-pile-top[data-fk="pile-later"][aria-expanded="false"]',
+          list.push('[data-tut="do-tonight"][data-tut-ref="' + cur.jobId + '"]',
+                    '.cc-pile-top[data-fk="pile-thisWeek"][aria-expanded="false"]', '.cc-pile-top[data-fk="pile-later"][aria-expanded="false"]',
                     '.cc-pile-top[data-fk="pile-soon"][aria-expanded="false"]', '.cc-pile-top[aria-expanded="false"]');
-        } else if (wait) list.push(fk('closeweek'));
+        } else if (wait) list.push(fk('callnight'), fk('closeweek'));
         break;
       case 'close': if (wait) list.push('.cc-tab--big.is-hot', '.cc-tab--big'); break;
       case 'night':

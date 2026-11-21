@@ -40,7 +40,7 @@
     meal: 'a meal',
     members: '{n} of them',
     from: 'from {home}',
-    theySay: 'they say',
+    theySay: 'they say they draw',
     guess: 'your guess',
     noGuess: 'no idea yet',
     each: 'each head is {n}',
@@ -49,7 +49,7 @@
     vetLong: { LISTEN: 'Listen to the record', CLIP: 'Watch a live clip', HISTORY: 'Look up their past shows', ASK_AROUND: 'Ask around', ASK_BOOKER: 'Ask a booker on their route' },
     vetDone: 'done',
     vetListed: 'on your list',
-    vetPlan: 'plan it on the calendar',
+    vetPlan: 'do it from the calendar',
     calendar: 'calendar',
     aMessage: 'a message',
     hoursN: '{n} hours',
@@ -59,9 +59,9 @@
     notes: 'What you found out',
     flags: 'Worth knowing',
     reply: 'Answer',
-    interested: 'interested',
-    hold: 'hold a room',
-    offer: 'make an offer',
+    book: 'book it',
+    bookL: 'Book it: tell them you are in and start the show',
+    toShowL: 'Open the show',
     pass: 'pass',
     takeIt: 'take it',
     counter: 'They came back with something else.',
@@ -81,7 +81,7 @@
     tone: 'How',
     tones: { SHORT: 'short', REASON: 'with a reason', LEAD: 'with a lead' },
     sendPass: 'send the pass',
-    offerWait: 'This one is answered when the week gets to it.',
+    offerWait: 'You answer this one when it comes up, in the morning.',
     toShow: 'open the show',
     show: 'show',
     queued: 'goes out tonight',
@@ -146,21 +146,23 @@
     try { url = URL.createObjectURL(new Blob([withFonts(mk)], { type: 'image/svg+xml' })); } catch (e) { delete PEND[key]; return; }
     im = new Image();
     im.onload = function () {
-      var waiting = PEND[key] || [], cv, ctx, sc, out = null;
+      var waiting = PEND[key] || [], c = null, sc = res;
       delete PEND[key];
       try {
-        sc = res;
-        cv = d.createElement('canvas'); cv.width = Math.max(1, Math.round(w * sc)); cv.height = Math.max(1, Math.round(ht * sc));
-        ctx = cv.getContext('2d');
-        ctx.drawImage(im, 0, 0, cv.width, cv.height);
-        K().photocopy(ctx, cv.width, cv.height, 'ph' + w + 'x' + ht + ':' + key.length, { px: sc, streaks: w > 300 ? 2 : 0, amp: 0.13 });
-        out = cv.toDataURL('image/png');
-      } catch (e) { out = null; }
+        c = K().copyCanvas(Math.max(1, Math.round(w * sc)), Math.max(1, Math.round(ht * sc)));
+        c.ctx.drawImage(im, 0, 0, c.cv.width, c.cv.height);
+      } catch (e) { c = null; }
       try { URL.revokeObjectURL(url); } catch (e) { /* fine */ }
-      if (!out) return;
-      if (NCOPY > 500) { COPIES = {}; NCOPY = 0; }
-      COPIES[key] = out; NCOPY += 1;
-      waiting.forEach(function (x) { put(x, out, w, ht); });
+      if (!c) return;
+      K().photocopyAsync(c.ctx, c.cv.width, c.cv.height, 'ph' + w + 'x' + ht + ':' + key.length, { px: sc, streaks: w > 300 ? 2 : 0, amp: 0.13 }, function (ok) {
+        if (!ok) return;
+        K().copyUrl(c.cv, function (out) {
+          if (!out) return;
+          if (NCOPY > 500) { Object.keys(COPIES).forEach(function (k) { K().dropUrl(COPIES[k]); }); COPIES = {}; NCOPY = 0; }
+          COPIES[key] = out; NCOPY += 1;
+          waiting.forEach(function (x) { put(x, out, w, ht); });
+        });
+      });
     };
     im.onerror = function () { delete PEND[key]; try { URL.revokeObjectURL(url); } catch (e) { /* fine */ } };
     im.src = url;
@@ -885,14 +887,15 @@
       return h('section', { class: 'ph-sec', aria: { label: L('findOut') } }, [
         kicker(L('findOut')),
         h('div', { class: 'ph-coupons' }, VETS.concat(Object.keys(byAct).filter(function (k) { return VETS.indexOf(k) < 0; })).map(function (a) {
-          var v = byAct[a], avail, done, listed, queued, state, why, cost;
+          var v = byAct[a], avail, done, listed, queued, state, why, cost, hrs;
           if (!v) return null;
           avail = v.available || {}; done = v.done !== null && v.done !== undefined;
           listed = !done && a !== 'ASK_BOOKER' ? listedJob(s, q, a) : null;
           queued = !done && a === 'ASK_BOOKER' && safe(function () { return SB.Mail.outbox(s).concat(SB.Mail.waiting(s)); }, []).some(function (o) { return o.kind === 'CONTACT_VET' && o.payload && o.payload.requestId === q.id; });
           state = done ? 'done' : (listed || queued ? 'listed' : (avail.ok ? 'open' : 'no'));
           why = state === 'no' ? (avail.why || '') : '';
-          cost = v.hours ? (v.hours === 1 ? L('hour1') : L('hoursN', { n: v.hours })) : L('aMessage');
+          hrs = v.hours ? v.hours : mailHours();                     // a question to a booker is a message: it costs what a message costs
+          cost = (SB.Clock && SB.Clock.cost ? SB.Clock.cost(hrs).toLowerCase() : '') || (v.hours ? (v.hours === 1 ? L('hour1') : L('hoursN', { n: v.hours })) : L('aMessage'));
           return h('button', { type: 'button', class: 'ph-tab ph-coupon is-' + state + (state === 'done' ? ' is-done' : ''), data: { fk: 'vet-' + a },
             'aria-disabled': state === 'open' || (state === 'listed' && listed) ? null : 'true',
             aria: { label: L('vetLong.' + a) + '. ' + cost + '. ' + (state === 'done' ? L('vetDone') : (state === 'listed' ? L('vetListed') + (listed ? ', ' + L('vetPlan') : '') : why)) },
@@ -901,8 +904,7 @@
               else if (state === 'listed' && listed) SB.UI.go('week');
             } } }, [
             gpic(a, 40, 'v'),
-            h('span', { class: 'ph-tab-t', text: up(L('vet.' + a)) }),
-            h('span', { class: 'ph-cost', title: cost }, v.hours ? [pic(clock(11, 11, 9, v.hours, 'vc' + a), 22, 22), up(L('hrs', { n: v.hours }))] : [up(L('msgCost'))]),
+            h('span', { class: 'ph-tab-t', title: cost, text: costTag(up(L('vet.' + a)), hrs) }),
             state === 'done' ? pic(stampMark(up(L('vetDone')), T, -12, 'vd' + a), 84, 40, { cls: 'ph-coupon-stamp' }) : null,
             state === 'listed' ? h('span', { class: 'ph-coupon-why' }, [up(L('vetListed'))]) : null,
             state === 'listed' && listed ? h('span', { class: 'ph-strip ph-strip--mini' }, up(L('calendar'))) : null,
@@ -968,11 +970,9 @@
       }
       if (q && !goneQ(q) && view !== 'hold' && view !== 'pass' && view !== 'slip') {
         queued = queuedFor(s, c).map(function (o) { return o.kind; });
-        tabs.push(tab('INTERESTED', L('interested'), function () { act(function (x) { return SB.Mail.reply(x, q.id, 'INTERESTED'); }); },
-                      { done: queued.indexOf('INTERESTED') >= 0 || !!(s.mail && s.mail.extended && s.mail.extended[q.id]), tut: 'req-interested', ref: q.id }));
-        /* the room and the offer are worked on the show's card (js/ui/screens/shows.js): these open it at the right row */
-        tabs.push(tab('HOLD', L('hold'), function () { toCard(q, 'room'); }, { icon: gpic('KEY', 18, 'dk'), tut: 'req-hold', ref: q.id }));
-        tabs.push(tab('OFFER', L('offer'), function () { toCard(q, 'offer'); }, { done: queued.indexOf('TERMS') >= 0, tut: 'req-offer', ref: q.id }));
+        /* one yes: BOOK IT says you are interested (a message, if it has not gone yet), makes the show and opens its
+         * card on the room. The hold and the offer are made there (js/ui/screens/shows.js). */
+        tabs.push(bookTab(s, q, queued.indexOf('INTERESTED') >= 0 || !!(s.mail && s.mail.extended && s.mail.extended[q.id])));
         tabs.push(tab('PASS', L('pass'), function () { view = 'pass'; draft.mode = 'PASS'; render(); }, { done: queued.indexOf('PASS') >= 0, tut: 'req-pass', ref: q.id }));
       }
       return tabs.length ? h('div', { class: 'ph-fringe ph-dock', role: 'group', aria: { label: L('reply') } }, tabs) : null;
@@ -984,6 +984,23 @@
       var id, x;
       for (id in (s.shows || {})) { x = s.shows[id]; if (x.requestId === q.id && x.status !== 'CANCELLED') return x; }
       return null;
+    }
+
+    /* BOOK IT: the one way to say yes to a band's dates. The message costs what any message costs (SB.Config.MAIL.hours),
+     * said on the tab; when tonight has no room for it the tab says why and does nothing. */
+    function mailHours() { return SB.Config.MAIL && num(SB.Config.MAIL.hours) ? SB.Config.MAIL.hours : 0.5; }
+    function costTag(label, hours) { return SB.Clock && SB.Clock.tag ? SB.Clock.tag(label, hours) : label; }
+    function bookTab(s, q, sent) {
+      var show = showFor(s, q), need = !sent && !show, hours = need ? mailHours() : 0,
+          fit = need ? (safe(function () { return SB.Week.fits(s, hours); }, null) || { ok: true }) : { ok: true }, ok = fit.ok !== false,
+          why = ok ? '' : ((SB.Clock && SB.Clock.why ? SB.Clock.why(fit) : fit.why) || '');
+      return tab('BOOK', show ? L('toShow') : costTag(L('book'), hours), function () {
+        var r;
+        if (!ok) return;
+        if (need) { r = act(function (x) { return SB.Mail.reply(x, q.id, 'INTERESTED'); }); if (!r || r.ok === false) return; }
+        toCard(q, 'room');
+      }, { hot: ok, disabled: !ok, sub: why || null, tut: 'req-book', ref: q.id,
+           aria: (show ? L('toShowL') : L('bookL')) + (why ? '. ' + why : '') });
     }
 
     /* the show this request is for (made now if there is none yet), opened at a row of its card */

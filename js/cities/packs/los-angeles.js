@@ -37,8 +37,8 @@ SB.Cities.register('los-angeles', {
     { id: 'victorville', kind: 'FEEDER', name: 'Victorville and Hesperia', minutes: 90, bearing: 50, beyond: 'cajon-pass', note: 'High-desert bedroom towns over the pass. Desert rats and skate parks.' },
     { id: 'oc', kind: 'PEER', name: 'Fullerton, Santa Ana and Anaheim', minutes: 50, bearing: 135, scene: 6000, note: 'Orange County: a famous suburban punk lineage and a strong rival more than a feeder.' },
     { id: 'santa-barbara', kind: 'PEER', name: 'Santa Barbara', minutes: 110, bearing: 305, slug: 'santa-barbara-ca', note: 'A college town with a small-venue and house-party scene.' },
-    { id: 'bakersfield', kind: 'PEER', name: 'Bakersfield', minutes: 125, bearing: 350, scene: 2500, note: 'An oil and farm city over the mountains with country pride and a punk and metal scene.' },
-    { id: 'san-diego', kind: 'PEER', name: 'San Diego', minutes: 140, bearing: 150, scene: 9000, note: 'A big city with a scene of its own, and the closest rival on the circuit.' }
+    { id: 'bakersfield', kind: 'PEER', name: 'Bakersfield', slug: 'bakersfield-ca', minutes: 125, bearing: 350, scene: 2500, note: 'An oil and farm city over the mountains with country pride and a punk and metal scene.' },
+    { id: 'san-diego', kind: 'PEER', name: 'San Diego', slug: 'san-diego', minutes: 140, bearing: 150, scene: 9000, note: 'A big city with a scene of its own, and the closest rival on the circuit.' }
   ],
 
   chokepoints: [

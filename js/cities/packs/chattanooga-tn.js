@@ -41,7 +41,7 @@ SB.Cities.register('chattanooga-tn', {
     { id: 'manchester', kind: 'FEEDER', name: 'Tullahoma and Manchester', minutes: 65, bearing: 290, note: 'Two plateau towns on I-24 with a few bands each.', bands: 2 },
     { id: 'rome', kind: 'FEEDER', name: 'Rome', state: 'GA', minutes: 70, bearing: 190, note: 'A two-college town south on US 27 with more music than most of the list.', bands: 2 },
     { id: 'fort-payne', kind: 'FEEDER', name: 'Fort Payne', state: 'AL', minutes: 75, bearing: 225, note: 'A hosiery-mill town on top of the mountain, down I-59.' },
-    { id: 'knoxville', kind: 'PEER', name: 'Knoxville', minutes: 105, bearing: 50, scene: 3000, note: 'The bigger university sibling up I-75; the two trade bands.' },
+    { id: 'knoxville', kind: 'PEER', name: 'Knoxville', slug: 'knoxville-tn', minutes: 105, bearing: 50, scene: 3000, note: 'The bigger university sibling up I-75; the two trade bands.' },
     { id: 'huntsville', kind: 'PEER', name: 'Huntsville', state: 'AL', minutes: 105, bearing: 255, slug: 'huntsville-al', note: 'A rocket-and-defense city of similar size, a separate tour stop.' },
     { id: 'murfreesboro', kind: 'PEER', name: 'Murfreesboro', minutes: 110, bearing: 290, scene: 2000, note: 'A big state-university town with a busy house-show culture.' },
     { id: 'asheville', kind: 'PEER', name: 'Asheville', state: 'NC', minutes: 175, bearing: 75, slug: 'asheville-nc', note: 'The art-and-tourist mountain city that people go to for shows.' }

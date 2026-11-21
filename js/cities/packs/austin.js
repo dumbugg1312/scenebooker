@@ -48,7 +48,7 @@ SB.Cities.register('austin', {
       note: 'A county seat and barbecue town. Kids with little to do come in for the weekend.' },
     { id: 'new-braunfels', kind: 'FEEDER', name: 'New Braunfels and Seguin', minutes: 60, bearing: 210, beyond: 'i35-crawl',
       note: 'German-heritage river towns growing toward San Antonio. Kids drive up for a bigger bill.' },
-    { id: 'san-antonio', kind: 'PEER', name: 'San Antonio', minutes: 85, bearing: 215, scene: 7000,
+    { id: 'san-antonio', kind: 'PEER', name: 'San Antonio', slug: 'san-antonio', minutes: 85, bearing: 215, scene: 7000,
       note: 'The big sibling, with a Latino-majority punk tradition and a chip on its shoulder. Bands go both ways, constantly.' },
     { id: 'killeen', kind: 'PEER', name: 'Killeen', minutes: 75, bearing: 355, slug: 'killeen-tx',
       note: 'An army town with a hardcore and metal streak and a huge transient population.' },

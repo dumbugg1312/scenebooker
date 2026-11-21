@@ -35,7 +35,7 @@ SB.Cities.register('gainesville-fl', {
     { id: 'lake-city', kind: 'FEEDER', name: 'Lake City', minutes: 45, bearing: 350, note: 'An interstate crossroads with a small college and a little scene.' },
     { id: 'palatka', kind: 'FEEDER', name: 'Palatka', minutes: 50, bearing: 75, note: 'A paper-mill river town with a small DIY presence.' },
     { id: 'ocala', kind: 'PEER', name: 'Ocala', minutes: 45, bearing: 200, slug: 'ocala-fl', note: 'Horse country and the little cousin: a growing small punk scene one night away.' },
-    { id: 'jacksonville', kind: 'PEER', name: 'Jacksonville', minutes: 90, bearing: 40, scene: 5000, note: 'A long-time band-trading partner and the bigger place bands move to.' },
+    { id: 'jacksonville', kind: 'PEER', name: 'Jacksonville', slug: 'jacksonville', minutes: 90, bearing: 40, scene: 5000, note: 'A long-time band-trading partner and the bigger place bands move to.' },
     { id: 'tallahassee', kind: 'PEER', name: 'Tallahassee', minutes: 135, bearing: 295, slug: 'tallahassee-fl', note: 'The real peer: a capital college town with its own scene, and a football rivalry that is also a social one.' }
   ],
 

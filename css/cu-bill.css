@@ -357,3 +357,62 @@ body.cb-dragging { user-select: none; }
 .cb-offer > * + *, .cb-bandpick > * + * { margin-top: calc(var(--p) * 10); }
 .cb-offer p, .cb-bandpick p { margin-bottom: 0; }
 .cb-offerrow { align-items: flex-end; }
+
+/* ================================================================================================================
+ * the card's seven steps (design/spec/11-booking-pipeline.md): NEXT on top, the steps in order with one stamp each
+ * (the open one unfolded to its rows), tonight's clock and CALL IT A NIGHT at the foot. Only what is late, what will
+ * not fit and the stay-up hour wear the city's hot ink (--hot / --ck-hot, set on .cb-card by the screen).
+ * ================================================================================================================ */
+.cb-card .cb-showhead--big { margin: 0 0 calc(var(--p) * -20); gap: calc(var(--p) * 10); }
+.cb-card .cb-showhead--big .cb-showtitle { flex: 1 1 auto; min-width: 0; }
+.cb-card .cb-statstamp { left: auto; right: calc(var(--p) * -14); top: calc(var(--p) * 6); }
+.cb-next { position: relative; z-index: 2; display: flex; align-items: center; gap: calc(var(--p) * 8); min-height: calc(var(--p) * 46); margin: 0 calc(var(--p) * 4) calc(var(--p) * 6) 0;
+  padding: calc(var(--p) * 4) calc(var(--p) * 8) calc(var(--p) * 4) calc(var(--p) * 4); background: var(--pp-white); box-shadow: var(--sh-s) 0 rgba(0, 0, 0, .55); transform: rotate(-.35deg); }
+.cb-nextword { flex: 0 0 auto; line-height: 0; }
+.cb-nexttext { flex: 1 1 auto; min-width: 0; margin: 0; font-size: calc(var(--fs) * 13); line-height: 1.2; color: var(--toner); }
+.cb-next > .cb-thing, .cb-next > .cb-nofitwrap { flex: 0 0 auto; }
+.cb-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; overflow: hidden auto; overscroll-behavior: contain; }
+.cb-step { line-height: 0; }
+.cb-stephead { display: block; }
+.cb-stephead.is-on { transform: rotate(-.3deg); filter: drop-shadow(calc(var(--p) * 2) calc(var(--p) * 3) 0 rgba(0, 0, 0, .5)); z-index: 3; }
+.cb-stephead.is-locked { cursor: default; }
+.cb-thing.cb-stephead.is-locked:hover, .cb-thing.cb-stephead.is-locked:focus-visible { transform: none; filter: none; }
+.cb-thing.cb-stephead.is-locked:hover .cb-strip { filter: none; }
+.cb-step > .cb-cardrows { margin: 0 0 calc(var(--p) * 3) calc(var(--p) * 14); }
+.cb-nightfoot { flex: 0 0 auto; flex-direction: column; align-items: stretch; justify-content: flex-end; gap: calc(var(--p) * 3); margin-top: 0; padding: calc(var(--p) * 4) calc(var(--p) * 4) 0 0; border-top: calc(var(--p) * 2) solid var(--toner); }
+.cb-clockrow { display: flex; align-items: center; justify-content: space-between; gap: calc(var(--p) * 10); }
+.cb-clockslot { min-width: 0; }
+.cb-clock.ck-slip { flex-direction: row; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 4) calc(var(--p) * 8); padding: 0; background: transparent; box-shadow: none; transform: none; }
+.cb-clock .ck-line { font-size: calc(var(--fs) * 12); }
+.cb-clock.ck-slip .ck-boxes { font-size: calc(var(--fs) * 13); }
+.cb-crunch.ck-crunch { max-width: none; font-size: calc(var(--fs) * 11.5); color: var(--toner); }
+.cb-notime { margin: 0; color: var(--toner); display: flex; gap: calc(var(--p) * 5); align-items: baseline; }
+.cb-notime .ck-bang, .cb-crunch .ck-bang { font-size: calc(var(--fs) * 15); }
+.cb-footrow { display: flex; align-items: baseline; justify-content: space-between; gap: calc(var(--p) * 10); }
+.cb-footrow .cb-asksout { line-height: 1.2; text-transform: uppercase; }
+.cb-link { appearance: none; border: 0; background: none; padding: 0 calc(var(--p) * 2); font: 400 calc(var(--fs) * 11.5)/1.2 var(--f-type); color: var(--toner-mid); text-decoration: underline; cursor: pointer; }
+.cb-link:hover, .cb-link:focus-visible { color: var(--toner); background: var(--hl-solid, #ffe94a); outline: none; }
+.cb-nightbtn.is-hot::after { content: "!!"; position: absolute; right: calc(var(--p) * -4); top: calc(var(--p) * -14); font: 400 calc(var(--fs) * 20)/1 var(--f-gothic); color: var(--ck-hot, var(--hot)); transform: rotate(10deg); }
+/* a thing that takes time and will not fit tonight: crossed out, with the reason beside it */
+.cb-thing.cb-nofit:disabled { opacity: 1; cursor: not-allowed; }
+.cb-nofit .cb-strip { position: relative; opacity: .55; }
+.cb-nofit .cb-strip::after { content: ""; position: absolute; left: 3%; right: 3%; top: 46%; border-top: calc(var(--p) * 3) solid var(--pp-white); box-shadow: 0 calc(var(--p) * 1) 0 var(--toner); transform: rotate(-2.5deg); }
+.cb-tab.cb-nofit:disabled, .cb-cand.cb-nofit:disabled { opacity: .7; }
+.cb-nofitwrap { display: inline-flex; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 4) calc(var(--p) * 8); max-width: 100%; }
+.cb-next > .cb-nofitwrap { flex-direction: column; align-items: flex-end; max-width: 46%; }
+.cb-show .cb-whynot { color: var(--toner); max-width: 46ch; line-height: 1.2; }
+.cb-next .cb-whynot { display: none; }
+.cb-msgcost { margin: 0 0 calc(var(--p) * 4); }
+/* the picker's top line: what is picked, and HOW IT LOOKS (the forecast) behind a strip */
+.cb-pickbar { display: flex; align-items: flex-start; justify-content: space-between; gap: calc(var(--p) * 10); }
+.cb-pickbar .cb-pickhead { min-width: 0; }
+.cb-pickbar > .cb-thing { flex: 0 0 auto; margin-top: calc(var(--p) * 2); }
+/* a job in the picker: its cost, when it is due (late in hot ink), and DO IT TONIGHT */
+.cb-pick .cb-note .cc-note-cost, .cb-pick .cb-note .cc-note-due { font-size: calc(var(--fs) * 12); line-height: 1.3; }
+.cb-pick .cb-note .cc-note-cost { color: var(--pp-white); }
+.cb-pick .cb-note .cc-note-due.is-late { color: var(--hot); font-weight: 700; }
+.cb-pick .cb-note .cb-tabslip { margin: 0; }
+.cb-donow { flex: 1 1 100%; gap: calc(var(--p) * 4) calc(var(--p) * 10); }
+.cb-hasit { text-transform: uppercase; }
+.cb-pick .cb-flyerjob { align-self: stretch; }
+.cb-pick .cb-flyerjob .cb-note { transform: none; margin: 0; }

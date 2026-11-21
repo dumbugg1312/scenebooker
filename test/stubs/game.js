@@ -4,7 +4,7 @@ SB.module('Game', function (SB) {
   'use strict';
   return {
     newGame: function () { return { v: SB.SAVE_VERSION, seed: String((arguments[0] && arguments[0].seed) || 'stub'), rng: SB.rng.init(), ids: {}, week: { n: 0, log: [], logN: 0 }, clock: { day: 0, half: 'DAY', pending: [], stop: null }, player: { name: 10, followers: 0, stage: 1 }, settings: { bills: true }, tune: null }; },
-    strip: function () { return { week: 0, from: 0, to: 6, phase: 'PLAN', fund: 0, bank: null, hours: { used: 0, cap: 27, over: 0 }, stress: { value: 0, zone: 'STEADY' }, name: 10, word: 22, wordTier: 'SKIPPED', stage: 1, badges: { inbox: 0, late: 0 } }; },
+    strip: function () { return { week: 0, from: 0, to: 6, phase: 'PLAY', fund: 0, bank: null, hours: { used: 0, cap: 40, over: 0 }, tonight: null, stress: { value: 0, zone: 'STEADY' }, name: 10, word: 22, wordTier: 'SKIPPED', stage: 1, badges: { inbox: 0, late: 0 } }; },
     setSetting: function () { return { ok: true }; },
     adjustName: function () { return { t: 'NAME', day: 0, half: 'DAY', showId: null, text: '', from: 10, to: 10, k: arguments[2], beat: null }; },
     adjustFollowers: function () { return undefined; }

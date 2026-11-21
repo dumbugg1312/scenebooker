@@ -621,6 +621,27 @@ SB.module('Rooms', function (SB) {
     return U.yes({ records: records });
   }
 
+  /* A yes is a yes (user, 2026-11-21): there is no second "confirm" message. The player's first hold on the show's own
+   * night becomes the booking as soon as the room has what it asked for (confirmNeeds) and the deposit can be paid.
+   * Called when a hold is granted (Mail) and every day (daily), so meeting a need later books it with no ask.
+   * Also settles a hold some other path confirmed (an event) whose show is still a draft. Returns records. */
+  function firmUp(state, showId, day) {
+    var show = state.shows && state.shows[showId], room, c, idx, res, records = [];
+    if (!show || show.status !== 'DRAFT' || !show.roomId || typeof show.day !== 'number') return records;
+    if (state.clock && state.clock.phase === 'OVER') return records;
+    room = state.rooms && state.rooms[show.roomId];
+    c = room ? cell(room, show.day) : null;
+    idx = c ? holdIndex(c, 'player', showId) : -1;
+    if (idx !== 0) return records;
+    if (c.holds[0].state !== 'CONFIRMED') {
+      res = confirm(state, showId);
+      if (!res || !res.ok) return records;
+      records = records.concat(res.records || []);
+    }
+    if (SB.Shows && SB.Shows.onConfirmed) records = records.concat(SB.Shows.onConfirmed(state, showId, typeof day === 'number' ? day : today(state)) || []);
+    return records;
+  }
+
   /* The player challenges the first holder of a night they hold second. */
   function challenge(state, roomId, day) {
     if (state.clock && state.clock.phase === 'OVER') return refuse(state, 'OVER');
@@ -706,6 +727,12 @@ SB.module('Rooms', function (SB) {
     var h = placeHold(state, room, p.day, 'player', p.showId || null, holdExpiry(state, room, p.day));
     records.push(rec(state, 'HOLD', { roomId: room.id, night: p.day, change: h.rank === 1 ? 'GRANTED' : 'SECOND' },
                      line(state, ownerPath(state, room, h.rank === 1 ? 'HOLD_YES' : 'HOLD_SECOND'), slots), p.showId || null));
+    /* first in line but the room wants something first: it holds the night and says what it needs; the night is the
+       player's the day they have it (firmUp), with no second message */
+    if (h.rank === 1 && p.showId && state.shows && state.shows[p.showId] &&
+        confirmNeeds(state, room, state.shows[p.showId]).some(function (n) { return !n.met; })) {
+      records[0].text = line(state, 'people.holdUntil', slots) + ' ' + line(state, ownerPath(state, room, 'CONFIRM_NEEDS'), slots);
+    }
     others.forEach(function (x) {
       if (r.chance(C.HOLD.twoRooms.p)) {
         records.push(adjustRel(state, room.id, C.HOLD.twoRooms.rel, 'TWO_ROOMS'));
@@ -931,6 +958,8 @@ SB.module('Rooms', function (SB) {
       });
     });
     bookersDaily(state, day, records);
+    /* a yes is a yes: any held show that now has what its room asked for is booked */
+    Object.keys(state.shows || {}).forEach(function (sid) { records.push.apply(records, firmUp(state, sid, day)); });
     challengesAgainstPlayer(state, day, records, stops);
     return { records: records, stops: stops };
   }
@@ -1221,7 +1250,7 @@ SB.module('Rooms', function (SB) {
   }
 
   return {
-    get: get, list: list, card: card, calendar: calendar, terms: terms, answerAsk: answerAsk, confirm: confirm,
+    get: get, list: list, card: card, calendar: calendar, terms: terms, answerAsk: answerAsk, confirm: confirm, firmUp: firmUp,
     release: release, challenge: challenge, rel: rel, adjustRel: adjustRel, otherShows: otherShows, bookers: bookers,
     bookerRel: bookerRel, adjustBookerRel: adjustBookerRel, afterShow: afterShow, daily: daily, weekly: weekly,
     /* internal outside the manifest: security and event insurance (Shows, Money, Night read them) */

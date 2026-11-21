@@ -52,7 +52,7 @@ SB.Cities.register('philadelphia', {
       note: 'Casino town with little room for locals. Kids work boardwalk jobs and drive up for shows.' },
     { id: 'dover', kind: 'FEEDER', name: 'Dover', state: 'DE', minutes: 85, bearing: 205, note: 'A state capital and military town in farm country. Kids who want a scene drive north.' },
     { id: 'stroudsburg', kind: 'FEEDER', name: 'Stroudsburg and the Poconos', minutes: 90, bearing: 355, note: 'A college town in resort country with a seasonal economy.' },
-    { id: 'baltimore', kind: 'PEER', name: 'Baltimore', state: 'MD', minutes: 105, bearing: 225, scene: 12000, note: 'The next stop down I-95. Friendly rivals.' },
+    { id: 'baltimore', kind: 'PEER', name: 'Baltimore', slug: 'baltimore', state: 'MD', minutes: 105, bearing: 225, scene: 12000, note: 'The next stop down I-95. Friendly rivals.' },
     { id: 'harrisburg', kind: 'PEER', name: 'Harrisburg', minutes: 110, bearing: 285, slug: 'harrisburg-pa', note: 'The state capital, a poor river city with a college orbit and a history of small rooms.' },
     { id: 'york', kind: 'PEER', name: 'York', minutes: 110, bearing: 262, slug: 'york-pa', note: 'A mill and factory city with a rough name and a punk streak.' },
     { id: 'scranton', kind: 'PEER', name: 'Scranton and Wilkes-Barre', minutes: 120, bearing: 350, slug: 'scranton-pa',

@@ -47,7 +47,7 @@ SB.Cities.register('boston', {
       season: { months: [6, 7, 8], mul: 1.4 } },
     { id: 'worcester', kind: 'PEER', name: 'Worcester', minutes: 45, bearing: 280, slug: 'worcester-ma',
       note: 'A big hardcore, metal and DIY scene of its own. The big-room cousin, and a rival for the weeknight.' },
-    { id: 'providence', kind: 'PEER', name: 'Providence', state: 'RI', minutes: 65, bearing: 215, scene: 6000,
+    { id: 'providence', kind: 'PEER', name: 'Providence', slug: 'providence', state: 'RI', minutes: 65, bearing: 215, scene: 6000,
       note: 'An arts and college city with its own DIY tradition. Bands trade shows constantly; the little sibling joke never dies.' },
     { id: 'manchester', kind: 'PEER', name: 'Manchester', state: 'NH', minutes: 60, bearing: 340, slug: 'manchester-nh',
       note: 'A former mill city with cheap liquor over the line and a small active scene.' },

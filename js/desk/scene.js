@@ -12,6 +12,9 @@
  * gray scraps are one background canvas. The SVG stays as the fallback (and is what the Node smoke test sees).
  * Reads the game only through engine views (Game.strip, Week.view, Mail, Shows, Jobs.flyerSpec, Bands, Rooms,
  * Money, People, Notebook, Legacy, Cities) and state.clock / state.player / state.seed.
+ * The tape deck is the time control (design/spec/10-night-clock.md): pressing it calls it a night and the night plays
+ * out to the next evening. Tonight's clock (SB.Clock: the hours left as pencil boxes, the stay-up hour in hot ink, and
+ * a crunch warning when the work due soon needs more hours than there are) is a slip taped under the deck.
  * Also registers the 'desk' route: the home of a running game. It shows nothing in #main except a hidden week
  * screen that keeps the play loop (js/ui/screens/week.js) running while you sit at the desk.
  */
@@ -77,7 +80,7 @@
        in the dark. The folder is pinned over the table's front edge, and the bottom right corner is left to the
        pocket player (js/ui/musicbar.js). */
     var LAYOUT = {
-      calendar: [280, 262, 1.08, -2.6], lamp: [290, 541, 1.1, 2], mug: [250, 790, 1, -1.5],
+      calendar: [280, 262, 1.08, -2.6], lamp: [290, 541, 1.1, 2], mug: [165, 872, 0.86, -1.5],   // mug low and left: the deck's clock slip hangs over where it was
       paper: [760, 268, 1.08, 1.2], notebook: [700, 820, 1.12, -3], flyers: [990, 800, 1.12, 2.5],
       map: [1290, 150, 1.0, 2.4], keys: [1482, 178, 0.95, -2], phone: [1150, 362, 1.22, -4],
       stickers: [1405, 458, 1.08, 1.6], book: [1185, 652, 1.2, 3], tin: [1405, 708, 1.1, -2],
@@ -192,6 +195,8 @@
       v.wall = safe(function () { return SB.Legacy.wall(s); }, []);
       v.binder = safe(function () { return SB.Legacy.binder(s, {}); }, []);
       v.lamp = safe(function () { return SB.UI.lamp.label(); }, null);
+      v.tonight = v.st && v.st.tonight ? v.st.tonight : null;
+      v.crunch = (v.wk && v.wk.crunch) || [];
       v.playing = safe(function () { return SB.UI.playing(); }, false);
       v.specs = {};
       v.upcoming.slice(0, 4).forEach(function (sh) { v.specs[sh.id] = safe(function () { return SB.Jobs.flyerSpec(s, sh.id); }, null); });
@@ -307,10 +312,11 @@
       return k.paper(x, y, w, h, { seed: v.seed + 'cal', stock: 'white', torn: 't', inner: inner, burn: 0.7 }) + k.staple(x + w / 2, y + 14, { rot: -6 });
     }
 
-    /* the tape deck: a xeroxed cut-out; its keys play, pause and close the week, the tape's label is the week */
+    /* the tape deck: a xeroxed cut-out; pressed, it calls it a night (the night plays out), pauses, closes the week;
+       the tape's label is the week. Stopped at an evening, playing while the night plays out. */
     function deckDown(v) {
       var st = v.st, key = v.lamp ? v.lamp.key : '';
-      return v.playing ? 'PLAY' : (st.phase === 'PLAY' ? 'PAUSE' : (st.phase === 'CLOSE' || key === 'close' ? 'STOP' : ''));
+      return v.playing ? 'PLAY' : (key === 'night' || key === 'close' || st.phase === 'CLOSE' ? 'STOP' : (st.phase === 'PLAY' ? 'PAUSE' : ''));
     }
     function reels(b) { return [[b[0] + 116, b[1] + 70], [b[0] + b[2] - 116, b[1] + 70]]; }
     function drawLamp(v, b) {
@@ -627,11 +633,13 @@
       }
       add('calendar', BOX.calendar, L('names.calendar'), v.late ? L('tag.late', { n: v.late }) : L('tag.week', { n: st.week + 1, from: md(st.from), to: md(st.to) }),
           v.late ? L(v.late === 1 ? 'state.lateOne' : 'state.late', { n: v.late }) : L('state.week', { n: st.week + 1, from: md(st.from), to: md(st.to) }), v.late > 0, 'week');
-      add('lamp', BOX.lamp, L('names.lamp'), v.lamp ? v.lamp.text : '', v.lamp ? String(v.lamp.text).toUpperCase() : '', false, null, {}, { cls: 'is-lamp' });
+      add('lamp', BOX.lamp, L('names.lamp'), (v.lamp ? v.lamp.text : '') + clockSay(v), v.lamp ? String(v.lamp.text).toUpperCase() : '', false, null, {}, { cls: 'is-lamp' });
       add('mug', BOX.mug, L('names.mug'), L('tag.mug', { zone: zoneWord(v) }), zoneWord(v).toUpperCase(), false, null, {}, { cls: 'is-mug' });
       add('paper', BOX.paper, L('names.paper'),
           !sh ? L('tag.paperNone') : L(sh.promo && sh.promo.flyer ? 'tag.paperDone' : 'tag.paperTodo', { when: dowShort(sh.day) + ' ' + md(sh.day) }),
-          !sh ? L('state.paperNone') : L(sh.promo && sh.promo.flyer ? 'state.paperDone' : 'state.paperTodo', { when: md(sh.day) }), flyerDue(v), sh ? 'flyerdesk' : 'shows', sh ? { showId: sh.id } : {});
+          !sh ? L('state.paperNone') : L(sh.promo && sh.promo.flyer ? 'state.paperDone' : 'state.paperTodo', { when: md(sh.day) }), flyerDue(v),
+          /* the flyer desk is locked until the room says yes: until then the flyer opens the show's card */
+          !sh ? 'shows' : (sh.status === 'CONFIRMED' ? 'flyerdesk' : 'show'), sh ? { showId: sh.id } : {});
       if (!clips.length) add('clips', clipBox(0), L('names.clips'), L('tag.clipsNone'), L('state.clipsNone'), false, 'shows');
       clips.forEach(function (c, i) {
         var d = c.day - v.today, when = dowShort(c.day) + ' ' + md(c.day);
@@ -657,6 +665,15 @@
       var worn = jacketItems(s0(v)).length;
       add('jacket', BOX.jacket, L('names.jacket'), worn ? L('tag.jacket', { n: worn }) : L('tag.jacketNone'), worn ? L('state.jacket', { n: worn }) : L('state.jacketNone'), false, 'jacket');
       return fit(quiet(ladder(list, s0(v))));
+    }
+
+    /* what the clock slip under the deck says, for the deck's name: ". tonight, 2½ of 4 hrs left. thursday: ..." */
+    function clockSay(v) {
+      var t = v.tonight, out = '';
+      if (!t || !SB.Clock || v.st.phase !== 'PLAY') return '';
+      out = '. ' + SB.Clock.line(t).toLowerCase();
+      if (v.crunch.length) out += '. ' + SB.Clock.crunchLine(v.crunch[0], { today: t.day }).toLowerCase();
+      return out;
     }
 
     /* the second strip says what the drawing does not: drop it where the thing already shows it (the map's town, the
@@ -793,25 +810,35 @@
       try { url = URL.createObjectURL(new Blob([SB.Finish && SB.Finish.withFonts ? SB.Finish.withFonts(svg) : svg], { type: 'image/svg+xml' })); } catch (e) { return; }
       im = new Image();
       im.onload = function () {
-        var ctx, g, lx, ly;
+        var off = null;
+        /* copied on a canvas of its own, a slice at a time (SB.DeskKit.photocopyAsync), and put on the desk when done */
+        function show() {
+          var ctx, g, lx, ly;
+          try {
+            if (gen !== gens[key]) return;
+            if (cv.width !== cw) cv.width = cw;
+            if (cv.height !== ch) cv.height = ch;
+            ctx = cv.getContext('2d');
+            ctx.clearRect(0, 0, cw, ch);
+            ctx.drawImage(off.cv, 0, 0);
+            lx = (LIGHT.x - disp.x0) * pxu; ly = (LIGHT.y - disp.y0) * pxu;
+            g = ctx.createRadialGradient(lx, ly, H * 0.3 * pxu, lx, ly, H * 1.02 * pxu);
+            g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.7, 'rgba(0,0,0,0.12)'); g.addColorStop(1, 'rgba(0,0,0,0.5)');
+            ctx.globalCompositeOperation = 'source-atop';
+            ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
+            ctx.globalCompositeOperation = 'source-over';
+            if (done) done();
+          } catch (e) { SB.log('warn', 'SB.Desk', 'copier: ' + (e && e.message)); }
+        }
         try {
           if (gen !== gens[key]) return;
-          if (cv.width !== cw) cv.width = cw;
-          if (cv.height !== ch) cv.height = ch;
-          ctx = cv.getContext('2d');
-          ctx.clearRect(0, 0, cw, ch);
-          ctx.drawImage(im, 0, 0, cw, ch);
-          /* the table is not put through the copier (it would crush its lit wood to toner black): it carries its own speckle */
-          if (key !== 'table') K().photocopy(ctx, cw, ch, seed, { px: pxu, floor: 0 });
-          lx = (LIGHT.x - disp.x0) * pxu; ly = (LIGHT.y - disp.y0) * pxu;
-          g = ctx.createRadialGradient(lx, ly, H * 0.3 * pxu, lx, ly, H * 1.02 * pxu);
-          g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.7, 'rgba(0,0,0,0.12)'); g.addColorStop(1, 'rgba(0,0,0,0.5)');
-          ctx.globalCompositeOperation = 'source-atop';
-          ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
-          ctx.globalCompositeOperation = 'source-over';
-          if (done) done();
-        } catch (e) { SB.log('warn', 'SB.Desk', 'copier: ' + (e && e.message)); }
+          off = K().copyCanvas(cw, ch);
+          off.ctx.drawImage(im, 0, 0, cw, ch);
+        } catch (e) { off = null; SB.log('warn', 'SB.Desk', 'copier: ' + (e && e.message)); }
         finally { URL.revokeObjectURL(url); }
+        if (!off) return;
+        /* the table is not put through the copier (it would crush its lit wood to toner black): it carries its own speckle */
+        if (key === 'table') show(); else K().photocopyAsync(off.ctx, cw, ch, seed, { px: pxu, floor: 0 }, show);
       };
       im.onerror = function () { URL.revokeObjectURL(url); };
       im.src = url;
@@ -823,13 +850,17 @@
       var vb = vbOf(o.box), art = h('div', { class: 'dk-ink', aria: { hidden: 'true' } }), cv = canvasEl('dk-cut'), live = h('div', { class: 'dk-live', aria: { hidden: 'true' } }),
           name = h('span', { class: 'dk-strip', text: o.strip }), state = h('span', { class: 'dk-state' }),
           strips = h('span', { class: 'dk-strips', aria: { hidden: 'true' } }, [name, state]),
+          clock = o.id === 'lamp' ? h('div', { class: 'dk-clock', aria: { hidden: 'true' } }) : null,
           obj = h('span', { class: 'dk-obj' }, cv ? [art, cv, live, strips] : [art, live, strips]),
           pad = h('span', { class: 'dk-pad', aria: { hidden: 'true' } }),
-          b = h('button', { type: 'button', class: 'dk-hit ' + (o.cls || ''), data: { obj: o.id }, on: { click: function () { open(o.id); } } }, [pad, obj]);
+          /* the clock slip sits in the button, not in the drawing, so it lies on top of whatever overlaps the deck (the mug) */
+          b = h('button', { type: 'button', class: 'dk-hit ' + (o.cls || ''), data: { obj: o.id }, on: { click: function () { open(o.id); } } }, [pad, obj, clock]);
       pad.style.left = pct(M, vb[2]); pad.style.top = pct(M, vb[3]); pad.style.width = pct(o.box[2], vb[2]); pad.style.height = pct(o.box[3], vb[3]);
       put(b, o);
       strips.style.left = pct(M - 12, vb[2]); strips.style.top = pct(M - 27, vb[3]);
-      built[o.id] = { b: b, art: art, cv: cv, live: live, state: state, obj: obj };
+      /* the clock slip: taped across the deck's front edge, under its keys */
+      if (clock) { clock.style.left = pct(M - 14, vb[2]); clock.style.right = pct(M - 14, vb[2]); clock.style.top = pct(M + o.box[3] - 6, vb[3]); }
+      built[o.id] = { b: b, art: art, cv: cv, live: live, state: state, obj: obj, clock: clock };
       return b;
     }
     /* where a thing sits and how big it is shown (fit): its button covers its drawing box, scaled */
@@ -870,10 +901,22 @@
           p.obj.classList.remove('is-copied');
           raster(o.id, p.cv, svg, vb, v.seed + o.id, (function (obj) { return function () { obj.classList.add('is-copied'); }; })(p.obj), o.disp);
         }
-        if (o.id === 'lamp') drawLive(p, v, o);
+        if (o.id === 'lamp') { drawLive(p, v, o); drawClock(p, v, s); }
         if (o.id === 'jacket') drawJacket(p, o, s);
         if (o.id === 'phone') p.live.innerHTML = v.needs > 0 ? '<svg viewBox="' + vbOf(o.box).join(' ') + '"><rect class="dk-glow" x="' + (o.box[0] + 12) + '" y="' + (o.box[1] + 36) + '" width="' + (o.box[2] - 24) + '" height="' + (o.box[3] - 84) + '" fill="#fffbe0" fill-opacity=".16"/></svg>' : '';
       });
+    }
+    /* tonight's clock under the deck (SB.Clock.slip), redrawn only when what it says changes */
+    function drawClock(p, v, s) {
+      var t = v.tonight, key;
+      if (!p.clock) return;
+      if (!t || !SB.Clock || v.st.phase !== 'PLAY') { if (p.clockKey !== '') { SB.UI.clear(p.clock); p.clockKey = ''; } return; }
+      key = JSON.stringify([t.day, t.cap, t.left, t.spent, t.reserved, t.stay, t.tired, t.show, t.off, t.called, t.burnt, v.hot,
+                            v.crunch.slice(0, 1).map(function (c) { return [c.day, c.need, c.have]; })]);
+      if (p.clockKey === key) return;
+      p.clockKey = key;
+      SB.UI.clear(p.clock);
+      p.clock.appendChild(SB.Clock.slip(s, { tonight: t, list: v.crunch, crunch: 1, hot: v.hot, split: true }));
     }
     function drawLive(p, v, o) {
       var out = '';
@@ -912,7 +955,7 @@
       if (hits) { if (info && info.closeup) hits.setAttribute('inert', ''); else hits.removeAttribute('inert'); }
     }
 
-    /** open(id): pick up a thing on the desk: its route opens as a close-up, the tape deck plays, the coffee answers. */
+    /** open(id): pick up a thing on the desk: its route opens as a close-up, the tape deck calls it a night, the coffee answers. */
     function open(id) {
       var o = null, i;
       for (i = 0; i < current.length; i++) if (current[i].id === id) o = current[i];

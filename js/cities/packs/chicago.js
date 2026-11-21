@@ -36,7 +36,7 @@ SB.Cities.register('chicago', {
     { id: 'valparaiso', kind: 'FEEDER', name: 'Valparaiso', state: 'IN', minutes: 75, bearing: 130, beyond: 'skyway', note: 'A small college and farm town. Students come up for a bigger bill.' },
     { id: 'ottawa', kind: 'FEEDER', name: 'Ottawa and La Salle-Peru', minutes: 90, bearing: 240, note: 'River and quarry towns. Kids drive an hour for a good show.' },
     { id: 'rockford', kind: 'PEER', name: 'Rockford', minutes: 90, bearing: 315, slug: 'rockford-il', note: 'A manufacturing city with its own punk and hardcore pride. A rival, not a satellite.' },
-    { id: 'milwaukee', kind: 'PEER', name: 'Milwaukee', state: 'WI', minutes: 90, bearing: 355, scene: 4000, note: 'A big friendly rival to the north.' },
+    { id: 'milwaukee', kind: 'PEER', name: 'Milwaukee', slug: 'milwaukee', state: 'WI', minutes: 90, bearing: 355, scene: 4000, note: 'A big friendly rival to the north.' },
     { id: 'south-bend', kind: 'PEER', name: 'South Bend', state: 'IN', minutes: 105, bearing: 105, slug: 'south-bend-in', note: 'A college town with a long scene tradition. Kids make the trip.' },
     { id: 'champaign', kind: 'PEER', name: 'Champaign and Urbana', minutes: 135, bearing: 185, slug: 'champaign-il', note: 'A big state university and a fine scene. Many Chicago bands started here.' }
   ],

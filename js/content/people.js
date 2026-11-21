@@ -109,6 +109,9 @@ SB.Content.people = {
     }
   },
 
+  /* An owner holding a night for the player until the room has what it asks for (then it is booked, no second ask). */
+  holdUntil: ['I\'ll hold the {date:ord} for you.', 'The {date:ord} is yours if you want it.'],
+
   /* Room owners by OWNER kind. Slots: room, date, dow, curfew, amount, booker. */
   owner: {
     HOST: {

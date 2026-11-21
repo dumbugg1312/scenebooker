@@ -6,7 +6,7 @@ SB.module('Jobs', function (SB) {
     catalog: function () { return { type: arguments[0], mode: 'MESSAGE', group: 'GETTING', hours: 0, half: 'ANY', helper: null, label: '', why: '' }; },
     ensure: function () { return undefined; },
     refreshAll: function () { return undefined; },
-    get: function () { return { id: 'j0', type: 'ANSWER_REQUEST', group: 'GETTING', mode: 'MESSAGE', showId: null, key: '', label: '', why: '', hours: 0, half: 'ANY', status: 'TODO', timing: null, by: null, byName: null, planned: null, rides: null, riders: [], optional: false, waived: null, opt: null, window: { state: 'NONE', opens: null, idealUntil: null, lateFrom: null, missedAt: null, label: '', loss: null }, needs: [], helper: null, helperOk: false, cost: null, text: null }; },
+    get: function () { return { id: 'j0', type: 'ANSWER_REQUEST', group: 'GETTING', mode: 'MESSAGE', showId: null, key: '', label: '', why: '', hours: 0, half: 'ANY', status: 'TODO', timing: null, by: null, byName: null, planned: null, rides: null, riders: [], optional: false, waived: null, opt: null, window: { state: 'NONE', opens: null, idealUntil: null, lateFrom: null, missedAt: null, label: '', loss: null }, due: null, needs: [], helper: null, helperOk: false, cost: null, text: null }; },
     forShow: function () { return []; },
     tray: function () { return { late: [], thisWeek: [], soon: [], later: [] }; },
     freeJobs: function () { return []; },

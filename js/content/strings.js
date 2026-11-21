@@ -92,7 +92,7 @@ SB.Content.strings = {
   stress: {
     STEADY: 'steady', STRETCHED: 'stretched', FRIED: 'fried', BURNING_OUT: 'burning out', BURNT_OUT: 'burnt out',
     cause: {
-      OVERTIME: '{n} hours over', RAN_SHOW: 'ran a show', AFTER_SHIFT: 'a show after a shift', LOAD: 'too many shows at once',
+      OVERTIME: 'staying up late', RAN_SHOW: 'ran a show', AFTER_SHIFT: 'a show after a shift', LOAD: 'too many shows at once',
       BROKE: 'money is short', BILLS_MISSED: 'a bill you missed', DUD: 'a night that fell flat', COVERED: 'covered a shortfall yourself',
       INCIDENT: 'something went wrong at a show', CANCELLED: 'a show that fell through', MAJOR: 'a hard week',
       HARM_OPEN: 'something about a person you haven\'t dealt with', HOUSEGUEST: 'a band sleeping at your place',
@@ -105,7 +105,7 @@ SB.Content.strings = {
       STEADY: 'Nothing is slipping.',
       STRETCHED: 'Small things start to slip: a wrong date, a load-in time you meant to change.',
       FRIED: 'More slips. One hour less on your days off. Your flyers come out rougher, and you don\'t get the bonus for asking in person.',
-      BURNING_OUT: 'A lot slips. You can\'t take on overtime this week.',
+      BURNING_OUT: 'A lot slips. You can\'t stay up late this week.',
       BURNT_OUT: 'Two weeks off. Every show in the next two weeks is handed off, moved or called off.'
     }
   },
@@ -180,7 +180,6 @@ SB.Content.strings = {
   check: {
     over: '{dow} has {hours} more planned than the day has{what}. Move something to another day, or it is overtime.',
     late: '{job} is late(?show: for {show}) and isn\'t on the calendar this week.',
-    mail: '{n} messages are waiting to go out. {free} go free each evening; the rest cost you an hour of the night.',
     hold: 'Your hold on {show} runs out {by}. Confirm the room or it goes to somebody else.',
     challenge: 'Somebody wants a date you\'re holding. Answer them before you play.',
     replyBy: '{band|A band} needs an answer by {dow}, and your phone is off that day.'
@@ -205,7 +204,17 @@ SB.Content.strings = {
     PLAN: 'The week isn\'t planned yet.',
     BURNT_OUT: 'You\'re burnt out. This waits.',
     INVALID: 'That doesn\'t work.',
-    OVER: 'That part of your life is over.'
+    OVER: 'That part of your life is over.',
+    NO_TIME: 'Not enough time tonight.'
+  },
+  /* the night clock (spec 10): hours spent on the spot, the stay-up hour, what is due when */
+  clock: {
+    noTime: 'Not enough time tonight: that\'s {need} and you have {left} left(?stay:, staying up included).',
+    noTimeNone: 'Not enough time tonight: that\'s {need} and you\'re out of hours.',
+    early: 'Too early for that. It opens {day}.',
+    nightOver: 'You called it a night. That waits for tomorrow.',
+    stayedUp: 'You stayed up {hours} past your night. Tomorrow starts {hours} short.',
+    half: 'half an hour', one: 'an hour', many: '{n} hours'
   },
 
   names: { name: 'your name', word: 'the town\'s standing', par: 'what the town expects', call: 'your call',
@@ -324,12 +333,12 @@ SB.Content.strings = {
     hat: { term: 'the hat', short: 'Whatever people put in a hat, a jar or a bucket for the band.',
            long: 'It works when the room liked them. It doesn\'t when the room was empty.', example: '(?show: The hat at {room} goes to {band}.)' },
     hold: { term: 'hold', short: 'A room saying it\'ll keep a date for you. Not a promise.',
-            long: 'Two people can hold the same Saturday; whoever confirms first gets it.', example: '(?show: You have {room} held for the {date:ord}.)' },
+            long: 'Two people can ask for the same Saturday; you\'re next in line if they let it go.', example: '(?show: You have {room} held for the {date:ord}.)' },
     challenge: { term: 'challenge', short: 'Another booker asking for a date you hold.',
                  long: 'The room tells you, and you have a few days to confirm or let it go.',
                  example: '(?show: Someone wants {room} on the {date:ord}. Confirm by {day}.)' },
-    confirm: { term: 'confirm', short: 'Making a hold real: the room says yes and you say yes.',
-               long: 'Halls and big rooms want the deposit when you confirm. After that the date is yours.',
+    confirm: { term: 'confirm', short: 'The room saying yes. Once they do, the date is yours.',
+               long: 'Some rooms want something first, like a full bill or a deposit. They hold the night until you have it, then it\'s yours, and the deposit comes out then.',
                example: '(?show: {room} on the {date:ord} is confirmed.)' },
     advance: { term: 'advance', short: 'Telling every band the address, load-in, set times and where the touring band sleeps.',
                long: 'An advanced band shows up on time. A band that wasn\'t advanced shows up when it shows up.',

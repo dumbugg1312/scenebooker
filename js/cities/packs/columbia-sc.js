@@ -39,7 +39,7 @@ SB.Cities.register('columbia-sc', {
     { id: 'batesburg', kind: 'FEEDER', name: 'Batesburg-Leesville and Saluda', minutes: 40, bearing: 255, note: 'Farm towns; teenagers drive forty-five minutes for a Saturday.' },
     { id: 'aiken', kind: 'FEEDER', name: 'Aiken', minutes: 70, bearing: 235, note: 'Horse country between here and Augusta; its kids go either way.' },
     { id: 'augusta', kind: 'PEER', name: 'Augusta', state: 'GA', minutes: 75, bearing: 240, slug: 'augusta-ga', note: 'Close in size and mood: the easiest weekend swap.' },
-    { id: 'greenville', kind: 'PEER', name: 'Greenville', minutes: 95, bearing: 320, scene: 900, note: 'Richer and polished; the Upstate and the Midlands trade bands.' },
+    { id: 'greenville', kind: 'PEER', name: 'Greenville', slug: 'greenville-sc', minutes: 95, bearing: 320, scene: 900, note: 'Richer and polished; the Upstate and the Midlands trade bands.' },
     { id: 'charleston', kind: 'PEER', name: 'Charleston', minutes: 105, bearing: 150, slug: 'charleston-sc', note: 'The coast: pricier, and it takes some of the bands.' },
     { id: 'asheville', kind: 'PEER', name: 'Asheville', state: 'NC', minutes: 150, bearing: 320, slug: 'asheville-nc', note: 'Hipper and costlier; a tour-stop partner.' }
   ],
