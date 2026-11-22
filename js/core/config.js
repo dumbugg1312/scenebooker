@@ -428,6 +428,25 @@
   };
   C.THANKS = { posts: 1.15, trust: 1 };
   C.VISIT = { ownerRel: 4 };       // coming in to ask instead of messaging; the answer is on the spot. R2: was 2
+  /* Things to do with the rest of the night (design/spec/12-day-activities.md, approved 2026-11-21). Starting points:
+   * the user retunes after playing. hours: what it takes of tonight; once: 'NIGHT' | 'WEEK' (per room for DROP_BY);
+   * repeat: what a second and a third time inside `days` days give (the first gives all of it). Money at Pensacola
+   * prices. stress is negative (it eases). SHOW and SHIFT are the old GO_TO_SHOW and EXTRA_SHIFT jobs. */
+  C.EVENING = {
+    days: 7, repeat: [1, .5, .25],
+    JOURNAL:   { hours: .5, once: 'NIGHT', stress: -3, stretchedX: 2 },
+    WORKOUT:   { hours: 1, once: 'NIGHT', stress: -6 },
+    BED_EARLY: { hours: 0, rested: 1, stress: -2 },
+    POST_PAGE: { hours: 1, followers: 6 },
+    DIG_BANDS: { hours: 1, narrow: .75 },
+    STICKERS:  { hours: 2, once: 'WEEK', cost: 15, word: 2, regulars: 3 },
+    SHOW:      { hours: 3 },
+    OPEN_MIC:  { hours: 2, stress: -2, regulars: 1 },
+    DROP_BY:   { hours: 1, once: 'WEEK', ownerRel: 3 },
+    MARKET:    { hours: 2, regulars: 2, offOnly: 'ART' },
+    FRIENDS:   { hours: 2, stress: -4, rel: 3 },
+    SHIFT:     { hours: 6, offOnly: true }
+  };
   /* R2. Work gets lighter with people and rooms you know. A room the player has put roomShows shows in waives
    * HOUSE_RULES and NEIGHBORS and halves ADVANCE (and SORT_GEAR rides free). A band at bandTrust shares the flyer
    * the day after it exists, unprompted, and never needs the day-before confirmation. */

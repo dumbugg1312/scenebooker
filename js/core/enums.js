@@ -272,7 +272,7 @@
   E.STRESS = en(['OVERTIME', 'RAN_SHOW', 'AFTER_SHIFT', 'LOAD', 'BROKE', 'BILLS_MISSED', 'DUD', 'COVERED', 'INCIDENT',
                  'CANCELLED', 'MAJOR', 'HARM_OPEN', 'HOUSEGUEST', 'INBOX', 'LATE_RENT', 'EVENT',
                  'WEEK', 'UNSPENT', 'DAY_OFF', 'PHONE_OFF', 'WENT_OUT', 'GREAT_NIGHT', 'THANKED', 'CUSHION',
-                 'NO_SHOW_WEEK']);
+                 'NO_SHOW_WEEK', 'JOURNAL', 'WORKOUT', 'SLEPT', 'FRIENDS']);
 
   /* ---------------- Territory, harm, legacy ---------------- */
   E.WORD_TIER = en(['SKIPPED', 'FREE_NIGHT', 'REAL_STOP', 'ASKED_FOR', 'DESTINATION']);
@@ -317,7 +317,7 @@
   E.REC = en([
     /* a day */
     'DAY_START', 'QUIET_DAY', 'JOB_DONE', 'JOB_BLOCKED', 'SLIP', 'HELPER_REPORT', 'MESSAGE', 'ASK_ANSWERED',
-    'HOLD', 'REQUEST_GONE', 'EVENT', 'CHOICE', 'OVERTIME', 'MONEY', 'STRESS', 'TRUST', 'NEWS', 'NOTE', 'RANGE',
+    'HOLD', 'REQUEST_GONE', 'EVENT', 'CHOICE', 'OVERTIME', 'MONEY', 'STRESS', 'TRUST', 'NEWS', 'NOTE', 'RANGE', 'EVENING',
     /* a show night */
     'NIGHT_START', 'TICK', 'ARRIVALS', 'SET_START', 'SET_END', 'POST', 'INCIDENT', 'NIGHT_END',
     'SETTLE_LINE', 'SETTLE_DONE',

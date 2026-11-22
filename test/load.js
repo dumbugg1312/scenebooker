@@ -14,7 +14,7 @@ const ENGINE  = [
   'show/model', 'show/notebook', 'show/forecast', 'show/night', 'show/feedback',
   'world/worldgen', 'world/bands', 'world/rooms', 'world/requests', 'world/trends', 'world/crowd', 'world/territory',
   'story/effects', 'story/director', 'story/people', 'story/harm', 'story/legacy', 'story/chapters', 'story/moments', 'story/tutorial', 'story/rungs', 'story/patches',
-  'week/money', 'week/stress', 'week/mail', 'week/shows', 'week/jobs', 'week/week', 'week/save', 'week/game'
+  'week/money', 'week/stress', 'week/mail', 'week/shows', 'week/jobs', 'week/week', 'week/save', 'week/game', 'week/evening'
 ].map(f => 'js/engine/' + f + '.js');
 
 // Engine files outside the SB.API manifest (no stub, never swapped by opts.real): loaded after the engine whenever they exist.

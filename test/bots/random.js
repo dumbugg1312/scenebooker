@@ -120,6 +120,12 @@ module.exports = {
     /* messages taken back, now and then */
     if (coin(.05)) { const o = L.arr(SB.Mail.outbox(state))[0]; if (o && o.id) SB.Mail.unqueue(state, o.id); }
     if (coin(.05)) SB.Mail.markRead(state, (pick(L.arr(SB.Mail.inbox(state, 'ALL'))) || {}).id);
+
+    /* the rest of the night: something at home or out (design/spec/12-day-activities.md); a refusal is an outcome */
+    if (SB.Evening && R.chance(.5)) {
+      const ev = pick(L.arr(SB.Evening.list(state)).filter(v => v.ok));
+      if (ev) SB.Evening.doIt(state, ev.id);
+    }
   },
 
   onStop: function (state, SB, stop) {

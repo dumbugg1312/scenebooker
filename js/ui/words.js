@@ -15,6 +15,9 @@
   /* how each glossary word is written on screen (lowercase; matched as whole words, any case) */
   var ALIASES = {
     guarantee: ['guarantee', 'guaranteed', 'guarantees'],
+    openMic: ['open mic', 'open mics'],
+    zine: ['zine', 'zines'],
+    wordOfMouth: ['word of mouth'],
     doorDeal: ['door deal', 'cut of the door', 'share of the door', 'door split'],
     versus: ['versus'],
     hat: ['gas money', 'donation door'],

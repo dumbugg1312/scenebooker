@@ -43,6 +43,7 @@ const ALLOWED = {
   Territory: ['word', 'contacts', 'drive', 'tourCandidates', 'tourStops', 'startTour', 'tour'],
   Effects:   ['preview'],
   Director:  ['risks'],
+  Evening:   ['list', 'can', 'doIt'],
   People:    ['get', 'card', 'rel', 'stage', 'crew', 'circle'],
   Harm:      ['current', 'act', 'list', 'add', 'remove', 'flags'],
   Legacy:    ['wall', 'binder', 'bandHistory', 'townLine', 'firsts', 'offers', 'answerOffer', 'end']
@@ -58,7 +59,8 @@ const ACTIONS = {
   Territory: ['startTour'],
   Harm:      ['act', 'add', 'remove'],
   Legacy:    ['answerOffer', 'end'],
-  Rooms:     ['release', 'challenge']
+  Rooms:     ['release', 'challenge'],
+  Evening:   ['doIt']
 };
 
 class BotError extends Error { constructor(msg) { super(msg); this.name = 'BotError'; } }
