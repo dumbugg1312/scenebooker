@@ -122,6 +122,13 @@
     return h('button', { type: 'button', class: 'ck-call pz-hl' + (t.left <= 0 ? ' is-hot' : ''), data: { fk: 'callnight', tut: 'night' },
                          aria: { label: L('callNightSay') }, text: L('callNight').toUpperCase(), on: { click: call } });
   }
+  /* the rest of tonight (js/ui/evening.js): beside CALL IT A NIGHT while the evening is up */
+  function things(t) {
+    if (lampKey() !== 'night' || !SB.UI.evening) return null;
+    return h('button', { type: 'button', class: 'ck-things pz-hl' + (t.left > 0 ? ' is-on' : ''), data: { fk: 'things' },
+                         aria: { label: SB.text.label('ui.evening.openSay') }, text: SB.text.label('ui.evening.open').toUpperCase(),
+                         on: { click: function () { SB.UI.evening.open(); } } });
+  }
 
   /** render(state, info): shown while a week is played on the desk or a close-up; hidden on a full screen. */
   function render(s, info) {
@@ -141,7 +148,7 @@
     if (k === key) return;
     key = k;
     SB.UI.clear(e);
-    e.appendChild(SB.Clock.slip(s, { tonight: t, list: cr, crunch: 1, short: true, hot: ink, extra: pv.hours, cls: 'nc-slip', foot: btnOn ? button(t) : null }));
+    e.appendChild(SB.Clock.slip(s, { tonight: t, list: cr, crunch: 1, short: true, hot: ink, extra: pv.hours, cls: 'nc-slip', foot: btnOn ? h('span', { class: 'ck-btns' }, [things(t), button(t)]) : null }));
     if (sayEl) e.appendChild(sayEl);                             // a redraw keeps the line that is up
   }
 
@@ -176,5 +183,5 @@
     if (b && b.focus) { try { b.focus({ preventScroll: true }); } catch (x) { b.focus(); } }
   }
 
-  SB.NightClock = { render: render, preview: preview, nudge: nudge };
+  SB.NightClock = { render: render, preview: preview, nudge: nudge, callNight: call };
 })(SB);

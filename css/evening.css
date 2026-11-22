@@ -1,0 +1,45 @@
+/* the rest of tonight (js/ui/evening.js): a card of paper scraps, at home and out; each scrap is a button that does it now.
+   The pictures are real kit cut-outs through the copier's toner pass (js/art/scenes.js copier). */
+.sb-card.sb-card.sb-card:has(> .ev-card) { background: transparent; border: 0; box-shadow: none; padding: 0; overflow: visible; max-width: none; width: auto; }
+.sb-card-frame:has(.ev-card) { max-width: none; }
+.ev-card { --paper: var(--pp-bond); --ink: var(--toner); --ink-2: var(--toner-mid); --ink-3: #6b665b;
+  position: relative; box-sizing: border-box; width: min(calc(var(--p) * 1000), 94vw); max-height: 92vh; overflow: auto; margin: 0 auto;
+  padding: calc(var(--p) * 26) calc(var(--p) * 26) calc(var(--p) * 16); background: var(--paper); color: var(--toner); font-family: var(--f-type);
+  box-shadow: var(--sh-l, calc(var(--p) * 8) calc(var(--p) * 10)) 0 rgba(0, 0, 0, .75); transform: rotate(-.5deg); }
+.ev-card::before { content: ""; position: absolute; left: 42%; top: calc(var(--p) * -9); width: calc(var(--p) * 110); height: calc(var(--p) * 22);
+  background: var(--pp-buff, rgba(236, 228, 200, .85)); transform: rotate(-3deg); }
+.ev-title { margin: 0 0 var(--s0); font: 400 calc(var(--fs) * 34)/1 var(--f-gothic); letter-spacing: .03em; color: var(--toner); transform: rotate(-.6deg); }
+.ev-left { margin: 0 0 var(--s2); font: 400 var(--t-body)/var(--lh-body) var(--f-mono); color: var(--ink-2); }
+.ev-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s3); }
+.ev-col { display: flex; flex-direction: column; gap: var(--s1); min-width: 0; }
+.ev-k { margin: 0 0 var(--s-1); font: 400 calc(var(--fs) * 18)/1 var(--f-gothic); letter-spacing: .05em; text-transform: uppercase; color: var(--ink);
+  border-bottom: calc(var(--p) * 2) solid var(--ink); padding-bottom: var(--s-1); }
+.ev-item { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: calc(var(--p) * 84) 1fr auto; gap: var(--s1); align-items: start;
+  padding: var(--s0); background: var(--pp-white); color: var(--toner); box-shadow: calc(var(--p) * 2) calc(var(--p) * 3) 0 rgba(0, 0, 0, .35); clip-path: var(--edge-cut-3, none); }
+.ev-item:nth-child(odd) { transform: rotate(-.35deg); }
+.ev-item:nth-child(even) { transform: rotate(.3deg); }
+.ev-item:hover, .ev-item:focus-visible { background: var(--hl-solid, #f2d93b); color: var(--toner); outline: none; }
+.ev-item:focus-visible { box-shadow: 0 0 0 calc(var(--p) * 3) var(--focus); }
+.ev-item.is-cant { background: #e2ddcf; }
+.ev-item.is-cant .ev-photo { opacity: .55; }
+.ev-item.is-cant .ev-label { color: var(--ink-3); }
+.ev-photo { display: block; width: calc(var(--p) * 84); height: calc(var(--p) * 68); background: #d6d6d6; }
+.ev-txt { display: flex; flex-direction: column; gap: calc(var(--p) * 2); min-width: 0; }
+.ev-label { font: 700 var(--t-h3)/var(--lh-h3) var(--f-type); color: var(--ink); }
+.ev-benefit { font: 400 var(--t-dense)/var(--lh-dense) var(--f-type); color: var(--ink-2); }
+.ev-note { font: 400 var(--t-small)/var(--lh-small) var(--f-type); color: #3f5aa0; }
+.ev-why { font: 400 var(--t-small)/var(--lh-small) var(--f-type); color: #b42318; }
+.ev-cost { font: 400 var(--t-dense)/1 var(--f-mono); color: var(--ink); white-space: nowrap; padding-top: calc(var(--p) * 3); }
+.ev-foot { display: flex; justify-content: flex-end; margin-top: var(--s3); }
+.ev-done { all: unset; cursor: pointer; padding: calc(var(--p) * 6) calc(var(--p) * 14); background: var(--toner); color: var(--pp-bond);
+  font: 400 calc(var(--fs) * 17)/1 var(--f-gothic); letter-spacing: .04em; text-transform: uppercase; }
+.ev-done:hover, .ev-done:focus-visible { background: var(--hl-solid, #f2d93b); color: var(--toner); }
+@media (max-width: 720px) { .ev-cols { grid-template-columns: 1fr; } }
+
+/* on the pinned clock: THINGS TO DO beside CALL IT A NIGHT */
+.ck-btns { display: flex; gap: calc(var(--p) * 8); align-items: center; flex: none; }
+.ck-things { all: unset; box-sizing: border-box; position: relative; flex: none; cursor: pointer; padding: calc(var(--p) * 6) calc(var(--p) * 12) calc(var(--p) * 5);
+  font: 400 calc(var(--fs) * 17)/1 var(--f-gothic); letter-spacing: .04em; clip-path: var(--edge-cut-3);
+  background: var(--pp-white); color: var(--toner); box-shadow: inset 0 0 0 calc(var(--p) * 2) var(--toner); transform: rotate(.8deg); }
+.ck-things:hover, .ck-things:focus-visible { background: var(--hl-solid, #f2d93b); color: var(--toner); }
+.ck-things.is-on { background: var(--hl-solid, #f2d93b); color: var(--toner); }

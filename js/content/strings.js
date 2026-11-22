@@ -99,7 +99,8 @@ SB.Content.strings = {
       INBOX: '{n} messages waiting', LATE_RENT: 'rent is late', EVENT: 'something came up',
       WEEK: 'a week went by', UNSPENT: 'hours you didn\'t spend', DAY_OFF: 'a day off', PHONE_OFF: 'a day with your phone off',
       WENT_OUT: 'went to a show for its own sake', GREAT_NIGHT: 'a night that went right', THANKED: 'somebody said thanks and meant it',
-      CUSHION: 'two months of bills in the bank', NO_SHOW_WEEK: 'a week with no show'
+      CUSHION: 'two months of bills in the bank', NO_SHOW_WEEK: 'a week with no show',
+      JOURNAL: 'wrote it all down', WORKOUT: 'went for a run', SLEPT: 'went to bed early', FRIENDS: 'a night with friends'
     },
     effects: {
       STEADY: 'Nothing is slipping.',
@@ -322,6 +323,47 @@ SB.Content.strings = {
            DESERT: 'desert', MOUNTAIN: 'in the mountains', RIVER: 'a river town' },
   zone: { CITY: 'in town', FEEDER: 'a town nearby', PEER: 'the next city over' },
 
+  /* Things to do with the rest of the night (SB.Evening, design/spec/12-day-activities.md). label: the button; benefit:
+   * what it does for you, one plain line; done: what happened, said once it is done. */
+  evening: {
+    home: 'At home', out: 'Out',
+    JOURNAL:   { label: 'Write in your journal', benefit: 'Eases stress a little.',
+                 benefitStretched: 'Eases stress. Twice as much when you\'re stretched thin, like now.',
+                 done: 'Three pages about everything. It helps.' },
+    WORKOUT:   { label: 'Go for a run', benefit: 'Eases more stress, and tomorrow you make fewer mistakes.',
+                 done: 'A long run. Your head is clearer, and tomorrow you\'ll be sharper for it.' },
+    BED_EARLY: { label: 'Go to bed early', benefit: 'Ends tonight now. Tomorrow you get an extra hour, and a little less stress.',
+                 done: 'Lights out early. Tomorrow you have {hours} more.', late: 'Too late for an early night. Call it a night instead.' },
+    POST_PAGE: { label: 'Post on your page', benefit: 'More followers, so your next announcement reaches more people.',
+                 done: '{n} more people follow your page.' },
+    DIG_BANDS: { label: 'Dig up local bands', benefit: 'A closer guess at how many people a local band brings, or one you didn\'t know about.',
+                 found: 'You turned up {band}. They\'re in your notebook now.',
+                 done: 'You went through {band}\'s old shows. Your guess at their draw is closer.',
+                 nothing: 'Nothing new turned up tonight.' },
+    STICKERS:  { label: 'Make stickers or a zine', benefit: 'About {cost}. Spreads word of mouth and wins a few regulars. Once a week.',
+                 done: 'A stack of stickers and a zine around town. People are talking.', memo: 'stickers and a zine' },
+    SHOW:      { label: 'Go to the show at {room}', benefit: 'See how the bands draw, meet whoever booked it, and unwind.',
+                 done: 'You went to {what}. You saw how the bands drew, and it took your mind off things.',
+                 any: { label: 'Go to a show in town' } },
+    OPEN_MIC:  { label: 'Go to the open mic', benefit: 'Nothing else is on tonight. A few regulars, maybe someone new, a little less stress.',
+                 met: 'A good night out. You got talking to {name}.', done: 'A good night out. A few faces you\'ll see again.' },
+    DROP_BY:   { label: 'Drop by {room}', benefit: 'Say hi to {name}. Owners who know you say yes to more holds and better terms. Once a week.',
+                 done: '{name} was glad you came by.', open: 'Nights they have open: {nights}.', owner: 'the owner' },
+    MARKET:    {
+      ART:  { label: 'Go to the art market', benefit: 'Meet someone who can help with a show (the door, sound, flyer art), and a couple of regulars.' },
+      SHOP: { label: 'Hang out at the record store', benefit: 'Meet someone who can help with a show (the door, sound, flyer art), and a couple of regulars.' },
+      metHelp: 'You met {name}. They do {role}.', met: 'You met {name}.', done: 'Nobody new tonight, but a couple of people took a flyer.'
+    },
+    FRIENDS:   { label: 'See your friends', benefit: 'Eases stress, and friends say yes more often when you ask them for a hand.',
+                 done: 'A night with friends. They\'ll be there when you need a hand.', alone: 'A night with friends. It helps.' },
+    SHIFT:     { label: 'Pick up an extra shift', benefit: 'A day\'s pay ({pay}). Days off only.',
+                 offOnly: 'Only on a day off.', noJob: 'No day job to pick up a shift at.', done: 'An extra shift. The money is in the bank.' },
+    role: { SOUND: 'sound', ARTIST: 'flyer art', FLOOR: 'the door', RUNNER: 'errands and flyers', SECURITY: 'security' },
+    again: { night: 'You already did that tonight.', week: 'Once a week. You can again on {day}.' },
+    repeat: { half: 'Done this week already: half as much.', quarter: 'Done a lot this week: a quarter as much.',
+              halfDone: '(Half as much: you did it this week already.)', quarterDone: '(A quarter as much: you\'ve done it a lot this week.)' }
+  },
+
   glossary: {
     guarantee: { term: 'guarantee', short: 'What you promised the band no matter how many people come.',
                  long: 'If the door doesn\'t cover it, you do.', example: '(?show: You promised {band} {amount:money}.)' },
@@ -406,6 +448,12 @@ SB.Content.strings = {
           long: 'Bands bring guitars and drums, not a PA. Your sound person brings it and runs it.', example: '' },
     promo: { term: 'promo', short: 'Getting the word out: flyers, posters, listings, texts, posts.',
              long: 'A great show nobody heard about is an empty room.', example: '' },
+    openMic: { term: 'open mic', short: 'A night anybody can sign up and play a few songs. Bands and regulars hang around.',
+               long: 'Small, cheap, and where you meet the people who come to everything.', example: '' },
+    zine: { term: 'zine', short: 'A small homemade magazine, photocopied and folded, left around town.',
+            long: 'Cheap to make. People keep them. Your name goes where your flyers can\'t.', example: '' },
+    wordOfMouth: { term: 'word of mouth', short: 'How much people in town talk about your shows.',
+                   long: 'The more they talk, the more people hear about a show without you telling them.', example: '' },
     callItANight: { term: 'call it a night', short: 'End tonight and go to sleep. This is how time moves.',
                     long: 'Answers to your texts come in overnight. Nothing changes until you call it a night.', example: '' }
   }

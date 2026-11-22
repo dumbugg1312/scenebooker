@@ -104,6 +104,8 @@
                   'billsView', 'payBills', 'weekly'],
       Stress:    ['add', 'zone', 'view', 'slip', 'weekly'],
       Save:      ['save', 'load', 'list', 'remove', 'exportText', 'importText'],
+      /* things to do with the rest of the night (design/spec/12-day-activities.md) */
+      Evening:   ['list', 'can', 'doIt'],
 
       /* E2: the show */
       Model:     ['affinity', 'bandGen', 'reach', 'demand', 'night', 'resolve'],

@@ -148,6 +148,9 @@ module.exports = {
   'Save.remove': "{ ok: false, code: 'INVALID', why: 'no storage in the stub' }",
   'Save.exportText': "JSON.stringify(arguments[0] || {})",
   'Save.importText': "{ ok: false, code: 'INVALID', why: 'the stub cannot import' }",
+  'Evening.list': '[]',
+  'Evening.can': "{ ok: false, code: 'INVALID', why: 'the stub does nothing' }",
+  'Evening.doIt': "{ ok: false, code: 'INVALID', why: 'the stub does nothing' }",
 
   /* ---- E2 ---- */
   'Model.affinity': 'SB.Config.AFFINITY[SB.Enums.GENRE_INDEX[arguments[1]] || 0][SB.Enums.GENRE_INDEX[arguments[2]] || 0]',

@@ -75,7 +75,7 @@ SB.module('Week', function (SB) {
   /* cap from HOURS, less COUCH.hours spread over days off, less FRIED.hoursOffDay on days off when fried, less what
    * was stayed up the night before (player.tired), zero until burnoutUntil (5.4). */
   function capsFor(state, W, n) {
-    var cap = [], i, off, left, fried, z, d, tired,
+    var cap = [], i, off, left, fried, z, d, tired, rested,
         free = billsOn(state) && !(C.SHIFTS[state.player.dayJob] || []).length ? C.HOURS.noJob : C.HOURS.off;   // no day job: 8 a day
     for (i = 0; i < 7; i++) {
       off = !W.shifts[i] || W.dropped.indexOf(i) >= 0;
@@ -92,10 +92,11 @@ SB.module('Week', function (SB) {
     }
     z = SB.Stress.zone(state);
     fried = z === E.STRESS_ZONE.FRIED || z === E.STRESS_ZONE.BURNING_OUT;
-    tired = state.player.tired;
+    tired = state.player.tired; rested = state.player.rested;
     for (i = 0; i < 7; i++) {
       off = !W.shifts[i] || W.dropped.indexOf(i) >= 0;
       if (fried && off) cap[i].DAY = Math.max(0, cap[i].DAY + C.FRIED.hoursOffDay);
+      if (rested && rested.day === n * 7 + i && rested.hours > 0) cap[i].NIGHT += rested.hours;   // went to bed early the night before
       if (tired && tired.day === n * 7 + i && tired.hours > 0) {    // the night before ran late: that much less today
         left = Math.min(cap[i].NIGHT, tired.hours);
         cap[i].NIGHT -= left;
@@ -318,6 +319,14 @@ SB.module('Week', function (SB) {
       if (!SB.text.off && has('clock.stayedUp')) r.text = label('clock.stayedUp', { hours: hoursText(ot) });
       records.push(r);
     }
+  }
+
+  /* Went to bed early (SB.Evening): tomorrow's pool is made again with player.rested in it. */
+  function rest(state) {
+    var W = state.week, idx;
+    if (!W) return;
+    idx = todayIdx(state);
+    if (idx < 6 && !frozen(state, idx + 1)) { W.cap[idx + 1] = capsFor(state, W, W.n)[idx + 1]; refreshHours(state); }
   }
 
   /* Put `hours` on the day's clock (negative: give them back). -> the stay-up hours this added. */
@@ -1435,6 +1444,6 @@ SB.module('Week', function (SB) {
     tonight: tonight, canDoNow: canDoNow, doNow: doNow, endNight: endNight, crunch: crunch,
     /* not in the manifest: E1a's own helpers, used by Game; fits / spend / refund are the clock as SB.Mail charges it */
     blankWeek: blankWeek, refreshHours: refreshHours, resetShape: resetShape, recap: recap,
-    fits: fits, spend: spend, refund: refund, eveningOpen: eveningOpen
+    fits: fits, spend: spend, refund: refund, eveningOpen: eveningOpen, rest: rest
   };
 });

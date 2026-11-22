@@ -685,6 +685,7 @@
       if (later.length) groups.push(group('later', L('later'), later, 'white', 0));
       if (opt.length) groups.push(group('opt', L('ifYouWant'), opt, 'pink', 0));
       any = groups.length > 0;
+      var evOn = !!(tn && tn.open && SB.Evening && SB.UI.evening);
       free = safe(function () { return SB.Jobs.freeJobs(s); }, []);
       rows = freeRows(s, free);
       now = rows.filter(function (r) { return r.prio; });
@@ -692,9 +693,10 @@
       return h('aside', { class: 'cc-pad' + (frozen ? ' is-frozen' : ''), aria: { label: L('tray') } }, [
         first ? h('p', { class: 'cc-hint' }, [h('span', { class: 'cc-hint-arrow', aria: { hidden: 'true' } }, pic(40, 22, K().arrow(38, 14, 4, 8, { seed: 'hint', sw: 3, stroke: '#f4f2ea', head: 9 }))), L('firstWeek')]) : null,
         groups,
-        !any && !rows.length ? h('p', { class: 'cc-empty', text: L('emptyTray') }) : null,
-        rows.length ? h('section', { class: 'cc-group cc-group--free' }, [
+        !any && !rows.length && !evOn ? h('p', { class: 'cc-empty', text: L('emptyTray') }) : null,
+        rows.length || evOn ? h('section', { class: 'cc-group cc-group--free' }, [
           h('span', { class: 'cc-group-k', text: L('free') }),
+          evOn ? eveningNote(s, tn, frozen) : null,
           now.map(function (r) { return freeNote(s, r, frozen); }),
           rest.length ? pile('free', rest.length, rest.map(function (r) { return freeNote(s, r, frozen); }), 'mint', rest[0].sub && rest[0].sub.text) : null
         ]) : null
@@ -793,6 +795,22 @@
       });
       return rows;
     }
+    /* the rest of tonight (js/ui/evening.js): one note that opens the things to do, at home or out */
+    function eveningNote(s, tn, frozen) {
+      var ui = function (k, c) { return SB.text.label('ui.evening.' + k, c); };
+      return h('div', { class: 'cc-notewrap' }, [
+        h('div', { class: 'cc-note', role: 'note' }, [
+          sheet('pink', 'eve' + tn.day),
+          h('span', { class: 'cc-note-txt' }, [
+            hand(ui('note'), 12, { max: 150 }),
+            h('span', { class: 'cc-note-who', text: tn.left > 0 ? ui('left', { n: cost(tn.left) }) : ui('none') })
+          ])
+        ]),
+        h('div', { class: 'cc-tabs' }, [tab({ label: ui('open'), say: ui('noteSay'), n: false, disabled: frozen, fk: 'free-evening', cls: 'cc-tab--mini cc-tab--now',
+                                             on: function () { SB.UI.evening.open(); } })])
+      ]);
+    }
+
     /* a free job's note, or a band's checks as small notes on one card: tapping one does it tonight */
     function freeNote(s, row, frozen) {
       var sub = row.sub, who = sub && sub.text;

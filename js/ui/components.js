@@ -832,7 +832,7 @@
     DAY_START: 'day log', QUIET_DAY: 'day log', JOB_DONE: 'day log', JOB_BLOCKED: 'day log', SLIP: 'day log',
     HELPER_REPORT: 'day log', MESSAGE: 'day log', ASK_ANSWERED: 'day log', HOLD: 'day log', REQUEST_GONE: 'day log',
     EVENT: 'overlay', CHOICE: 'day log', OVERTIME: 'day log', MONEY: 'day log', STRESS: 'strip', TRUST: 'day log',
-    NEWS: 'day log', NOTE: 'day log', RANGE: 'day log',
+    NEWS: 'day log', NOTE: 'day log', RANGE: 'day log', EVENING: 'day log',
     NIGHT_START: 'night', TICK: 'night', ARRIVALS: 'night', SET_START: 'night', SET_END: 'night', POST: 'night',
     INCIDENT: 'night', NIGHT_END: 'night', SETTLE_LINE: 'night', SETTLE_DONE: 'night',
     SHOW_RESULT: 'night', LEDGER: 'show result', LUCK: 'show result', COMMENT: 'show result', LEARNED: 'show result',

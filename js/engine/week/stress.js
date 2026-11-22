@@ -132,7 +132,7 @@ SB.module('Stress', function (SB) {
   /* Which slip a tired person makes on this job (02-engine 5.2), or null. job null (or with no type) is the
    * evening send of Mail.flush: SHORT_ANSWER or CREW_UNCONFIRMED. */
   function slip(state, job) {
-    var z = zone(state), p = C.SLIP[z] || 0, r, type = job && job.type;
+    var z = SB.Evening && SB.Evening.steadier ? SB.Evening.steadier(state, zone(state)) : zone(state), p = C.SLIP[z] || 0, r, type = job && job.type;
     if (!(p > 0)) return null;
     // SPEC?: Stress.slip is E1a's function but enums.js names the JOBS stream as the stream of slips, and
     // the slip is rolled for Jobs (and Mail). The roll uses STREAM.JOBS so a slip never moves E1a's MONEY stream.
