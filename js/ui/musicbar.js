@@ -306,7 +306,7 @@
 
     /* a mouse: pointing opens it, leaving closes it after a breath */
     root.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { if (openT) { clearTimeout(openT); openT = null; } setOpen(true); } });
-    root.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && !pinned) closeSoon(450); });
+    root.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && !pinned) closeSoon(120); });   // gone as soon as the mouse is, like the clock (the short wait lets it cross the gap to the deck)
     root.addEventListener('focusin', function () { setOpen(true); if (openT) { clearTimeout(openT); openT = null; } });
     root.addEventListener('focusout', function () { setTimeout(function () { if (!root.contains(D.activeElement)) setOpen(false); }, 0); });
     root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-open')) { e.stopPropagation(); setOpen(false); tape.focus(); } });

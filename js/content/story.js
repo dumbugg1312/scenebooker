@@ -144,16 +144,16 @@ SB.Content.story = {
    * just tells me to do a bunch of shit without me figuring how it fits in the process"). Then why, then the button. */
   coach: {
     /* the map at the top of every call: the whole show in order, the part you're on in capitals.
-       book it > room > bands > sound > flyer > word out > the night > pay out > close-out */
+       the date > room > bands > sound > flyer > word out > the night > pay out > close-out */
 
     TUT_ANSWER_REPLY: { kind: "SCENE", title: "How a show gets made", mood: "warm", frames: [
-      { art: "FLYER_WALL", caption: "{outgoing} calls. A show, start to finish: book it > room > bands > sound > flyer > word out > the night > pay out.", lines: [
+      { art: "FLYER_WALL", caption: "{outgoing} calls. A show, start to finish: the date > room > bands > sound > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "Every show goes in that order. Each part opens up the next one. I'll call at every part." },
         { who: "outgoing", say: "Skip one and the next one has nothing to stand on." } ] },
       { art: "KITCHEN_FLOOR", caption: "The clock in the corner is your night. A work night gives you four hours.", lines: [
         { who: "outgoing", say: "Every text and every job costs some of those hours. Nobody answers till morning." },
         { who: "outgoing", say: "So you do what you can, call it a night, and see who wrote back." } ] },
-      { art: "INBOX_STACK", caption: "Where you are: BOOK IT > room > bands > sound > flyer > word out > the night > pay out.", lines: [
+      { art: "INBOX_STACK", caption: "Where you are: THE DATE > room > bands > sound > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "{touring} wrote asking for {dow}, {date}. A band asking is how a show starts." },
         { who: "outgoing", say: "Open the message from {sender} and tell them {dow} works. Then it's a show." } ] },
       { art: "DOOR_TABLE", caption: "The card is the show. Its steps run in the same order as the map.", lines: [
@@ -161,70 +161,70 @@ SB.Content.story = {
     ] },
 
     TUT_HOLD_ASK: { kind: "SCENE", title: "Room first", mood: "warm", frames: [
-      { art: "CARPORT_EMPTY", caption: "Where you are: book it > ROOM > bands > sound > flyer > word out > the night > pay out.", lines: [
+      { art: "CARPORT_EMPTY", caption: "Where you are: the date > ROOM > bands > sound > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "Why room first: bands, sound, the flyer all need a place and a date to point at." },
         { who: "outgoing", say: "Ask bands before you have a room and you're promising them a night you don't have." } ] },
       { art: "PHONE_SCREEN", caption: "{room}. {host}'s place.", lines: [
         { who: "outgoing", say: "Text {host}. Ask them to hold {dow} for you." } ] }
     ] },
     TUT_HOLD_WAIT: { kind: "SCENE", title: "Waiting is part of it", mood: "quiet", frames: [
-      { art: "PHONE_SCREEN", caption: "Where you are: book it > ROOM > bands > sound > flyer > word out > the night > pay out.", lines: [
+      { art: "PHONE_SCREEN", caption: "Where you are: the date > ROOM > bands > sound > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "You asked. {host} answers overnight. Nothing else can move till they do." },
         { who: "outgoing", say: "So there's nothing left tonight. Call it a night." } ] }
     ] },
     TUT_HOLD_HELD: { kind: "SCENE", title: "On hold", mood: "quiet", frames: [
-      { art: "CARPORT_EMPTY", caption: "Where you are: book it > ROOM > bands > sound > flyer > word out > the night > pay out.", lines: [
+      { art: "CARPORT_EMPTY", caption: "Where you are: the date > ROOM > bands > sound > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "{host} is holding {dow} for you. A hold isn't a yes yet." },
         { who: "outgoing", say: "If they asked for something, get it to them. If not, call it a night. It's yours by morning." } ] }
     ] },
 
     TUT_BILL_OFFER: { kind: "SCENE", title: "The band that asked", mood: "warm", frames: [
-      { art: "CARPORT_EMPTY", caption: "Where you are: book it > room > BANDS > sound > flyer > word out > the night > pay out.", lines: [
+      { art: "CARPORT_EMPTY", caption: "Where you are: the date > room > BANDS > sound > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "Room's yours. Now you have a night to fill, so now you can ask bands." } ] },
       { art: "VAN_CURB", caption: "{touring} drove here on gas money. They need to know what they're getting paid.", lines: [
         { who: "outgoing", say: "They asked you, so you answer with a deal." },
         { who: "outgoing", say: "A door deal is fine: they get a cut of what comes in. Send it." } ] }
     ] },
     TUT_BILL_KIDS: { kind: "SCENE", title: "Who opens", mood: "warm", frames: [
-      { art: "STAGE_BAND", caption: "Where you are: book it > room > BANDS > sound > flyer > word out > the night > pay out.", lines: [
+      { art: "STAGE_BAND", caption: "Where you are: the date > room > BANDS > sound > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "One band is a short night. Three is a show. The locals you ask yourself." },
         { who: "outgoing", say: "{kids} open. Kids bring their friends, and their friends show up early." } ] },
       { art: "PHONE_SCREEN", caption: "An early crowd means the touring band plays to a full room.", lines: [
         { who: "outgoing", say: "Ask {kids} to open." } ] }
     ] },
     TUT_BILL_LOCAL: { kind: "SCENE", title: "Who closes", mood: "warm", frames: [
-      { art: "CROWD_FRONT", caption: "Where you are: book it > room > BANDS > sound > flyer > word out > the night > pay out.", lines: [
+      { art: "CROWD_FRONT", caption: "Where you are: the date > room > BANDS > sound > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "{local} are who people here come out for. So they go last." },
         { who: "outgoing", say: "If they played first, half the room would leave before {touring} even started." } ] },
       { art: "PHONE_SCREEN", caption: "Last on the bill.", lines: [
         { who: "outgoing", say: "Ask {local} to close. They'll take a cut of the door, not a flat fee. I asked." } ] }
     ] },
     TUT_BILL_ORDER: { kind: "SCENE", title: "The order", mood: "warm", frames: [
-      { art: "STAGE_BAND", caption: "Where you are: book it > room > BANDS > sound > flyer > word out > the night > pay out.", lines: [
+      { art: "STAGE_BAND", caption: "Where you are: the date > room > BANDS > sound > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "The order is the whole trick: {kids}, then {touring}, then {local}." },
         { who: "outgoing", say: "Fix the bill till it reads like that." } ] }
     ] },
     TUT_BILL_WAIT: { kind: "SCENE", title: "Everybody's asked", mood: "quiet", frames: [
-      { art: "KITCHEN_FLOOR", caption: "Where you are: book it > room > BANDS > SOUND > flyer > word out > the night > pay out.", lines: [
+      { art: "KITCHEN_FLOOR", caption: "Where you are: the date > room > BANDS > SOUND > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "Everybody's asked the same night, so they all answer over the same wait." },
         { who: "outgoing", say: "Nothing else on this show tonight. Call it a night." } ] }
     ] },
 
     TUT_SOUND_ASK: { kind: "SCENE", title: "Sound", mood: "warm", frames: [
-      { art: "CARPORT_NIGHT", caption: "Where you are: book it > room > bands > SOUND > flyer > word out > the night > pay out.", lines: [
+      { art: "CARPORT_NIGHT", caption: "Where you are: the date > room > bands > SOUND > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "Bands bring guitars, not a PA. Somebody has to bring speakers and run them." },
         { who: "outgoing", say: "Ask now, same night as the bands, so you're not waiting twice." } ] },
       { art: "PHONE_SCREEN", caption: "{sound}. {soundRate:money} a night.", lines: [
         { who: "outgoing", say: "Late every time, never misses. Text {sound}." } ] }
     ] },
     TUT_SOUND_WAIT: { kind: "SCENE", title: "Sound's asked", mood: "quiet", frames: [
-      { art: "PHONE_SCREEN", caption: "Where you are: book it > room > bands > SOUND > flyer > word out > the night > pay out.", lines: [
+      { art: "PHONE_SCREEN", caption: "Where you are: the date > room > bands > SOUND > flyer > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "{sound} answers overnight. {sound} always says yes." },
         { who: "outgoing", say: "Call it a night." } ] }
     ] },
 
     TUT_FLYER_MAKE: { kind: "SCENE", title: "Flyer the day you confirm", mood: "warm", frames: [
-      { art: "FLYER_WALL", caption: "Where you are: book it > room > bands > sound > FLYER > word out > the night > pay out.", lines: [
+      { art: "FLYER_WALL", caption: "Where you are: the date > room > bands > sound > FLYER > word out > the night > pay out.", lines: [
         { who: "outgoing", say: "The room's yours, so the show is real. Now people have to find out about it." },
         { who: "outgoing", say: "A flyer only needs the room and the date. Bands who haven't answered go on as TBA." } ] },
       { art: "CROWD_FRONT", caption: "Why today: every day people don't know, some of them make other plans.", lines: [
@@ -232,20 +232,20 @@ SB.Content.story = {
     ] },
 
     TUT_PROMO_PLAN: { kind: "SCENE", title: "Get the word out", mood: "warm", frames: [
-      { art: "FLYER_WALL", caption: "Where you are: book it > room > bands > sound > flyer > WORD OUT > the night > pay out.", lines: [
+      { art: "FLYER_WALL", caption: "Where you are: the date > room > bands > sound > flyer > WORD OUT > the night > pay out.", lines: [
         { who: "outgoing", say: "A flyer nobody sees is a drawing. Who comes depends on who heard." },
         { who: "outgoing", say: "Printing, posters, listings, the mailing list. Each one reaches different people." } ] },
       { art: "KITCHEN_FLOOR", caption: "Each job says its hours and the day it does the most good.", lines: [
         { who: "outgoing", say: "Do the one due soonest tonight. Too early or too late, it does less." } ] }
     ] },
     TUT_PROMO_WAIT: { kind: "SCENE", title: "Tomorrow's hours", mood: "quiet", frames: [
-      { art: "KITCHEN_FLOOR", caption: "Where you are: book it > room > bands > sound > flyer > WORD OUT > the night > pay out.", lines: [
+      { art: "KITCHEN_FLOOR", caption: "Where you are: the date > room > bands > sound > flyer > WORD OUT > the night > pay out.", lines: [
         { who: "outgoing", say: "Out of hours tonight. The rest fit on later nights." },
         { who: "outgoing", say: "Call it a night. Nobody does it all at once." } ] }
     ] },
 
     TUT_WAIT_PLAY: { kind: "SCENE", title: "The nights till then", mood: "quiet", frames: [
-      { art: "INBOX_STACK", caption: "Where you are: book it > room > bands > sound > flyer > word out > THE NIGHT > pay out.", lines: [
+      { art: "INBOX_STACK", caption: "Where you are: the date > room > bands > sound > flyer > word out > THE NIGHT > pay out.", lines: [
         { who: "outgoing", say: "The show's set. Now it's the nights till {dow}." },
         { who: "outgoing", say: "Answer your other mail. A band you say no to today might be your next show." } ] },
       { art: "PHONE_SCREEN", caption: "One night at a time.", lines: [
@@ -254,10 +254,10 @@ SB.Content.story = {
 
     /* the whole door step (its stages PLAY on the desk, OPEN on the night screen): once, before the doors open */
     TUT_DOOR: { kind: "SCENE", title: "You're the door", mood: "warm", frames: [
-      { art: "DOOR_TABLE", caption: "Where you are: book it > room > bands > sound > flyer > word out > THE NIGHT > pay out.", lines: [
+      { art: "DOOR_TABLE", caption: "Where you are: the date > room > bands > sound > flyer > word out > THE NIGHT > pay out.", lines: [
         { who: "outgoing", say: "Everything you did lands tonight. Who heard about it is who shows up." },
         { who: "outgoing", say: "You're the door. Count twice. The count is what everybody gets paid from." } ] },
-      { art: "HANDS_TIN", caption: "Then: book it > room > bands > sound > flyer > word out > the night > PAY OUT.", lines: [
+      { art: "HANDS_TIN", caption: "Then: the date > room > bands > sound > flyer > word out > the night > PAY OUT.", lines: [
         { who: "outgoing", say: "After, the envelope. Pay the room, {sound}, {touring}, then the locals. What's left is yours." },
         { who: "outgoing", say: "{touring} first: they have a drive tomorrow. Open the doors when it's {dow}." } ] }
     ] },
@@ -285,23 +285,24 @@ SB.Content.story = {
         { who: "outgoing", say: "Count it with me." } ] },
       /* the setup questions, asked in the scene (user, 2026-11-21): each `ask` waits for the player's reply on the way
          in; the reply sets a choice of the new game (SB.UI.story.openingAsk). Watched again, the reply that was picked
-         is shown as a plain line. `note` says what the reply does in the game; `foot` sits under the replies. */
+         is shown as a plain line. `note` says what the reply does in the game; `level` (EASY / NORMAL / HARD, user 2026-11-22) is stamped on
+         that note so a setting reads as a difficulty; `foot` sits under the replies. */
       { art: "KITCHEN_FLOOR", caption: "Your kitchen floor. The door money in stacks: the room, {sound}, the bands.", lines: [
         { who: "outgoing", say: "You still at the day job? This doesn't pay rent." } ],
         ask: { id: "bills", foot: "You can still change this in Settings until your first week starts.", options: [
-          { v: true, say: "Yeah. Rent's due the first.", note: "Besides the show money you pay your own rent, work a day job and keep a bank account. More like life." },
-          { v: false, say: "Don't worry about my rent.", note: "You only handle the show money in the cash box. No rent, no day job." } ] } },
+          { v: true, level: "NORMAL", say: "Yeah. Rent's due the first.", note: "Besides the show money you pay your own rent, work a day job and keep a bank account. More like life." },
+          { v: false, level: "EASY", say: "Don't worry about my rent.", note: "You only handle the show money in the cash box. No rent, no day job." } ] } },
       { art: "INBOX_STACK", amb: "kitchen", caption: "{outgoing}'s notebook. Six years of it.", lines: [
         { who: "outgoing", say: "Every band, who they bring, which rooms answer." } ],
         ask: { id: "fog", foot: "The game shows guesses, like how many people will come, as ranges. This sets how fast they get narrow. You can change it any time in Settings.", options: [
-          { v: "OPEN", say: "Give me all of it.", note: "You start out knowing more and learn twice as fast." },
-          { v: "NORMAL", say: "Just the basics.", note: "Ranges start wide and get narrow as you book shows here." },
-          { v: "HARD", say: "Keep it. I'd rather guess.", note: "Ranges get narrow as you book, but a band's draw never gets better than a rough guess." } ] } },
+          { v: "OPEN", level: "EASY", say: "Give me all of it.", note: "You start out knowing more and learn twice as fast." },
+          { v: "NORMAL", level: "NORMAL", say: "Just the basics.", note: "Ranges start wide and get narrow as you book shows here." },
+          { v: "HARD", level: "HARD", say: "Keep it. I'd rather guess.", note: "Ranges get narrow as you book, but a band's draw never gets better than a rough guess." } ] } },
       { art: "FLYER_WALL", amb: "kitchen", caption: "Every flyer {outgoing} ever made, on one wall.", lines: [
         { who: "outgoing", say: "Flyer the day you confirm. Not the week of." } ],
         ask: { id: "windows", foot: "Jobs like putting up flyers do the most good in a window of days. You can change this any time in Settings.", options: [
-          { v: "NORMAL", say: "The day I confirm. Got it.", note: "Jobs close when they would in real life." },
-          { v: "FORGIVING", say: "Give me some slack at first.", note: "Jobs stay open a little longer while you learn." } ] } },
+          { v: "NORMAL", level: "NORMAL", say: "The day I confirm. Got it.", note: "Jobs close when they would in real life." },
+          { v: "FORGIVING", level: "EASY", say: "Give me some slack at first.", note: "Jobs stay open a little longer while you learn." } ] } },
       { art: "HANDS_TIN", caption: "The cash tin. A dent in the lid, a stamp pad, a clicker, a pen that works.", lines: [
         { who: "outgoing", say: "It's yours if you want it." },
         { who: "you", say: "Okay." },

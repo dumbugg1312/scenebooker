@@ -109,7 +109,7 @@ body.is-closeup .sb-main { position: fixed; inset: 0; z-index: 30; padding: 0; o
 .cu--clipboard { width: calc(var(--p) * 1000); transform: rotate(.4deg); }
 .cu--book { width: calc(var(--p) * 860); }
 .cu--tin { width: calc(var(--p) * 960); }
-.cu--drawer, .cu--window, .cu--folder { width: calc(var(--p) * 1000); }
+.cu--drawer, .cu--window, .cu--folder, .cu--pad { width: calc(var(--p) * 1000); }
 .cu--mat, .cu--wall { width: calc(var(--p) * 1240); height: calc(var(--p) * 752); }
 :root[data-motion="reduce"] .cu-back::before { animation: none; }
 @media (prefers-reduced-motion: reduce) { :root:not([data-motion="full"]) .cu-back::before { animation: none; } }

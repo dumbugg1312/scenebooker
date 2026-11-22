@@ -22,7 +22,7 @@
     /* which object each existing route is held in */
     var FRAME = { week: 'calendar', close: 'calendar', inbox: 'phone', shows: 'clipboard', show: 'clipboard', bill: 'clipboard',
                   bands: 'sheet', band: 'sheet', rooms: 'folder', room: 'folder', notebook: 'notebook', money: 'tin', people: 'book',
-                  town: 'window', legacy: 'wall', settings: 'drawer', flyerdesk: 'mat', jacket: 'jacket' };
+                  town: 'window', legacy: 'wall', files: 'drawer', settings: 'pad', flyerdesk: 'mat', jacket: 'jacket' };   // settings: the sticky pad (2026-11-22)
     var observer = null, lastKind = null;
 
     function K() { return SB.DeskKit; }
@@ -34,12 +34,12 @@
     /* The object's body around an inner box of w by h (px), drawn with the kit. pad is the border the body takes. */
     var PAD = { phone: [0, 0, 0, 0], calendar: [14, 14, 14, 14], notebook: [18, 18, 18, 18], clipboard: [62, 26, 26, 26], sheet: [28, 28, 28, 28],
                 folder: [28, 26, 26, 26], tin: [14, 14, 14, 14], book: [14, 14, 14, 14], window: [14, 14, 14, 14], drawer: [10, 26, 22, 26],
-                mat: [30, 30, 30, 30], wall: [14, 14, 14, 14], paper: [24, 24, 24, 24], jacket: [14, 14, 14, 14] };
+                mat: [30, 30, 30, 30], wall: [14, 14, 14, 14], paper: [24, 24, 24, 24], jacket: [14, 14, 14, 14], pad: [40, 26, 26, 26] };
 
     /* The object's body around an inner box: a cut sheet of copy paper (or the phone's xeroxed cut-out) on the black
        table, a hard paste-up shadow, tape at the corners. pad is the border the body takes. */
     var STOCK = { phone: null, calendar: 'white', notebook: '#141413', clipboard: 'white', sheet: 'white', folder: 'manila', tin: 'bone',
-                  book: 'goldenrod', window: 'white', drawer: 'manila', mat: 'olive', wall: 'newsprint', paper: 'white' };
+                  book: 'goldenrod', window: 'white', drawer: 'manila', mat: 'olive', wall: 'newsprint', paper: 'white', pad: '#f2dc5d' };
     function body(kind, w, h, seed) {
       var k = K(), out = '', p = PAD[kind] || PAD.paper, iw = w - p[1] - p[3], ih = h - p[0] - p[2], ix = p[3], iy = p[0], inner = '', i, r = k.rng('cu' + seed);
       switch (kind) {
@@ -79,6 +79,14 @@
              its top are js/ui/screens/settings.js's own (they choose) */
           inner = '<path d="M0 ' + f(h * 0.5) + 'H' + f(w) + '" stroke="#a88f55" stroke-width="2" stroke-dasharray="2 5"/>' + k.dotsRect(0, 0, w, h, 1, { op: 0.35 });
           out += k.paper(8, 46, w - 16, h - 54, { seed: seed, stock: 'manila', inner: inner, burn: 0.6, cut: 1.6 });
+          break;
+        case 'pad':
+          /* a sticky-note pad (the settings, user 2026-11-22): yellow sheets, the gummed strip along the top, the pad's
+             edge showing the sheets under it */
+          out += k.paper(14, 22, w - 20, h - 24, { seed: seed + 'u2', stock: '#d9c34a', burn: 0.3, cut: 1.2, sop: 0.5 });
+          out += k.paper(10, 16, w - 20, h - 24, { seed: seed + 'u1', stock: '#e6cf52', burn: 0.3, cut: 1.2, sop: 0.4 });
+          inner = '<rect x="0" y="0" width="' + f(w) + '" height="34" fill="#000" fill-opacity=".07"/>' + k.dotsRect(0, 0, w, h, 1, { op: 0.25 });
+          out += k.paper(6, 10, w - 20, h - 24, { seed: seed, stock: '#f2dc5d', inner: inner, burn: 0.4, cut: 1.2 });
           break;
         case 'clipboard':
           /* a hardboard clipboard: kraft-brown board, toner grit, a steel clip xeroxed and cut out at the top */

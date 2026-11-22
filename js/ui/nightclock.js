@@ -18,6 +18,7 @@
   SB.Content.ui.nightclock = {
     region: 'Tonight', callNight: 'call it a night',
     callNightSay: 'Call it a night: the night plays out, answers come overnight, and the next evening is yours',
+    playOn: 'play on', playOnSay: 'Play on: let the days run to the next evening', pause: 'pause', pauseSay: 'Pause the days running',
     closeWeek: 'close the week', closeWeekSay: 'Close the week: see how it went and start the next one',
     overnight: 'Overnight', gotIt: 'got it', quiet: 'Nobody has answered yet. They answer when they answer.',
     still: 'Quiet night. Nothing changed.', onClock: 'Call it a night is on the clock.',
@@ -41,6 +42,12 @@
     if (!d || !d.body || !SB.UI || !SB.UI.h) return null;
     el = h('section', { class: 'nc', id: 'nightclock', role: 'region', aria: { label: L('region') } });
     el.hidden = true;
+    /* the folded clock opens on a tap of its strip (touch has no hover); the button inside still just presses */
+    el.addEventListener('click', function (e) {
+      if (e.target && e.target.closest && e.target.closest('button')) return;
+      el.classList.toggle('is-open');
+    });
+    d.addEventListener('click', function (e) { if (el && !el.contains(e.target)) el.classList.remove('is-open'); }, true);
     d.body.appendChild(el);
     return el;
   }
@@ -123,6 +130,16 @@
                          aria: { label: L('callNightSay') }, text: L('callNight').toUpperCase(), on: { click: call } });
   }
 
+  /* between evenings: PLAY ON when the nights are stopped, PAUSE while they run (the tape deck's job until 2026-11-22,
+     when the user had it taken off the desk: the clock is the one place time is moved) */
+  function playButton() {
+    var k = lampKey();
+    if (k !== 'resume' && k !== 'pause') return null;
+    return h('button', { type: 'button', class: 'ck-call pz-hl', data: { fk: k === 'resume' ? 'playon' : 'pause', tut: 'night' },
+                         aria: { label: L(k === 'resume' ? 'playOnSay' : 'pauseSay') }, text: L(k === 'resume' ? 'playOn' : 'pause').toUpperCase(),
+                         on: { click: function () { SB.UI.lamp.pull(); } } });
+  }
+
   /** render(state, info): shown while a week is played on the desk or a close-up; hidden on a full screen. */
   function render(s, info) {
     var e = ensure(), d = doc(), t = null, cr, ink, btnOn, k;
@@ -130,20 +147,37 @@
     if (!e) return;
     if (s && s.clock && s.clock.phase === 'PLAY' && !info0.full && SB.Clock && SB.Week) t = safe(function () { return SB.Week.tonight(s); }, null);
     if (d && d.body && d.body.classList) d.body.classList.toggle('nc-on', !!t);
-    if (!t) { e.hidden = true; key = null; if (!s || !s.clock || s.clock.phase !== 'PLAY') { dropSlip(); snap = null; } return; }
+    if (!t) {
+      /* no evening to show, but the week is playing: the clock is just its PLAY ON / PAUSE button */
+      var pb = s && s.clock && s.clock.phase === 'PLAY' && !info0.full ? playButton() : null;
+      if (pb) {
+        e.hidden = false;
+        if (d && d.body && d.body.classList) d.body.classList.add('nc-on');
+        k = 'play|' + lampKey();
+        if (k === key) return;
+        key = k; SB.UI.clear(e);
+        e.appendChild(h('div', { class: 'ck-slip nc-slip nc-slip--play' }, [h('div', { class: 'ck-foot' }, [pb])]));
+        retape();
+        return;
+      }
+      e.hidden = true; key = null; if (!s || !s.clock || s.clock.phase !== 'PLAY') { dropSlip(); snap = null; } return;
+    }
     e.hidden = false;
     checkSlip(s, t);
     if (pv.el && gone(pv.el)) pv = { hours: 0, el: null };
     cr = safe(function () { return SB.Week.crunch(s); }, []) || [];
     ink = SB.Clock.hot(s);
-    btnOn = lampKey() === 'night' || lampKey() === 'close';
+    btnOn = lampKey() === 'night' || lampKey() === 'close' || lampKey() === 'resume' || lampKey() === 'pause';
     k = JSON.stringify([t, cr.slice(0, 1), ink, btnOn && lampKey(), pv.hours]);
     if (k === key) return;
     key = k;
     SB.UI.clear(e);
-    e.appendChild(SB.Clock.slip(s, { tonight: t, list: cr, crunch: 1, short: true, hot: ink, extra: pv.hours, cls: 'nc-slip', foot: btnOn ? button(t) : null }));
+    e.appendChild(SB.Clock.slip(s, { tonight: t, list: cr, crunch: 1, short: true, hot: ink, extra: pv.hours, cls: 'nc-slip', foot: btnOn ? (playButton() || button(t)) : null }));
     if (sayEl) e.appendChild(sayEl);                             // a redraw keeps the line that is up
+    retape();
   }
+  /* the button was rebuilt: the walkthrough's tape, if it was on it, finds the new one */
+  function retape() { if (SB.UI.story && typeof SB.UI.story.retape === 'function') safe(function () { SB.UI.story.retape(); }, null); }
 
   /** preview(hours, el): what a button would take, hatched from now on; preview(0, el) takes that button's off again. */
   function preview(hours, src) {

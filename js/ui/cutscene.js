@@ -169,9 +169,32 @@ SB.module('Cutscene', function (SB) {
   }
 
   function caption(text, cls) {
-    var p = el('p', 'cs-cap pz-paper' + (cls ? ' ' + cls : ''));
-    el('span', null, p, text);
+    var p = el('p', 'cs-cap pz-paper' + (cls ? ' ' + cls : '')), m = showMap(text), here = [], first;
+    if (!m) { el('span', null, p, text); return p; }
+    /* the show map ("Where you are: the date > ROOM > bands > ..."): the steps as a strip of stamps, the step you're
+       on (the one written in capitals) under the highlighter, the ones behind you faded (user 2026-11-22: "the
+       critical information is not the star", "highlight this better than just capitalizing") */
+    p.classList.add('cs-cap-map');
+    if (m.lead) el('span', 'cs-map-lead', p, m.lead);
+    /* every step in capitals is a step you're on (bands and sound get asked the same night) */
+    m.steps.forEach(function (s, i) { if (s.length > 1 && s === s.toUpperCase()) here.push(i); });
+    first = here.length ? here[0] : -1;
+    var ol = el('ol', 'cs-map', p);
+    m.steps.forEach(function (s, i) {
+      if (i) el('li', 'cs-arrow', ol, '\u203A').setAttribute('aria-hidden', 'true');
+      var on = here.indexOf(i) >= 0, li = el('li', 'cs-step' + (on ? ' is-here' : '') + (first >= 0 && i < first ? ' is-done' : ''), ol, s.toLowerCase());
+      if (on) li.setAttribute('aria-current', 'step');
+    });
     return p;
+  }
+  /* "Lead: a > b > c > ..." with four steps or more -> { lead, steps }; anything else -> null */
+  function showMap(text) {
+    var parts = String(text || '').split(' > '), first, at;
+    if (parts.length < 4) return null;
+    first = parts[0]; at = first.lastIndexOf(': ');
+    parts[0] = at >= 0 ? first.slice(at + 2) : first;
+    parts[parts.length - 1] = parts[parts.length - 1].replace(/[.\s]+$/, '');
+    return { lead: at >= 0 ? first.slice(0, at + 1) : '', steps: parts.map(function (s) { return s.trim(); }) };
   }
 
   /* ---------------- pictures ---------------- */
@@ -351,9 +374,15 @@ SB.module('Cutscene', function (SB) {
       (a.options || []).forEach(function (o, i) {
         var b = el('button', 'cs-reply', row), say = fill(o.say, slots), note = fill(o.note, slots);
         b.type = 'button';
-        b.setAttribute('aria-label', say + (note ? ' (' + note + ')' : ''));
+        var lvl = o.level ? String(o.level).toLowerCase() : '', nEl;
+        b.setAttribute('aria-label', say + (lvl ? ', ' + lvl : '') + (note ? ' (' + note + ')' : ''));
         b.appendChild(speech({ who: 'you', say: o.say }, slots, x, key + ':' + idx + ':o' + i, 'right', true));
-        if (note) el('span', 'cs-note', b, note);
+        if (note || lvl) {
+          nEl = el('span', 'cs-note', b, '');
+          /* the difficulty stamped first on the strip: EASY / NORMAL / HARD */
+          if (lvl) el('b', 'cs-level cs-level-' + lvl, nEl, lvl);
+          if (note) nEl.appendChild(document.createTextNode(note));
+        }
         if (!still) mv(b, 'slap', t + 150 + i * 160);
         b.addEventListener('click', function (e) { e.stopPropagation(); answer(a, o.v, b); });
       });

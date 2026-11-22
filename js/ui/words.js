@@ -120,6 +120,8 @@
         span.setAttribute('tabindex', '0');
         span.setAttribute('role', 'button');
         span.setAttribute('aria-label', L('label', { term: word }));
+        /* resting the mouse on the word: the game's slip says what it means, not "What X means" */
+        if (gloss()[k] && gloss()[k].short) span.setAttribute('data-tip', gloss()[k].short);
         span.textContent = word;
         t.parentNode.replaceChild(span, t);
         t = after; RE.lastIndex = 0;

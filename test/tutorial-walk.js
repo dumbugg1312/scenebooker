@@ -66,10 +66,10 @@
     }
     function fk(v) { return '#main [data-fk="' + v + '"]'; }
     /* CALL IT A NIGHT is the pinned night clock's (js/ui/nightclock.js), on the card as everywhere else */
-    var NIGHT = '#nightclock:not([hidden]) [data-fk="callnight"]';
+    var NIGHT = '#nightclock .ck-call';   // the clock's one button: call it a night, or play on between evenings (no :not() in the fake DOM)
     /* where calling it a night is on the desk: the pinned clock while a week is played, its close-the-week at the end of one, else the tape deck */
     var WEEKEND = '[data-fk="closeweek"]:not([disabled])';
-    function nightSel() { return q(NIGHT) ? NIGHT : (q(WEEKEND) ? WEEKEND : hit('lamp')); }
+    function nightSel() { return q(WEEKEND) && !q(NIGHT) ? WEEKEND : NIGHT; }   // no tape deck on the desk (2026-11-22): the clock
     function hit(id) { return '#desk .dk-hit[data-obj="' + id + '"]'; }
     function clip() {
       var objs = SB.Desk.objects(), i, c = cur();
@@ -210,7 +210,7 @@
       taped(NIGHT);
       cardNight();
       taped(nightSel());
-      if (env.autoPause) env.autoPause(hit('lamp')); else until('HOLD:WAIT', 'the hold');
+      if (env.autoPause) env.autoPause(NIGHT); else until('HOLD:WAIT', 'the hold');
       if (at() === 'HOLD:HELD') { if (cur().target !== 'lamp') fail('the room is held with something still wanted: ' + text()); until('HOLD:HELD', 'the held night to be booked'); }
       /* a yes is a yes: the host's answer books the night, no second message */
       expect('BILL', 'OFFER'); clean();

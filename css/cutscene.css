@@ -184,3 +184,21 @@
   :root:not([data-motion="full"]) .cs-art { animation: none; }
   :root:not([data-motion="full"]) :is(.cs-pc, .cs-pc-in) { animation: none; }
 }
+
+/* ---------- the show map in a caption (js/ui/cutscene.js caption/showMap, user 2026-11-22) ----------
+   the order of a show as a row of stamps: the step you're on highlighted and set big, the ones behind you faded */
+.cs-cap.cs-cap-map { max-width: none; display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 8) calc(var(--p) * 12);
+  padding: calc(var(--p) * 10) calc(var(--p) * 16) calc(var(--p) * 12); }
+.cs-map-lead { color: var(--cs-ink); }
+.cs-map { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 6) calc(var(--p) * 4); }
+.cs-step { display: inline-flex; align-items: center; font: 400 calc(var(--fs) * 20)/1.1 var(--f-gothic); letter-spacing: .06em;
+  text-transform: uppercase; color: var(--cs-ink); padding: calc(var(--p) * 3) calc(var(--p) * 7) calc(var(--p) * 2);
+  border: calc(var(--p) * 2) solid var(--cs-ink); background: var(--cs-paper); }
+.cs-arrow { font: 400 calc(var(--fs) * 24)/1 var(--f-gothic); color: var(--cs-ink); opacity: .5; padding: 0 calc(var(--p) * 1); }
+.cs-step.is-done { opacity: .4; text-decoration: line-through; text-decoration-thickness: calc(var(--p) * 2); }
+.cs-step.is-here { font-size: calc(var(--fs) * 34); background: var(--hl-solid); border-width: calc(var(--p) * 3);
+  padding: calc(var(--p) * 5) calc(var(--p) * 12) calc(var(--p) * 3); transform: rotate(-2deg);
+  box-shadow: calc(var(--p) * 3) calc(var(--p) * 4) 0 var(--cs-ink); }
+.cs-cap-panel .cs-step, .cs-cap-drop .cs-step { font-size: calc(var(--fs) * 12); }
+.cs-cap-panel .cs-step.is-here, .cs-cap-drop .cs-step.is-here { font-size: calc(var(--fs) * 16); }
+.cs-cap-drop.cs-cap-map { white-space: normal; }

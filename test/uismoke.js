@@ -528,7 +528,7 @@ function main() {
     if (SB.UI.game() !== state) throw new Error('SB.UI.game() is not the started state');
     const desk = fakeDocument.getElementById('desk');
     if (!desk || desk.hidden || !desk.childNodes.length) throw new Error('the desk did not render after SB.UI.start');
-    if (!desk.querySelector('.dk-hit[data-obj="lamp"]')) throw new Error('the desk has no lamp to pull');
+    if (desk.querySelector('.dk-hit[data-obj="lamp"]')) throw new Error('the tape deck is back on the desk (removed 2026-11-22: the clock calls the night)');
     const n = errorsBefore();
     if (n) throw new Error(SB.log.entries.filter(e => e.level === 'error').map(e => e.where + ': ' + e.message).join(' | '));
     if (wanted('shell')) report('shell start (week ' + (state.clock.week + 1) + ', ' + state.clock.phase + ')');
@@ -580,23 +580,19 @@ function main() {
     } catch (e) { report('shell placeholder', e); }
   }
 
-  /* the corner clock (#nightclock) holds the one CALL IT A NIGHT: a new game sits down at its first evening; pressing the
-     tape deck only nudges the clock; its button calls it a night (Week.endNight) and the night plays out; the deck then
-     pauses ('sb-play' { cmd: 'pause' }); 'next' plays the night out in one go, to the next stop */
+  /* the pinned clock (#nightclock) holds the one CALL IT A NIGHT: a new game sits down at its first evening; there is no
+     tape deck on the desk (user 2026-11-22); the clock's button calls it a night (Week.endNight) and the night plays out;
+     SB.UI.lamp.pull() still pauses it ('sb-play' { cmd: 'pause' }); 'next' plays the night out in one go, to the next stop */
   if (wanted('shell')) {
     try {
-      const lamp = () => fakeDocument.querySelector('#desk .dk-hit[data-obj="lamp"]');
       SB.UI.go('desk');
-      const btn = lamp();
-      if (!btn) throw new Error('no lamp on the desk');
+      if (fakeDocument.querySelector('#desk .dk-hit[data-obj="lamp"]')) throw new Error('the tape deck is back on the desk');
       const stop = () => state.clock.stop ? state.clock.stop.kind : 'none';
       if (stop() !== 'EVENING') throw new Error('the game is not at an evening at the desk (stop ' + stop() + ', phase ' + state.clock.phase + ')');
       const nc = fakeDocument.getElementById('nightclock');
       if (!nc || nc.hidden || !nc.querySelector('.ck-ruler')) throw new Error('no clock in the corner at an evening');
-      if (SB.UI.lamp.label().key !== 'night') throw new Error('the tape deck does not offer a night at an evening: ' + JSON.stringify(SB.UI.lamp.label()));
+      if (SB.UI.lamp.label().key !== 'night') throw new Error('the lamp does not offer a night at an evening: ' + JSON.stringify(SB.UI.lamp.label()));
       const day0 = state.clock.day;
-      btn.click();
-      if (stop() !== 'EVENING') throw new Error('pressing the tape deck at an evening should only nudge the clock (stop ' + stop() + ')');
       const call = nc.querySelector('.ck-call');
       if (!call) throw new Error('no CALL IT A NIGHT button on the corner clock');
       call.click();
@@ -604,11 +600,11 @@ function main() {
       if (!SB.UI.playing()) throw new Error('SB.UI.playing() is false after calling it a night');
       let heard = null;
       fakeDocument.addEventListener('sb-play', e => { heard = e.detail && e.detail.cmd; });
-      lamp().click();
+      SB.UI.lamp.pull();
       if (heard !== 'pause' || SB.UI.playing()) throw new Error('Pause did not send sb-play { cmd: pause }');
       SB.UI.fire('sb-play', { cmd: 'next' });
       if (stop() === 'none') throw new Error('the night played out to no stop');
-      report('shell lamp (call it a night from the clock, pause, played out from day ' + day0 + ' to day ' + state.clock.day + ' ' + stop() + ')');
+      report('shell clock (call it a night from the clock, pause, played out from day ' + day0 + ' to day ' + state.clock.day + ' ' + stop() + ')');
     } catch (e) { report('shell play', e); }
   }
 

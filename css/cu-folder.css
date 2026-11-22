@@ -4,7 +4,7 @@
  * control is a css/kit.css part; only the layout lives here.
  * Polish brief (css/finish.css): sized in --p, the shipped faces, the copy stock, one light. Settings is quiet utility: the
  * form's own pasted headline names the tab, and a pause/options menu will replace it later. */
-.cu-obj.cu--drawer .cu-in { background: transparent; padding: 0 calc(var(--p) * 16) calc(var(--p) * 16); overflow-x: hidden; }
+.cu-obj.cu--drawer .cu-in, .cu-obj.cu--pad .cu-in { background: transparent; padding: 0 calc(var(--p) * 16) calc(var(--p) * 16); overflow-x: hidden; }   /* pad: the settings' sticky pad (2026-11-22) */
 .sf { position: relative; min-height: 100%; color: var(--toner); }
 .sf-tabs { position: relative; z-index: 2; min-height: calc(var(--p) * 46); padding-left: calc(var(--p) * 22); }
 .sf-page { position: relative; padding: calc(var(--p) * 16) calc(var(--p) * 14) calc(var(--p) * 20) calc(var(--p) * 18); }

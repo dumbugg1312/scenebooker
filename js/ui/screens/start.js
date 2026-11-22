@@ -886,8 +886,9 @@
         h('p', { class: 'kt-pencil st-help', text: L('name', 'markHelp') }),
         marksBox,
         h('div', { class: 'st-acts' }, [
-          Kt().button({ label: L('name', 'done'), kind: 'primary', big: 22, fk: 'name-done', on: done }),
-          Kt().button({ label: L('name', 'reroll'), fk: 'reroll', on: function () { draft.markSeeds = rollMarks(); draft.mark = { v: 1, seed: draft.markSeeds[0] }; thumped = draft.markSeeds[0]; marks(); flyer(); } })
+          /* roll first, right under the marks it rolls; the big "that's the name" last, under it (user 2026-11-22) */
+          Kt().button({ label: L('name', 'reroll'), fk: 'reroll', on: function () { draft.markSeeds = rollMarks(); draft.mark = { v: 1, seed: draft.markSeeds[0] }; thumped = draft.markSeeds[0]; marks(); flyer(); } }),
+          Kt().button({ label: L('name', 'done'), kind: 'primary', big: 22, fk: 'name-done', on: done })
         ]),
         msg
       ]),

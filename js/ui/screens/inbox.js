@@ -49,8 +49,8 @@
     vetLong: { LISTEN: 'Listen to the record', CLIP: 'Watch a live clip', HISTORY: 'Look up their past shows', ASK_AROUND: 'Ask around', ASK_BOOKER: 'Ask a booker on their route' },
     vetDone: 'done',
     vetListed: 'on your list',
-    vetPlan: 'do it from the calendar',
-    calendar: 'calendar',
+    vetPlan: 'press to do it tonight',
+    calendar: 'calendar', doTonight: 'do it tonight',
     aMessage: 'a message',
     hoursN: '{n} hours',
     hour1: '1 hour',
@@ -940,13 +940,13 @@
             aria: { label: L('vetLong.' + a) + '. ' + cost + '. ' + (state === 'done' ? L('vetDone') : (state === 'listed' ? L('vetListed') + (listed ? ', ' + L('vetPlan') : '') : why)) },
             on: { click: function () {
               if (state === 'open') vet(s, q, v);
-              else if (state === 'listed' && listed) SB.UI.go('week');
+              else if (state === 'listed' && listed) doVet(listed.id);
             } } }, [
             gpic(a, 40, 'v'),
             h('span', { class: 'ph-tab-t', title: cost, text: costTag(up(L('vet.' + a)), hrs) }),
             state === 'done' ? pic(stampMark(up(L('vetDone')), T, -12, 'vd' + a), 84, 40, { cls: 'ph-coupon-stamp' }) : null,
             state === 'listed' ? h('span', { class: 'ph-coupon-why' }, [up(L('vetListed'))]) : null,
-            state === 'listed' && listed ? h('span', { class: 'ph-strip ph-strip--mini' }, up(L('calendar'))) : null,
+            state === 'listed' && listed ? h('span', { class: 'ph-strip ph-strip--mini' }, up(L('doTonight'))) : null,
             state === 'no' && why ? h('span', { class: 'ph-coupon-why', text: why }) : null
           ]);
         }))
@@ -959,7 +959,22 @@
         act(function (x) { return SB.Mail.ask(x, 'CONTACT_VET', v.available.contactId, { requestId: q.id }); });
         return;
       }
-      act(function (x) { return SB.Week.addJob(x, 'VET_' + v.action, { requestId: q.id }); });
+      /* pressing it does it (user 2026-11-22: "when i click do something it should do it - not take me to the
+         calendar"): onto your list, then done tonight off the clock. No time left tonight: it stays on the list and
+         the refusal says why; pressing it again tomorrow does it then. */
+      var j = listedJob(s, q, v.action), id = j ? j.id : null, r;
+      if (!id) {
+        r = act(function (x) { return SB.Week.addJob(x, 'VET_' + v.action, { requestId: q.id }); });
+        if (!r || r.ok === false || !r.jobId) return;
+        id = r.jobId;
+      }
+      doVet(id);
+    }
+    function doVet(id) {
+      var r = act(function (x) { return SB.Week.doNow(x, id, {}); });
+      if (!r || r.ok === false) return;
+      if (r.answer && r.answer.text) SB.UI.toast(r.answer.text, r.answer.status === 'NO' ? 'no' : 'info');
+      (r.records || []).forEach(function (x) { if (x && x.t === 'OVERTIME' && x.text) SB.UI.toast(x.text, 'info'); });
     }
 
     /** What you found out about this band, from the week's records, and anything worth knowing: notes in the margin. */

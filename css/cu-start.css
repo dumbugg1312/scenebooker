@@ -35,7 +35,7 @@
 .st-title { position: relative; margin: 0; line-height: 0; width: calc(var(--p) * 640); }
 .st-title > .st-title-b { position: absolute; left: 0; top: 0; }
 .st-sub { margin: calc(var(--p) * -4) 0 calc(var(--p) * 20) calc(var(--p) * 22); }
-.st-sub span { display: inline-block; --paper: var(--pp-buff); --edge: var(--edge-cut-2); --ring: calc(var(--p) * 1.2); --drop: calc(var(--p) * 3); padding: calc(var(--p) * 6) calc(var(--p) * 14) calc(var(--p) * 6);
+.st-sub > span { display: inline-block; --paper: var(--pp-buff); --edge: var(--edge-cut-2); --ring: calc(var(--p) * 1.2); --drop: calc(var(--p) * 3); padding: calc(var(--p) * 6) calc(var(--p) * 14) calc(var(--p) * 6);
   color: var(--toner); font: calc(var(--fs) * 16)/1.3 var(--f-type); transform: rotate(-1deg); }
 
 /* saved games: a short stack of tapes, small */

@@ -337,7 +337,9 @@ SB.module('Jobs', function (SB) {
         opensDay = ov.o == null ? nd.day : (nd.day == null ? show.day - ov.o : Math.max(show.day - ov.o, nd.day));
         /* a job is never late before it could be done: a show booked short gets JOB_GRACE days from the day the job
          * became possible (its needs met, else the confirm), never past the night before the show */
-        exp = nd.day != null ? nd.day : (show.confirmedDay != null ? show.confirmedDay : null);
+        /* not confirmed yet: nothing is late, the grace runs from tonight (user 2026-11-22: "it says 2 is late even
+           though i just started the game"). A show without a room is a rumor; its clock starts at the confirm. */
+        exp = nd.day != null ? nd.day : (show.confirmedDay != null ? show.confirmedDay : onDay);
         if (idealUntil != null && exp != null && idealUntil < exp + JOB_GRACE) idealUntil = Math.max(idealUntil, Math.min(exp + JOB_GRACE, show.day - 1));
         if (ov.m != null && T <= ov.m) st = 'MISSED';
         else if (!nd.met || (ov.o != null && T > ov.o)) st = 'EARLY';

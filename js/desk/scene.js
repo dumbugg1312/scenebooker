@@ -26,11 +26,11 @@
     names: {
       calendar: 'Calendar page', flyers: 'Flyer pile', map: 'Road map', keys: 'Key ring', phone: 'Phone', paper: 'Paste-up and markers',
       clips: 'Set lists', clip: 'Set list for {when}', stickers: 'Sticker pile', notebook: 'Composition book', tin: 'Cash envelope', mug: 'Coffee',
-      book: 'Matchbook', lamp: 'Tape deck', drawer: 'Manila folder', jacket: 'Jean jacket'
+      book: 'Matchbook', lamp: 'Tape deck', drawer: 'Manila folder', pad: 'Sticky notes', jacket: 'Jean jacket'
     },
     strip: {
       calendar: 'CALENDAR', flyers: 'FLYERS', map: 'TOWN', keys: 'ROOMS', phone: 'PHONE', paper: 'NEXT FLYER', clips: 'SHOWS', clip: 'SHOW',
-      stickers: 'BANDS', notebook: 'NOTEBOOK', tin: 'MONEY', mug: 'COFFEE', book: 'PEOPLE', lamp: 'TAPE DECK', drawer: 'SETTINGS', jacket: 'JACKET'
+      stickers: 'BANDS', notebook: 'NOTEBOOK', tin: 'MONEY', mug: 'COFFEE', book: 'PEOPLE', lamp: 'TAPE DECK', drawer: 'FILES', pad: 'SETTINGS', jacket: 'JACKET'
     },
     state: {
       week: 'WEEK {n}: {from}-{to}', late: '{n} LATE', lateOne: '1 LATE', flyersNone: 'NONE YET', flyers: '{n} MADE', flyersStar: '{n} MADE, {k} STARRED',
@@ -38,7 +38,7 @@
       paperNone: 'NOTHING TO FLYER', paperTodo: '{when}: NOT MADE', paperDone: '{when}: MADE', clipsNone: 'NOTHING BOOKED: START ONE',
       clip: '{when}', clipDays: '{when} · {n} DAYS', clipToday: '{when} · TONIGHT', clipTomorrow: '{when} · TOMORROW',
       stickers: '{n} LOCAL', stickersNone: 'NONE YET', notebook: '{n} THINGS', notebookNew: 'NEW PAGE', tin: '{total}', tinDue: '{what} IN {n} DAYS', tinToday: '{what} DUE TODAY',
-      mug: '{zone}', book: '{n} PEOPLE', bookNone: 'NONE', drawer: 'SAVES', jacket: '{n} ON IT', jacketNone: 'BARE', new: 'NEW'
+      mug: '{zone}', book: '{n} PEOPLE', bookNone: 'NONE', drawer: 'FILES', pad: 'SETTINGS', jacket: '{n} ON IT', jacketNone: 'BARE', new: 'NEW'
     },
     tag: {
       new: 'new on the desk. {what}', week: 'week {n}: {from} to {to}', weekShows: 'week {n}, {k} show nights', late: '{n} jobs running late',
@@ -49,7 +49,7 @@
       clipsNone: 'no shows on the way: press to start one', clip: '{when}: {days}', today: 'tonight', tomorrow: 'tomorrow', days: '{n} days out',
       stickers: '{n} local bands', stickersNone: 'no local bands yet', notebook: '{n} things learned', notebookNew: 'something new in here',
       tin: 'fund {fund}, bank {bank}', tinDue: 'fund {fund}, {what} due {when}', mug: 'stress: {zone}',
-      book: '{n} people you can call', bookNone: 'nobody in here yet', drawer: 'settings and saves', lampNight: 'call it a night on the clock in the corner',
+      book: '{n} people you can call', bookNone: 'nobody in here yet', drawer: 'settled shows and cheat sheets', pad: 'settings and saves', lampNight: 'call it a night on the clock in the corner',
       jacket: '{n} patches and buttons on it', jacketNone: 'nothing sewn on yet'
     },
     /* the hover slip (js/ui/tooltip.js): what each thing on the desk is for */
@@ -68,13 +68,14 @@
       mug: 'How stressed you are. Rest or stop early if it climbs.',
       book: 'People you can call for help: sound, door, rides.',
       lamp: 'The tape deck: music while you work. The night itself is ended on the clock in the corner.',
-      drawer: 'Settings and saves.',
+      drawer: 'Your paperwork: a sheet for every show you\u2019ve settled, and cheat sheets on booking in real life.',
+      pad: 'Settings and saves.',
       jacket: 'Patches and buttons you have earned.'
     },
     zone: { STEADY: 'steady', STRETCHED: 'stretched', FRIED: 'fried', BURNING_OUT: 'burning out', BURNT_OUT: 'burnt out' },
     words: { notes: 'NOTES', safe: 'get home safe', nothing: 'NOTHING BOOKED', flyersHere: 'NO FLYERS YET', mom: 'call mom',
              roadMap: 'OFFICIAL ROAD MAP', composition: 'COMPOSITION', learned: '{n} things', deposit: 'DEPOSIT', week: 'WEEK {n}',
-             folder: 'SETTINGS / SAVES', matches: 'COCKTAILS * POOL', noKeys: 'no keys yet', noBands: 'no local bands yet', newMsg: '{n} NEW',
+             folder: 'FILES', folderLabel: 'SHOWS + CHEAT SHEETS', padNote: 'SETTINGS', padSub: '+ saves', matches: 'COCKTAILS * POOL', noKeys: 'no keys yet', noBands: 'no local bands yet', newMsg: '{n} NEW',
              glue: 'GLUE STICK', perm: 'PERMANENT', nothingToFlyer: 'nothing to flyer yet', doors: 'doors {t}', due: 'DUE {when}', pastDue: 'PAST DUE' }
   };
 
@@ -86,10 +87,10 @@
       paper: [446, 40, 604, 412, 1.4], notebook: [470, 742, 300, 176, -3], flyers: [752, 726, 260, 190, 2.5],
       map: [1104, 44, 268, 250, 2.4], keys: [1386, 36, 180, 282, -2],
       phone: [1112, 352, 156, 268, -3], stickers: [1292, 382, 280, 250, 1.6],
-      book: [1092, 686, 166, 150, 3], tin: [1276, 668, 284, 160, -2], drawer: [1046, 872, 500, 96, -1],
+      book: [1092, 686, 166, 150, 3], tin: [1276, 668, 284, 160, -2], drawer: [1046, 700, 330, 230, -1], pad: [1100, 640, 170, 160, 2],
       jacket: [292, 716, 172, 200, 4]
     };
-    var CLIP = { x: 452, y: 440, w: 142, h: 206, step: 144, dy: [0, 18, 4, 22], rot: [-3, 2.4, -1.5, 3.2] };
+    var CLIP = { x: 452, y: 440, w: 142, h: 206, step: 144, dy: [0, 0, 0, 0], rot: [-1, 0.8, -0.6, 1] };   // a straight row
 
     /* Where each thing lies on the table (polish brief job 7): [centre x, centre y, zoom, crooked degrees]. BOX above is
        what each drawing is drawn in; this is where it is put and how big it is shown, so a bigger calendar is the same
@@ -98,15 +99,19 @@
        SB.Rungs) is then zoomed to fill the table, so a week-one desk is a few big things in the lamp's light, not islands
        in the dark. The folder is pinned over the table's front edge, and the bottom right corner is left to the
        pocket player (js/ui/musicbar.js). */
+    /* laid out in three columns (user 2026-11-22: "reorganize this desk and make it look more organized", "too much
+       overlapping at the bottom"): time on the left (calendar, the settings folder where the tape deck was, coffee),
+       the work in the middle (paste-up, the set lists in a row under it, notebook and flyers), people and places on
+       the right in two columns. Nothing lies on anything else; tilts are a degree or so. The bottom band is left to
+       the guide's strip, the pinned clock and the pocket player (js/ui/musicbar.js). */
     var LAYOUT = {
-      calendar: [280, 262, 1.08, -2.6], lamp: [290, 541, 1.1, 2], mug: [165, 872, 0.86, -1.5],   // mug low and left: the deck's clock slip hangs over where it was
-      paper: [760, 268, 1.08, 1.2], notebook: [700, 820, 1.12, -3], flyers: [990, 800, 1.12, 2.5],
-      map: [1290, 150, 1.0, 2.4], keys: [1482, 178, 0.95, -2], phone: [1150, 362, 1.22, -4],
-      stickers: [1405, 458, 1.08, 1.6], book: [1185, 652, 1.2, 3], tin: [1405, 708, 1.1, -2],
-      drawer: [1180, 925, 0.8, -1], jacket: [450, 830, 1, 4]
+      calendar: [265, 270, 1.0, -1.2], drawer: [265, 610, 1.18, -0.6], mug: [150, 860, 0.86, 1], jacket: [392, 870, 1, -1],
+      paper: [770, 268, 1.08, 0.8], notebook: [670, 892, 1.08, -1], flyers: [935, 892, 1.08, 1],
+      map: [1220, 150, 1.0, 1], keys: [1480, 150, 0.95, -1], phone: [1205, 282, 1.4, -1.2], pad: [1205, 612, 1.3, 2],   // phone + pad span the same height as the calendar + folder and the mat + set lists (user 2026-11-22)
+      stickers: [1480, 450, 1.08, 0.8], book: [1220, 790, 1.2, 1], tin: [1480, 780, 1.1, -0.8]
     };
-    var CLIPLAY = { x: 540, y: 590, step: 156, z: 1.12 };
-    var PINNED = { drawer: 1 };
+    var CLIPLAY = { x: 580, y: 620, step: 184, z: 1.12 };
+    var PINNED = {};
     var TABLE = { x: 34, y: 20, w: 1532, h: 920, lip: 34 };          // the table top; its front edge drops lip units to the floor
     var AREA = { x: 60, y: 34, w: 1480, h: 850 }, AREA_GUIDED = { x: 60, y: 34, w: 1480, h: 786 };   // the walkthrough's strip takes the bottom band
     var LIGHT = { x: 760, y: 420 };                                   // the lamp's pool on the table
@@ -288,7 +293,7 @@
         out += '<path d="M' + q[0] + ' ' + q[1] + 'h' + q[2] + 'v' + q[3] + 'h-' + q[2] + 'Z" fill="#4a4944" transform="rotate(' + q[4] + ' ' + q[0] + ' ' + q[1] + ')"/>';
       });
       out += k.tape(bx + 18, by + 22, 40, 12, { seed: 'tt1', rot: -40, op: 0.35 }) + k.tape(bx + bw - 22, front - 18, 40, 12, { seed: 'tt2', rot: 30, op: 0.35 });
-      out += '<g transform="rotate(-3 ' + (bx + 30) + ' ' + (front - 22) + ')"><path d="M' + (bx + 24) + ' ' + (front - 34) + 'h150v20h-150Z" fill="#8f8b80"/>' + k.type(L('words.safe'), bx + 32, front - 19, 13, { fill: '#1f1f1d' }) + '</g>';
+      /* (the typed "get home safe" scrap at the front left is gone: the guide's strip sat on it, a grey sliver showing, 2026-11-22) */
       return out;
     }
 
@@ -633,10 +638,32 @@
     }
 
     /* the manila folder: lying along the bottom edge with a typed tab */
+    /* a whole manila folder lying shut (user 2026-11-22: "settings should be an actual manila folder not just the top of
+       one"): the back cover with its tab, two sheets showing past the top edge, the front cover a little shorter, and
+       a typed label stuck on it */
     function drawDrawer(v, b) {
+      var k = K(), x = b[0], y = b[1], w = b[2], h = b[3], tabW = Math.round(w * 0.42), fy = y + 46, out = '';
+      out += k.paper(0, 0, 0, 0, { pts: [[x, y + 24], [x + 12, y + 2], [x + tabW, y], [x + tabW + 12, y + 22], [x + w, y + 22], [x + w, y + h], [x, y + h]],
+                                   stock: 'manila', burn: 0.7, inner: k.type(L('words.folder'), x + 22, y + 17, 13, { bold: true }) });
+      out += k.paper(x + w * 0.46, y + 26, w * 0.46, 40, { stock: 'white', burn: 0.3, seed: 'fold-s1' });
+      out += k.paper(x + w * 0.3, y + 34, w * 0.4, 30, { stock: 'bone', burn: 0.3, seed: 'fold-s2' });
+      out += k.paper(0, 0, 0, 0, { pts: [[x - 2, fy], [x + w + 2, fy + 4], [x + w, y + h + 2], [x, y + h]], stock: 'manila', burn: 0.5,
+                                   inner: k.dotsRect(x, y + h - 46, w, 46, 1) +
+                                          '<path d="M' + (x + 4) + ' ' + (fy + 10) + 'H' + (x + w - 4) + '" stroke="#8c7f60" stroke-width="1.5"/>' });
+      out += k.paper(x + w * 0.2, fy + 46, w * 0.6, 44, { stock: 'white', burn: 0.2, seed: 'fold-lbl',
+                                   inner: k.type(L('words.folderLabel'), x + w * 0.5, fy + 75, 16, { bold: true, anchor: 'middle' }) });
+      return out;
+    }
+
+    /* the settings: a pad of sticky notes, SETTINGS written on the top one in sharpie (user 2026-11-22) */
+    function drawPad(v, b) {
       var k = K(), x = b[0], y = b[1], w = b[2], h = b[3];
-      return k.paper(0, 0, 0, 0, { pts: [[x, y + 24], [x + 10, y + 2], [x + 200, y], [x + 208, y + 22], [x + w, y + 20], [x + w, y + h], [x, y + h]], stock: 'manila', burn: 0.6,
-                                   inner: k.type(L('words.folder'), x + 22, y + 18, 13, { bold: true }) + k.dotsRect(x, y + 60, w, h - 60, 1) + '<path d="M' + x + ' ' + (y + 34) + 'H' + (x + w) + '" stroke="#8c7f60" stroke-width="2"/>' });
+      return k.paper(x + 8, y + 10, w - 8, h - 10, { stock: '#d9c34a', burn: 0.3, seed: 'pad-u' }) +
+             k.paper(x + 4, y + 5, w - 8, h - 10, { stock: '#e6cf52', burn: 0.3, seed: 'pad-m', shadow: false }) +
+             k.paper(x, y, w - 8, h - 10, { stock: '#f2dc5d', burn: 0.4, seed: 'pad-t', shadow: false,
+                                           inner: '<rect x="' + x + '" y="' + y + '" width="' + (w - 8) + '" height="24" fill="#000" fill-opacity=".07"/>' +
+                                                  k.type(L('words.padNote'), x + (w - 8) / 2, y + 74, 22, { bold: true, anchor: 'middle' }) +
+                                                  k.type(L('words.padSub'), x + (w - 8) / 2, y + 104, 14, { anchor: 'middle' }) });
     }
 
     /* ---------------------------------------------------------------- */
@@ -654,7 +681,8 @@
       add('calendar', BOX.calendar, L('names.calendar'), v.late ? L('tag.late', { n: v.late }) : L('tag.week', { n: st.week + 1, from: md(st.from), to: md(st.to) }),
           v.late ? L(v.late === 1 ? 'state.lateOne' : 'state.late', { n: v.late }) : L('state.week', { n: st.week + 1, from: md(st.from), to: md(st.to) }), v.late > 0, 'week');
       night = !!v.lamp && v.lamp.key === 'night';
-      add('lamp', BOX.lamp, L('names.lamp'), (night ? L('tag.lampNight') : (v.lamp ? v.lamp.text : '')) + clockSay(v), v.lamp && !night ? String(v.lamp.text).toUpperCase() : '', false, null, {}, { cls: 'is-lamp' });
+      /* no tape deck on the desk any more (user 2026-11-22): the pinned clock calls the night and closes the week */
+      void night; void clockSay;
       add('mug', BOX.mug, L('names.mug'), L('tag.mug', { zone: zoneWord(v) }), zoneWord(v).toUpperCase(), false, null, {}, { cls: 'is-mug' });
       add('paper', BOX.paper, L('names.paper'),
           !sh ? L('tag.paperNone') : L(sh.promo && sh.promo.flyer ? 'tag.paperDone' : 'tag.paperTodo', { when: dowShort(sh.day) + ' ' + md(sh.day) }),
@@ -681,7 +709,8 @@
       add('book', BOX.book, L('names.book'), v.circle ? L('tag.book', { n: v.circle }) : L('tag.bookNone'), v.circle ? L('state.book', { n: v.circle }) : L('state.bookNone'), false, 'people');
       add('tin', BOX.tin, L('names.tin'), billsNear(v) ? L('tag.tinDue', { fund: money(st.fund), what: due.label || 'bills', when: md(due.day) }) : L('tag.tin', { fund: money(st.fund), bank: money(st.bank || 0) }),
           billsNear(v) ? (dd <= 0 ? L('state.tinToday', { what: what }) : L('state.tinDue', { what: what, n: dd })) : L('state.tin', { total: money((st.fund || 0) + (st.bank || 0)) }), billsNear(v), 'money');
-      add('drawer', BOX.drawer, L('names.drawer'), L('tag.drawer'), L('state.drawer'), false, 'settings');
+      add('drawer', BOX.drawer, L('names.drawer'), L('tag.drawer'), L('state.drawer'), false, 'files');
+      add('pad', BOX.pad, L('names.pad'), L('tag.pad'), L('state.pad'), false, 'settings');
       /* the jean jacket on the back of the chair (09 section 4): its patches and buttons */
       var worn = jacketItems(s0(v)).length;
       add('jacket', BOX.jacket, L('names.jacket'), worn ? L('tag.jacket', { n: worn }) : L('tag.jacketNone'), worn ? L('state.jacket', { n: worn }) : L('state.jacketNone'), false, 'jacket');
@@ -757,6 +786,7 @@
         case 'book': return drawBook(v, b);
         case 'tin': return drawTin(v, b);
         case 'drawer': return drawDrawer(v, b);
+        case 'pad': return drawPad(v, b);
         default: return '';
       }
     }

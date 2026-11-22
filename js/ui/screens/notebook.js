@@ -400,7 +400,8 @@
             return h('li', null, [h('b', { text: SB.text.label('jobs.' + ty + '.label') }), ' ', SB.text.label('jobs.' + ty + '.why')]);
           })));
         }
-        out.push(learnedView(s));
+        /* the lessons moved to the manila folder's CHEAT SHEETS (js/ui/screens/files.js, user 2026-11-22) */
+        void learnedView;
         tally = safe(function () { return SB.Notebook.tally(s); }, null);
         if (tally && tally.shows > 0) {
           t = tallyArt(tally.inside, tally.shows);

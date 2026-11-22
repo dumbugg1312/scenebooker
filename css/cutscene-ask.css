@@ -18,6 +18,13 @@
 }
 .cs-reply:hover .cs-balloon-shape, .cs-reply:focus-visible .cs-balloon-shape, .cs-reply.is-picked .cs-balloon-shape { fill: var(--hl-solid); }
 .cs-reply:hover .cs-note, .cs-reply:focus-visible .cs-note { background: var(--pp-buff); }
+/* the difficulty stamp at the head of the strip (user 2026-11-22): rubber-stamp letters, HARD in the late red */
+.cs-level {
+  display: inline-block; margin: 0 calc(var(--p) * 8) 0 0; padding: calc(var(--p) * 1) calc(var(--p) * 6) 0;
+  font: 400 calc(var(--fs) * 13)/1.2 var(--f-gothic); letter-spacing: .1em; text-transform: uppercase;
+  background: var(--toner); color: var(--pp-bond); transform: rotate(-2deg); vertical-align: calc(var(--p) * 1);
+}
+.cs-level-hard { background: var(--late, var(--toner)); }
 .cs-reply:focus-visible { outline: calc(var(--p) * 3) dashed var(--hl-solid); outline-offset: calc(var(--p) * 2); }
 .cs-reply[disabled] { cursor: default; }
 .cs-reply.is-dropped { opacity: 0; transform: translateY(calc(var(--p) * 10)) rotate(2deg); transition: opacity .2s steps(2, end), transform .2s steps(2, end); }
@@ -40,7 +47,7 @@
 .cs-namecard .st-stamps { gap: calc(var(--p) * 10) calc(var(--p) * 12); margin: calc(var(--p) * 4) 0 calc(var(--p) * 8); }
 .cs-namecard .st-stamp .sb-mark, .cs-namecard .st-stamp svg { width: calc(var(--p) * 56); }
 .cs-namecard .st-ideas-row { padding-left: 0; gap: calc(var(--p) * 8) calc(var(--p) * 10); }
-.cs-namecard .st-acts { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 10) calc(var(--p) * 14); margin-top: calc(var(--p) * 6); }
+.cs-namecard .st-acts { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 10); margin-top: calc(var(--p) * 6); }
 .cs-nameflybox { flex: none; width: calc(var(--p) * 200); padding-top: calc(var(--p) * 8); }
 .cs-namefly { width: calc(var(--p) * 200); transform: rotate(3deg); }
 .cs-namefly canvas { width: 100% !important; height: auto !important; }

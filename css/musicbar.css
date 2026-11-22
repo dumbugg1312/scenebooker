@@ -61,16 +61,19 @@
 .mb-deck {
   position: absolute; right: calc(100% + calc(var(--p) * 12)); bottom: calc(var(--p) * 6);
   display: flex; flex-direction: column; align-items: flex-end; gap: calc(var(--p) * 8);
-  opacity: 0; visibility: hidden; transform: translateX(calc(var(--p) * 14)); pointer-events: none; filter: drop-shadow(var(--sh-s) 0 var(--pitch));
-  transition: opacity 166ms steps(2, end), transform 166ms steps(2, end), visibility 0s steps(2, end) .2s;
+  opacity: 0; visibility: hidden; pointer-events: none; filter: drop-shadow(var(--sh-s) 0 var(--pitch));
 }
 .mb.at-tr .mb-deck, .mb.at-tl .mb-deck { bottom: auto; top: calc(var(--p) * 6); }
-.mb.at-bl .mb-deck, .mb.at-tl .mb-deck { right: auto; left: calc(100% + calc(var(--p) * 12)); align-items: flex-start; transform: translateX(calc(var(--p) * -14)); }
-.mb.is-open .mb-deck, .mb.is-peek .mb-deck {
-  opacity: 1; visibility: visible; transform: none; transition: opacity 166ms steps(2, end), transform 166ms steps(2, end), visibility 0s;
-}
+.mb.at-bl .mb-deck, .mb.at-tl .mb-deck { right: auto; left: calc(100% + calc(var(--p) * 12)); align-items: flex-start; }
+/* it opens the way the pinned clock unfolds (user 2026-11-22: "it should fade equally as the tonight centerpiece
+   clock"): the same quick fade in (sb-unfold, css/clock.css), gone at once when it closes, nothing slides */
+.mb.is-open .mb-deck, .mb.is-peek .mb-deck { opacity: 1; visibility: visible; animation: sb-unfold 166ms steps(2, end); }
 .mb.is-open .mb-deck { pointer-events: auto; }
 .mb.is-peek:not(.is-open) .mb-row { display: none; }
+/* just the song (a new one starting): it comes out level with the cassette, to its left, in the gap before the pinned
+   clock (user 2026-11-22), not up above it */
+.mb:not(.at-tr):not(.at-tl).is-peek:not(.is-open) .mb-deck { bottom: 50% !important; transform: translateY(50%); }
+.mb.is-peek:not(.is-open) .mb-song { max-width: calc(var(--p) * 250); }
 
 /* the song: a label-maker strip, embossed, as the desk names its things */
 .mb-song {
@@ -116,13 +119,18 @@
 
 /* ---------- still ---------- */
 .mb.is-still .mb-hub, :root[data-motion="reduce"] .mb-hub { animation: none; }
-:root[data-motion="reduce"] .mb-tape, :root[data-motion="reduce"] .mb-deck, .mb.is-still .mb-tape, .mb.is-still .mb-deck { transition: none; }
+:root[data-motion="reduce"] .mb-tape, :root[data-motion="reduce"] .mb-deck, .mb.is-still .mb-tape, .mb.is-still .mb-deck { transition: none; animation: none; }
 @media (prefers-reduced-motion: reduce) {
   :root:not([data-motion="full"]) .mb-hub { animation: none; }
-  :root:not([data-motion="full"]) .mb-tape, :root:not([data-motion="full"]) .mb-deck { transition: none; }
+  :root:not([data-motion="full"]) .mb-tape, :root:not([data-motion="full"]) .mb-deck { transition: none; animation: none; }
 }
 
-/* tonight's clock sits just left of the tape in the bottom-right corner (css/clock.css .nc): the song strip and the
-   keys go up above the tape there, so they never cover CALL IT A NIGHT */
-body.nc-on .mb.at-br .mb-deck { right: 0; bottom: calc(100% + calc(var(--p) * 10)); transform: translateY(calc(var(--p) * 14)); }
-body.nc-on .mb.at-br.is-open .mb-deck, body.nc-on .mb.at-br.is-peek .mb-deck { transform: none; }
+/* tonight's clock is centred at the foot of the stage (css/clock.css .nc): the opened deck (song + keys) goes up above
+   the tape, clear of it; a new song's name alone comes out to the tape's left, in the gap before the clock (user
+   2026-11-22) */
+/* opened, it comes out beside the tape as well (user 2026-11-22: "it keeps going above before beside"), song on top,
+   keys under it level with the tape, both made compact to fit the gap */
+body.nc-on .mb.at-br .mb-deck { bottom: 0; }
+body.nc-on .mb.at-br.is-open .mb-deck { transform: none; }
+body.nc-on .mb.at-br .mb-row { zoom: .72; }
+body.nc-on .mb.at-br .mb-song { max-width: calc(var(--p) * 250); }

@@ -1,7 +1,9 @@
 /* Scene Booker — tap-to-define (js/ui/words.js): a dotted sharpie underline on a booking word, and a sticky note
    that says what it means */
-.wd-term { cursor: help; text-decoration: underline dotted; text-decoration-thickness: .12em; text-underline-offset: .2em;
-           text-decoration-color: currentColor; border-radius: 2px; }
+/* just bold, sitting in the line like any other word: doubled class so a screen's "span { padding… }" rule can't
+   turn it into its own scrap of paper */
+.wd-term.wd-term { cursor: help; font-weight: 700; text-decoration: none; border-radius: 2px;
+           display: inline; padding: 0; margin: 0; transform: none; }
 .wd-term:hover, .wd-term:focus-visible, .wd-term.is-open { background: rgba(255, 214, 64, .45); outline: none; }
 .wd-note {
   position: fixed; left: 0; top: 0; z-index: 10050; box-sizing: border-box;

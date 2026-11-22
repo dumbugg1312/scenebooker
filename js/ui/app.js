@@ -547,9 +547,9 @@
     if (!t) return;
     term = t.getAttribute('data-term');
     if (!term) return;
-    if (!t.getAttribute('title') && hasLabel('glossary.' + term + '.short')) {
+    /* no title attribute: the browser's own box would turn up on top of the game's slip */
+    if (!t.getAttribute('aria-description') && hasLabel('glossary.' + term + '.short')) {
       tip = SB.text.label('glossary.' + term + '.short');
-      t.setAttribute('title', tip);
       if (!t.getAttribute('aria-label') && !t.getAttribute('aria-describedby')) t.setAttribute('aria-description', tip);
     }
     if (state && state.notebook && state.notebook.terms && state.notebook.terms[term] === undefined && SB.Notebook && SB.Notebook.seeTerm) {

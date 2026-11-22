@@ -22,11 +22,39 @@
 .ck-crunch li { display: flex; gap: calc(var(--p) * 5); align-items: baseline; }
 .ck-bang { font: 400 calc(var(--fs) * 16)/1 var(--f-gothic); color: var(--ck-hot); transform: rotate(8deg); flex: 0 0 auto; }
 
-/* the pinned clock (js/ui/nightclock.js): one place on every screen, at the stage's foot left of the pocket player,
-   with the one CALL IT A NIGHT. Close-ups shrink to leave it the foot of the stage (as they do for the guide's strip). */
-.nc { position: fixed; z-index: 35; width: calc(var(--u) * 420);
-  right: calc((100vw - var(--u) * 1600) / 2 + var(--u) * 182); bottom: calc((100vh - var(--u) * 1000) / 2 + var(--u) * 14); }
+/* the pinned clock (js/ui/nightclock.js): one place on every screen, centred at the stage's foot (user 2026-11-22:
+   it is the important thing, and at the right it sat on the settings folder and the pocket player), with the one
+   CALL IT A NIGHT. Close-ups shrink to leave it the foot of the stage (as they do for the guide's strip). */
+.nc { position: fixed; z-index: 35; width: max-content; max-width: calc(var(--u) * 560);
+  left: 50%; right: auto; transform: translateX(-50%); bottom: calc((100vh - var(--u) * 1000) / 2 + var(--u) * 14); }
+/* small until you want it (user 2026-11-22: "maybe it should be small and then you hover over it"): one row with the
+   time, what's left and the one button; the ruler and the crunch words unfold ABOVE that row on hover, keyboard
+   focus, or a tap on the strip (.is-open, js/ui/nightclock.js). The row never moves and the width never changes, so
+   CALL IT A NIGHT stays under the pointer: one click (user: "it should just be one click"). */
+.nc .ck-slip { flex-direction: row; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 6) calc(var(--p) * 10); }
+.nc .ck-foot { display: contents; }
+.nc .ck-top { flex-wrap: nowrap; white-space: nowrap; }
+.nc .ck-ruler { order: -2; flex: 1 0 100%; width: 0; }
+.nc .ck-crunch { order: -1; flex: 1 0 100%; }
+/* unfolding: the ruler and the crunch words fade in, quick, as the mixtape's deck does (css/musicbar.css) */
+@keyframes sb-unfold { from { opacity: 0; } }
+.nc:is(:hover, :focus-within, .is-open) .ck-ruler, .nc:is(:hover, :focus-within, .is-open) .ck-crunch li > :not(.ck-bang) { animation: sb-unfold 166ms steps(2, end); }
+:root[data-motion="reduce"] .nc .ck-ruler, :root[data-motion="reduce"] .nc .ck-crunch li > * { animation: none; }
+@media (prefers-reduced-motion: reduce) { :root:not([data-motion="full"]) .nc .ck-ruler, :root:not([data-motion="full"]) .nc .ck-crunch li > * { animation: none; } }
+.nc:not(:hover):not(:focus-within):not(.is-open) .ck-slip { cursor: pointer; }
+.nc:not(:hover):not(:focus-within):not(.is-open) .ck-ruler { display: none; }
+.nc:not(:hover):not(:focus-within):not(.is-open) .ck-crunch { order: 3; flex: 0 0 auto; }
+.nc:not(:hover):not(:focus-within):not(.is-open) .ck-crunch li > :not(.ck-bang) { display: none; }
 .nc[hidden] { display: none; }
+/* the phone fills the middle of the stage: the clock steps into the free column on its right, at any window size
+   (user 2026-11-22: centred, it sat on the phone's messages). Tall narrow windows keep it under the stage (below). */
+@media (min-aspect-ratio: 3/4) {
+  body:has(.cu--phone) .nc { max-width: calc(var(--u) * 390); bottom: auto; left: auto; transform: none;
+    right: calc((100vw - var(--u) * 1600) / 2 + var(--u) * 28); top: calc((100vh - var(--u) * 1000) / 2 + var(--u) * 46); }
+  /* folded beside the phone the column is narrow: the button takes a second line rather than running off the edge */
+  body:has(.cu--phone) .nc .ck-top { flex-wrap: wrap; white-space: normal; }   /* beside the phone the column is narrow: the button may take a second line */
+  body:has(.cu--phone) .nc-say { bottom: auto; top: 100%; margin: calc(var(--u) * 14) 0 0; white-space: normal; }
+}
 .nc .ck-slip { transform: rotate(-1deg); box-shadow: calc(var(--u) * 5) calc(var(--u) * 6) 0 var(--pitch); }
 .nc .ck-slip::before { content: ""; position: absolute; left: 38%; top: calc(var(--u) * -10); width: calc(var(--u) * 80); height: calc(var(--u) * 20);
   background: var(--tape, rgba(236, 228, 200, .78)); transform: rotate(-3deg); }
@@ -40,7 +68,7 @@
 body.nc-on .cu-back--staged:not(.cu-back--column) .cu-stage { align-items: flex-start; padding-top: calc(var(--u) * 22); }
 body.nc-on .cu-back--staged:not(.cu-back--column) .cu-stage > .cu-obj { zoom: .84; }
 body.nc-on .cu-back--staged .cu-stage > .cu--mat, body.nc-on .cu-back--staged .cu-stage > .cu--wall { zoom: .82; }
-body.nc-on .sy-strip { max-width: calc(var(--u) * 930); }
+body.nc-on .sy-strip { max-width: calc(var(--u) * 470); }   /* the guide's strip stops well short of the centred clock */
 
 /* on the calendar: the week's close tab in the head; each day's evening as a small ruler under its words */
 .cc-tonight { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 8); margin-left: auto; }
@@ -98,7 +126,7 @@ body.nc-on .sy-strip { max-width: calc(var(--u) * 930); }
    In a tall narrow window (a phone, about 390 wide) the stage is a band across the middle with empty paper above and
    below: the clock goes below it and the slip and the patch card above, each at a size you can read. */
 @media (max-width: 1279px) and (min-aspect-ratio: 3/4), (max-height: 799px) and (min-aspect-ratio: 3/4) {
-  body:has(.cu--phone) .nc { width: calc(var(--u) * 390); bottom: auto;
+  body:has(.cu--phone) .nc { max-width: calc(var(--u) * 390); bottom: auto; left: auto; transform: none;
     right: calc((100vw - var(--u) * 1600) / 2 + var(--u) * 28); top: calc((100vh - var(--u) * 1000) / 2 + var(--u) * 46); }
   body:has(.cu--phone) .nc-say { bottom: auto; top: 100%; margin: calc(var(--u) * 14) 0 0; white-space: normal; }
   body:has(.cu--phone) .on-slip { width: calc(var(--u) * 390); bottom: auto;
@@ -109,7 +137,7 @@ body.nc-on .sy-strip { max-width: calc(var(--u) * 930); }
 }
 @media (max-aspect-ratio: 3/4) {
   body .nc { --u: min(calc((100vw - 32px) / 420), 1px); --p: calc(var(--u) * 1.25); --fs: calc(var(--p) * var(--scale, 1));
-    width: calc(var(--u) * 420); left: calc((100vw - var(--u) * 420) / 2); right: auto; bottom: 16px; }
+    max-width: calc(var(--u) * 420); left: 50%; right: auto; transform: translateX(-50%); bottom: 16px; }
   body .on-slip { --u: min(calc((100vw - 32px) / 420), 1px); --p: calc(var(--u) * 1.25); --fs: calc(var(--p) * var(--scale, 1));
     width: calc(var(--u) * 420); left: calc((100vw - var(--u) * 420) / 2); right: auto; bottom: auto; top: 16px; }
   body .sy-card.pz-paper, body .sy-card-leaving.pz-paper { transform: translate(-50%, 0) rotate(var(--tilt, 0deg)); --u: min(calc((100vw - 32px) / 550), 1px); --p: calc(var(--u) * 1.25); --fs: calc(var(--p) * var(--scale, 1));

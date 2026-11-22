@@ -23,7 +23,7 @@ Music, ambience and one-shots used only by the cutscenes. Ambience and one-shots
 
 | file | source file | artist | title | licence | url | note |
 |---|---|---|---|---|---|---|
-| crickets.mp3 | archive.org crickets-1.mp3 | Claire Sauvaget | Rabastens, Occitanie, France - crickets during the night | Public Domain | https://archive.org/details/aporee_74097_86689 | 20 s from 11 s in the source (filtered: {'hp': 300, 'lp': 11000}) |
+| crickets.mp3 | archive.org crickets-2.mp3 | Jillis Molenaar | Buis-les-Baronnies, Auvergne-Rhône-Alpes, Frankrijk - Crickets at night near Le Derboux | Public Domain | https://archive.org/details/aporee_70552_82256 | 20 s from 105 s in the source (filtered: {'hp': 300, 'lp': 11000}) |
 | rain.mp3 | archive.org rain-6.mp3 | USC Cinema / Sunset Editorial Collection (Red Library, archive.org) | R30-25a-Steady Heavy Rain | CC0 | https://archive.org/details/Red_Library_Nature_Rain | 20 s from 22 s in the source (filtered: {'hp': 70, 'lp': 11000}) |
 | crowd.mp3 | archive.org crowd-5.mp3 | USC Cinema / Sunset Editorial Collection (Red Library, archive.org) | R08-10-Large Crowd Murmur | CC0 | https://archive.org/details/Red_Library_Crowds_Indoor_1 | 20 s from 14 s in the source (filtered: {'hp': 90, 'lp': 6500}) |
 | chatter.mp3 | archive.org chatter-9.mp3 | USC Cinema / Sunset Editorial Collection (Red Library, archive.org) | R08-40-Men and Women at Gathering | CC0 | https://archive.org/details/Red_Library_Crowds_Mixed | 20 s from 12 s in the source (filtered: {'hp': 120, 'lp': 9000}) |

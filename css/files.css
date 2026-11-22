@@ -1,0 +1,31 @@
+/* Scene Booker — css/files.css: the manila folder's paperwork (js/ui/screens/files.js), prefix fl-.
+ * It borrows the settings folder's tabs and page (css/cu-folder.css, sf-). Settled shows are typed sheets in a row,
+ * each a little crooked; the cheat sheets are typed lists, one sheet per step of booking. */
+.fl-head { margin: 0 0 calc(var(--p) * 12); font: 400 calc(var(--fs) * 22)/1.1 var(--f-gothic); letter-spacing: .04em; text-transform: uppercase; }
+.fl-none { max-width: 34em; font-size: calc(var(--fs) * 16); }
+
+.fl-sheets { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--p) * 230), 1fr)); gap: calc(var(--p) * 16); }
+.fl-sheet { all: unset; box-sizing: border-box; display: flex; flex-direction: column; gap: calc(var(--p) * 5); width: 100%; min-height: calc(var(--p) * 190);
+  padding: calc(var(--p) * 14) calc(var(--p) * 14) calc(var(--p) * 12); background: var(--pp-white, #fbfaf3); color: var(--toner); cursor: pointer;
+  font: 400 calc(var(--fs) * 14)/1.35 var(--f-type); transform: rotate(-.6deg); box-shadow: calc(var(--p) * 4) calc(var(--p) * 5) 0 rgba(0, 0, 0, .45); }
+.fl-sheet.is-alt { transform: rotate(.7deg); background: var(--pp-bone, #efe8d6); }
+.fl-sheet:hover, .fl-sheet:focus-visible { outline: calc(var(--p) * 3) solid var(--hl-solid); outline-offset: calc(var(--p) * 2); }
+.fl-sheet.is-called { opacity: .7; }
+.fl-when { align-self: flex-start; padding: calc(var(--p) * 2) calc(var(--p) * 7) calc(var(--p) * 1); background: var(--toner); color: var(--pp-bond);
+  font: 400 calc(var(--fs) * 16)/1.1 var(--f-gothic); letter-spacing: .05em; }
+.fl-room { font-weight: 700; font-size: calc(var(--fs) * 16); }
+.fl-bill { font-size: calc(var(--fs) * 13); opacity: .85; }
+.fl-called { align-self: flex-start; color: var(--late, #b42318); font: 400 calc(var(--fs) * 14)/1 var(--f-gothic); letter-spacing: .08em; transform: rotate(-3deg); border: calc(var(--p) * 2) solid currentColor; padding: calc(var(--p) * 2) calc(var(--p) * 6); }
+.fl-facts { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 4) calc(var(--p) * 14); margin: calc(var(--p) * 4) 0 0; border-top: calc(var(--p) * 1.5) dashed rgba(0, 0, 0, .35); padding-top: calc(var(--p) * 6); }
+.fl-facts div { display: flex; flex-direction: column; }
+.fl-facts dt { font-size: calc(var(--fs) * 11); text-transform: uppercase; letter-spacing: .06em; opacity: .7; }
+.fl-facts dd { margin: 0; font: 400 calc(var(--fs) * 20)/1.1 var(--f-gothic); }
+.fl-line { margin-top: auto; padding-top: calc(var(--p) * 6); font-style: italic; font-size: calc(var(--fs) * 13); }
+
+.fl-cheats { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--p) * 300), 1fr)); gap: calc(var(--p) * 16); }
+.fl-cheat { padding: calc(var(--p) * 14) calc(var(--p) * 16); background: var(--pp-white, #fbfaf3); color: var(--toner); transform: rotate(-.4deg);
+  box-shadow: calc(var(--p) * 4) calc(var(--p) * 5) 0 rgba(0, 0, 0, .45); font: 400 calc(var(--fs) * 14)/1.45 var(--f-type); }
+.fl-cheat:nth-child(even) { transform: rotate(.5deg); }
+.fl-step { margin: 0 0 calc(var(--p) * 8); display: inline-block; padding: calc(var(--p) * 2) calc(var(--p) * 8) calc(var(--p) * 1); background: var(--hl-solid);
+  font: 400 calc(var(--fs) * 16)/1.1 var(--f-gothic); letter-spacing: .06em; }
+.fl-cheat ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: calc(var(--p) * 6); }

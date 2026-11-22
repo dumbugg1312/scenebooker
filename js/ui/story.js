@@ -416,7 +416,7 @@
   function targetOf(cur) {
     var objs = safe(function () { return SB.Desk.objects(); }, []) || [], ids = {}, t = cur.target, i;
     objs.forEach(function (o) { ids[o.id] = o; });
-    if (t === 'night') return ids.lamp ? 'lamp' : null;
+    if (t === 'night') return null;                      // the night is played from the pinned clock (spot), not a desk thing
     if (t === 'clip') {
       for (i = 0; i < objs.length; i++) if (/^clip\d/.test(objs[i].id) && objs[i].params && objs[i].params.showId === cur.showId) return objs[i].id;
       return ids.clips ? 'clips' : (ids.clip0 ? 'clip0' : (ids.calendar ? 'calendar' : null));
@@ -461,8 +461,18 @@
         t = cur.target, st = cur.stage, id, list = [], down = '.cu-down', wait = t === 'lamp';
     if (!d) return null;
     /* waiting at an evening is CALL IT A NIGHT, on the pinned clock, whatever is on screen (js/ui/nightclock.js) */
-    if (wait && d.querySelector) { id = safe(function () { return d.querySelector('#nightclock:not([hidden]) [data-fk="callnight"], #nightclock:not([hidden]) [data-fk="closeweek"]'); }, null); if (id) return { el: id, key: fk(id.getAttribute('data-fk')) }; }
-    if (r === 'desk') { id = targetOf(cur); return id ? first(desk, ['.dk-hit[data-obj="' + id + '"]']) : null; }
+    if (wait && d.getElementById) {
+      id = safe(function () { var nc = d.getElementById('nightclock'); return nc && !nc.hidden ? nc.querySelector('.ck-call') : null; }, null);
+      if (id) return { el: id, key: fk(id.getAttribute('data-fk')) };
+    }
+    if (r === 'desk') {
+      id = targetOf(cur);
+      if (!id && t === 'night' && d.getElementById) {           // go play the night: the clock's button does it
+        id = safe(function () { var nc = d.getElementById('nightclock'); return nc && !nc.hidden ? nc.querySelector('.ck-call') : null; }, null);
+        return id ? { el: id, key: fk(id.getAttribute('data-fk')) } : null;
+      }
+      return id ? first(desk, ['.dk-hit[data-obj="' + id + '"]']) : null;
+    }
     switch (r) {
       case 'inbox':
         /* a band's message has one yes, BOOK IT: it makes the show and opens its card on the room. While the guided

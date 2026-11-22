@@ -352,7 +352,8 @@ SB.module('Scenes', function (SB) {
     MAP_ROUTE:     { snaps: [['road', 'postcard'], 2] },
     STOREFRONT:    { front: [['storefront'], 1] },
     FOR_SALE:      { house: [['house'], 1] },
-    VAN_CURB:      { who: [['carrying', 'standing'], 1], van: [['van'], 1, { facing: ['left', 'right'], minTone: 0.3 }], house: [['house'], 1] },
+    VAN_CURB:      { who: [['carrying', 'standing'], 1], van: [['van'], 1, { facing: ['left', 'right'], minTone: 0.3 }], house: [['house'], 1],
+                     bed: [['bedding'], 1, { ids: ['couch-04'] }] },   /* the one real mattress, for the roof (user 2026-11-22) */
     CARPORT_CAR:   { car: [['car', 'van'], 1, { facing: ['left', 'right'] }] },   /* the car parked on the lawn by the carport (any carport picture) */
     BAR_DOOR:      { who: [['adult', 'standing', 'older'], 1] },
     FLOOR_SLEEP:   { who: [['asleep'], 1], sofa: [['sofa'], 1], case: [['case'], 1], fan: [['fan'], 1], bed: [['bedding'], 1] },
@@ -389,7 +390,7 @@ SB.module('Scenes', function (SB) {
       var pool = [], n = spec[slot][1], got = [], only = spec[slot][2];
       spec[slot][0].forEach(function (ro) {
         pool = pool.concat(byRole(ro).filter(function (k) {
-          return !only || ((!only.frame || only.frame.indexOf(k.frame) >= 0) && (!only.facing || only.facing.indexOf(k.facing) >= 0) &&
+          return !only || ((!only.ids || only.ids.indexOf(k.id) >= 0) && (!only.frame || only.frame.indexOf(k.frame) >= 0) && (!only.facing || only.facing.indexOf(k.facing) >= 0) &&
             (!only.minTone || (k.tone == null ? 0.5 : k.tone) >= only.minTone));
         }).map(function (k) { return k.id; }));
       });
@@ -1161,10 +1162,8 @@ SB.module('Scenes', function (SB) {
     turned(c, 600, 370, -0.12, function () {
       var w = 330, h = 600, x0 = -w / 2, y0 = -h / 2, f;
       blurred(c, 40, function () { c.fillStyle = 'rgba(255,255,255,0.3)'; c.fillRect(x0 - 70, y0 - 70, w + 140, h + 140); });
-      /* the palm behind, on the right */
-      var palm = [[x0 + w - 30, y0 + 150], [x0 + w + 90, y0 + 170], [x0 + w + 150, y0 + 420], [x0 + w + 110, y0 + 700], [x0 + w - 60, y0 + 720]];
-      inkShape(c, palm, 5, r, 1);
-      hatch(c, polyClip(c, palm), boxOf(palm), 0.9, 8, 2, r);
+      /* no hand: people are never drawn (memory, user 2026-11-22). The phone lies on the table, a shadow under it */
+      blurred(c, 18, function () { c.fillStyle = 'rgba(0,0,0,0.55)'; c.fillRect(x0 + 14, y0 + 22, w, h); });
       rrect(c, x0, y0, w, h, 38); c.fillStyle = g(0.05); c.fill();
       c.lineWidth = 5; c.strokeStyle = g(0.6); c.stroke();
       rrect(c, x0 + 16, y0 + 50, w - 32, h - 100, 10); c.fillStyle = g(1); c.fill();
@@ -1182,20 +1181,6 @@ SB.module('Scenes', function (SB) {
         by += bh + 18;
       }
       rrect(c, x0 + 30, y0 + h - 104, w - 60, 40, 18); c.lineWidth = 3; c.strokeStyle = g(0.6); c.stroke();
-      /* four fingertips curled over the right edge */
-      for (f = 0; f < 4; f++) {
-        var fy = y0 + 190 + f * 82, fx = x0 + w;
-        rrect(c, fx - 34, fy - 6, 120, 58, 27); c.fillStyle = g(1); c.fill();
-        c.lineWidth = 4.5; c.strokeStyle = g(0); c.stroke();
-        inkShape(c, [[fx - 26, fy + 6], [fx - 4, fy + 4], [fx - 2, fy + 40], [fx - 24, fy + 38]], 2.4, r);
-        ink(c, [[fx + 34, fy - 2], [fx + 36, fy + 48]], 2.4, r);
-        hatch(c, function () { c.beginPath(); c.rect(fx + 40, fy + 26, 50, 28); }, [fx + 40, fy + 26, 50, 28], 0.9, 6, 1.6, r);
-      }
-      /* the thumb over the bottom left */
-      var th = [[x0 - 120, y0 + h + 140], [x0 - 60, y0 + h - 120], [x0 + 20, y0 + h - 200], [x0 + 80, y0 + h - 196], [x0 + 86, y0 + h - 160], [x0 + 40, y0 + h - 100], [x0 + 10, y0 + h + 140]];
-      inkShape(c, th, 5, r, 1);
-      inkShape(c, [[x0 + 34, y0 + h - 190], [x0 + 74, y0 + h - 188], [x0 + 76, y0 + h - 162], [x0 + 40, y0 + h - 160]], 2.5, r);
-      hatch(c, polyClip(c, th), [x0 - 120, y0 + h - 120, 140, 260], 0.7, 8, 2, r);
     });
   }
 
@@ -1262,10 +1247,23 @@ SB.module('Scenes', function (SB) {
     var vk = cutById((picks('VAN_CURB', x).van || [])[0]);
     if (vk && vehicle(c, vk.id, 560, 690, 860, 'left', { bright: 1.05, border: 5 })) {
       var vw0 = 860, vh0 = vw0 * vk.h / vk.w, vtop = 690 - vh0 + vh0 * 0.13;   /* the roof line, a little under the top of the cut */
-      /* a mattress roped to the roof */
-      rrect(c, 560 - vw0 * 0.3, vtop - 44, vw0 * 0.6, 58, 22); c.fillStyle = g(0.84); c.fill(); c.lineWidth = 3; c.strokeStyle = g(0.3); c.stroke();
-      for (var mq = 0; mq < 8; mq++) ell(c, 560 - vw0 * 0.26 + mq * vw0 * 0.074, vtop - 15, 4, 4, 0, 0.45);
-      [-0.16, 0.16].forEach(function (f) { line(c, 560 + vw0 * f, vtop - 48, 560 + vw0 * f + 8, vtop + 14, 5, 0.12); line(c, 560 + vw0 * f + 8, vtop + 14, 560 + vw0 * f * 1.6, vtop + vh0 * 0.3, 3, 0.12); });
+      /* a mattress roped to the roof: the real mattress photo, pressed flat; the drawn slab only until it is in */
+      var bedId = (picks('VAN_CURB', x).bed || [])[0], bk = cutById(bedId), mw = vw0 * 0.56, SQ = 0.78, mh = 58, laid = false;
+      if (bk && isIn(bedId)) {
+        mh = mw * bk.h / bk.w * SQ;
+        c.save(); c.translate(560, vtop + 16); c.scale(1, SQ);
+        laid = paste(c, bedId, { x: 0, y: 0, h: mw * bk.h / bk.w, border: 4, bright: 0.88, contrast: 1.45, still: true });
+        c.restore();
+      }
+      if (!laid) {
+        mh = 58;
+        rrect(c, 560 - vw0 * 0.3, vtop - 44, vw0 * 0.6, 58, 22); c.fillStyle = g(0.84); c.fill(); c.lineWidth = 3; c.strokeStyle = g(0.3); c.stroke();
+      }
+      /* two ropes over the top, down through the doors */
+      [-0.17, 0.15].forEach(function (f) {
+        line(c, 560 + vw0 * f, vtop + 10 - mh - 4, 560 + vw0 * f + 10, vtop + 14, 5, 0.1);
+        line(c, 560 + vw0 * f + 10, vtop + 14, 560 + vw0 * f * 1.5, vtop + vh0 * 0.3, 3, 0.1);
+      });
     } else drawnVan();
     function drawnVan() {
     var L = 150, R = 1000, T = 330, B = 660;
