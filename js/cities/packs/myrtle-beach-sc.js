@@ -6,7 +6,11 @@ SB.Cities.register('myrtle-beach-sc', {
            'carolina country music fest', 'coastal carolina university', 'coastal carolina', 'sun news', 'waffle house', 'hurricane matthew',
            'hurricane florence', 'hurricane ian', 'myrtle beach air force base', 'pavilion amusement park', 'american legion', 'vfw', 'low tide hall',
            'the bypass annex', 'bypass annex', 'dune road garage', 'shag hall backroom', 'waterway warehouse', 'hushpuppy hall',
-           'the rented room on kings', 'tern street studio', 'marsh lot', 'peanut stand annex', 'the motel ballroom'],
+           'the rented room on kings', 'tern street studio', 'marsh lot', 'peanut stand annex', 'the motel ballroom',
+           'atlantic beach bikefest', 'atlantic beach', 'bikefest', 'black pearl', 'spring bike week', 'harley bike week', 'run to the sun', 'myrtle beach mini marathon',
+           'mini marathon', 'myrtle beach classic', 'myrtle beach international film festival', 'mbiff', 'dickens christmas show', 'myrtle beach convention center',
+           'plyler park', 'grand strand magazine', 'visit myrtle beach', 'myrtle beach sun news', 'myrtle beach police department', 'quality of life court',
+           'horry county', 'beach n chili fest', 'myrtle beach food truck festival'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Storms are written only as 'the storm' in game text. */
   blocklist: ['sun news*', 'coastal carolina*', 'bike week*', 'can-am*', 'waffle house*', 'low tide hall*', 'hushpuppy hall*', 'senior week*'],
 
@@ -50,6 +54,21 @@ SB.Cities.register('myrtle-beach-sc', {
   ],
 
   contacts: ['wilmington-nc', 'charleston-sc', 'columbia-sc', 'fayetteville-nc'],
+
+  calendar: [
+    { id: 'spring-break-fest', label: 'the spring-break festival weekends', tag: 'festival', month: 3, weeks: [2, 3], dows: [4, 5, 6], can: [.80, .75, .75], hoods: ['oceanfront', 'old-town'], elsewhere: [.95, .92, .92] },
+    { id: 'spring-bike-rally', label: 'the spring bike rally', tag: 'festival', month: 5, weeks: [2, 3], dows: [4, 5, 6], can: [.70, .65, .65], hoods: ['oceanfront', 'old-town', 'socastee'], elsewhere: [.88, .85, .85] },
+    { id: 'memorial-bike-fest', label: 'the Memorial Day bike festival', tag: 'festival', month: 5, week: 4, dows: [4, 5, 6, 0], can: [.70, .65, .65], hoods: ['oceanfront', 'old-town'], elsewhere: [.90, .88, .88] },
+    { id: 'senior-trip', label: 'the graduates\' beach week', tag: 'graduation', month: 6, week: 4, dows: [3, 4, 5, 6], can: [.90, .92, .92], hoods: ['oceanfront', 'old-town'], elsewhere: [1, 1, 1] },
+    { id: 'fourth-weekend', label: 'the Fourth of July weekend', tag: 'holiday', month: 7, week: 1, dows: [3, 4, 5, 6], can: [.75, .72, .72], hoods: ['oceanfront', 'old-town'], elsewhere: [.92, .90, .90] },
+    { id: 'half-marathon', label: 'the fall half-marathon', tag: 'race', month: 10, week: 2, dows: [5], can: [.92, .90, .90], hoods: ['oceanfront'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [.88, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [.88, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { curfewMinors: { weeknight: 1320, weekend: 1320, inForce: true } },
 
   points: [
     { name: 'Florence', state: 'SC', lat: 34.2, lon: -79.76, pop: 40000 },

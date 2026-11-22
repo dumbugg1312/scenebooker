@@ -1,0 +1,53 @@
+/* Scene Booker: css/cutscene-ask.css
+ * The questions asked inside a cutscene (js/ui/cutscene.js reply(): the setup asked in the going-away show, user
+ * 2026-11-21). Each reply is your own sharpie balloon (dashed, like every "you" line) to press, with a typed strip of
+ * copy paper under it saying what it does in the game; the picked one gets the highlighter, the rest drop away.
+ * The booking name is a taped sheet on the right of the stage (js/ui/screens/start.js nameWidget). Nothing eases.
+ */
+.cs-ask { align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; gap: calc(var(--p) * 8); }
+.cs-replies { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: flex-start; gap: calc(var(--p) * 12) calc(var(--p) * 22); }
+.cs-reply {
+  display: flex; flex-direction: column; align-items: flex-end; gap: calc(var(--p) * 4); max-width: calc(var(--p) * 360);
+  background: none; border: 0; padding: calc(var(--p) * 4); margin: 0; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.cs-reply .cs-say { align-self: auto; pointer-events: none; }
+.cs-note {
+  display: block; max-width: calc(var(--p) * 340); padding: calc(var(--p) * 4) calc(var(--p) * 10) calc(var(--p) * 5);
+  font: 400 calc(var(--fs) * 15)/1.35 var(--f-type); color: var(--toner); background: var(--pp-bond);
+  transform: rotate(.6deg); clip-path: var(--edge-cut-1);
+}
+.cs-reply:hover .cs-balloon-shape, .cs-reply:focus-visible .cs-balloon-shape, .cs-reply.is-picked .cs-balloon-shape { fill: var(--hl-solid); }
+.cs-reply:hover .cs-note, .cs-reply:focus-visible .cs-note { background: var(--pp-buff); }
+.cs-reply:focus-visible { outline: calc(var(--p) * 3) dashed var(--hl-solid); outline-offset: calc(var(--p) * 2); }
+.cs-reply[disabled] { cursor: default; }
+.cs-reply.is-dropped { opacity: 0; transform: translateY(calc(var(--p) * 10)) rotate(2deg); transition: opacity .2s steps(2, end), transform .2s steps(2, end); }
+.cs-foot {
+  margin: 0; max-width: calc(var(--p) * 620); padding: calc(var(--p) * 3) calc(var(--p) * 9) calc(var(--p) * 4);
+  font: 400 calc(var(--fs) * 14)/1.35 var(--f-type); color: var(--pp-bond); background: var(--toner); transform: rotate(-.4deg);
+}
+
+/* the booking name: the words keep the left, the sheet takes the right */
+.cs-k-scene .cs-words:has(.cs-ask-name) { right: calc(var(--p) * 690); }
+.cs-ask-name { position: absolute; left: calc(100% + var(--p) * 24); bottom: 0; width: calc(var(--p) * 610); align-items: stretch; }
+.cs-namecard {
+  display: flex; gap: calc(var(--p) * 18); align-items: flex-start; padding: calc(var(--p) * 18) calc(var(--p) * 20) calc(var(--p) * 16);
+  background: var(--pp-bond); color: var(--toner); transform: rotate(.8deg); clip-path: var(--edge-cut-2);
+  filter: drop-shadow(calc(var(--p) * 4) calc(var(--p) * 6) 0 var(--pitch));
+}
+.cs-namecol { flex: 1 1 auto; min-width: 0; }
+.cs-namecard .st-k { margin: calc(var(--p) * 10) 0 calc(var(--p) * 4); }
+.cs-namecard .st-help { margin: calc(var(--p) * 4) 0 0; }
+.cs-namecard .st-stamps { gap: calc(var(--p) * 10) calc(var(--p) * 12); margin: calc(var(--p) * 4) 0 calc(var(--p) * 8); }
+.cs-namecard .st-stamp .sb-mark, .cs-namecard .st-stamp svg { width: calc(var(--p) * 56); }
+.cs-namecard .st-ideas-row { padding-left: 0; gap: calc(var(--p) * 8) calc(var(--p) * 10); }
+.cs-namecard .st-acts { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 10) calc(var(--p) * 14); margin-top: calc(var(--p) * 6); }
+.cs-nameflybox { flex: none; width: calc(var(--p) * 200); padding-top: calc(var(--p) * 8); }
+.cs-namefly { width: calc(var(--p) * 200); transform: rotate(3deg); }
+.cs-namefly canvas { width: 100% !important; height: auto !important; }
+
+/* a way back to the map, beside skip, while the questions are still open */
+.cs-box .cs-back { position: absolute; top: calc(var(--p) * 18); right: calc(var(--p) * 112); z-index: 5; transform: rotate(-1.2deg); }
+
+.cs-still .cs-reply.is-dropped, :root[data-motion="reduce"] .cs-reply.is-dropped { transition: none; }
+.cs-btn[disabled] { opacity: .45; cursor: default; }
+.cs-btn[disabled]:hover { background: var(--cs-tape); }

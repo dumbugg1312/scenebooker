@@ -76,6 +76,7 @@ SB.module('Scenes', function (SB) {
     c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.lineWidth = w; c.lineCap = 'round'; c.strokeStyle = g(v); c.stroke();
   }
   function glow(c, x, y, rad, a) {
+    tone(c, function (cc) { glow(cc, x, y, rad, a); }, [x - rad, y - rad, x + rad, y + rad]);
     c.save();
     c.globalCompositeOperation = 'lighter';
     var gr = c.createRadialGradient(x, y, 0, x, y, rad);
@@ -93,6 +94,7 @@ SB.module('Scenes', function (SB) {
     c.restore();
   }
   function vignette(c, a) {
+    tone(c, function (cc) { vignette(cc, a); });
     c.save();
     var gr = c.createRadialGradient(DW / 2, DH / 2, DH * 0.35, DW / 2, DH / 2, DW * 0.72);
     gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,' + a + ')');
@@ -206,7 +208,7 @@ SB.module('Scenes', function (SB) {
     var h = maxH, w = h * k.w / k.h;
     if (w > maxW) { w = maxW; h = w * k.h / k.w; }
     return paste(c, id, { x: cx, y: bottom, h: h, rot: o.rot || 0, flip: !!o.flip, border: o.border == null ? 3 : o.border,
-      bright: (o.bright || 1) * (o.night ? Math.max(0.8, Math.min(2.2, 0.45 / (k.tone || 0.45))) : 1), contrast: o.contrast || 1.1 });
+      bright: (o.bright || 1) * (o.night ? Math.max(0.8, Math.min(2.2, 0.45 / (k.tone || 0.45))) : 1), contrast: o.contrast || 1.1, still: true });
   }
   function amp(c, x, y, w, h, r, label) {
     /* a real amp photo when this picture picked one and it is in: standing on the box's floor, as tall as the box */
@@ -434,6 +436,105 @@ SB.module('Scenes', function (SB) {
   }
   function ready(ids) { for (var i = 0; i < ids.length; i++) if (!isIn(ids[i])) return false; return true; }
 
+  /* ---------------- layered pictures ---------------- */
+
+  /* In a layered picture (SB.Scenes.layered) every person pasted on is lifted off the room and comes back as a
+   * cut-out piece of their own, photocopied on the same paper, for the cutscene to slap on and move. REC collects them
+   * while the room is drawn: the people (paste), and what is drawn over them after (tone: glow, vignette, light through
+   * blinds; front: a thing standing in front of someone), replayed on each piece it falls on. */
+  var REC = null;
+  var PEOPLE = { singer: 1, guitar: 1, bass: 1, singguitar: 1, band: 1, drums: 1, crowd: 1, back: 1, backs: 1, standing: 1,
+    sitting: 1, kids: 1, adult: 1, older: 1, carrying: 1, cop: 1, diver: 1, line: 1, asleep: 1 };
+  /* pictures with a band playing or a crowd going: their pieces move to it; every other picture only breathes */
+  var LOUD = { STAGE_BAND: 1, CROWD_FRONT: 1, CARPORT_NIGHT: 1, STAGE_DIVE: 1, YARD_NIGHT: 1, RAIN_CARPORT: 1, SOLO_SET: 1 };
+  function mat(t) { return typeof DOMMatrix !== 'undefined' ? new DOMMatrix([t.a, t.b, t.c, t.d, t.e, t.f]) : t; }
+  function pt(t, x, y) { return [t.a * x + t.c * y + t.e, t.b * x + t.d * y + t.f]; }
+  function devBox(t, b) {
+    var q = [pt(t, b[0], b[1]), pt(t, b[2], b[1]), pt(t, b[0], b[3]), pt(t, b[2], b[3])];
+    var xs = q.map(function (p) { return p[0]; }), ys = q.map(function (p) { return p[1]; });
+    return [Math.min.apply(null, xs), Math.min.apply(null, ys), Math.max.apply(null, xs), Math.max.apply(null, ys)];
+  }
+  /* a tone laid over everything drawn so far (box: where it falls, in the picture's units; none = everywhere) */
+  function tone(c, fn, box) {
+    if (!REC) return;
+    var t = c.getTransform();
+    REC.over.push({ seq: REC.seq++, t: t, box: box ? devBox(t, box) : null, run: fn });
+  }
+  /* fn(c, r) draws something standing in front of the people pasted before it (box: where, in the picture's units).
+   * Drawn on the room as always; in a layered picture also replayed, with the same draws of r, on each person piece it
+   * covers, and those pieces stay planted (they move only about their bottom edge, so it never comes apart). */
+  function front(c, r, fn, box) {
+    if (!REC) { fn(c, r); return; }
+    var log = [], rec = {}, rep = {}, at = 0, k, hold = REC, t = c.getTransform();
+    for (k in r) if (typeof r[k] === 'function') (function (k) {
+      rec[k] = function () { var v = r[k].apply(r, arguments); log.push(v); return v; };
+      rep[k] = function () { return log[at++]; };
+    })(k);
+    REC = null;
+    try { fn(c, rec); } finally { REC = hold; }
+    REC.over.push({ seq: REC.seq++, t: t, box: box ? devBox(t, box) : null, plant: !!box, run: function (cc) { at = 0; fn(cc, rep); } });
+  }
+
+  /* The recorded pieces, each drawn into a canvas only as big as it is (plus what hangs off the frame, up to a margin),
+   * toned like the room, softened and photocopied the way the room was, one piece a turn of the event loop so the page
+   * keeps drawing while they are made; then done([{ canvas, x, y, w, h, seq, kind, depth, planted, off }]) in the target
+   * canvas's pixels. live() false drops the work (the picture was drawn again). */
+  function lift(rec, W, H, s, key, seed, xo, live, done) {
+    var out = [], i = 0;
+    (function next() {
+      if (!live()) return;
+      if (i >= rec.pieces.length) { done(out); return; }
+      var L = liftOne(rec, rec.pieces[i++], W, H, s, key, seed, xo);
+      if (L) out.push(L);
+      setTimeout(next, 0);
+    })();
+  }
+  function liftOne(rec, p, W, H, s, key, seed, xo) {
+    var M = Math.round(Math.max(W, H) * 0.06), loud = !!LOUD[key];
+    var m = p.m, cw = p.cv.width, ch = p.cv.height;
+    var b = devBox(m, [p.ox, p.oy, p.ox + cw, p.oy + ch]), foot = b[3];
+    if (p.clip) {
+      var cb = [Infinity, Infinity, -Infinity, -Infinity];
+      p.clip.forEach(function (q) { cb[0] = Math.min(cb[0], q[0]); cb[1] = Math.min(cb[1], q[1]); cb[2] = Math.max(cb[2], q[0]); cb[3] = Math.max(cb[3], q[1]); });
+      b = [Math.max(b[0], cb[0]), Math.max(b[1], cb[1]), Math.min(b[2], cb[2]), Math.min(b[3], cb[3])];
+    }
+    var x0 = Math.floor(Math.max(b[0], -M)), y0 = Math.floor(Math.max(b[1], -M));
+    var x1 = Math.ceil(Math.min(b[2], W + M)), y1 = Math.ceil(Math.min(b[3], H + M)), w = x1 - x0, h = y1 - y0;
+    if (w < 2 || h < 2) return null;
+    var pc = mk(w, h), c2 = pc.getContext('2d');
+    c2.save();
+    if (p.clip) { c2.beginPath(); p.clip.forEach(function (q, i) { c2[i ? 'lineTo' : 'moveTo'](q[0] - x0, q[1] - y0); }); c2.closePath(); c2.clip(); }
+    c2.setTransform(m.a, m.b, m.c, m.d, m.e - x0, m.f - y0);
+    if (p.alpha != null) c2.globalAlpha = p.alpha;
+    c2.drawImage(p.cv, p.ox, p.oy);
+    c2.restore();
+    /* what was drawn over this person after they were pasted: their light, and anything standing in front */
+    var planted = p.planted, ov = rec.over.filter(function (o) {
+      return o.seq > p.seq && (!o.box || (o.box[0] < x1 && o.box[2] > x0 && o.box[1] < y1 && o.box[3] > y0));
+    });
+    if (ov.length) {
+      var tv = mk(w, h), tc = tv.getContext('2d');
+      tc.drawImage(pc, 0, 0);
+      ov.forEach(function (o) {
+        if (o.plant) planted = true;
+        tc.save(); tc.setTransform(o.t.a, o.t.b, o.t.c, o.t.d, o.t.e - x0, o.t.f - y0); o.run(tc); tc.restore();
+      });
+      tc.globalCompositeOperation = 'destination-in'; tc.drawImage(pc, 0, 0);
+      pc = tv; c2 = tc; c2.globalCompositeOperation = 'source-over';
+    }
+    if (!DRAWN[key]) {
+      var soft = mk(w, h), so = soft.getContext('2d');
+      so.filter = 'blur(' + (0.8 * s).toFixed(2) + 'px)'; so.drawImage(pc, 0, 0);
+      c2.drawImage(soft, 0, 0);
+    }
+    var cv = mk(w, h), o2 = {}, k;
+    for (k in xo) o2[k] = xo[k];
+    o2.alpha = true; o2.ox = x0; o2.oy = y0; o2.refW = W; o2.refH = H; o2.streak = false;
+    xerox(c2, cv.getContext('2d'), w, h, SB.rng.make(seed + ':piece:' + p.seq), o2);
+    return { canvas: cv, x: x0, y: y0, w: w, h: h, seq: p.seq, id: p.id, kind: loud ? p.kind : 'calm', planted: planted,
+      off: foot > H + 2, depth: planted ? 0 : clamp(0.32 * Math.pow(foot / H, 2), 0.02, 0.36) };
+  }
+
   /* Paste a cut-out, its bottom centre at (o.x, o.y), o.h tall (or o.w wide), turned o.rot, mirrored if o.flip, with a
    * scissor margin of white paper o.border wide (uneven, as cut by hand) and the faint shadow line a paste-up edge
    * makes on the copier glass. o.contrast / o.bright tone the print. Returns false if the image isn't in yet. */
@@ -467,6 +568,13 @@ SB.module('Scenes', function (SB) {
       cc.drawImage(sil, 0, 0);
     }
     cc.drawImage(photo, pad, pad);
+    if (REC && !o.still && PEOPLE[(cutById(id) || {}).role]) {
+      /* a layered picture: the person is lifted off the room, to be copied as a piece of their own (lift()) */
+      var m = mat(tr).translate(o.x, o.y).rotate((o.rot || 0) * 180 / Math.PI).scale(1 / s, 1 / s);
+      REC.pieces.push({ id: id, cv: cv, m: m, ox: -cv.width / 2, oy: -(ph + pad), alpha: o.alpha, kind: o.kind || 'person',
+        seq: REC.seq++, clip: o.clip ? o.clip.map(function (q) { return pt(tr, q[0], q[1]); }) : null, planted: !!o.clip });
+      return true;
+    }
     c.save();
     c.translate(o.x, o.y); c.rotate(o.rot || 0); c.scale(1 / s, 1 / s);
     if (o.alpha != null) c.globalAlpha = o.alpha;
@@ -481,24 +589,24 @@ SB.module('Scenes', function (SB) {
     var bottom = k.frame === 'full' ? DH + 70 : DH + 20, h = bottom - top, w = h * k.w / k.h;
     if (w > maxW) { h = maxW * k.h / k.w; bottom = Math.max(bottom - (bottom - top - h) * 0.3, DH + 20); }
     var flip = (side < 0 && k.facing === 'left') || (side > 0 && k.facing === 'right');
-    return paste(c, id, { x: cx, y: bottom, h: h, rot: r.range(-0.04, 0.04), flip: flip, border: 6 });
+    return paste(c, id, { x: cx, y: bottom, h: h, rot: r.range(-0.04, 0.04), flip: flip, border: 6, kind: 'band' });
   }
 
   function bandIds(cast) { return (cast.drums ? [cast.drums] : []).concat(cast.front || []); }
   /* One person from behind, the top of the head at `top`, sized so heads come out about the same (a whole-body cut is
    * pasted bigger, its legs off the bottom of the frame). */
-  function backAt(c, id, cx, top, H, rot, bright) {
+  function backAt(c, id, cx, top, H, rot, bright, kind) {
     var k = cutById(id); if (!k) return false;
     var h = H * (k.frame === 'full' ? 2.4 : k.frame === 'waist' ? 1.5 : 1.1);
-    return paste(c, id, { x: cx, y: top + h, h: h, rot: rot, border: 5, bright: bright || 0.95, contrast: 1.25 });
+    return paste(c, id, { x: cx, y: top + h, h: h, rot: rot, border: 5, bright: bright || 0.95, contrast: 1.25, kind: kind || 'crowd' });
   }
   /* The crowd from behind: a row of real people from behind, the tops of their heads near `top`, across w centred on
    * cx, printed dark so they stand against the light. Nothing is drawn for a photo not in yet. */
-  function backs(c, r, cx, top, w, H, ids, bright) {
+  function backs(c, r, cx, top, w, H, ids, bright, kind) {
     var n = ids ? ids.length : 0, sw = n ? w / n : 0;
     for (var i = 0; i < n; i++) {
       backAt(c, ids[i], cx - w / 2 + sw * (i + 0.5) + r.range(-sw * 0.12, sw * 0.12), top + r.range(-H * 0.12, H * 0.18),
-        H * r.range(0.9, 1.12), r.range(-0.04, 0.04), (bright || 1) * r.range(0.85, 1));
+        H * r.range(0.9, 1.12), r.range(-0.04, 0.04), (bright || 1) * r.range(0.85, 1), kind);
     }
   }
 
@@ -510,13 +618,19 @@ SB.module('Scenes', function (SB) {
     var P = rgbOf(opts.paper), I = rgbOf(opts.ink || TONER);
     var cell = opts.cell || Math.max(4, W / 210), ca = Math.SQRT1_2, sa = Math.SQRT1_2;
     var rand = mulberry(r.int(1, 2147483646)), contrast = opts.contrast || 1.55, bias = opts.bias || 0;
-    var gx = 18, gy = 12, field = [], i, x, y;
-    for (i = 0; i < (gx + 1) * (gy + 1); i++) field.push(r.next());
+    /* a cut-out piece of a bigger page (opts.ox/oy: where it sits on that page, opts.refW/refH: the page's size,
+       opts.field: the page's toner unevenness) gets the page's dot screen, unevenness and speck size */
+    var ox = opts.ox || 0, oy = opts.oy || 0, RW = opts.refW || W, RH = opts.refH || H;
+    var gx = 18, gy = 12, field = opts.field, i, x, y;
+    if (!field) { field = []; for (i = 0; i < (gx + 1) * (gy + 1); i++) field.push(r.next()); opts.field = field; }
     var streakX = r.chance(0.6) ? r.int(0, W - 1) : -1, streakW = Math.max(1, Math.round(W / 900));
+    if (opts.streak === false) streakX = -1;
     for (y = 0; y < H; y++) {
-      var fy = y / H * gy, iy = Math.floor(fy), ty = fy - iy;
+      var fy = clamp((y + oy) / RH * gy, 0, gy - 1e-6), iy = Math.floor(fy), ty = fy - iy;
       for (x = 0; x < W; x++) {
-        var fx = x / W * gx, ix = Math.floor(fx), tx = fx - ix, b = iy * (gx + 1) + ix;
+        var fx = (x + ox) / RW * gx, ix, tx, b;
+        if (fx < 0) fx = 0; else if (fx > gx - 1e-6) fx = gx - 1e-6;
+        ix = Math.floor(fx); tx = fx - ix; b = iy * (gx + 1) + ix;
         var n = (field[b] * (1 - tx) + field[b + 1] * tx) * (1 - ty) + (field[b + gx + 1] * (1 - tx) + field[b + gx + 2] * tx) * ty;
         var k = (y * W + x) * 4;
         if (opts.alpha && d[k + 3] < 10) { od[k + 3] = 0; continue; }
@@ -528,7 +642,7 @@ SB.module('Scenes', function (SB) {
         if (l < 0.16) a = 1;
         else if (l > 0.9) a = 0;
         else {
-          var u = (x * ca + y * sa) / cell, v = (-x * sa + y * ca) / cell;
+          var u = ((x + ox) * ca + (y + oy) * sa) / cell, v = (-(x + ox) * sa + (y + oy) * ca) / cell;
           var fu = u - Math.floor(u) - 0.5, fv = v - Math.floor(v) - 0.5, dd = Math.sqrt(fu * fu + fv * fv) * 1.4142;
           a = dd < Math.sqrt((0.9 - l) / 0.74) * 0.98 ? 1 : 0;
         }
@@ -543,13 +657,13 @@ SB.module('Scenes', function (SB) {
     }
     var tmp = mk(W, H), tc = tmp.getContext('2d');
     tc.putImageData(o, 0, 0);
-    out.save(); out.filter = 'blur(' + (W > 900 ? 0.6 : 0.4) + 'px)'; out.drawImage(tmp, 0, 0); out.restore();
+    out.save(); out.filter = 'blur(' + (RW > 900 ? 0.6 : 0.4) + 'px)'; out.drawImage(tmp, 0, 0); out.restore();
     /* toner specks, clustered, and a copier edge on one side (a cut-out piece, opts.alpha, keeps its own shape) */
     out.save(); out.fillStyle = opts.ink || TONER;
     if (opts.alpha) out.globalCompositeOperation = 'source-atop';
     var nSpeck = Math.round(W * H / 9000);
     for (i = 0; i < nSpeck; i++) {
-      var sx = r.range(0, W), sy = r.range(0, H), sr = r.range(0.4, 1.6) * W / 1200;
+      var sx = r.range(0, W), sy = r.range(0, H), sr = r.range(0.4, 1.6) * RW / 1200;
       out.beginPath(); out.arc(sx, sy, sr, 0, TAU); out.fill();
     }
     if (!opts.alpha && r.chance(0.7)) {
@@ -664,12 +778,12 @@ SB.module('Scenes', function (SB) {
     if (cast && ready(bandIds(cast))) {
       /* the band at the back, cut out of real show photos and pasted in under the carport */
       amp(c, 600, 470, 80, 96, r); amp(c, 990, 450, 90, 116, r);
-      paste(c, cast.drums, { x: 815, y: 585, h: 180, rot: r.range(-0.03, 0.03), border: 3 });
+      paste(c, cast.drums, { x: 815, y: 585, h: 180, rot: r.range(-0.03, 0.03), border: 3, kind: 'drums', still: true });   /* the kick is in front */
       kick(c, 815, 540, 42, name);
       var spots = cast.front.length === 3 ? [590, 1015, 1125] : [610, 1050];
       cast.front.forEach(function (id, i) {
         var k = cutById(id), hh = k.frame === 'full' ? 300 : 215;
-        paste(c, id, { x: spots[i], y: k.frame === 'full' ? 665 : 615, h: hh, rot: r.range(-0.04, 0.04), border: 3,
+        paste(c, id, { x: spots[i], y: k.frame === 'full' ? 665 : 615, h: hh, rot: r.range(-0.04, 0.04), border: 3, kind: 'band',
           flip: (i === 0 && k.facing === 'left') || (i > 0 && k.facing === 'right') });
       });
     } else if (!empty) {
@@ -691,9 +805,11 @@ SB.module('Scenes', function (SB) {
     if (wet) backs(c, r, 815, 598, 760, 120, picks('RAIN_CARPORT', x).front, 0.95);   /* packed in out of the rain */
     else if (!empty) backs(c, r, 825, 625, 820, 115, picks('CARPORT_NIGHT', x).front, 1);
     /* a sign on the post */
-    fillPoly(c, [[468, 470], [560, 466], [562, 530], [470, 534]], 0.97);
-    marker(c, x.cover || '$5', 515, 516, 40, { align: 'center', maxWidth: 80, seed: 'post' });
-    if (wet) rain(c, r);
+    front(c, r, function (c) {
+      fillPoly(c, [[468, 470], [560, 466], [562, 530], [470, 534]], 0.97);
+      marker(c, x.cover || '$5', 515, 516, 40, { align: 'center', maxWidth: 80, seed: 'post' });
+    }, [462, 460, 570, 540]);
+    if (wet) front(c, r, rain);
     vignette(c, 0.45);
   }
 
@@ -715,7 +831,7 @@ SB.module('Scenes', function (SB) {
     for (var cb = 0; cb < 4; cb++) { c.beginPath(); c.moveTo(r.range(100, 1100), 610); c.bezierCurveTo(r.range(0, 1200), 680, r.range(0, 1200), 640, r.range(100, 1100), 750); c.lineWidth = 6; c.strokeStyle = g(0.05); c.stroke(); }
     /* the drummer at the back, behind the kick with the name on it */
     var dk = cutById(cast.drums);
-    if (have) paste(c, cast.drums, { x: 610, y: 610, h: dk && dk.w > dk.h ? 380 : 430, rot: r.range(-0.03, 0.03), border: 5 });
+    if (have) paste(c, cast.drums, { x: 610, y: 610, h: dk && dk.w > dk.h ? 380 : 430, rot: r.range(-0.03, 0.03), border: 5, kind: 'drums', still: true });
     kick(c, 610, 545, 118, name);
     /* the front line: two or three of them, the kick showing between */
     var n = cast.front.length, xs = n === 3 ? [225, 900, 1120] : [290, 930], tops = n === 3 ? [150, 175, 205] : [150, 170];
@@ -909,6 +1025,7 @@ SB.module('Scenes', function (SB) {
 
   /* From the back of the room: the band small on the lit stage, the kick with its name, and the crowd from behind,
    * all of them cut out of real photos: a strip of heads and raised hands, three bigger backs nearest the lens. */
+  var LIP = [[-DW, -DH], [DW * 2, -DH], [DW * 2, 556], [-DW, 556]];
   function crowdFront(c, r, x) {
     var name = bandName(x) || 'THE BAND', cast = bandCast(x, name), have = ready(bandIds(cast));
     rect(c, 0, 0, DW, DH, 0.08);
@@ -918,7 +1035,7 @@ SB.module('Scenes', function (SB) {
     amp(c, 150, 250, 170, 230, r); amp(c, 880, 220, 170, 260, r);
     if (have) {
       var dk = cutById(cast.drums);
-      paste(c, cast.drums, { x: 600, y: 560, h: dk && dk.w > dk.h ? 250 : 290, rot: r.range(-0.03, 0.03), border: 4, bright: 1.1 });
+      paste(c, cast.drums, { x: 600, y: 560, h: dk && dk.w > dk.h ? 250 : 290, rot: r.range(-0.03, 0.03), border: 4, bright: 1.1, kind: 'drums', still: true });
     }
     kick(c, 600, 515, 74, name);
     if (have) {
@@ -926,7 +1043,7 @@ SB.module('Scenes', function (SB) {
       cast.front.forEach(function (id, i) {
         var k = cutById(id), full = k.frame === 'full';
         paste(c, id, { x: xs[i] + r.range(-15, 15), y: full ? 640 : 590, h: full ? 430 : 310, rot: r.range(-0.03, 0.03), border: 4, bright: 1.1,
-          flip: (i === 0 && k.facing === 'left') || (i > 0 && k.facing === 'right') });
+          flip: (i === 0 && k.facing === 'left') || (i > 0 && k.facing === 'right'), kind: 'band', clip: LIP });   /* behind the stage's edge */
       });
     }
     rect(c, 110, 556, 980, 24, 0.25);
@@ -954,11 +1071,14 @@ SB.module('Scenes', function (SB) {
     var spots = [[330, 1.15, -0.02], [640, 1.25, 0.02], [930, 1.1, -0.01]];
     ids.forEach(function (id, j) {
       var s = spots[j % spots.length];
-      paste(c, id, { x: s[0], y: 1230, h: 1250 * s[1], rot: s[2], border: 4, bright: 1.05, contrast: 1.15, flip: j === 1 });
+      paste(c, id, { x: s[0], y: 1230, h: 1250 * s[1], rot: s[2], border: 4, bright: 1.05, contrast: 1.15, flip: j === 1,
+        clip: [[-200, -DH], [1400, -DH], [1400, 367.9], [-200, 391.1]] });   /* behind the table's edge */
     });
     /* someone holding out a five, the hand coming down from the line */
-    turned(c, 820, 70, Math.PI / 2 + 0.25, function () { hand(c, r, 210, 0, 150, 1, 'hoodie', false); });
-    bill(c, r, 790, 330, 150, 0.35, '5');
+    front(c, r, function (c, r) {
+      turned(c, 820, 70, Math.PI / 2 + 0.25, function () { hand(c, r, 210, 0, 150, 1, 'hoodie', false); });
+      bill(c, r, 790, 330, 150, 0.35, '5');
+    }, [560, 0, 1000, 460]);
     /* the table */
     var top = [[-20, 390], [1220, 372], [1220, 760], [-20, 760]];
     inkShape(c, top, 6, r, 1);
@@ -1220,13 +1340,15 @@ SB.module('Scenes', function (SB) {
       : { x: 1130, y: 640, h: 440, rot: -Math.PI / 2 + 0.06, border: 4, bright: 0.9 });   /* shot from above: laid down */
     paste(c, 'boots-01', { x: 140, y: 740, h: 200, rot: -0.08, border: 4, bright: 1.05 });
     /* the streetlight through the blinds, striped across the room */
-    c.save(); c.globalCompositeOperation = 'lighter';
-    for (var s = 0; s < 10; s++) {
-      var y0 = 340 + s * 44;
-      c.beginPath(); c.moveTo(1000, y0 - 200); c.lineTo(1000, y0 - 184); c.lineTo(40, y0 + 160); c.lineTo(40, y0 + 136); c.closePath();
-      c.fillStyle = 'rgba(255,255,255,0.18)'; c.fill();
-    }
-    c.restore();
+    front(c, r, function (c) {
+      c.save(); c.globalCompositeOperation = 'lighter';
+      for (var s = 0; s < 10; s++) {
+        var y0 = 340 + s * 44;
+        c.beginPath(); c.moveTo(1000, y0 - 200); c.lineTo(1000, y0 - 184); c.lineTo(40, y0 + 160); c.lineTo(40, y0 + 136); c.closePath();
+        c.fillStyle = 'rgba(255,255,255,0.18)'; c.fill();
+      }
+      c.restore();
+    });
     vignette(c, 0.5);
   }
 
@@ -1296,7 +1418,7 @@ SB.module('Scenes', function (SB) {
         var head = heads[i % heads.length];
         if (i === photoAt) {
           rect(c, -w / 2 + 14, -h / 2 + 14, w - 28, h * 0.5, 0.15);
-          if (pid) paste(c, pid, { x: 0, y: -h / 2 + 14 + h * 0.5, h: h * 0.48, border: 0, bright: 1.2 });
+          if (pid) paste(c, pid, { x: 0, y: -h / 2 + 14 + h * 0.5, h: h * 0.48, border: 0, bright: 1.2, still: true });
           marker(c, head, 0, h * 0.16, 36, { align: 'center', maxWidth: w - 30, treatment: 'block', seed: 'fw' + i });
           typed(c, (x.cover || '$5') + '  DOORS 8', 0, h * 0.3, 17, 0, 'center');
         } else {
@@ -1473,7 +1595,7 @@ SB.module('Scenes', function (SB) {
     /* people on the lawn and at the door: photos, printed black against the light */
     var pp = picks('POLICE_LIGHTS', x), lawn = pp.lawn || [], cops = pp.cops || [];
     [[lawn[0], 150, 520, 230], [lawn[1], 250, 530, 250], [lawn[2], 545, 460, 175], [cops[0], 705, 476, 190], [cops[1], 790, 482, 200]].forEach(function (p) {
-      if (p[0]) paste(c, p[0], { x: p[1], y: p[2], h: p[3], border: 0, bright: 0.12, contrast: 1.2 });
+      if (p[0]) paste(c, p[0], { x: p[1], y: p[2], h: p[3], border: 0, bright: 0.12, contrast: 1.2, still: true });   /* the car and the beams are in front */
     });
     beam(c, 600, 344, -0.3, 0.3, 200, 0.55);
     /* the beams */
@@ -1618,7 +1740,7 @@ SB.module('Scenes', function (SB) {
     if (!k || !isIn(id)) return false;
     var flip = (nose === 'left' && k.facing === 'right') || (nose === 'right' && k.facing === 'left');
     return paste(c, id, { x: cx, y: groundY, w: w, rot: o.rot || 0, flip: flip, border: o.border == null ? 4 : o.border,
-      bright: o.bright || 1, contrast: o.contrast || 1.12 });
+      bright: o.bright || 1, contrast: o.contrast || 1.12, still: true });
   }
 
   /* People in a night scene are lit (a porch light, a headlight): their shadows lifted before the copier, which turns
@@ -1634,7 +1756,7 @@ SB.module('Scenes', function (SB) {
     /* at night each photo is brightened by what it needs: a dark print more, a pale one a little less */
     var lift = o.night ? Math.max(0.8, Math.min(2.2, 0.45 / (k.tone || 0.45))) : 1;
     return paste(c, id, { x: cx, y: bottom, h: h, rot: o.rot || 0, flip: flip, border: o.border == null ? 4 : o.border,
-      bright: (o.bright || 1) * lift, contrast: o.night ? NIGHT_LIFT : (o.contrast || 1.15) });
+      bright: (o.bright || 1) * lift, contrast: o.night ? NIGHT_LIFT : (o.contrast || 1.15), kind: o.kind, still: o.still, clip: o.clip });
   }
 
   /* Rain: a curtain pouring off the carport's roof edge in front of everyone, rain slanting across the whole frame,
@@ -1766,7 +1888,7 @@ SB.module('Scenes', function (SB) {
     /* the drummer behind the kick off to one side (the diver goes over the other), the front line out at the edges */
     var side = r.chance(0.5) ? -1 : 1, kx = 600 - side * 170, dvx = 600 + side * 300;
     var dk = cutById(cast.drums);
-    if (have) paste(c, cast.drums, { x: kx, y: 480, h: dk && dk.w > dk.h ? 250 : 300, rot: r.range(-0.03, 0.03), border: 4 });
+    if (have) paste(c, cast.drums, { x: kx, y: 480, h: dk && dk.w > dk.h ? 250 : 300, rot: r.range(-0.03, 0.03), border: 4, kind: 'drums', still: true });
     kick(c, kx, 432, 80, name);
     if (have) {
       /* the front line leaves a gap where the diver goes over (mirrored when the diver is on the left) */
@@ -1775,7 +1897,7 @@ SB.module('Scenes', function (SB) {
       cast.front.forEach(function (id, i) {
         var k = cutById(id), full = k.frame === 'full';
         paste(c, id, { x: xs[i] + r.range(-15, 15), y: full ? 640 : 600, h: full ? 470 : 360, rot: r.range(-0.04, 0.04), border: 4,
-          flip: (i === 0 && k.facing === 'left') || (i > 0 && k.facing === 'right') });
+          flip: (i === 0 && k.facing === 'left') || (i > 0 && k.facing === 'right'), kind: 'band' });
       });
     }
     glow(c, 600, 260, 700, 0.25);
@@ -1784,12 +1906,12 @@ SB.module('Scenes', function (SB) {
     backs(c, r, 600, 478, 1300, 110, pk.far, 0.5);
     var pit = pk.pit || [];
     [[dvx - 150, 430, -0.05], [dvx + 150, 440, 0.05]].forEach(function (q, i) {
-      if (pit[i]) paste(c, pit[i], { x: q[0], y: q[1] + 290, h: 290, rot: q[2], border: 4, bright: 0.45, contrast: 1.3 });
+      if (pit[i]) paste(c, pit[i], { x: q[0], y: q[1] + 290, h: 290, rot: q[2], border: 4, bright: 0.45, contrast: 1.3, kind: 'crowd' });
     });
     var dv = (pk.diver || [])[0], dkk = dv && cutById(dv);
     if (dkk) {
       /* low and nearly flat across the heads, so it crosses the band's legs and not their faces; lit by the stage */
-      var dcx = dvx + r.range(-20, 20), dopt = { border: 7, bright: 1.25, contrast: 0.9 };
+      var dcx = dvx + r.range(-20, 20), dopt = { border: 7, bright: 1.25, contrast: 0.9, kind: 'crowd' };
       if (dkk.w > dkk.h * 1.1) {   /* already lying across the hands */
         dopt.h = Math.max(170, Math.min(220, 400 * dkk.h / dkk.w)); dopt.x = dcx; dopt.y = 590; dopt.rot = r.range(-0.08, 0.08);
       } else {                     /* a tall one is laid over, head first off the stage, its middle over the crowd */
@@ -1832,7 +1954,7 @@ SB.module('Scenes', function (SB) {
     var tl = 470, tr = 820, ty = 540;
     var seller = (picks('YARD_NIGHT', x).seller || [])[0];
     /* behind the table: feet well below its top so the sheet hides them from the waist down */
-    if (seller) personAt(c, seller, 650, 740, 450, { bottom: 640, face: 'left', bright: 1.5, night: true, border: 4, maxW: 300 });
+    if (seller) personAt(c, seller, 650, 740, 450, { bottom: 640, face: 'left', bright: 1.5, night: true, border: 4, maxW: 300, still: true });
     fillPoly(c, [[tl, ty], [tr, ty - 6], [tr + 22, ty + 22], [tl - 20, ty + 28]], 0.95);
     fillPoly(c, [[tl - 20, ty + 28], [tr + 22, ty + 22], [tr + 18, 640], [tl - 16, 646]], 0.88);
     for (i = 0; i < 6; i++) line(c, tl + 20 + i * 60, ty + 30, tl + 16 + i * 62, 640, 2, 0.75);
@@ -1886,13 +2008,13 @@ SB.module('Scenes', function (SB) {
     var cx = 640 + r.range(-20, 20), top = 150, full = k && k.frame === 'full', h = full ? 450 : 470;
     if (k) {
       if (k.w / k.h > 0.75) h = Math.min(h, 520 * k.h / k.w);   /* a wide one: keep it from swallowing the room */
-      paste(c, pl, { x: cx, y: full ? 600 : top + h, h: h, rot: r.range(-0.03, 0.03), border: 5, bright: 1.02 });
+      paste(c, pl, { x: cx, y: full ? 600 : top + h, h: h, rot: r.range(-0.03, 0.03), border: 5, bright: 1.02, kind: 'band' });
     }
-    micStand(c, cx - 110, 600, 300, cx - 60, 260);
+    front(c, r, function (c) { micStand(c, cx - 110, 600, 300, cx - 60, 260); }, [cx - 160, 240, cx - 20, 615]);
     /* the people on the floor, from behind, and one sat by the wall watching */
     var side = (pk.side || [])[0];
     if (side) personAt(c, side, 1080, 640, 330, { face: 'left', bright: 0.95, maxW: 300 });
-    backs(c, r, 600, 560, 1250, 150, pk.floor, 0.95);
+    backs(c, r, 600, 560, 1250, 150, pk.floor, 0.95, 'person');   /* sat listening */
     vignette(c, 0.5);
   }
 
@@ -1953,9 +2075,11 @@ SB.module('Scenes', function (SB) {
     bulbs(c, -20, 30, 560, 40, 26, 6, 7);
     c.beginPath(); c.moveTo(560, 40); c.quadraticCurveTo(880, 90, 1220, 36); c.lineWidth = 2.5; c.strokeStyle = g(0.05); c.stroke();
     for (i = 0; i < 6; i++) { var t = (i + 0.5) / 6, bx = 560 + 660 * t, by = 40 + Math.sin(t * Math.PI) * 26 - 4 * t; line(c, bx, by, bx, by + 7, 3, 0.05); ell(c, bx, by + 13, 5, 7, 0, 0.3); }
-    c.save(); var dark = c.createLinearGradient(560, 0, 1200, 0);
-    dark.addColorStop(0, 'rgba(0,0,0,0)'); dark.addColorStop(1, 'rgba(0,0,0,0.2)');
-    c.fillStyle = dark; c.fillRect(0, 0, DW, DH); c.restore();
+    front(c, r, function (c) {
+      c.save(); var dark = c.createLinearGradient(560, 0, 1200, 0);
+      dark.addColorStop(0, 'rgba(0,0,0,0)'); dark.addColorStop(1, 'rgba(0,0,0,0.2)');
+      c.fillStyle = dark; c.fillRect(0, 0, DW, DH); c.restore();
+    });
     vignette(c, 0.45);
   }
 
@@ -2023,11 +2147,13 @@ SB.module('Scenes', function (SB) {
     var r = SB.rng.make(seed);
     var src = mk(W, H), sc = src.getContext('2d');
     var s = Math.max(W / DW, H / DH);
+    var lay = !isSvg && typeof x._layers === 'function' && !!sc.getTransform, rec = null;
     sc.fillStyle = '#fff'; sc.fillRect(0, 0, W, H);
     sc.save();
     sc.translate((W - DW * s) / 2, (H - DH * s) / 2); sc.scale(s, s);
     CUR = { key: key, x: x, n: {} };   /* amp() and gear() take their photos from this picture's picks */
-    try { (DRAW[key] || function (c, rr) { stub(c, rr, key); })(sc, r, x); } finally { CUR = null; }
+    if (lay) REC = rec = { pieces: [], over: [], seq: 0 };
+    try { (DRAW[key] || function (c, rr) { stub(c, rr, key); })(sc, r, x); } finally { CUR = null; REC = null; }
     sc.restore();
     if (!DRAWN[key]) { /* a photo original is soft; the copier makes it hard */
       var soft = mk(W, H), so = soft.getContext('2d');
@@ -2036,10 +2162,16 @@ SB.module('Scenes', function (SB) {
     }
     var out = cv.getContext('2d');
     var photos = !DRAWN[key] && plan(key, x).length > 0 && ready(plan(key, x));
-    xerox(sc, out, W, H, SB.rng.make(seed + ':copy'), {
+    var xo = {
       paper: paperOf(x, key), ink: TONER, cell: Math.max(4, W / (DRAWN[key] ? 240 : photos ? 250 : 190)),
       contrast: DRAWN[key] ? 1.9 : photos ? 1.3 : 1.4, bias: DRAWN[key] ? 0 : photos ? 0.06 : 0.04
-    });
+    };
+    xerox(sc, out, W, H, SB.rng.make(seed + ':copy'), xo);
+    if (lay) {
+      /* the people, after the room is up; a newer drawing of this canvas makes these stale */
+      var gen = target._sbLayers = (target._sbLayers || 0) + 1, info = { key: key, loud: !!LOUD[key], w: W, h: H };
+      lift(rec, W, H, s, key, seed, xo, function () { return target._sbLayers === gen; }, function (L) { x._layers(L, info); });
+    }
     if (isSvg) {
       while (target.firstChild) target.removeChild(target.firstChild);
       var im = document.createElementNS('http://www.w3.org/2000/svg', 'image');
@@ -2326,6 +2458,19 @@ SB.module('Scenes', function (SB) {
     resolve: resolve,
     papers: PAPER,
     draw: draw,
+    /** layered(canvas, artKey, ctx, onLayers): draw() with the people lifted off: the canvas gets the room, and
+     *  onLayers(layers, { key, loud, w, h }) gets each person as a photocopied cut-out piece, back to front:
+     *  [{ canvas, x, y, w, h (in the canvas's pixels; a piece may hang past its edges), seq, id, kind ('band' | 'drums' |
+     *  'crowd' | 'person' | 'calm': calm in every picture without a band or crowd going), planted (something stands in
+     *  front of it: move it only about its bottom edge), off (it runs off the bottom of the frame), depth (0..0.36, how
+     *  much nearer the lens than the room) }]. The pieces are made after draw returns, one a turn, so onLayers comes
+     *  a little later; it comes again when late photos land and the picture repaints. */
+    layered: function (cv, key, x, onLayers) {
+      var y = {}, k; x = x || {};
+      for (k in x) y[k] = x[k];
+      y._layers = onLayers;
+      return draw(cv, key, y);
+    },
     patch: patch,
     jacket: jacket,
     /** copier(canvas, { paper, ink, cell, contrast, bias, alpha, seed }): the photocopier pass, in place: the canvas's

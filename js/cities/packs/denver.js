@@ -40,7 +40,7 @@ SB.Cities.register('denver', {
     { id: 'fort-morgan', kind: 'FEEDER', name: 'Fort Morgan', minutes: 85, bearing: 50, note: 'Sugar beets and meatpacking on the plains. Almost nothing for kids; they drive in.' },
     { id: 'fort-collins', kind: 'PEER', name: 'Fort Collins', minutes: 65, bearing: 355, slug: 'fort-collins-co', note: 'A big university and brewery city, a friendly smaller rival and a dependable touring stop.' },
     { id: 'colorado-springs', kind: 'PEER', name: 'Colorado Springs', minutes: 80, bearing: 185, slug: 'colorado-springs-co', note: 'A military and evangelical city with a strong, rivalrous scene.' },
-    { id: 'cheyenne', kind: 'PEER', name: 'Cheyenne', state: 'WY', minutes: 100, bearing: 5, scene: 300, note: 'A small capital with a base and a tiny scene. Wind and ice close the road.' },
+    { id: 'cheyenne', kind: 'PEER', name: 'Cheyenne', state: 'WY', minutes: 100, bearing: 5, scene: 300, slug: 'cheyenne-wy', note: 'A small capital with a base and a tiny scene. Wind and ice close the road.' },
     { id: 'pueblo', kind: 'PEER', name: 'Pueblo', minutes: 120, bearing: 185, scene: 500, note: 'A steel city with a scrappy scene of its own.' }
   ],
 

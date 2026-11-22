@@ -310,13 +310,23 @@
       function bandCard(c) {
         var r = SB.rng.make('tilt:' + c.id).range(-1.2, 1.2), d = lastPlayed(c), down = c.listedMembers > 0, ended = c.stage === 'ENDED',
             tag = down ? 'ON YOUR LIST' : c.playedOut && !ended && !c.out ? 'PLAYED OUT' : '',
-            meta = [c.home || '', tierWord(c.tierPublic)].filter(Boolean).join(' / ');
+            meta = [c.home || '', tierWord(c.tierPublic)].filter(Boolean).join(' / '),
+            rd = ended ? null : safe(function () { return SB.UI.bandRead(game(), c, {}); }, null), B = function (k, x) { return SB.text.label('ui.bill.' + k, x); };
         return h('button', { type: 'button', class: 'rb-card pz-paper pz-hl' + (down ? ' is-down' : '') + (ended || c.playedOut ? ' is-dim' : ''), style: { '--kt-rot': r.toFixed(2) + 'deg' },
-          data: { fk: 'band-' + c.id }, aria: { label: stickerLabel(c) }, on: { click: function () { SB.UI.go('band', { bandId: c.id }); } } }, [
+          data: { fk: 'band-' + c.id }, aria: { label: stickerLabel(c) + (rd && rd.pull ? ' ' + B(rd.pull.sure ? 'pullL' : 'pullGuessL', { n: rd.pull.text }) + '.' : '') +
+            (rd && rd.plus.length ? ' ' + B('plusL', { list: rd.plus.slice(0, 2).join(', ') }) + '.' : '') + (rd && rd.minus.length ? ' ' + B('minusL', { list: rd.minus.slice(0, 2).join(', ') }) + '.' : '') + (rd && rd.crowd ? ' ' + B('crowdL', { who: rd.crowd }) + '.' : '') },
+          on: { click: function () { SB.UI.go('band', { bandId: c.id }); } } }, [
           kit().photo({ ids: bandPhotoIds(c, 2), w: 224, h: 150, paper: down ? STOCK[3] : bandStock(c), seed: c.id }),
           down ? h('span', { class: 'rb-name', aria: { hidden: 'true' }, text: String(c.name).toUpperCase() }) : null,
           h('span', { class: 'rb-mark', aria: { hidden: 'true' } }, D().art(sticker(c, 210), 210, Math.round(210 * 0.42) + 8)),
           h('span', { class: 'rb-meta', aria: { hidden: 'true' }, text: meta }),
+          /* what they pull, what helps them, what holds them back (SB.UI.bandRead, the same read as on the bill's sticker sheet) */
+          rd && (rd.pull || rd.plus.length || rd.minus.length) ? h('span', { class: 'cb-read rb-read', aria: { hidden: 'true' } }, [
+            rd.pull ? h('span', { class: 'rb-pull' + (rd.pull.sure ? '' : ' is-guess'), text: B(rd.pull.sure ? 'pull' : 'pullGuess', { n: rd.pull.text }) }) : null,
+            rd.plus.length ? h('ul', { class: 'cb-read-plus' }, rd.plus.slice(0, 2).map(function (t) { return h('li', { text: t }); })) : null,
+            rd.minus.length ? h('ul', { class: 'cb-read-minus' }, rd.minus.slice(0, 2).map(function (t) { return h('li', { text: t }); })) : null,
+            rd.crowd ? h('span', { class: 'cb-read-small', text: B('crowd', { who: rd.crowd }) }) : null
+          ]) : null,
           h('span', { class: 'rb-last', aria: { hidden: 'true' }, text: d === null ? 'never played for you' : 'last: ' + SB.time.fmt(d, 'short') }),
           tag ? h('span', { class: 'rb-tag', aria: { hidden: 'true' }, text: tag }) : null
         ]);
@@ -376,7 +386,7 @@
     inner += dd.type(label, 14, 22, 10, { bold: true });
     if (!v) {
       return h('li', { class: 'cb-know rb-blank', role: 'img', aria: { label: L('knowL', { what: label.toLowerCase(), text: L('dunno') }) } }, [
-        h('span', { class: 'rb-unk', text: label.toUpperCase() }), h('span', { class: 'rb-pencil', text: 'not seen yet' })]);
+        h('span', { class: 'rb-unk', text: label.toUpperCase() }), h('span', { class: 'rb-pencil', text: label === L('drawL') && view && view.text && view.text !== '—' ? 'word is ' + view.text + ', not seen yet' : 'not seen yet' })]);
     } else if (kind === 'heads') {
       var hi = Math.max(1, v.hi90 || 0), unit = Math.max(1, Math.ceil(hi / 14)), n = Math.min(14, Math.round(hi / unit)), lo = Math.round((v.lo50 || 0) / unit), k;
       for (k = 0; k < n; k++) inner += dd.head(18 + k * 11, 54, 15, k < lo ? { mode: 'solid' } : { mode: 'dots', op: Math.max(0.3, 1 - (k - lo + 1) / (n - lo + 2)) });

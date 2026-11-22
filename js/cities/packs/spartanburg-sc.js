@@ -1,14 +1,18 @@
 SB.Cities.register('spartanburg-sc', {
   v: 1,
   slug: 'spartanburg-sc',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['wofford', 'wofford college', 'converse university', 'converse college', 'usc upstate', 'spartanburg methodist', 'bmw', 'festifall',
            'dickens of a christmas', 'greek festival', 'hub city hog fest', 'hog fest', 'hub city', 'international festival', 'red white and boom',
            'taste of the backcountry', 'spartanburg criterium', 'music on main', 'hub city farmers market', 'mayfest', 'gibbs stadium',
            'waffle house', 'bojangles', 'cook out', 'zaxby\'s', 'hardee\'s', 'cheerwine', 'amtrak', 'crescent', 'greenville-spartanburg',
            'winthrop university', 'clinton college', 'york tech', 'clemson', 'fort jackson', 'sparkle city',
            'the switchyard', 'hub hall', 'piedmont annex', 'loom room', 'sparkle lot', 'the depot back room', 'depot back room', 'red clay hall',
-           'backcountry lodge', 'spindle street garage', 'boiled peanut annex', 'fourth shift'],
+           'backcountry lodge', 'spindle street garage', 'boiled peanut annex', 'fourth shift',
+           'spartanburg herald-journal', 'herald-journal', 'spartan weekly', 'fox carolina', 'greenville news', 'visit spartanburg', 'experience spartanburg',
+           'hub city brew fest', 'shenanigans on the square', 'spring fling', 'criterium', 'cribbs burger cookoff', 'jaycees christmas parade', 'parade of nations',
+           'spartanburg international festival', 'spartanburg memorial auditorium', 'memorial auditorium', 'chapman cultural center', 'bon secours wellness arena',
+           'peace center', 'coach music factory', 'sc venue crisis', 'spartanburg community college', 'sccsc', 'spartanburg bmx'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Colleges and events appear in game text only as generic words. */
   blocklist: ['wofford*', 'converse*', 'hub city*', 'sparkle city*', 'waffle house*', 'cheerwine*', 'switchyard*', 'loom room*'],
 
@@ -54,7 +58,45 @@ SB.Cities.register('spartanburg-sc', {
     { id: 'upstate-edge', name: 'the Business 85 east side', route: 'campus', note: 'Student apartments and retail around a suburban commuter campus.' }
   ],
 
-  contacts: ['asheville-nc', 'columbia-sc', 'atlanta'],
+  rooms: [
+    { id: 'ring-garage', kind: 'HOUSE', hood: 'suburbs', cap: 40, hostCut: 0, pa: .4, curfew: 1320, ac: false, outdoor: false, sketch: 20, standing: [65, 60, 50],
+      pressure: 45, start: true, note: 'A carport and garage in a subdivision, run off extension cords. Real basements are rare, and the neighbors are close.' },
+    { id: 'heights-porch', kind: 'HOUSE', hood: 'hampton-heights', cap: 50, hostCut: 0, pa: .4, curfew: 1320, ac: false, outdoor: false, sketch: 20, standing: [65, 60, 45],
+      pressure: 55, note: 'A big old house split into rentals, with a porch and a front-room stage. A historic block with neighbors who call.' },
+    { id: 'mill-yard', kind: 'HOUSE', hood: 'mill-villages', cap: 60, hostCut: 0, pa: .4, curfew: 1380, ac: false, outdoor: true, sketch: 25, standing: [65, 60, 50],
+      pressure: 40, note: 'A worker house with a big yard and a carport. Easy neighbors, until a summer storm rolls in.' },
+    { id: 'mill-bay', kind: 'DIY', hood: 'mill-villages', cap: 80, rent: 60, deposit: 0, pa: .5, curfew: 1380, ac: false, sketch: 40, standing: [55, 60, 45],
+      pressure: 55, needs: ['VOUCH'], note: 'A practice room in an old mill building. The owner is hard to reach and the developers are not.' },
+    { id: 'storage-jam', kind: 'DIY', hood: 'southside', cap: 50, rent: 40, deposit: 0, pa: .5, curfew: 1350, ac: false, sketch: 35, standing: [55, 60, 45],
+      pressure: 55, needs: ['VOUCH'], note: 'A warehouse bay by the interstate. Cheap, loud, and the fire marshal hears about anything that charges at the door.' },
+    { id: 'civic-hall', kind: 'HALL', hood: 'downtown', cap: 150, rent: 150, deposit: 75, pa: .6, curfew: 1320, ac: true, sketch: 10, standing: [55, 60, 65],
+      owner: 'HALL_MANAGER', note: 'A rented lodge-style hall off the square. No beer, no late nights, and a board that wants to hear the amps first.' },
+    { id: 'square-lot', kind: 'OUTDOOR', hood: 'downtown', cap: 100, rent: 15, pa: .4, curfew: 1260, ac: false, outdoor: true, sketch: 30, standing: [60, 55, 45],
+      note: 'A side lot off the downtown square where the weekly outdoor music runs in season. Parking and a permit are the squeeze.' },
+    { id: 'brewery-bar', kind: 'BAR', hood: 'downtown', cap: 120, soundFee: 50, pa: .7, ages: ['ALL', 'A21'], matinee: true, curfew: 1410, ac: true, following: .3, sketch: 15, standing: [50, 65, 70],
+      note: 'A downtown stage that leans toward roots and covers. An early all-ages slot is possible if you ask nicely.' },
+    { id: 'rock-club', kind: 'CLUB', hood: 'southside', cap: 300, houseCosts: 200, split: .8, pa: .9, ages: ['A21'], curfew: 1440, ac: true, following: .5, sketch: 15, standing: [45, 70, 65],
+      owner: 'TALENT_BUYER', notice: 42, needs: ['FULL_BILL'], pressure: 60, note: 'A stripped-down rock, punk and metal club off the interstate, same owner for decades. Mostly 21 and up, and nobody can say if it is still open.' },
+    { id: 'civic-theater', kind: 'BIG', hood: 'downtown', cap: 2000, rent: 2000, deposit: 500, pa: 1, curfew: 1380, ac: true, sketch: 5, standing: [40, 70, 70],
+      note: 'The civic hall and theater complex downtown. Punk gets in as an opener on a package, never as a booker\'s room.' },
+    { id: 'main-shop', kind: 'SHOP', hood: 'college-corridor', cap: 40, pa: .4, curfew: 1260, ac: true, sketch: 5, standing: [65, 65, 70], following: .15,
+      note: 'A storefront on East Main by the two campuses. In-store sets in the afternoon, here and gone with the semesters.' }
+  ],
+
+  contacts: ['greenville-sc', 'asheville-nc', 'columbia-sc', 'charlotte', 'atlanta'],
+
+  calendar: [
+    { id: 'march-party', label: 'the March street party', tag: 'festival', month: 3, week: 3, dows: [5], can: [.85, .88, .90], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'bike-race', label: 'the spring bike race weekend', tag: 'race', month: 5, weeks: [2, 3], dows: [4, 5], can: [.88, .90, .92], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'fourth-night', label: 'the Fourth of July night', tag: 'holiday', month: 7, week: 1, dows: [3, 4, 5, 6], can: [.80, .82, .85] },
+    { id: 'beer-fest', label: 'the autumn beer weekend', tag: 'festival', month: 9, week: 2, dows: [5], can: [.88, .90, .92], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'intl-fest', label: 'the autumn world-foods weekend', tag: 'festival', month: 10, week: 1, dows: [5], can: [.88, .90, .92], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'xmas-weekend', label: 'the winter Christmas weekend and parade', tag: 'parade', month: 12, week: 1, dows: [4, 5], can: [.80, .85, .88], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [4, 5], can: [.90, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [4, 5], can: [.90, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
 
   points: [
     { name: 'Greenville', state: 'SC', lat: 34.85, lon: -82.4, pop: 70720 },
@@ -70,5 +112,52 @@ SB.Cities.register('spartanburg-sc', {
     hood: ['Hampton Heights', 'Beaumont', 'Saxon', 'Glendale', 'Valley Falls', 'Northside', 'Boiling Springs', 'Morgan Square', 'the Upstate'],
     thing: ['carport', 'boiled peanuts', 'pimento cheese', 'peach stand', 'mill house', 'sweet tea', 'generator', 'mill building', 'church youth hall', 'slab garage'],
     weather: ['afternoon thunderstorm', 'ice storm']
-  }
+  },
+
+  events: [
+    { id: 'SPARTANBURG_SC_CHAPERONE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 6] },
+      telegraph: 'The club will only run the all-ages bill if a parent stays for the whole night.',
+      title: 'Someone\'s mother has to stay',
+      body: 'The all-ages punk bill needs a grown-up in the room from doors to last chord. You have the bands and the PA but not a single chaperone.',
+      options: [
+        { id: 'FIND', label: 'Call every parent you know', likely: 'Costs a day of favors and a few of them stay.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 30 }, { op: 'REGULARS', pct: .01 }],
+          result: 'A mother with a folding chair watched the whole bill and left with a free shirt.' },
+        { id: 'ADULTS', label: 'Make it 21 and up this once', likely: 'Easy. Locks out the kids.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
+          result: 'The kids waited out front and some of them went home.' },
+        { id: 'HOUSE', label: 'Take it to a garage', likely: 'Smaller, and no chaperone rule.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'A slab garage took the bill, extension cords and all.' }
+      ] },
+
+    { id: 'SPARTANBURG_SC_XMAS_GRID', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'parade', months: [11, 12] },
+      telegraph: 'The tree lighting and parade close the downtown grid on the first weekend of December.',
+      title: 'The grid is closed',
+      body: 'Tree lighting, market and parade have shut the streets around the hall. Parking is gone and half your crowd is walking in from the interstate.',
+      options: [
+        { id: 'EARLY', label: 'Start at five and finish early', likely: 'The parade crowd drifts in. A short bill.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Doors at five. The parade crowd wandered in and stayed for two bands.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list gives up on parking.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
+          result: 'The regulars walked a mile in the cold. Nobody else came.' }
+      ] },
+
+    { id: 'SPARTANBURG_SC_STORM_POWER', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3], months: [6, 7, 8, 9] },
+      telegraph: 'A carport show is booked and the afternoon sky is turning green.',
+      title: 'The power goes out',
+      body: 'A summer thunderstorm took the power in the middle of the second set. The whole crowd is jammed into a neighbor\'s garage, and the amps are dead.',
+      options: [
+        { id: 'GENERATOR', label: 'Run it off the generator', likely: 'Costs thirty dollars and an hour.',
+          effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'lateMin', v: 60 }],
+          result: 'The generator coughed and caught. The crowd cheered, and the neighbors did not.' },
+        { id: 'UNPLUGGED', label: 'Play it unplugged in the garage', likely: 'Quiet, small and strangely good.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'REGULARS', pct: .01 }],
+          result: 'Three bands played acoustic by flashlight and nobody wanted to leave.' }
+      ] }
+  ]
 });

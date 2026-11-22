@@ -36,7 +36,16 @@
     function tapedEl() { return q('[data-taped]'); }
     function describe(e) { return e ? ((e.getAttribute('data-fk') || e.getAttribute('data-obj') || e.getAttribute('data-tut') || e.className || e.tagName) + '') : 'nothing'; }
     /* the one tape is on this element */
+    /* the outgoing booker's call at the start of a step (js/ui/story.js coach) plays over whatever is up: watch it through */
+    function coachKey() {
+      var c = cur(), k = 'TUT_' + (c.step || '') + (c.stage ? '_' + c.stage : ''), all = SB.Content.story.coach || {};
+      return all[k] ? k : 'TUT_' + (c.step || '');
+    }
+    function cuts() {
+      for (var i = 0; i < 12 && q('.cs-root'); i++) { var c = SB.Chapters.nextCutscene(S()); seenCuts.push(c ? c.key : coachKey()); q('.cs-root .cs-skip').click(); }
+    }
     function taped(sel) {
+      cuts();
       var want = q(sel), tapes = d.querySelectorAll('.sy-tape'), got = tapedEl();
       if (!want) fail('nothing on the page matches ' + sel);
       if (tapes.length !== 1) fail(tapes.length + ' tapes on the page, wanted one on ' + sel);
@@ -51,10 +60,16 @@
     function tap(sel) { var e = taped(sel); if (e.disabled) fail(sel + ' is disabled'); e.click(); flush0(); return e; }
     function flush0() { /* a click's own redraw is synchronous; nothing to wait for */ }
     function expect(step, stage) {
+      cuts();
       var c = cur();
       if (c.step !== step || (stage && c.stage !== stage)) fail('expected ' + step + (stage ? ':' + stage : ''));
     }
     function fk(v) { return '#main [data-fk="' + v + '"]'; }
+    /* CALL IT A NIGHT is the pinned night clock's (js/ui/nightclock.js), on the card as everywhere else */
+    var NIGHT = '#nightclock:not([hidden]) [data-fk="callnight"]';
+    /* where calling it a night is on the desk: the pinned clock while a week is played, its close-the-week at the end of one, else the tape deck */
+    var WEEKEND = '[data-fk="closeweek"]:not([disabled])';
+    function nightSel() { return q(NIGHT) ? NIGHT : (q(WEEKEND) ? WEEKEND : hit('lamp')); }
     function hit(id) { return '#desk .dk-hit[data-obj="' + id + '"]'; }
     function clip() {
       var objs = SB.Desk.objects(), i, c = cur();
@@ -73,7 +88,7 @@
     }
     /* the guided show's card, from wherever the walk is: the clip on the desk (where the tape is) opens it */
     function toCard() {
-      if (SB.UI.route() === 'show' && q(fk('card-night'))) return card();
+      if (SB.UI.route() === 'show' && q(NIGHT)) return card();
       down();
       tap(clip());
       if (SB.UI.route() !== 'show') fail('the clip did not open the show\'s card');
@@ -82,7 +97,7 @@
     /* CALL IT A NIGHT on the card's foot, where the tape is while the guide says wait. The card asks to be picked up
      * again at the next evening; the walk drives the play-out itself, so it stops the deck as the player would. */
     function cardNight() {
-      tap(fk('card-night'));
+      tap(NIGHT);
       if (SB.UI.route() !== 'desk') fail('CALL IT A NIGHT on the card did not go to the desk');
       if (SB.UI.playing()) SB.UI.fire('sb-play', { cmd: 'pause', by: 'player' });
     }
@@ -93,18 +108,17 @@
     /* the seven steps, one of them unfolded to its rows (the one named), the NEXT line, tonight's clock and
      * CALL IT A NIGHT on the foot; all of it on the sheet (a real browser only) */
     function cardFits(step) {
+      cuts();
       var heads = d.querySelectorAll('#main .cb-stephead'), rows = d.querySelectorAll('#main .cb-cardrow'), box = q('#main .cu-in'),
           b = box && box.getBoundingClientRect ? box.getBoundingClientRect() : null, all = [], i, r;
       if (heads.length !== 7) fail('the card has ' + heads.length + ' steps, not seven');
       if (!rows.length) fail('the card has no step unfolded');
       if (step && card().getAttribute('data-step') !== step) fail('the card is unfolded on ' + card().getAttribute('data-step') + ', not ' + step);
       if (!q('#main .cb-next .cb-nexttext') || !/\S/.test(q('#main .cb-next .cb-nexttext').textContent)) fail('the card has no NEXT line');
-      if (!q(fk('card-night'))) fail('the card\'s foot has no CALL IT A NIGHT');
-      if (!q('#main .cb-clockslot .ck-boxes')) fail('the card\'s foot has no clock');
+      if (!q(NIGHT)) fail('the night clock has no CALL IT A NIGHT over the card');
       if (!b || !b.height) return;
       for (i = 0; i < heads.length; i++) all.push(heads[i]);
       for (i = 0; i < rows.length; i++) all.push(rows[i]);
-      all.push(q(fk('card-night')));
       for (i = 0; i < all.length; i++) { r = all[i].getBoundingClientRect(); if (r.height && (r.top < b.top - 1 || r.bottom > b.bottom + 1)) fail('on the card, ' + describe(all[i]) + ' is off the sheet'); }
     }
     function text() { var c = cur(); return (c.text || '') + ' ' + (c.more || ''); }
@@ -116,7 +130,7 @@
       for (i = 0; i < 400; i++) {
         s = S();
         if (done()) return;
-        if (q('.cs-root')) { c = SB.Chapters.nextCutscene(s); if (c) seenCuts.push(c.key); q('.cs-root .cs-skip').click(); continue; }
+        if (q('.cs-root')) { c = SB.Chapters.nextCutscene(s); seenCuts.push(c ? c.key : coachKey()); q('.cs-root .cs-skip').click(); continue; }
         if (q('.sy-card')) { cards.push(q('.sy-card').getAttribute('data-patch')); q('.sy-card .sy-card-go').click(); continue; }
         e = live('#overlay .sb-check');
         if (e) { bs = e.querySelectorAll('button'); bs[bs.length - 1].click(); continue; }
@@ -136,17 +150,17 @@
           e.click(); continue;
         }
         /* the show's card is up at an evening: CALL IT A NIGHT is on its foot (the tape is there while the guide waits) */
-        if (SB.UI.route() === 'show' && q(fk('card-night')) && s.clock.stop && s.clock.stop.kind === 'EVENING') {
-          if (cur().target === 'lamp') taped(fk('card-night'));
-          q(fk('card-night')).click();
+        if (SB.UI.route() === 'show' && q(NIGHT) && s.clock.stop && s.clock.stop.kind === 'EVENING') {
+          if (cur().target === 'lamp') taped(NIGHT);
+          q(NIGHT).click();
           if (SB.UI.playing()) SB.UI.fire('sb-play', { cmd: 'pause', by: 'player' });
           continue;
         }
         if (SB.UI.route() !== 'desk') { down(); continue; }
         /* an evening: call it a night on the tape deck (where the tape is, when the step points there); the end of a week: close it */
         if (s.clock.stop && (s.clock.stop.kind === 'EVENING' || s.clock.stop.kind === 'END_OF_WEEK')) {
-          if (cur().target === 'lamp' || cur().target === 'night') taped(hit('lamp'));
-          q(hit('lamp')).click();
+          if (cur().target === 'lamp' || cur().target === 'night') taped(nightSel());
+          q(nightSel()).click();
           if (SB.UI.playing()) SB.UI.fire('sb-play', { cmd: 'pause' });
           continue;
         }
@@ -193,9 +207,9 @@
       expect('HOLD', 'WAIT'); clean();
       if (outN() !== 1) fail('the card\'s foot counts ' + outN() + ' asks going out tonight, not the one hold');
       /* waiting is CALL IT A NIGHT, on the card: nobody goes looking for the tape deck */
-      taped(fk('card-night'));
+      taped(NIGHT);
       cardNight();
-      taped(hit('lamp'));
+      taped(nightSel());
       if (env.autoPause) env.autoPause(hit('lamp')); else until('HOLD:WAIT', 'the hold');
       if (at() === 'HOLD:HELD') { if (cur().target !== 'lamp') fail('the room is held with something still wanted: ' + text()); until('HOLD:HELD', 'the held night to be booked'); }
       /* a yes is a yes: the host's answer books the night, no second message */
@@ -236,18 +250,12 @@
       cardFits('CREW');
       taped(fk('cr-sound' + cur().personId));
     });
-    phase('sound: asked; the bands and sound answer over one wait', null, function () {
+    /* the room is confirmed, so the flyer does not wait on the bands (they go on it as TBA): asked, the guide goes
+     * straight to the flyer, the same night */
+    phase('sound: asked; the flyer goes on the same night', null, function () {
       tap(fk('cr-sound' + cur().personId));
-      expect('BILL', 'WAIT'); clean();
+      expect('FLYER', 'MAKE'); clean();
       if (outN() !== 4) fail('the card\'s foot counts ' + outN() + ' messages going out tonight, not the offer, the two locals and sound');
-      cardNight();
-      until('BILL:WAIT', 'the bands and sound to answer');
-      if (cur().step === 'SOUND') until('SOUND:WAIT', 'sound to answer');
-      expect('FLYER'); clean();
-      var o = SB.Chapters.billOrder(S(), show()), last = show().bill.slots[show().bill.slots.length - 1];
-      if (!o.ok || o.n < 3) fail('the bill is not kids, touring, draw: ' + JSON.stringify(show().bill.slots.map(function (x) { return S().bands[x.bandId].name + ' ' + x.role; })));
-      if (last.pay === 'FLAT' || last.fee > 0) fail('the closer is on the bill for a flat fee');
-      if (!(show().crew && show().crew.sound)) fail('sound did not say yes over the same wait as the bands');
     });
     /* 5 FLYER: the card's flyer row, into the flyer desk, and USE THIS FLYER comes back to the card */
     phase('flyer: the flyer desk', '05-FLYER', function () {
@@ -257,22 +265,27 @@
       if (SB.UI.route() !== 'flyerdesk') fail('the flyer row did not open the flyer desk');
       taped('#main [data-tut="flyer-make"]');
     });
-    phase('flyer: use this flyer', null, function () {
+    /* the room is booked and the flyer made, so the evenings spent waiting on the bands and sound go to getting the
+     * word out (SB.Tutorial.current: PROMO while BILL or SOUND waits); the answers come in along the way */
+    phase('flyer: use this flyer, on to getting the word out', null, function () {
       tap('#main [data-tut="flyer-make"]');
-      expect('PROMO', 'PLAN'); clean();
       if (SB.UI.route() !== 'show' || card().getAttribute('data-sel') !== 'flyer') fail('USE THIS FLYER did not come back to the card\'s flyer row');
+      clean();
+      if (!/^(PROMO|BILL|SOUND):/.test(at())) fail('with the flyer made, the guide says ' + at());
     });
     /* 6 PROMO: the ANNOUNCE step: each job with what it takes and when it is due, and DO IT TONIGHT */
     phase('promo: the calendar, a job', '06-PROMO', function () {
+      if (at() !== 'PROMO:PLAN') return;
       cardFits('ANNOUNCE');
       taped('#main [data-tut="card-donow"][data-tut-ref="' + cur().jobId + '"]');
     });
-    phase('promo: jobs on days, done', null, function () {
-      var i, e, n = 0, nights = 0, k;
-      for (i = 0; i < 80 && cur().step === 'PROMO'; i++) {
+    phase('promo: jobs on days, done; the bands and sound answered', null, function () {
+      var i, e, n = 0, nights = 0, k, o, last;
+      for (i = 0; i < 80 && /^(PROMO|BILL|SOUND)$/.test(cur().step || ''); i++) {
         if (at() === 'PROMO:PLAN') {
           /* the job the guide names: its DO IT TONIGHT, or the row (or folded step) it is under */
           toCard();
+          cuts();
           e = tapedEl();
           if (!e || d.querySelectorAll('.sy-tape').length !== 1) fail('no tape on the card');
           k = e.getAttribute('data-tut');
@@ -280,22 +293,26 @@
           else if (k !== 'card-row' && k !== 'card-step') fail('the tape is on ' + describe(e) + ', not on a job to do tonight');
           if (e.disabled) fail(describe(e) + ' is disabled');
           e.click();
-        } else {
-          /* nothing more fits tonight: call it a night, on the card */
-          if (nights++ > 12) fail('the promo jobs never got done');
+        } else if (/:WAIT$/.test(at())) {
+          /* nothing more fits tonight, or answers are out: call it a night */
+          if (nights++ > 14) fail('the promo jobs never got done');
           if (SB.UI.route() === 'show') cardNight();
-          until('PROMO:WAIT', 'tomorrow\'s hours');
-        }
+          until(at(), 'tomorrow');
+        } else fail('the guide asks for ' + at() + ' while getting the word out');
       }
-      if (cur().step === 'PROMO') fail('the jobs never got done');
       if (n < 3) fail('fewer than the flyer and two promo jobs were done from the card (' + n + ')');
       expect('WAIT', 'PLAY'); clean();
+      o = SB.Chapters.billOrder(S(), show()); last = show().bill.slots[show().bill.slots.length - 1];
+      if (!o.ok || o.n < 3) fail('the bill is not kids, touring, draw: ' + JSON.stringify(show().bill.slots.map(function (x) { return S().bands[x.bandId].name + ' ' + x.role; })));
+      if (last.pay === 'FLAT' || last.fee > 0) fail('the closer is on the bill for a flat fee');
+      if (!(show().crew && show().crew.sound)) fail('sound did not say yes');
     });
     /* 7 WAIT */
     phase('wait: the tape deck', '07-WAIT', function () {
-      if (SB.UI.route() === 'show') taped(fk('card-night'));     // on the card, waiting is CALL IT A NIGHT
+      /* waiting is CALL IT A NIGHT on the pinned night clock, on the card or the desk; the tape deck when the clock is away */
+      if (SB.UI.route() === 'show') taped(NIGHT);
       down();
-      taped(hit('lamp'));
+      taped(nightSel());
     });
     phase('wait: the weeks go by', null, function () {
       time(function () { return SB.UI.route() === 'night'; }, 'the night of the show');
@@ -310,7 +327,13 @@
       var i, e;
       tap(fk('open'));
       for (i = 0; i < 60 && cur().step === 'DOOR'; i++) { e = tapedEl(); if (e) e.click(); flush(); }
-      for (i = 0; i < 60 && !q('#main .nt-tab[data-option="custom"]'); i++) { e = tapedEl(); if (!e) flush(); else { e.click(); flush(); } }
+      /* while the night plays out the guide keeps quiet (no tape: js/ui/story.js, body.nt-playing); the player skips to
+       * the settle themselves, or lets it play */
+      for (i = 0; i < 60 && !q('#main .nt-tab[data-option="custom"]'); i++) {
+        e = tapedEl() || q(fk('skip') + ':not([disabled])');
+        if (e) e.click();
+        flush();
+      }
       expect('SETTLE'); clean();
     });
     /* 9 SETTLE */
@@ -335,12 +358,17 @@
       if (!S().patches.DOORS_AT_8) fail('the DOORS_AT_8 patch was not earned');
       if (cards.indexOf('DOORS_AT_8') < 0) fail('the DOORS_AT_8 card did not land on the desk');
       expect('CLOSEOUT');
-      taped(hit('lamp'));
+      taped(nightSel());
     }, '#main [data-fk="leave"]');
     phase('close-out: the week closes', null, function () {
       time(function () { return !S().story.tutorial.on; }, 'the close-out');
       if (S().story.tutorial.done === null) fail('the walkthrough did not finish');
       if (d.querySelector('.sy-tape')) fail('the tape is still up after the last step');
+      /* the outgoing booker's call came up for every thing the guide asked on the way (content story.coach) */
+      ['TUT_ANSWER_REPLY', 'TUT_HOLD_ASK', 'TUT_HOLD_WAIT', 'TUT_BILL_OFFER', 'TUT_BILL_KIDS', 'TUT_BILL_LOCAL', 'TUT_SOUND_ASK', 'TUT_FLYER_MAKE',
+       'TUT_PROMO_PLAN', 'TUT_WAIT_PLAY', 'TUT_DOOR', 'TUT_CLOSEOUT_READ'].forEach(function (k) {
+        if (S().story.seen.indexOf(k) < 0) fail('the call ' + k + ' never played (seen: ' + S().story.seen.join(', ') + ')');
+      });
       log.push('settle ' + JSON.stringify(env.settle) + '; cutscenes ' + seenCuts.join(', ') + '; patches ' + Object.keys(S().patches).join(', '));
     });
 

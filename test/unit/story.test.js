@@ -15,6 +15,24 @@ module.exports = function (t) {
   const STEPS = sb.Tutorial.STEPS;
   const copy = x => JSON.parse(JSON.stringify(x));
 
+  /* ---------------- the way in: the setup asked in the going-away scene ---------------- */
+  H.section(t, 'the going-away bill is kept', () => {
+    /* the scene plays on a first draft (guided, no name); the replies make the real game with the same seed */
+    const first = H.newGame(sb, { seed: 'story-way-in', bookingName: '', tutorial: true });
+    const a = sb.Chapters.slots(first, 'GOING_AWAY_open');
+    const bill = { band1: a.band1, band2: a.band2, band2Home: a.band2Home, band3: a.band3 };
+    t.ok(bill.band1 && bill.band2 && bill.band3, 'the draft has a going-away bill');
+    const real = sb.Game.newGame({ seed: 'story-way-in', citySlug: 'pensacola', bookingName: 'Tin Lid', settings: { bills: false, fog: 'HARD', windows: 'FORGIVING' },
+                                   tutorial: false, goingAway: bill });
+    const b = sb.Chapters.slots(real, 'GOING_AWAY_open');
+    t.eq([b.band1, b.band2, b.band2Home, b.band3], [bill.band1, bill.band2, bill.band2Home, bill.band3], 'the real game shows the bill that was watched');
+    t.eq(b.bands, [bill.band1, bill.band2, bill.band3], 'in that order');
+    t.eq([b.outgoing, b.room, b.host, b.sound, b.town], [a.outgoing, a.room, a.host, a.sound, a.town], 'and the same people and room');
+    t.ok(real.story.tutorial.skipped && !real.settings.bills && real.settings.fog === 'HARD' && real.settings.windows === 'FORGIVING', 'the replies are the settings');
+    const none = sb.Game.newGame({ seed: 'story-way-in', citySlug: 'pensacola', bookingName: 'Tin Lid', goingAway: { band1: 'x' } });
+    t.ok(!(none.story.chapters.GOING_AWAY.refs || {}).band1, 'a half bill is not kept');
+  });
+
   /* ---------------- a new game ---------------- */
   H.section(t, 'a new game', () => {
     const s = H.newGame(sb, { seed: 'story-new' });
@@ -55,6 +73,11 @@ module.exports = function (t) {
     t.eq(sb.Patches.nextToast(s), null, 'until it is shown');
     sb.Tutorial.start(s);
     t.ok(!s.story.tutorial.on, 'a skipped walkthrough does not start again');
+    /* the strip's "skip the walkthrough" marks the skip's one text read, so the strip goes straight to the reminder */
+    const s2 = H.newGame(sb, { seed: 'story-skip-strip' });
+    t.ok(!!sb.Tutorial.current(s2), 'a new game is mid-walkthrough');
+    sb.Tutorial.skip(s2); sb.Chapters.markSeen(s2, 'TUTORIAL_SKIP');
+    t.ok(sb.Tutorial.current(s2) === null && s2.story.seen.indexOf('TUTORIAL_SKIP') >= 0, 'skipped mid-way: no step, and the skip text is read');
   });
 
   /* ---------------- the guided band waits for a slow offer ---------------- */
@@ -73,6 +96,26 @@ module.exports = function (t) {
     o.story.tutorial.on = false;
     for (let d = oq.day; d <= last; d++) { o.clock.day = d; sb.Requests.daily(o, d); }
     t.ok(['IGNORED', 'LAPSED'].indexOf(oq.status) >= 0, 'with the walkthrough off it lapses or goes to a rival (' + oq.status + ')');
+  });
+
+  /* ---------------- the guided show falls through after the room said yes ---------------- */
+  H.section(t, 'the guided show falls through', () => {
+    const s = H.newGame(sb, { seed: 'story-fall' }), T = s.story.tutorial, rid = T.requestId;
+    t.ok(!Object.keys(s.shows || {}).length, 'a new game has no show yet');
+    s.shows = s.shows || {};
+    s.shows.fall = { id: 'fall', day: s.clock.day + 6, status: 'DRAFT', requestId: rid, roomId: null, hold: null, night: null,
+                     bill: { slots: [], times: [], locked: false }, crew: {}, promo: {}, jobs: [] };
+    T.step = 'PROMO'; T.showId = 'fall'; T.replied = true;
+    const cur = sb.Tutorial.current(s);
+    t.ok(cur && cur.step === 'HOLD', 'the room fell through: current() goes back to HOLD (' + (cur && cur.step) + ')');
+    sb.Tutorial.notify(s, 'CHECK', null);
+    t.eq(T.step, 'HOLD', 'and notify() writes it down');
+    s.shows.fall.status = 'CANCELLED';
+    if (rid && s.requests[rid]) s.requests[rid].status = 'LAPSED';
+    T.step = 'BILL';
+    t.eq(sb.Tutorial.current(s), null, 'cancelled with the request gone: nothing to walk through');
+    sb.Tutorial.notify(s, 'CHECK', null);
+    t.ok(!T.on && T.step === null && T.lapsed && !T.skipped, 'the walkthrough closes, not skipped');
   });
 
   /* ---------------- the walkthrough, played ---------------- */
@@ -177,7 +220,7 @@ module.exports = function (t) {
     const c = s.story.counts;
     c.secondToLast = 10; c.flyerSameDay = 5; c.doneBy = 10; c.fourPeople = 1; c.swaps = 1; c.copsCame = 1;
     got = check();
-    ['SECOND_TO_LAST', 'FLYER_SAME_DAY', 'DONE_BY_1030', 'FOUR_PEOPLE', 'SWAP', 'COPS_CAME'].forEach(id => t.ok(got.indexOf(id) >= 0 || (id === 'SWAP' && !!s.patches.SWAP), id + ' from its counter'));   // the swap of week 5 may already have been played
+    ['SECOND_TO_LAST', 'FLYER_SAME_DAY', 'DONE_BY_1030', 'FOUR_PEOPLE', 'SWAP', 'COPS_CAME'].forEach(id => t.ok(got.indexOf(id) >= 0 || ((id === 'SWAP' || id === 'FOUR_PEOPLE') && !!s.patches[id]), id + ' from its counter'));   // the swap of week 5, or a four-person night, may already have been played
     t.ok(got.indexOf('SWAP:closed') >= 0 || open('SWAP'), 'a swap played opens (and closes) The swap');
     t.eq(check(), [], 'nothing is earned or opened twice');
     Object.keys(s.patches).forEach(id => t.ok(typeof s.patches[id].week === 'number' && s.patches[id].refs && typeof s.patches[id].refs === 'object', id + ' is { week, refs }'));

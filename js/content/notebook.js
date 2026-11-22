@@ -9,8 +9,8 @@ SB.Content.notebook = {
   family: {
     aff:     { title: '{a} and {b}', WORKS: 'They share a crowd here. Put them together.', DOESNT: 'The crowds don\'t mix here.',
                DEPENDS: 'Some cross over. Not most.', NEUTRAL: 'Nobody knows yet.' },
-    draw:    { title: '{band|A band}', WORKS: 'Worth {lo} to {hi} here, more than people guessed.', DOESNT: 'Worth {lo} to {hi} here. Less than the name suggests.',
-               DEPENDS: 'Worth {lo} to {hi} here, depending on the night.', NEUTRAL: 'Worth {lo} to {hi} here.' },
+    draw:    { title: '{band|A band}', WORKS: '{band|A band} draws {lo} to {hi} people here, more than people guessed.', DOESNT: '{band|A band} draws {lo} to {hi} people here. Less than the name suggests.',
+               DEPENDS: '{band|A band} draws {lo} to {hi} people here, depending on the night.', NEUTRAL: '{band|A band} draws {lo} to {hi} people here.' },
     cross:   { title: '{band} outside their crowd', WORKS: 'People who don\'t like {a|their sound} still come out for them.',
                DOESNT: 'Only their own crowd comes. Nobody else stays for the set.', DEPENDS: 'Some people outside their crowd come. It depends on the bill.',
                NEUTRAL: 'Nobody knows yet who comes for them besides their own people.' },

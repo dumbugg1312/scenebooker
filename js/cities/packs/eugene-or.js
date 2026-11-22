@@ -1,8 +1,9 @@
 SB.Cities.register('eugene-or', {
   v: 1,
   slug: 'eugene-or',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
-  banned: ['university of oregon', 'oregon ducks', 'oregon state', 'oregon state beavers', 'olcc', 'oregon liquor and cannabis commission',
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
+  banned: ['saturday market', 'oregon bach festival', 'bach festival', 'oregon aloha festival', 'prefontaine classic', 'hayward field', 'autzen stadium', 'autzen', 'lane events center', 'lookout eugene-springfield', 'lookout eugene', 'opb', 'katu', 'eugene police department', 'social host ordinance', 'civil war game', 'alton baker park', 'frohnmayer bridge', 'ferry street bridge', 'riverfront district',
+           'university of oregon', 'oregon ducks', 'oregon state', 'oregon state beavers', 'olcc', 'oregon liquor and cannabis commission',
            'peacehealth', '4j', 'lane community college', 'lane transit district', 'emx', 'bushnell university', 'eugene weekly', 'register-guard',
            'the register-guard', 'daily emerald', 'kwva', 'klcc', 'krvm', 'jefferson public radio', 'oregon country fair', 'eugene celebration',
            'whiteaker block party', 'track town', 'track town usa', 'world athletics championships', 'olympic trials', 'amtrak', 'amtrak cascades',
@@ -47,7 +48,47 @@ SB.Cities.register('eugene-or', {
     { id: 'river-road', name: 'River Road and Santa Clara', route: 'campus', note: 'Car-oriented suburbs north of the river: ranch houses with garages, big-box stores and the kids from the burbs.' }
   ],
 
+  rooms: [
+    { id: 'near-west-house', kind: 'HOUSE', hood: 'near-west', cap: 60, curfew: 1290, ac: false, outdoor: false, pressure: 50, start: true,
+      note: 'A living room and garage on a quiet craftsman block. The host knocks on doors first, and the neighbors still call it in.' },
+    { id: 'campus-coop', kind: 'HOUSE', hood: 'campus', cap: 80, curfew: 1305, ac: false, outdoor: false, pressure: 55,
+      note: 'A co-op house with a garage and a long history of shows. The students leave every June and the landlord worries all year.' },
+    { id: 'whiteaker-yard', kind: 'HOUSE', hood: 'whiteaker', cap: 120, curfew: 1305, ac: false, outdoor: true, pressure: 65,
+      note: 'A big backyard house, the one everybody wants. One like it ended after three shows of three hundred people.' },
+    { id: 'river-yard', kind: 'OUTDOOR', hood: 'river-road', cap: 100, curfew: 1260, ac: false, outdoor: true,
+      note: 'A suburban backyard and garage on a big lot. Dry months only, and tarps the rest of the year.' },
+    { id: 'resale-shop', kind: 'SHOP', hood: 'west-eugene', cap: 150, curfew: 1320, pa: 0.5, ac: false, standing: [65, 65, 70],
+      note: 'A resale store that turns into a warehouse music room at night. All ages, and the neighbors are industrial.' },
+    { id: 'trainsong-bay', kind: 'DIY', hood: 'west-eugene', cap: 100, curfew: 1320, ac: false, pressure: 55, needs: ['VOUCH'],
+      note: 'A practice bay in a metal building by the rail yard. Cheap and mostly ignored, until the fire marshal reads the occupancy.' },
+    { id: 'corner-cafe', kind: 'SHOP', hood: 'whiteaker', cap: 120, curfew: 1290, pa: 0.5, ac: true, standing: [65, 65, 70],
+      note: 'A coffee shop with a lot and a corner stage that books heavy bills. It keeps them short and early.' },
+    { id: 'community-hall', kind: 'HALL', hood: 'downtown', cap: 150, curfew: 1260, rent: 150, ac: true,
+      note: 'A rented community space with a church attached. Acoustic bills are fine, and loud ones only for a benefit.' },
+    { id: 'riverfront-lot', kind: 'OUTDOOR', hood: 'downtown', cap: 250, curfew: 1140, rent: 20, ac: false, outdoor: true, pressure: 45,
+      note: 'A downtown lot for a summer daytime bill, run by a benefit collective. It needs a permit, and it is over by seven.' },
+    { id: 'whiteaker-bar', kind: 'BAR', hood: 'whiteaker', cap: 200, soundFee: 60, ages: ['A21'], curfew: 1410, ac: true, following: 0.3,
+      note: 'A tavern with a stage on the Whiteaker strip. The longest-running one has just closed ahead of a building sale.' },
+    { id: 'back-stage-bar', kind: 'BAR', hood: 'downtown', cap: 150, soundFee: 50, ages: ['ALL', 'A21'], matinee: true, curfew: 1440, ac: true, following: 0.3,
+      note: 'A bar with a back stage that lets kids in until nine, and then it goes 21 and over.' },
+    { id: 'music-hall', kind: 'CLUB', hood: 'downtown', cap: 300, ages: ['A21'], curfew: 1410, ac: true, following: 0.5,
+      note: 'A mid-size music hall that keeps undergrads out. Hard to book for punk, and rooms like it are closing.' }
+  ],
+
   contacts: ['salem-or', 'bend-or', 'portland', 'olympia-wa'],
+
+  calendar: [
+    { id: 'country-fair', label: 'the country fair', tag: 'festival', month: 7, week: 2, dows: [4, 5, 6], can: [0.85, 0.8, 0.8] },
+    { id: 'track-meet', label: 'track meet weekend', tag: 'race', month: 6, weeks: [1, 4], dows: [3, 4, 5], can: [0.92, 0.9, 0.9], hoods: ['downtown', 'campus'], elsewhere: [1, 1, 1] },
+    { id: 'graduation', label: 'graduation weekend', tag: 'graduation', month: 6, week: 2, dows: [4, 5], can: [0.85, 0.85, 0.9], hoods: ['campus'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [0.8, 0.95, 0.95], hoods: ['campus', 'downtown'], elsewhere: [1, 1, 1] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [0.8, 0.95, 0.95], hoods: ['campus', 'downtown'], elsewhere: [1, 1, 1] },
+    { id: 'football-nov', label: 'home football', tag: 'game', month: 11, weeks: [1, 5], dows: [5], can: [0.8, 0.95, 0.95], hoods: ['campus', 'downtown'], elsewhere: [1, 1, 1] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.1] }
+  ],
+
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1440, weekend: 1440, inForce: false } },
 
   points: [
     { name: 'Portland', state: 'OR', lat: 45.52, lon: -122.68, pop: 650000 },
@@ -82,6 +123,40 @@ SB.Cities.register('eugene-or', {
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
           result: 'You moved it a day. The sky cleared up and half the list had other plans.' }
+      ] },
+
+    { id: 'EUGENE_OR_NOISE_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 2], months: [9, 10, 11, 3, 4, 5, 6] },
+      telegraph: 'Two neighbors on the street know about the show, and the one on the left was never asked.',
+      title: 'The call at twenty past nine',
+      body: 'The host knocked on doors and left a note on the porch, but the neighbor on the left never got one. A police call comes in at 9:20 with the first band still on.',
+      options: [
+        { id: 'KNOCK', label: 'Go knock on the door and apologize', likely: 'Costs a little and buys some goodwill. The crowd sees you leave.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }, { op: 'REGULARS', pct: .02 }],
+          result: 'The neighbor got a plate of cookies and a promise. The police car rolled on.' },
+        { id: 'SHORT', label: 'Cut the bill short and clear out', likely: 'Safe for the host. A thin, early night.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
+          result: 'You stopped after two bands. Nobody argued, and the host kept the house.' },
+        { id: 'ACCEPT', label: 'Keep playing and hope', likely: 'Risks a citation for the host.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
+          result: 'The third band played to a quiet street, and the host got a warning in the morning.' }
+      ] },
+
+    { id: 'EUGENE_OR_GAME_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'game' },
+      telegraph: 'A home game is on Saturday, and cones are going up on the bridges.',
+      title: 'Football Saturday',
+      body: 'Tens of thousands are coming into town for the game. No parking within a mile of campus, and half your usual crowd is stuck in the cone patterns on the bridges.',
+      options: [
+        { id: 'LATE', label: 'Push doors back until the traffic clears', likely: 'The crowd that gets through still wants a night out.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
+          result: 'Doors an hour late. The ones who got across came in loud and tired.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is in traffic.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
+          result: 'The bridges stayed jammed. The regulars walked in.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
       ] }
   ]
 });

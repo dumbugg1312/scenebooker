@@ -279,12 +279,17 @@ const PAGE = `(function () {
     await report('start', 'the start screen');
     await click('[data-fk="new"]', 900); await waitFor('[data-fk="city-pensacola"]');
     await click('[data-fk="city-pensacola"]', 400); await click('[data-fk="city-pick"]', 400);
-    await waitFor('[data-fk="name-in"]', 15000); await sleep(400);
-    await ev('(function () { var i = document.querySelector("[data-fk=\\"name-in\\"] input") || document.querySelector("input[data-fk=\\"name-in\\"]"); i.focus(); i.value = "Extension Cord Booking"; i.dispatchEvent(new Event("input", { bubbles: true })); return 1; })()');
-    await sleep(600); await report('name', 'named the outfit');
-    await click('[data-fk="name-next"]', 1000); await waitFor('[data-fk="skip-tutorial"]');
-    await report('setup', 'setup, the skip button is there');
-    await click('[data-fk="skip-tutorial"]', 1500);
+    /* the setup is asked in the going-away show: skip to the questions, take each first reply till the name */
+    await waitFor('.cs-root .cs-skip', 15000); await click('.cs-root .cs-skip', 1200);
+    for (let i = 0; i < 60 && !(await ev('!!document.querySelector(".cs-ask-name input")')); i++) {
+      await ev('(function () { var b = document.querySelector(".cs-root .cs-reply:not([disabled])"); if (b) b.click(); return 1; })()'); await sleep(400);
+    }
+    await waitFor('.cs-ask-name input', 15000); await sleep(1200);
+    await ev('(function () { var i = document.querySelector(".cs-ask-name input"); i.focus(); i.value = "Extension Cord Booking"; i.dispatchEvent(new Event("input", { bubbles: true })); return 1; })()');
+    await sleep(600); await report('name', 'named the outfit, in the scene');
+    await click('[data-fk="name-done"]', 1500); await waitFor('.cs-root .cs-reply:not([disabled])');
+    await report('setup', 'the walkthrough question, "I\'ve done this before" is there');
+    await ev('(function () { var r = document.querySelectorAll(".cs-root .cs-reply"); r[r.length - 1].click(); return 1; })()'); await sleep(1500);
     await waitFor('.cs-root, #desk .dk-hit', 15000);
     await ev('(function () { var g = 0; while (document.querySelector(".cs-root .cs-skip") && g++ < 12) document.querySelector(".cs-root .cs-skip").click(); return 1; })()');
     await sleep(1500);

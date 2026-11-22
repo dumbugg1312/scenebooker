@@ -18,7 +18,7 @@ SB.Content.legacy = {
             'The door is yours. Cash box, stamp, the count. That\'s the whole job, so don\'t hand it off.\n' +
             '{host} has {room}. Done by {curfew}, no exceptions.\n\n' +
             'Three things I wish somebody told me:\n1. Answer everyone, even with a no.\n2. Don\'t promise a guarantee you can\'t pay out of your own pocket.\n3. Flyer the day you confirm. Not the week of. The day you confirm.\n\n' +
-            'You\'ll need a name to put on the flyers. Don\'t use mine.\n\nI\'ll still answer my phone. Probably.\n{outgoingInitial}'
+            'I\'ll still answer my phone. Probably.\n{outgoingInitial}'
     },
     notes: ['Answer everyone.', 'Flyer the day you confirm.', '{room}: done by {curfew}.'],     // the first three notebook notes, conf RUMOR
     script: [                              // the scripted first weeks (story 4.4), as 03-content section 10 gives them

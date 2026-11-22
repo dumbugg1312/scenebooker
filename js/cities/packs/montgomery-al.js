@@ -1,13 +1,15 @@
 SB.Cities.register('montgomery-al', {
   v: 1,
   slug: 'montgomery-al',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['maxwell-gunter', 'maxwell gunter', 'maxwell air force base', 'maxwell afb', 'air university', 'hyundai', 'baptist hospital', 'jackson hospital',
            'alabama state university', 'alabama state', 'auburn university at montgomery', 'aum', 'faulkner university', 'huntingdon college', 'tuskegee university',
            'troy university', 'montgomery biscuits', 'iron bowl', 'national fair', 'legacy museum', 'rosa parks museum', 'montgomery advertiser',
            'waffle house', 'chris\' hot dogs', 'vfw', 'american legion', 'elks', 'moose lodge', 'abc board', 'union station',
            'catoma annex', 'two mile hall', 'bell street backroom', 'fairview tarp', 'day street garage', 'sayre street loft', 'coosa street warehouse',
-           'lanier carport', 'pill hill parlor', 'mount meigs shop floor', 'wetumpka road bay', 'capitol heights porch'],
+           'lanier carport', 'pill hill parlor', 'mount meigs shop floor', 'wetumpka road bay', 'capitol heights porch',
+           'alabama national fair', 'alabama state fair', 'red bluff', 'riverbend brewfest', 'camellia bowl', 'experience montgomery', '1819 news', 'yellowhammer news',
+           'bandsintown', 'hbcu classic', 'turkey day classic', 'alabama state hornets', 'auburn tigers', 'camellia city', 'montgomery police', 'montgomery city council'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['montgomery advertiser*', 'hyundai*', 'waffle house*', 'iron bowl*', 'montgomery biscuits*', 'catoma annex*', 'chris\' hot dogs*'],
 
@@ -49,7 +51,45 @@ SB.Cities.register('montgomery-al', {
     { id: 'south-side', name: 'the south and southeast side', route: 'work-side', note: 'Light industry and warehouse bays along the highways, far from neighbors. Practice rooms and generator shows, with fire code the unspoken problem.' }
   ],
 
-  contacts: ['columbus-ga', 'mobile-al', 'huntsville-al', 'tuscaloosa-al'],
+  rooms: [
+    { id: 'midtown-carport', kind: 'HOUSE', hood: 'midtown', cap: 40, curfew: 1320, ac: false, outdoor: true, start: true,
+      note: 'A carport and backyard on a rental street. The neighbors call, and July heat ends it before they do.' },
+    { id: 'cloverdale-porch', kind: 'HOUSE', hood: 'cloverdale', cap: 30, curfew: 1320, ac: false, outdoor: true, pressure: 55,
+      note: 'A porch set on a block of close bungalows. The neighbors are near and the rents are climbing.' },
+    { id: 'river-storefront', kind: 'DIY', hood: 'downtown', cap: 120, ac: true, pressure: 55, needs: ['VOUCH'],
+      note: 'A small storefront or upper room near the river that bands have started using. The landlord and the fire code both have opinions.' },
+    { id: 'church-hall', kind: 'HALL', hood: 'downtown', cap: 150, curfew: 1350, ac: true, standing: [60, 60, 55], pressure: 50,
+      note: 'A church hall the bands run themselves, which punk shows came back to. The landlord or the congregation can pull it any week.' },
+    { id: 'east-hall', kind: 'HALL', hood: 'east-montgomery', cap: 120, curfew: 1320, ac: true, owner: 'HALL_MANAGER',
+      note: 'A rentable lodge hall in the subdivision belt. Content rules, no beer, and out by ten.' },
+    { id: 'downtown-bar', kind: 'BAR', hood: 'downtown', cap: 150, ages: ['A18'], curfew: 1410, ac: true,
+      note: 'A downtown bar with music most nights. Wristbands or an 18-plus night, and the liquor license sets the rules.' },
+    { id: 'vaughn-bar', kind: 'BAR', hood: 'east-montgomery', cap: 100, ages: ['A18'], curfew: 1380, ac: true, pressure: 50,
+      note: 'A bar back room on the east side, filling in for the dive on Vaughn Road that closed. Nobody is sure how long it will last.' },
+    { id: 'blues-club', kind: 'CLUB', hood: 'downtown', cap: 300, ages: ['A18'], curfew: 1410, ac: true, needs: ['FULL_BILL'],
+      note: 'An 18-plus blues club with a real stage. It rarely books punk and wants real money when it does.' },
+    { id: 'bay-unit', kind: 'SHOP', hood: 'south-side', cap: 60, curfew: 1260, ac: false, pressure: 50,
+      note: 'A practice bay in a light-industrial strip along the highway. Far from neighbors, with the fire code left unsaid.' },
+    { id: 'lot-day-show', kind: 'OUTDOOR', hood: 'east-montgomery', cap: 80, curfew: 1140, ac: false, outdoor: true,
+      note: 'An afternoon lot or park set by the skate spots. Heat and thunderstorms cancel it more often than not.' },
+    { id: 'performing-arts', kind: 'BIG', hood: 'downtown', cap: 1500, ages: ['ALL'], curfew: 1350, ac: true,
+      note: 'The big downtown performing arts hall. It books touring acts, not local bills.' }
+  ],
+
+  contacts: ['columbus-ga', 'huntsville-al', 'mobile-al', 'birmingham', 'tuscaloosa-al'],
+
+  calendar: [
+    { id: 'parade-weekend', label: 'Mardi Gras parade weekend', tag: 'parade', month: 2, weeks: [1, 2], dows: [4, 5, 6], can: [.85, .80, .75], hoods: ['downtown'], elsewhere: [.97, .95, .95] },
+    { id: 'riverfront-fest', label: 'the riverfront music and food festival', tag: 'festival', month: 5, week: 2, dows: [4, 5, 6], can: [.88, .85, .85], hoods: ['downtown'], elsewhere: [.98, .96, .96] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 4], dows: [5], can: [.90, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 4], dows: [5], can: [.90, .95, .95] },
+    { id: 'harvest-day', label: 'the downtown harvest festival', tag: 'festival', month: 10, week: 3, dows: [5], can: [.88, .85, .85], hoods: ['downtown'], elsewhere: [1, .98, .98] },
+    { id: 'state-fair', label: 'the state fair', tag: 'fair', month: 10, weeks: [3, 4], dows: [3, 4, 5, 6], can: [.85, .85, .85], hoods: ['east-montgomery'], elsewhere: [.95, .93, .93] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { curfewMinors: { weeknight: 1260, weekend: 1380, inForce: false } },
 
   points: [
     { name: 'Birmingham', state: 'AL', lat: 33.52, lon: -86.81, pop: 200000 },
@@ -65,5 +105,57 @@ SB.Cities.register('montgomery-al', {
     hood: ['Cloverdale', 'Garden District', 'Capitol Heights', 'Centennial Hill', 'Eastdale', 'Eastchase', 'Pike Road', 'Day Street'],
     thing: ['carport', 'crawlspace', 'window unit', 'kudzu', 'fire ant mound', 'church sign', 'boiled peanuts', 'meat-and-three', 'lodge hall', 'drive-thru', 'wristband night', 'pickup truck'],
     weather: ['tornado watch', 'afternoon thunderstorm', 'heat index']
-  }
+  },
+  events: [
+    { id: 'MONTGOMERY_AL_TORNADO_WATCH', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [3, 4, 5, 11] },
+      telegraph: 'A tornado watch is posted for the whole county, and the sky over the river has gone green.',
+      title: 'A watch on the night of the show',
+      body: 'The watch is up at six. Half the list is texting that they will stay in, and the carport crowd is already looking for an interior wall.',
+      options: [
+        { id: 'HALLWAY', label: 'Run it in the middle of the house, a hallway full of people', likely: 'Small, loud and strangely close. The set may restart.',
+          effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'The power flickered and the set restarted on a phone flashlight. Nobody forgot it.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people stay home to watch the sky.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
+          result: 'The watch expired at nine. By then most of the list had given up on the night.' }
+      ] },
+
+    { id: 'MONTGOMERY_AL_FAIR_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'The state fair has the east side jammed, and half the kids you know are working the midway.',
+      title: 'Half the kids are on the midway',
+      body: 'The church hall show lands on a fair Saturday. The lots on the east side are closed for the fair, and the kids are riding the rides instead of coming to you.',
+      options: [
+        { id: 'LATE', label: 'Push doors back until the fair crowd thins', likely: 'The ones who still want a show come late.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Doors an hour late. The midway kids drifted in smelling of funnel cake.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual kids are at the fair.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The casual crowd rode the rides. The regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'MONTGOMERY_AL_PARADE_ALLEY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'parade' },
+      telegraph: 'Parade weekend is closing the streets around the 18-plus bar.',
+      title: 'The band loads in past a float',
+      body: 'The parade has the street by the bar shut. The band has to load in through the alley, around a float, and the doors are stuck behind the barricades.',
+      options: [
+        { id: 'EARLY', label: 'Open early and load in before the barricades', likely: 'Most get in. A short night.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
+          result: 'Doors early, loaded in before the barricades. The ones who came walked in from the parade.' },
+        { id: 'ALLEY', label: 'Carry the gear through the alley by hand', likely: 'Two hours of your day. The band remembers it.',
+          effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
+          result: 'You carried the amps past the float. The band told the story all night.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The streets stayed shut. Half the list never found a place to leave the car.' }
+      ] }
+  ]
 });

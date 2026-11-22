@@ -15,7 +15,7 @@ SB.Content.requests = {
       weight: 1,
       teaches: 'A good ask: exact dates, the route, what they carry, a small honest number.',
       subject: [
-        '{city}, {day1} the {date1:ord} (?date2: or {day2} the {date2:ord}), {band} ({home})',
+        '{city}, {day1} the {date1:ord}{of1} (?date2: or {day2} the {date2:ord}{of2}), {band} ({home})',
         'Date request: {city}, {month} {date1} (?date2: or {date2}), {band} from {home}'
       ],
       body: [
@@ -35,7 +35,7 @@ SB.Content.requests = {
 
         "Hi {you|there},\n\n" +
         "{band} here, from {home}. We play {genrePlain}. (?firstVisit: It's our first time down your way, so honestly, don't expect a crowd for us.)\n\n" +
-        "Dates: {day1} the {date1:ord} (?date2: or {day2} the {date2:ord}). " +
+        "Dates: {day1} the {date1:ord}{of1} (?date2: or {day2} the {date2:ord}{of2}). " +
         "[?hasRoute: We're in {prev} the night before and {next} the night after, so either one works for the drive. | We're still building the rest of the run around these.]\n" +
         "(?shortNotice: Sorry this is so close. We'd understand a no.)\n\n" +
         "Lineup is {n:words}, set is {setLen} minutes, done in time for the next band. (?PLEASANT: We'll bring our own snare and cymbals and we're happy to share the rest.)\n" +
@@ -49,8 +49,8 @@ SB.Content.requests = {
         "Thanks,\n{member}"
       ],
       followup: [
-        'Bumping this. Still have the {date1:ord} open if it works.',
-        'Checking back on {day1} the {date1:ord}. We\'re holding it for you till the end of the week, then we\'ll ask {next}.'
+        'Bumping this. Still have the {date1:ord}{of1} open if it works.',
+        'Checking back on {day1} the {date1:ord}{of1}. We\'re holding it for you till the end of the week, then we\'ll ask {next}.'
       ]
     },
 
@@ -102,7 +102,7 @@ SB.Content.requests = {
       body: [
         "Hi,\n\n" +
         "I handle routing for {band}. They're doing a {region} run in {month} supporting the new record and we're looking at {city} " +
-        "for the {date1:ord} (?date2: or the {date2:ord}) as an off-day fill between {prev} and {next}.\n" +
+        "for the {date1:ord}{of1} (?date2: or the {date2:ord}{of2}) as an off-day fill between {prev} and {next}.\n" +
         "(?shortNotice: Apologies for the short window; a date moved on us.)\n\n" +
         "Looking for a room in the 250 to 400 range. Ask is a {guarantee:money} guarantee versus {pct}% of the door after expenses, whichever is greater, " +
         "plus hospitality for {n} and two hotel rooms. Production rider attached. They'll want to know ticketing and age policy.\n\n" +
@@ -111,7 +111,7 @@ SB.Content.requests = {
 
         "Hi {you|there},\n\n" +
         "Checking avails for {band} in {city}, {month}. Routing has them in {prev} on the {date0:ord} and {next} after, so the " +
-        "{date1:ord} (?date2: or {date2:ord}) is the window.\n" +
+        "{date1:ord}{of1} (?date2: or {date2:ord}{of2}) is the window.\n" +
         "(?shortNotice: This one's tight, I know.)\n\n" +
         "Terms we've been doing in markets your size: {guarantee:money} flat, or versus {pct}% after documented costs. " +
         "Hospitality: a hot meal and water for {n}, a locked room for merch. Hotel is on us if the guarantee clears {guarantee:money}.\n" +
@@ -137,7 +137,7 @@ SB.Content.requests = {
       ],
       body: [
         "hey! {referrer} ({referrerHow}) said you're the person in {city}.\n\n" +
-        "we're {band}, we're [kind of {genrePlain} | {genrePlain} but slower | sort of {genreOwn}]. we're driving {prev} to {next} around the {date1:ord} " +
+        "we're {band}, we're [kind of {genrePlain} | {genrePlain} but slower | sort of {genreOwn}]. we're driving {prev} to {next} around the {date1:ord}{of1} " +
         "and would love to stop. (?shortNotice: i know that's really soon. sorry.) we don't need much, honestly, gas and a floor.\n\n" +
         "{referrer} said you'd [know a house | know where to put us | be nice about it].\n" +
         "(?hasLocal: we know {local} a little, they said they'd play.)\n" +
@@ -146,7 +146,7 @@ SB.Content.requests = {
 
         "hi {you|there},\n\n" +
         "{member} from {band} ({home}). we stayed with {referrer} last time through and they said if we ever come back to write you before anybody else.\n\n" +
-        "we'll be around {region} the week of the {date1:ord}(?date2: , {day1} or {day2} works best). " +
+        "we'll be around {region} the week of the {date1:ord}{of1}(?date2: , {day1} or {day2} works best). " +
         "(?firstVisit: never played {city} before.) (?hasDraw: we usually get {draw} or so at home, less out here.)\n" +
         "(?shortNotice: this is close, i know. tell me if it's too close.)\n\n" +
         "[?doorDeal: door's fine. whatever's fair. | we're trying to make {guarantee:money} a night for gas but we'll talk.] (?lodging: a floor for {n:words} would be amazing.)\n" +
@@ -154,7 +154,7 @@ SB.Content.requests = {
         "\\[link\\]\nthank you"
       ],
       followup: [
-        'hey just checking this got to you. still hoping for the {date1:ord}.',
+        'hey just checking this got to you. still hoping for the {date1:ord}{of1}.',
         '{referrer} said you\'re busy so no stress. just bumping it once.'
       ]
     },
@@ -166,7 +166,7 @@ SB.Content.requests = {
       weight: 1,
       teaches: 'A show with days instead of weeks: no posters, word of mouth and regulars only. The band remembers who caught them.',
       subject: [
-        'last minute - {day1} the {date1:ord} - anything?',
+        'last minute - {day1} the {date1:ord}{of1} - anything?',
         'show fell through {day1}, anything in {city}?'
       ],
       body: [
@@ -176,7 +176,7 @@ SB.Content.requests = {
         "(?PLEASANT: We'll bring our own everything and sweep up after.)\n\n" +
         "{band}, {home}. \\[link\\]\n{member}. text is better, we're in the van",
 
-        "hi. {member} from {band} ({home}). our {day1} the {date1:ord} just fell apart. the room closed. we found out an hour ago.\n" +
+        "hi. {member} from {band} ({home}). our {day1} the {date1:ord}{of1} just fell apart. the room closed. we found out an hour ago.\n" +
         "(?shortNotice: i know it's {daysOut:words} days.)\n\n" +
         "we're {n:words}, we play {genrePlain}, we can share everything. any room, any time, any money. (?lodging: we can sleep in the van if we have to.)\n" +
         "(?hasLocal: {local} said they'd play if you can find a place.)\n" +
@@ -204,14 +204,14 @@ SB.Content.requests = {
         "What's up!\n\n" +
         "{band} here, [{home}'s premier live act | the hardest-working band in {region} | you've probably heard of us]. " +
         "We [sold out | packed] our last hometown show ({bigNumber}+ people) and we're [building serious momentum | blowing up] right now.\n\n" +
-        "We're routing through {city} on the {date1:ord} and want to make it a big one. Looking for a Saturday if possible and a {guarantee:money} guarantee, which honestly is below our usual.\n" +
+        "We're routing through {city} on the {date1:ord}{of1} and want to make it a big one. Looking for a Saturday if possible and a {guarantee:money} guarantee, which honestly is below our usual.\n" +
         "(?shortNotice: We know it's soon but our people travel.)\n\n" +
         "We bring a crowd everywhere we go. Trust us.\n\n" +
         "\"Raw, urgent, essential.\" (a review from a site you've never heard of)\n\\[link\\]",
 
         "Yo {you|there}!\n\n" +
         "{band} is coming to {city} and we want the best room in town. We've been on fire this year: [{bigNumber} people at our release show | sold out back to back in {home} | everybody's talking about us in {region}].\n\n" +
-        "Looking at {day1} the {date1:ord}. {guarantee:money} guarantee plus a rider, nothing crazy. We're the next big thing, period, and we'd love {city} to be part of it.\n" +
+        "Looking at {day1} the {date1:ord}{of1}. {guarantee:money} guarantee plus a rider, nothing crazy. We're the next big thing, period, and we'd love {city} to be part of it.\n" +
         "(?shortNotice: Date's close but trust us, we fill rooms fast.)\n" +
         "(?hasDraw: Our last show in {peerCity} did {draw} on a {weekday}.)\n\n" +
         "Hit us back!!\n{member}"
@@ -234,7 +234,7 @@ SB.Content.requests = {
       ],
       body: [
         "Hey. {member} here, I book shows in {theirCity}. One of our bands, {band}, has been trying to get your way for a while.\n\n" +
-        "Want to trade? You put them on something in {city} {day1} the {date1:ord} (?date2: or {day2} the {date2:ord}), I'll get " +
+        "Want to trade? You put them on something in {city} {day1} the {date1:ord}{of1} (?date2: or {day2} the {date2:ord}{of2}), I'll get " +
         "[?yourBand: {yourBand} | ?yourBand: one of your bands | one of your bands] a good spot here, on a [Friday | weekend night]. I [book at {theirRoom} | know the people at {theirRoom}].\n" +
         "(?shortNotice: I know that's coming up fast.)\n\n" +
         "They're {n:words}, {setLen} minutes, can share drums. (?doorDeal: Door's fine with them.) They'll drive home after.\n" +
@@ -243,7 +243,7 @@ SB.Content.requests = {
 
         "hi {you|there}. {member} here, i book in {theirCity}.\n\n" +
         "the person who had your inbox before you used to send us bands and we sent them some back. figured we'd keep it going if you want.\n\n" +
-        "one of ours, {band}, would love {day1} the {date1:ord} in {city}. in return {theirRoom} has a [Friday | Saturday] open next month and we'd put [?yourBand: {yourBand} | whoever you want] on it, second to last, real slot.\n" +
+        "one of ours, {band}, would love {day1} the {date1:ord}{of1} in {city}. in return {theirRoom} has a [Friday | Saturday] open next month and we'd put [?yourBand: {yourBand} | whoever you want] on it, second to last, real slot.\n" +
         "(?shortNotice: sorry it's soon.)\n\n" +
         "they're {genrePlain}, {setLen} minutes, easy. (?PLEASANT: they'll bring snacks and they don't need a floor.)\n\n" +
         "\\[link\\]\n{member}"
@@ -267,13 +267,13 @@ SB.Content.requests = {
       body: [
         "Hey {you|there}! It's {member} from {band}. We're heading back down your way in {month} and wanted to ask you first before anybody.\n\n" +
         "[?lastGood: Last time was one of our favorite nights of the tour. | ?lastRough: Last time was rough but you treated us right. | ?lastWeird: We know last time was a weird night. | Last time was good. We talk about it.]\n\n" +
-        "{day1} the {date1:ord} works best(?date2: , {day2} the {date2:ord} too). Same deal is fine.\n" +
+        "{day1} the {date1:ord}{of1} works best(?date2: , {day2} the {date2:ord}{of2} too). Same deal is fine.\n" +
         "(?shortNotice: Sorry it's so close. We only just got the dates.)\n" +
         "(?host: Everybody says hi to {host}.)\n" +
         "(?lineupChanged: We've got a new {instrument|player}, {newMember}. Same songs, faster.)\n\n" +
         "\\[link\\]",
 
-        "hi again. {band}. {month}, the {date1:ord} (?date2: or the {date2:ord}).\n\n" +
+        "hi again. {band}. {month}, the {date1:ord}{of1} (?date2: or the {date2:ord}{of2}).\n\n" +
         "[?lastGood: people still bring up the {city} show in the van. | ?lastRough: we know the turnout last time wasn't what either of us wanted. we'd like another shot. | ?lastWeird: we'll be better this time. promise. | it was a good night last time.]\n" +
         "(?shortNotice: this is short notice, i know.)\n" +
         "(?lineupChanged: heads up, {newMember} is in the band now.)\n\n" +
@@ -283,7 +283,7 @@ SB.Content.requests = {
       ],
       followup: [
         'Bumping this. We\'d rather play for you than anybody else down there.',
-        'checking in on the {date1:ord}. we\'re keeping it open for you.'
+        'checking in on the {date1:ord}{of1}. we\'re keeping it open for you.'
       ]
     },
 
@@ -299,7 +299,7 @@ SB.Content.requests = {
       ],
       body: [
         "hi!! this is {member} from {band}. we're from {smallTown}. we're doing our first tour over spring break (one week!!). my mom is driving. " +
-        "we would love to play {city} on the {date1:ord} if there is any show at all. we've played like eight shows. we can play first. " +
+        "we would love to play {city} on the {date1:ord}{of1} if there is any show at all. we've played like eight shows. we can play first. " +
         "we're punk but kind of [emo | surf | weird].\n" +
         "(?shortNotice: sorry it's so soon we just found out we can go)\n\n" +
         "\\[link\\]\nthank you so much",
@@ -307,7 +307,7 @@ SB.Content.requests = {
         "hey!! um we're {band}, from {smallTown}, we're {n:words} people and we're 16 and 17. " +
         "we're going on tour for the first time in {month} and someone said {city} has good shows.\n" +
         "(?shortNotice: it's really soon sorry!!)\n\n" +
-        "could we play the {date1:ord}? it has to be all ages obviously lol. and done by like 10 because my dad is driving and he has work. " +
+        "could we play the {date1:ord}{of1}? it has to be all ages obviously lol. and done by like 10 because my dad is driving and he has work. " +
         "we don't need money. (?PROMOTES: we'll make a flyer if you want, our drummer draws.)\n\n" +
         "\\[link\\] (it's mostly demos)\nthanks!!!!"
       ],
@@ -338,7 +338,7 @@ SB.Content.requests = {
 
         "{you|Hi},\n\n" +
         "Writing for {band}. Some people in {city} might remember us from {era}. We've been asked enough times that we're doing it: " +
-        "{day1} the {date1:ord} (?date2: or {day2} the {date2:ord}), one night, then back to work.\n" +
+        "{day1} the {date1:ord}{of1} (?date2: or {day2} the {date2:ord}{of2}), one night, then back to work.\n" +
         "(?shortNotice: Short notice. Our fault.)\n\n" +
         "We'd like a hall or a bar, somewhere with parking. We'd like to go on last, if that's all right. {setLen} minutes. Door deal, or whatever's usual now; we haven't done this in a while.\n" +
         "(?hasLocal: {local} offered to open. Their singer's brother was our first drummer.)\n\n" +
@@ -358,15 +358,15 @@ SB.Content.requests = {
       teaches: 'Terse is not rude, and not evidence of much. The tell is a guarantee with no draw at all.',
       subject: [
         '{band} / {city} / {month} {date1}',
-        '{city} {date1:ord}?'
+        '{city} {date1:ord}{of1}?'
       ],
       body: [
-        "{band} from {home}. {day1} the {date1:ord}. {guarantee:money} guarantee. Let us know.\n(?shortNotice: Short notice.)\n{member}",
-        "Hey. {band}, {home}, {genrePlain}. Looking for {city}, the {date1:ord} (?date2: or {date2:ord}). {guarantee:money}. (?lodging: Need a floor.) (?shortNotice: Soon, I know.)\n\\[link\\]\n{member}"
+        "{band} from {home}. {day1} the {date1:ord}{of1}. {guarantee:money} guarantee. Let us know.\n(?shortNotice: Short notice.)\n{member}",
+        "Hey. {band}, {home}, {genrePlain}. Looking for {city}, the {date1:ord}{of1} (?date2: or {date2:ord}{of2}). {guarantee:money}. (?lodging: Need a floor.) (?shortNotice: Soon, I know.)\n\\[link\\]\n{member}"
       ],
       followup: [
         'Still open?',
-        '{date1:ord}?'
+        '{date1:ord}{of1}?'
       ]
     },
 
@@ -387,7 +387,7 @@ SB.Content.requests = {
 
         "hey it's {member} from {band}. you had us before. we're stuck. the van's at a shop near {nearbyTown} and the part is {amount:money} we don't have.\n" +
         "(?shortNotice: this is no notice. sorry.)\n\n" +
-        "any night this week. {day1} the {date1:ord} would be best. we'll play any room for whatever comes in the door. " +
+        "any night this week. {day1} the {date1:ord}{of1} would be best. we'll play any room for whatever comes in the door. " +
         "(?PLEASANT: we'll fix whatever needs fixing at the house in return. one of us is good with sinks.)\n\nthank you either way"
       ],
       followup: [
@@ -525,7 +525,7 @@ SB.Content.requests = {
       '{price:money} at the door, {ages}. (?lodging: You\'re sleeping at {stay}.) Good?'
     ],
     BAND_PLAY: [
-      'Want to [open | play | close] {dateLong}? {touring} from {home}. {room}. (?fee: {fee:money}.)',
+      'Want to {slotVerb} {dateLong}? {touring} from {home}. {room}. (?fee: {fee:money}.)',
       '{dateLong} at {room}, with {touring} from {home}. You in? (?fee: {fee:money} for you.)'
     ],
     ROOM_HOLD: [

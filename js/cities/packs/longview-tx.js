@@ -9,7 +9,12 @@ SB.Cities.register('longview-tx', {
            'balloon race capital', 'balloon race', 'lobos', 'lobo', 'texas eagle', 'amtrak', 'yamboree', 'tabc', 'vfw', 'american legion',
            'moose lodge', 'elks', 'east texas state fair', 'pine tree high', 'spring hill isd', 'pine tree isd', 'longview isd', 'hallsville isd',
            'the loop annex', 'greggton hall', 'the fellowship room', 'piney woods lodge', 'the big inch', 'fredonia pit', 'the pipeline room',
-           'spring hill barn', 'the derrick', 'highway 80 social club', 'the dogwood basement', 'balloon field garage'],
+           'spring hill barn', 'the derrick', 'highway 80 social club', 'the dogwood basement', 'balloon field garage',
+           'longview lobos', 'lobo stadium', 'maude cobb', 'maude cobb convention complex', 'longview convention complex', 'belcher center',
+           'great texas balloon race', 'juneteenth parade', 'james hooper memorial juneteenth rodeo', 'broughton park', 'broughton recreation center',
+           'teague park', 'longview ambucs', 'ambucs christmas parade', 'gregg county fair', 'longview pro rodeo', 'longview rodeo arena',
+           'longview symphony orchestra', 'heritage plaza', 'cbs19', 'longview cvb', 'maxpreps', 'bandsintown', 'shazam', 'yelp',
+           'texas rose horse park', 'mlk celebration'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['whataburger*', 'news-journal*', 'kltv*', 'ketk*', 'letourneau*', 'balloon race*', 'waffle house*', 'dr pepper*'],
 
@@ -50,7 +55,20 @@ SB.Cities.register('longview-tx', {
     { id: 'northeast', name: 'northeast Longview', route: 'work-side', note: 'Plant-family and older neighborhoods; church halls and community centers more than punk rooms.' }
   ],
 
-  contacts: ['tyler-tx'],
+  contacts: ['tyler-tx', 'shreveport-la', 'dallas'],
+
+  calendar: [
+    { id: 'mlk-weekend', label: 'the MLK weekend', tag: 'holiday', month: 1, week: 3, dows: [5, 6, 0], can: [.92, .90, .90], hoods: ['northeast', 'downtown'], elsewhere: [1, .97, .97] },
+    { id: 'hot-air-weekend', label: 'the big hot-air weekend', tag: 'festival', month: 6, week: 2, dows: [4, 5, 6], can: [.90, .88, .88] },
+    { id: 'juneteenth', label: 'Juneteenth', tag: 'holiday', month: 6, week: 3, dows: [5], can: [.85, .85, .85], hoods: ['northeast'], elsewhere: [.95, .95, .95] },
+    { id: 'july-fourth', label: 'the Fourth of July', tag: 'holiday', month: 7, week: 1, dows: [4, 5, 6], can: [.90, .90, .90] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [4], can: [.80, .92, .92] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [4], can: [.80, .92, .92] },
+    { id: 'county-fair', label: 'the county fair', tag: 'fair', month: 9, weeks: [2, 3], dows: [4, 5, 6], can: [.92, .90, .90] },
+    { id: 'christmas-parade', label: 'the downtown Christmas parade', tag: 'parade', month: 12, week: 1, dows: [3], can: [.88, .90, .90], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
 
   points: [
     { name: 'Shreveport', state: 'LA', lat: 32.53, lon: -93.75, pop: 390000 },

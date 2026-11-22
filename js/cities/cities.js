@@ -58,6 +58,20 @@ SB.module('Cities', function (SB) {
     AZ: 'DESERT', WA: 'PACIFIC_NW', OR: 'PACIFIC_NW', CA: 'CALIFORNIA', AK: 'ALASKA'
   };
 
+  /* Full state names, so the town search finds "Wyoming" as well as "WY". */
+  var STATE_NAME = {
+    AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California', CO: 'Colorado', CT: 'Connecticut',
+    DE: 'Delaware', DC: 'District of Columbia', FL: 'Florida', GA: 'Georgia', HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois',
+    IN: 'Indiana', IA: 'Iowa', KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland',
+    MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri', MT: 'Montana',
+    NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey', NM: 'New Mexico', NY: 'New York',
+    NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio', OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania',
+    RI: 'Rhode Island', SC: 'South Carolina', SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah',
+    VT: 'Vermont', VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming'
+  };
+  /** Two-letter state code -> full name ('' when unknown). */
+  function stateName(code) { return STATE_NAME[code] || ''; }
+
   /** The weather preset id for an index entry: HURRICANE -> GULF, DESERT -> DESERT, then by state (04-cities 4.3). */
   function presetFor(entry, traits) {
     var st = entry && entry.state, tr = traits || (entry && entry.traits) || [], lon = entry && entry.lon, lat = entry && entry.lat;
@@ -1203,7 +1217,7 @@ SB.module('Cities', function (SB) {
   var Cities = {
     register: register, load: load, isLoaded: isLoaded, get: get, pack: pack, entry: entry, near: near,
     normalize: normalize, validate: validate, questions: questions,
-    presetFor: presetFor, hasBasements: hasBasements, generalBanned: null,
+    presetFor: presetFor, hasBasements: hasBasements, stateName: stateName, generalBanned: null,
     TABLES: { WEATHER: WEATHER, STYLE: STYLE }
   };
   return Cities;

@@ -1,46 +1,57 @@
 /* Scene Booker — js/ui/clock.js (the night clock, design/spec/10-night-clock.md "Interface")
- * SB.Clock: tonight's hours as the player sees them, wherever they are on screen: the desk (js/desk/scene.js), the
- * calendar (js/ui/screens/week.js) and the booking card. One piece, so the clock reads the same everywhere.
- * The hours are empty pencil boxes, one per half hour, toner as they are spent; what a show takes of the night is
- * hatched; hours lost to last night are crossed out; the stay-up hour is drawn in the city's hot ink (only it is hot:
- * it is the one that costs you).
- * Reads the view Week.tonight / Week.view(state).tonight / Game.strip(state).tonight and Week.crunch; computes no
- * rule (whether a thing fits is Week.canDoNow / Week.fits, never worked out here).
+ * SB.Clock: tonight's hours as the player sees them. They are drawn as clock time (user, 2026-11-21: the half-hour
+ * boxes "dont really represent time well unless you already know what youre looking at"): a ruler marked with the
+ * hours of the evening, from getting home to bed at 11 PM. The time spent is inked in up to a NOW pin; what a show
+ * takes is hatched before bed; hours lost to last night are crossed out at the start; the stay-up hour runs past bed
+ * in the city's hot ink (only it is hot: it is the one that costs you).
+ * There is one clock on screen, pinned to the same corner everywhere (js/ui/nightclock.js); the calendar's days carry
+ * the ruler's small form. Reads the view Week.tonight / Week.view(state).tonight and Week.crunch; computes no rule
+ * (whether a thing fits is Week.canDoNow / Week.fits, never worked out here).
  *
- *   SB.Clock.boxes(tonight, opts) -> element   the half-hour boxes. opts: { hot, extra, tired, cls, say }
- *   SB.Clock.line(tonight)        -> string    "TONIGHT · 2½ OF 4 HRS LEFT", "DAY OFF · 10 HRS", "SHOW NIGHT", tired noted
+ *   SB.Clock.ruler(tonight, opts) -> element   the evening as a ruler. opts: { hot, extra (hours a choice would take,
+ *                                              hatched), mini (no words: a calendar day), cls, say }
+ *   SB.Clock.times(tonight)       -> object    the evening in hours of the day: { start, home, doors, bed, end, now, ... }
+ *   SB.Clock.at(hours)            -> string    "8:30 PM", "MIDNIGHT"
+ *   SB.Clock.span(tonight)        -> string    "7-11 PM": the evening, home to bed
+ *   SB.Clock.parts(tonight)       -> object    { head: "TONIGHT", now: "8:30 PM", rest: "2½ HRS TILL BED" }
+ *   SB.Clock.line(tonight)        -> string    the parts in one line: "TONIGHT · 8:30 PM · 2½ HRS TILL BED"
  *   SB.Clock.cost(hours)          -> string    "½ HR", "1 HR", "2½ HRS" ('' for no time)
- *   SB.Clock.crunchLine(item, o)  -> string    "THURSDAY: 5 HRS OF WORK DUE, 3 HRS FREE BEFORE THEN" (o: { today })
+ *   SB.Clock.crunchLine(item, o)  -> string    "THURSDAY: 5 HRS OF WORK DUE, 3 HRS FREE BEFORE THEN" (o: { today, short })
  *   SB.Clock.tag(label, hours)    -> string    "ASK THEM TO HOLD IT · ½ HR": a button's words with what it costs
  *   SB.Clock.due(jobView, o)      -> { text, late } | null   "DUE THU", "DUE TONIGHT", "LATE" (o: { today })
  *   SB.Clock.why(result)          -> string    a refusal's words (NO_TIME says what it takes and what is left)
  *   SB.Clock.hot(state)           -> colour    the city's hot ink
- *   SB.Clock.slip(state, opts)    -> element   the whole clock: the line, the boxes and the crunch warnings.
+ *   SB.Clock.slip(state, opts)    -> element   the whole clock: the words, the ruler, the crunch warnings.
  *                                              opts: { crunch: n lines (default 1), list (Week.crunch, if read
- *                                              already), cls, tonight, hot, extra (as boxes) }
+ *                                              already), short (crunch in few words), cls, tonight, hot, extra,
+ *                                              foot (an element set in the crunch's row: the pinned clock's button) }
  */
 (function (SB) {
   'use strict';
 
   SB.Content.ui.clock = {
     tonight: 'tonight', dayOff: 'day off', showNight: 'show night', burnt: 'burnt out', called: 'night called',
-    left: '{left} of {cap} hrs left', all: '{cap} hrs', none: 'no hours left',
-    stay: 'stay up {n} more', stayed: 'up {n} late', tired: 'tired, {n} short',
-    beforeDoors: '{n} before doors', noTimeShow: 'the show takes the night',
+    none: 'no hours left', tillBed: '{n} till bed', tillDoors: '{n} till doors', doorsAt: 'doors {t}',
+    bedtime: 'bedtime', upLate: 'up late', stayTill: 'can stay up till {t}', tired: 'tired, {n} lost',
+    am: 'am', pm: 'pm', midnight: 'midnight', now: 'now', bed: 'bed', stayUp: 'stay up', show: 'show',
     half: '½ hr', one: '1 hr', many: '{n} hrs',
     crunch: '{day}: {need} of work due, {have} free before then', crunchNone: '{day}: {need} of work due, no hours free before then',
+    crunchShort: '{day}: {need} due, {have} free', crunchShortNone: '{day}: {need} due, none free',
     today: 'tonight', tomorrow: 'tomorrow',
-    due: 'due {day}', late: 'late', say: '{line}. Each box is half an hour.(?stay: The last {stay} in red is staying up.)'
+    due: 'due {day}', late: 'late',
+    say: '{line}. The evening runs {span}, bed at {bed}(?stay:; past bed, till {end}, is staying up, and it costs you tomorrow).'
   };
 
   var TONER = '#141413', PAPER = '#f4f2ea', PENCIL = '#6d6a62', SHOW = '#8d8a80';
+  var BED = 23;           // the evening ends at 11 PM: tonight's hours are the ones before it, staying up the ones after
+  var uid = 0;            // hatch patterns need ids unique on the page
 
   function h(t, a, k) { return SB.UI.h(t, a, k); }
   function L(key, ctx) { return SB.text.label('ui.clock.' + key, ctx); }
   function num(v) { return typeof v === 'number' && isFinite(v); }
   function safe(f, fb) { try { var v = f(); return v === undefined ? fb : v; } catch (e) { return fb; } }
-  function halves(n) { return num(n) ? Math.max(0, Math.round(n * 2)) : 0; }
   function up(t) { return String(t || '').toUpperCase(); }
+  function r1(n) { return Math.round(n * 10) / 10; }
 
   /** 2½, 10, ½: hours the way they are pencilled. */
   function fmt(n) {
@@ -60,81 +71,130 @@
 
   function tag(label, hours) { var c = cost(hours); return String(label || '') + (c ? ' · ' + c : ''); }
 
-  /* hours in a line: "4 HRS", "½ HR" */
-  function hrs(n) { return cost(n) || up(L('many', { n: '0' })); }
-
-  /** line(tonight): the clock in words, upper case, for a label strip. */
-  function line(t) {
-    var parts = [], head, pool, left, cap, stay;
-    if (!t) return '';
-    if (t.burnt) return up(L('burnt')) + ' · ' + up(L('none'));
-    cap = num(t.cap) ? t.cap : 0;
-    pool = Math.max(0, cap - (num(t.reserved) ? t.reserved : 0));
-    left = num(t.left) ? t.left : pool;
-    stay = t.stay || {};
-    head = t.show ? L('showNight') : (t.off ? L('dayOff') : L('tonight'));
-    parts.push(head);
-    if (t.called) parts.push(L('called'));
-    else if (t.show && pool <= 0) { if ((stay.used || 0) > 0) parts.push(L('stayed', { n: cost(stay.used) })); }
-    else if (left <= 0) {
-      parts.push(L('none'));
-      if ((stay.used || 0) > 0) parts.push(L('stayed', { n: cost(stay.used) }));
-      if ((stay.left || 0) > 0) parts.push(L('stay', { n: cost(stay.left) }));
-    } else if (t.show) parts.push(L('beforeDoors', { n: hrs(left) }));
-    else if (left >= pool) parts.push(L('all', { cap: fmt(pool) }));
-    else parts.push(L('left', { left: fmt(left), cap: fmt(pool) }));
-    if (num(t.tired) && t.tired > 0) parts.push(L('tired', { n: cost(t.tired) }));
-    return up(parts.join(' · '));
+  /** times(tonight): the evening laid on the day's clock, in hours of the day (19.5 is 7:30 PM).
+   *  start: where last night's lost hours begin; home: when the evening's own hours begin; doors: where a show's take
+   *  begins (bed with no show); bed: 11 PM; end: the end of the stay-up hour; now: how far the evening has got. */
+  function times(t) {
+    t = t || {};
+    var cap = Math.max(0, num(t.cap) ? t.cap : 0), res = Math.min(cap, Math.max(0, num(t.reserved) ? t.reserved : 0)),
+        tired = Math.max(0, num(t.tired) ? t.tired : 0), st = t.stay || {}, max = Math.max(0, num(st.max) ? st.max : 0),
+        sUsed = Math.min(max, Math.max(0, num(st.used) ? st.used : 0)), free = cap - res,
+        mine = num(t.spent) ? t.spent : (num(t.used) ? t.used - res : 0),
+        pool = Math.min(free, Math.max(0, mine - sUsed)), home = BED - cap, doors = BED - res;
+    return { start: home - tired, home: home, doors: doors, bed: BED, end: BED + max, free: free, spent: pool, tired: tired,
+             now: sUsed > 0 ? BED + sUsed : (pool >= free ? doors : home + pool), stayUsed: sUsed, stayLeft: Math.max(0, max - sUsed),
+             left: num(t.left) ? Math.max(0, t.left) : Math.max(0, free - pool) };
   }
 
-  /* the half-hour boxes, in order: the pool (spent, a preview, free, the show's), what last night took, the stay-up hour */
-  function cells(t, o) {
-    var out = [], cap2, res2, spent2, extra2, ex1, ex2, free2, i, max2, used2, stay = (t && t.stay) || {}, poolSpent;
-    cap2 = halves(t && t.cap);
-    res2 = Math.min(cap2, halves(t && t.reserved));
-    poolSpent = Math.max(0, (num(t && t.spent) ? t.spent : (num(t && t.used) ? t.used - (t.reserved || 0) : 0)) - (stay.used || 0));
-    spent2 = Math.min(cap2 - res2, halves(poolSpent));
-    free2 = cap2 - res2 - spent2;
-    extra2 = halves(o.extra);
-    ex1 = Math.min(free2, extra2); ex2 = extra2 - ex1;
-    for (i = 0; i < cap2 - res2; i++) out.push({ g: 'pool', k: i < spent2 ? 'spent' : (i < spent2 + ex1 ? 'extra' : 'free') });
-    for (i = 0; i < res2; i++) out.push({ g: 'pool', k: 'show' });
-    if (o.tired !== false) for (i = 0; i < halves(t && t.tired); i++) out.push({ g: 'tired', k: 'tired' });
-    max2 = halves(stay.max); used2 = Math.min(max2, halves(stay.used));
-    for (i = 0; i < max2; i++) out.push({ g: 'stay', k: i < used2 ? 'staySpent' : (i < used2 + ex2 ? 'stayExtra' : 'stayFree') });
-    return out;
+  /** at(hours of the day): "7 PM", "8:30 PM", "MIDNIGHT". */
+  function at(hh) {
+    var m = Math.round((num(hh) ? hh : 0) * 60), H = Math.floor(m / 60) % 24, M = m % 60;
+    if (H === 0 && M === 0) return up(L('midnight'));
+    return up((H % 12 || 12) + (M ? ':' + (M < 10 ? '0' : '') + M : '') + ' ' + L(H >= 12 ? 'pm' : 'am'));
   }
 
-  /* one half-hour box: 9 x 12 units, a little crooked */
-  function cell(c, x, hot, seed) {
-    var stroke = c.g === 'stay' ? hot : (c.k === 'tired' ? PENCIL : TONER), fill = PAPER, extra = '', rot = ((seed * 7) % 5 - 2) * 0.9, sw = c.g === 'stay' ? 1.8 : 1.4;
-    if (c.k === 'spent') fill = TONER;
-    else if (c.k === 'staySpent') fill = hot;
-    else if (c.k === 'show') { fill = SHOW; extra = '<path d="M' + (x + 1) + ' 12L' + (x + 8) + ' 2" stroke="' + PAPER + '" stroke-width="1.3"/>'; }
-    else if (c.k === 'extra' || c.k === 'stayExtra') extra = '<path d="M' + (x + 1) + ' 6L' + (x + 4) + ' 2M' + (x + 1) + ' 11L' + (x + 8) + ' 2M' + (x + 4) + ' 12L' + (x + 8) + ' 7" stroke="' + (c.k === 'stayExtra' ? hot : TONER) + '" stroke-width="1.3"/>';
-    else if (c.k === 'tired') extra = '<path d="M' + (x + 1) + ' 2L' + (x + 8) + ' 12M' + (x + 8) + ' 2L' + (x + 1) + ' 12" stroke="' + PENCIL + '" stroke-width="1.4"/>';
-    return '<g transform="rotate(' + rot + ' ' + (x + 4.5) + ' 7)"><rect x="' + x + '" y="1.5" width="9" height="11" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + sw + '"/>' + extra + '</g>';
+  /** span(tonight): the evening, home to bed: "7-11 PM", "1-11 PM", "11 AM-11 PM". */
+  function span(t) {
+    var x = times(t), a = at(x.home), b = at(x.bed), sa = a.split(' '), sb = b.split(' ');
+    if (sa.length === 2 && sb.length === 2 && sa[1] === sb[1]) a = sa[0];
+    return a + '-' + b;
   }
 
-  /** boxes(tonight, opts): the half-hour boxes as an element, one group per hour so a narrow place wraps between hours.
-   *  opts: { hot: colour, extra: hours to show hatched (what a choice would take), tired: false to leave out last
-   *  night's crossed boxes, cls, say: false to leave it out of the reading order } */
-  function boxes(t, opts) {
-    var o = opts || {}, hot = o.hot || hot0(), list = cells(t || {}, o), groups = [], i, g, cur = null, kids, label;
-    for (i = 0; i < list.length; i++) {
-      if (!cur || cur.g !== list[i].g || cur.items.length === 2) { cur = { g: list[i].g, items: [] }; groups.push(cur); }
-      cur.items.push(list[i]);
+  /** parts(tonight): the clock in words, upper case: the head (what kind of evening), the time now, the rest. */
+  function parts(t) {
+    var x, rest = [], now = '', head;
+    if (!t) return { head: '', now: '', rest: '' };
+    if (t.burnt) return { head: up(L('burnt')), now: '', rest: up(L('none')) };
+    head = up(t.show ? L('showNight') : (t.off ? L('dayOff') : L('tonight')));
+    x = times(t);
+    if (t.called) rest.push(L('called'));
+    else if (t.show && x.free <= 0 && !x.stayUsed) rest.push(L('doorsAt', { t: at(x.doors) }));
+    else {
+      now = at(x.now);
+      if (x.left <= 0) {
+        rest.push(L(x.stayUsed > 0 ? 'upLate' : 'bedtime'));
+        if (x.stayLeft > 0) rest.push(L('stayTill', { t: at(x.end) }));
+      } else rest.push(L(t.show ? 'tillDoors' : 'tillBed', { n: cost(x.left) }));
     }
-    kids = groups.map(function (gr, n) {
-      var w = gr.items.length * 10 + 1, inner = '';
-      gr.items.forEach(function (c, j) { inner += cell(c, 1 + j * 10, hot, n * 2 + j); });
-      return h('span', { class: 'ck-hr ck-hr--' + gr.g, aria: { hidden: 'true' },
-                         html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' 14" style="width:' + (w / 14) + 'em" focusable="false">' + inner + '</svg>' });
+    if (x.tired > 0) rest.push(L('tired', { n: cost(x.tired) }));
+    return { head: head, now: now, rest: up(rest.join(' · ')) };
+  }
+
+  /** line(tonight): the clock in words, upper case, for a label or a screen reader. */
+  function line(t) { var p = parts(t); return [p.head, p.now, p.rest].filter(Boolean).join(' · '); }
+
+  /** ruler(tonight, opts): the evening as a ruler, an element (an inline drawing).
+   *  opts: { hot: colour, extra: hours to show hatched from now on (what a choice would take), mini: the bar alone,
+   *  cls, say: false to leave it out of the reading order } */
+  function ruler(t, opts) {
+    var o = opts || {}, hot = o.hot || hot0(), x = times(t || {}), mini = !!o.mini, W = 280, PL = mini ? 1 : 12, PR = mini ? 1 : 12,
+        a = x.start, b = Math.max(x.end, x.bed), k = (W - PL - PR) / Math.max(0.5, b - a),
+        Y0 = mini ? 1 : 13, BH = mini ? 9 : 16, Y1 = Y0 + BH, H = mini ? 11 : 46, n = ++uid, out = '', defs = '', words = [],
+        ex = num(o.extra) && o.extra > 0 ? o.extra : 0, ex1 = Math.min(Math.max(0, x.doors - x.now), ex), ex2 = Math.max(0, ex - ex1),
+        hh, step, first = true, label, wrap;
+    function X(v) { return r1(PL + (v - a) * k); }
+    function box(v0, v1, fill, stroke, sw, more) {
+      if (v1 - v0 <= 0.001) return '';
+      return '<rect x="' + X(v0) + '" y="' + Y0 + '" width="' + r1((v1 - v0) * k) + '" height="' + BH + '" fill="' + fill + '"' +
+             (stroke ? ' stroke="' + stroke + '" stroke-width="' + sw + '"' : '') + (more || '') + '/>';
+    }
+    function hatch(id, color, w, gap, cross) {
+      defs += '<pattern id="' + id + '" width="' + gap + '" height="' + gap + '" patternUnits="userSpaceOnUse" patternTransform="rotate(' + (cross ? 0 : 45) + ')">' +
+              (cross ? '<path d="M0 0L' + gap + ' ' + gap + 'M' + gap + ' 0L0 ' + gap + '" stroke="' + color + '" stroke-width="' + w + '"/>'
+                     : '<rect width="' + w + '" height="' + gap + '" fill="' + color + '"/>') + '</pattern>';
+      return 'url(#' + id + ')';
+    }
+    /* last night's lost hours, crossed out in pencil; the evening; what is spent; a show's take; the stay-up hour */
+    if (x.tired > 0) out += box(x.start, x.home, PAPER, PENCIL, 1.2) + box(x.start, x.home, hatch('ckt' + n, PENCIL, 1, 6, true));
+    out += box(x.home, x.bed, PAPER, TONER, 1.5);
+    out += box(x.home, x.home + x.spent, TONER);
+    if (x.doors < x.bed) {
+      out += box(x.doors, x.bed, SHOW, TONER, 1.5) + box(x.doors, x.bed, hatch('cks' + n, PAPER, 1.3, 5));
+      if (!mini && (x.bed - x.doors) * k >= 34) out += '<text x="' + X((x.doors + x.bed) / 2) + '" y="' + (Y1 - 4) + '" text-anchor="middle" font-size="10" fill="' + PAPER + '" stroke="' + SHOW + '" stroke-width="3" paint-order="stroke">' + up(L('show')) + '</text>';
+    }
+    if (x.end > x.bed) out += box(x.bed, x.end, PAPER, hot, 1.5, ' stroke-dasharray="3 2"') + box(x.bed, x.bed + x.stayUsed, hot);
+    if (ex1 > 0) out += box(x.now, x.now + ex1, hatch('cke' + n, TONER, 2, 5));
+    if (ex2 > 0) out += box(x.bed + x.stayUsed, x.bed + x.stayUsed + ex2, hatch('ckx' + n, hot, 2, 5));
+    /* the hours: a tick on every one, a number over every one (every other on a long day), the first with its am/pm */
+    step = mini || k >= 19 ? 1 : 2;
+    for (hh = Math.ceil(a - 0.001); hh <= b + 0.001; hh++) {
+      out += '<path d="M' + X(hh) + ' ' + (Y0 - (mini ? 0 : 3)) + 'V' + (Y0 + (mini ? 3 : 4)) + '" stroke="' + (hh > x.bed ? hot : TONER) + '" stroke-width="1"/>';
+      if (mini || (x.bed - hh) % step) continue;
+      label = String(hh % 12 || 12) + (first ? L(hh % 24 >= 12 ? 'pm' : 'am').toUpperCase() : '');
+      first = false;
+      out += '<text x="' + X(hh) + '" y="9.5" text-anchor="middle" font-size="10" fill="' + (hh > x.bed ? hot : TONER) + '">' + label + '</text>';
+    }
+    /* bed: a heavy line through the bar */
+    out += '<path d="M' + X(x.bed) + ' ' + (Y0 - (mini ? 1 : 4)) + 'V' + (Y1 + (mini ? 1 : 4)) + '" stroke="' + TONER + '" stroke-width="' + (mini ? 1.6 : 2.6) + '"/>';
+    if (!mini) {
+      /* now: a pin under the bar where the evening has got to; then the words under the bar, nearest first */
+      if (!(t && (t.called || t.burnt))) {
+        out += '<path d="M' + X(x.now) + ' ' + (Y1 + 1) + 'L' + r1(X(x.now) - 4.5) + ' ' + (Y1 + 8) + 'H' + r1(X(x.now) + 4.5) + 'Z" fill="' + (x.now > x.bed ? hot : TONER) + '"/>';
+        words.push({ x: X(x.now), t: up(L('now')), c: x.now > x.bed ? hot : TONER, a: 'middle' });
+      }
+      words.push({ x: X(x.bed) - 2, t: up(L('bed')), c: TONER, a: 'end' });
+      if (x.end > x.bed) words.push({ x: X(x.bed) + 3, t: up(L('stayUp')), c: hot, a: 'start' });
+      out += place(words, W, H - 1.5);
+    }
+    wrap = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '"' + (mini ? ' preserveAspectRatio="none"' : '') + ' focusable="false">' + (defs ? '<defs>' + defs + '</defs>' : '') + out + '</svg>';
+    label = L('say', { line: line(t || {}), span: span(t || {}), bed: at(x.bed), end: at(x.end), stay: x.end > x.bed ? 1 : null });
+    return h('span', { class: 'ck-ruler' + (mini ? ' ck-ruler--mini' : '') + (o.cls ? ' ' + o.cls : ''), style: { '--ck-hot': hot }, role: o.say === false ? null : 'img',
+                       aria: o.say === false ? { hidden: 'true' } : { label: label }, html: wrap });
+  }
+  /* the words under the bar: each where it points, dropped when it would run into one already placed */
+  function place(words, W, y) {
+    var taken = [], out = '';
+    words.forEach(function (w) {
+      var wd = w.t.length * 6 + 2, x0 = w.a === 'middle' ? w.x - wd / 2 : (w.a === 'end' ? w.x - wd : w.x), x1, ok;
+      if (x0 < 0) { x0 = 0; w.a = 'start'; w.x = 0; }
+      if (x0 + wd > W) { x0 = W - wd; w.a = 'end'; w.x = W; }
+      x1 = x0 + wd;
+      ok = taken.every(function (r) { return x1 <= r[0] || x0 >= r[1]; });
+      if (!ok) return;
+      taken.push([x0 - 3, x1 + 3]);
+      out += '<text x="' + r1(w.x) + '" y="' + y + '" text-anchor="' + w.a + '" font-size="9.5" fill="' + w.c + '">' + w.t + '</text>';
     });
-    label = L('say', { line: line(t || {}), stay: t && t.stay && t.stay.max > 0 ? cost(t.stay.max) : null });
-    g = h('span', { class: 'ck-boxes' + (o.cls ? ' ' + o.cls : ''), style: { '--ck-hot': hot }, role: o.say === false ? null : 'img',
-                    aria: o.say === false ? { hidden: 'true' } : { label: label } }, kids);
-    return g;
+    return out;
   }
 
   /* a day as the reader says it: tonight, tomorrow, Thursday, Feb 19 */
@@ -152,12 +212,13 @@
     return safe(function () { var s = SB.UI.game(); return s ? SB.Week.tonight(s).day : null; }, null);
   }
 
-  /** crunchLine(item, opts): one due day that needs more hours than there are, from Week.crunch. */
+  /** crunchLine(item, opts): one due day that needs more hours than there are, from Week.crunch. opts.short: in few words. */
   function crunchLine(item, opts) {
     if (!item) return '';
-    var day = up(dayWord(item.day, todayOf(opts)));
-    return up(item.have > 0 ? L('crunch', { day: day, need: cost(item.need), have: cost(item.have) })
-                            : L('crunchNone', { day: day, need: cost(item.need) }));
+    var o = opts || {}, today = todayOf(o), day = up(o.short && num(item.day) && num(today) && item.day > today + 1 && item.day - today <= 6 ? SB.time.fmt(item.day, 'dow3') : dayWord(item.day, today)),
+        k = o.short ? 'crunchShort' : 'crunch';
+    return up(item.have > 0 ? L(k, { day: day, need: cost(item.need), have: cost(item.have) })
+                            : L(k + 'None', { day: day, need: cost(item.need) }));
   }
 
   /** due(jobView, opts): when a job is due, in a few words; null when it has no due day. */
@@ -186,26 +247,29 @@
   }
   function hot0() { var s = safe(function () { return SB.UI.game(); }, null); return s ? hot(s) : '#d8392b'; }
 
-  /** slip(state, opts): the clock as one paper slip: the line on a label strip, the boxes, and the crunch warnings.
-   *  opts.split: the line's first part as a big headline ("TONIGHT", "DAY OFF") with the rest beside it (the desk). */
+  /** slip(state, opts): the clock as one paper slip: what kind of evening on a label strip with the time now big beside
+   *  it, the ruler, and the crunch warnings in a row with opts.foot (the pinned clock's button). */
   function slip(s, opts) {
-    var o = opts || {}, t = o.tonight || safe(function () { return SB.Week.tonight(s); }, null), ink = o.hot || hot(s), cr, n = o.crunch === undefined ? 1 : o.crunch, today, words, head;
+    var o = opts || {}, t = o.tonight || safe(function () { return SB.Week.tonight(s); }, null), ink = o.hot || hot(s), cr, n = o.crunch === undefined ? 1 : o.crunch, p;
     if (!t) return null;
     cr = n ? (o.list || safe(function () { return SB.Week.crunch(s); }, []) || []) : [];
-    today = t.day;
-    words = line(t).split(' · ');
-    head = o.split && words.length > 1 ?
-      h('span', { class: 'ck-line ck-line--split' }, [h('span', { class: 'ck-head', text: words[0] }), h('span', { class: 'ck-rest', text: words.slice(1).join(' · ') })]) :
-      h('span', { class: 'ck-line', text: line(t) });
-    return h('div', { class: 'ck-slip' + (o.cls ? ' ' + o.cls : '') + (t.left <= 0 && !t.called ? ' is-out' : '') + (cr.length ? ' is-crunch' : '') +
-                       ((t.cap || 0) + ((t.stay && t.stay.max) || 0) > 6 ? ' is-long' : ''), style: { '--ck-hot': ink } }, [
-      head,
-      boxes(t, { hot: ink, extra: o.extra }),
-      cr.length ? h('ul', { class: 'ck-crunch', role: 'note' }, cr.slice(0, n).map(function (c) {
-        return h('li', null, [h('span', { class: 'ck-bang', aria: { hidden: 'true' }, text: '!!' }), crunchLine(c, { today: today })]);
-      })) : null
+    p = parts(t);
+    return h('div', { class: 'ck-slip' + (o.cls ? ' ' + o.cls : '') + (t.left <= 0 && !t.called ? ' is-out' : '') + (cr.length ? ' is-crunch' : ''), style: { '--ck-hot': ink } }, [
+      h('div', { class: 'ck-top', aria: { hidden: 'true' } }, [
+        h('span', { class: 'ck-line', text: p.head }),
+        p.now ? h('span', { class: 'ck-now', text: p.now }) : null,
+        p.rest ? h('span', { class: 'ck-rest', text: p.rest }) : null
+      ]),
+      ruler(t, { hot: ink, extra: o.extra }),
+      cr.length || o.foot ? h('div', { class: 'ck-foot' }, [
+        o.foot || null,
+        cr.length ? h('ul', { class: 'ck-crunch', role: 'note' }, cr.slice(0, n).map(function (c) {
+          return h('li', null, [h('span', { class: 'ck-bang', aria: { hidden: 'true' }, text: '!!' }), crunchLine(c, { today: t.day, short: o.short })]);
+        })) : null
+      ]) : null
     ]);
   }
 
-  SB.Clock = { boxes: boxes, line: line, cost: cost, crunchLine: crunchLine, tag: tag, due: due, why: why, hot: hot, slip: slip, fmt: fmt };
+  SB.Clock = { ruler: ruler, times: times, at: at, span: span, parts: parts, line: line, cost: cost, crunchLine: crunchLine, tag: tag, due: due, why: why,
+               hot: hot, slip: slip, fmt: fmt };
 })(SB);

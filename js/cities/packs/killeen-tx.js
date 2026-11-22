@@ -9,7 +9,10 @@ SB.Cities.register('killeen-tx', {
            'amtrak', 'atsf', 'santa fe railway',
            'the motor pool annex', 'motor pool annex', 'rancier rec room', 'ironhorse hall', 'gate nine tire & lube', 'gate nine', 'trimmier ballroom',
            'the cantonment', 'cantonment', 'nolan creek pavilion', 'santa fe depot annex', 'clear creek carport', 'bunny trail bowl',
-           'post 4414', 'post 4414 social hall', 'lone star laundromat', 'the lone star laundromat back room'],
+           'post 4414', 'post 4414 social hall', 'lone star laundromat', 'the lone star laundromat back room',
+           'killeen civic and conference center', 'killeen civic center', 'killeen special events center', 'rodeo killeen', 'red white and blue music festival',
+           'red white & blue festival', 'celebrate killeen', 'motown downtown', 'festival of holidays', 'killeen police department', 'killeen police',
+           'ktem', 'us105', 'kiss 103.1', 'kxxv', 'killeen isd', 'jeep jam', 'eventbrite', 'bandsintown', 'gigsalad', 'thebash'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The post is written only as 'the post' or 'the base' in game text. */
   blocklist: ['fort hood*', 'killeen daily herald*', 'whataburger*', 'waffle house*', 'dairy queen*', 'ironhorse*', 'central texas college*', 'baylor*'],
 
@@ -49,7 +52,20 @@ SB.Cities.register('killeen-tx', {
     { id: 'nolanville', name: 'Nolanville and the east edge', route: 'work-side', note: 'Trailers and farmland along the creek; cheap yards well out of earshot.' }
   ],
 
-  contacts: ['waco-tx', 'college-station-tx'],
+  contacts: ['waco-tx', 'college-station-tx', 'austin', 'san-antonio'],
+
+  calendar: [
+    { id: 'july-fourth', label: 'the Fourth of July festival', tag: 'festival', month: 7, week: 1, dows: [5], can: [.85, .85, .85], hoods: ['downtown', 'gate-side'], elsewhere: [.97, .95, .95] },
+    { id: 'rodeo', label: 'the rodeo', tag: 'fair', month: 5, week: 3, dows: [3, 4, 5], can: [.92, .90, .88] },
+    { id: 'spring-festival', label: 'the downtown spring festival', tag: 'festival', month: 4, week: 4, dows: [5], can: [.90, .88, .88], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'christmas-parade', label: 'the Christmas parade', tag: 'parade', month: 12, week: 2, dows: [5], can: [.88, .90, .90], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [4], can: [.85, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [4], can: [.85, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1380, curfewMinors: { weeknight: 1380, weekend: 1440, inForce: true } },
 
   points: [
     { name: 'Austin', state: 'TX', lat: 30.27, lon: -97.74, pop: 2300000 },

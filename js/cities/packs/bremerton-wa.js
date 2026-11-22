@@ -1,8 +1,9 @@
 SB.Cities.register('bremerton-wa', {
   v: 1,
   slug: 'bremerton-wa',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
-  banned: ['puget sound naval shipyard', 'psns', 'bremerton annex', 'naval base kitsap', 'naval station bremerton', 'bangor', 'olympic college',
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
+  banned: ['bremerton art walk', 'first friday art walk', 'wayzgoose', 'bremerton bridge blast', 'bridge blast', 'kitsap wine festival', 'west sound film festival', 'kitsap harbor festival', 'jingle fest', 'kitsap sun pavilion', 'kitsap county fairgrounds', 'kitsap daily news', 'seattle weekly', 'seattle times', 'knkx', 'port of bremerton', 'greater kitsap chamber', 'wsipp', 'washington state liquor control board', 'seattle seafair', 'wildcat lake', 'bremerton boardwalk',
+           'puget sound naval shipyard', 'psns', 'bremerton annex', 'naval base kitsap', 'naval station bremerton', 'bangor', 'olympic college',
            'evergreen state college', 'kitsap sun', 'kitsap transit', 'washington state ferries', 'liquor and cannabis board',
            'armed forces day parade', 'blackberry festival', 'whaling days', 'seahawks', 'huskies', 'kitsap county fair',
            'sierra pacific', 'simpson', 'squaxin island', 'port madison indian reservation', 'vfw', 'american legion', 'elks', 'grange',
@@ -56,10 +57,36 @@ SB.Cities.register('bremerton-wa', {
     { id: 'manette', name: 'Manette', route: 'old-side', note: 'Across the bridge on the Narrows: quiet residential streets with yards and basements, and getting priced out of reach.' },
     { id: 'east-bremerton', name: 'East Bremerton and Wheaton Way', route: 'old-side', note: 'Postwar houses, apartments and strip malls. Most of the scene lives here; backyards and halls.' },
     { id: 'union-hill', name: 'Union Hill', route: 'campus', note: 'Hilly and residential, part student and part Navy family. Apartment and house shows.' },
-    { id: 'kitsap-way', name: 'Kitsap Way and Gorst', route: 'campus', note: 'Warehouses, auto shops and big-box land. Where a cheap space would be, but nobody can walk there.' }
+    { id: 'kitsap-way', name: 'Kitsap Way and Gorst', route: 'campus', note: 'Warehouses, auto shops and big-box land. Where a cheap space would be, but nobody can walk there.' },
+    { id: 'tracyton', name: 'Tracyton and the Kitsap Lake side', route: 'work-side', note: 'A drive out of the city, with a movie house and no bus. The kids come with their parents or not at all.' }
   ],
 
-  contacts: ['olympia-wa', 'bellingham-wa', { name: 'Tacoma', state: 'WA', lat: 47.25, lon: -122.44 }],
+  contacts: ['olympia-wa', 'bellingham-wa', 'seattle', { name: 'Tacoma', state: 'WA', lat: 47.25, lon: -122.44 }],
+
+  rooms: [
+    { id: 'manette-basement', kind: 'HOUSE', hood: 'manette', cap: 40, curfew: 1320, outdoor: false, pressure: 55, start: true, note: 'A basement or yard on a quiet residential street. A neighbor on a night-shift schedule is the threat.' },
+    { id: 'union-apartment', kind: 'HOUSE', hood: 'union-hill', cap: 50, curfew: 1320, outdoor: false, pressure: 55, note: 'An apartment or house on the hill. One complaint or one lease and it is over.' },
+    { id: 'gorst-garage', kind: 'DIY', hood: 'kitsap-way', cap: 80, curfew: 1380, pressure: 55, needs: ['VOUCH'], note: 'A practice garage or auto bay off the highway. Cheap, but nobody can walk there; the landlord and the fire marshal are the risk.' },
+    { id: 'callow-club', kind: 'CLUB', hood: 'downtown', cap: 250, ages: ['ALL', 'A18'], curfew: 1380, following: .6, needs: ['FULL_BILL'], pressure: 55, note: 'An old movie theater turned punk club, with an all-ages floor below and a roped-off bar above. It is the whole scene.' },
+    { id: 'waterfront-theater', kind: 'BIG', hood: 'downtown', cap: 1000, ages: ['ALL'], curfew: 1350, note: 'A restored theater on the waterfront that sells out nostalgia tours. Too grand for a local bill.' },
+    { id: 'lakeside-movie-house', kind: 'BAR', hood: 'tracyton', cap: 200, ages: ['ALL', 'A21'], curfew: 1380, note: 'A converted movie house out on the lake side that runs punk nights. All ages, with the bar 21 and up, and a drive with no bus.' },
+    { id: 'back-stage-bar', kind: 'BAR', hood: 'downtown', cap: 80, ages: ['A21'], curfew: 1500, standing: [50, 60, 70], note: 'A small bar with a back stage for the older metal and hard rock crowd. Twenty-one and up, and the cover is five dollars.' },
+    { id: 'east-hall', kind: 'HALL', hood: 'east-bremerton', cap: 150, curfew: 1320, owner: 'HALL_MANAGER', note: 'A hall rented for a night, with a deposit and a board that wants a name on the form.' },
+    { id: 'manette-yard', kind: 'OUTDOOR', hood: 'manette', cap: 60, curfew: 1260, ac: false, note: 'A waterfront yard in summer. Any rain and it is over.' },
+    { id: 'charleston-shop', kind: 'SHOP', hood: 'charleston', cap: 40, curfew: 1200, note: 'An in-store set on a first Friday, with the walkers out early. Over by eight.' }
+  ],
+
+  calendar: [
+    { id: 'may-parade', label: 'the May parade', tag: 'parade', month: 5, week: 3, dows: [5], can: [0.9, 0.88, 0.85], hoods: ['downtown'], elsewhere: [1, 0.97, 0.97] },
+    { id: 'print-fair', label: 'the block-print fair', tag: 'festival', month: 6, weeks: [4, 5], dows: [5, 6], can: [0.92, 0.9, 0.9], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'bridge-fireworks', label: 'the bridge fireworks night', tag: 'festival', month: 6, weeks: [4, 5], dows: [5], can: [0.9, 0.88, 0.88], hoods: ['manette', 'downtown'], elsewhere: [1, 0.95, 0.95] },
+    { id: 'county-fair', label: 'the county fair', tag: 'fair', month: 8, weeks: [4, 5], dows: [3, 4, 5, 6], can: [0.88, 0.85, 0.82], hoods: ['kitsap-way'], elsewhere: [0.95, 0.9, 0.9] },
+    { id: 'berry-festival', label: 'the waterfront festival', tag: 'festival', month: 9, week: 1, dows: [4, 5, 6], can: [0.95, 0.9, 0.9], hoods: ['downtown'], elsewhere: [1, 0.97, 0.97] },
+    { id: 'football-oct', label: 'game days', tag: 'game', month: 10, weeks: [1, 5], dows: [5, 6], can: [0.9, 0.95, 0.95] },
+    { id: 'football-nov', label: 'game days', tag: 'game', month: 11, weeks: [1, 5], dows: [5, 6], can: [0.9, 0.95, 0.95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.1] }
+  ],
 
   points: [
     { name: 'Seattle', state: 'WA', lat: 47.61, lon: -122.33, pop: 750000 },
@@ -75,5 +102,55 @@ SB.Cities.register('bremerton-wa', {
     hood: ['Charleston', 'Manette', 'Navy Yard City', 'East Bremerton', 'Union Hill', 'Evergreen', 'Haddon', 'Gorst', 'Old Town'],
     thing: ['teriyaki place', 'espresso stand', 'ferry', 'anchor', 'foot ferry', 'daylight basement', 'all-ages club', 'fest weekend', 'shipyard shift', 'old riot story'],
     weather: ['drizzle', 'windstorm', 'gray sky']
-  }
+  },
+
+  events: [
+    { id: 'BREMERTON_WA_FERRY_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], chokepoint: true },
+      telegraph: 'The ferry schedule is tight this week and the last boat is early.',
+      title: 'The last boat',
+      body: 'The last boat leaves before the headliner, and half the Seattle crowd has to choose between the set and getting home.',
+      options: [
+        { id: 'EARLY', label: 'Move the bill up so the headliner plays before the boat', likely: 'The kids who need the ferry make it. A short start.',
+          effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
+          result: 'Doors early. The headliner went on at eight and the boat crowd got home.' },
+        { id: 'ACCEPT', label: 'Let them choose', likely: 'The ones across the water leave early.',
+          effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
+          result: 'Half the room ran for the dock before the last song.' }
+      ] },
+
+    { id: 'BREMERTON_WA_PARADE_MORNING', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'parade' },
+      telegraph: 'A parade closes the downtown streets on Saturday.',
+      title: 'The load-in van is stuck',
+      body: 'A May parade has the downtown streets closed, and the load-in van cannot reach the club until the last marching band clears.',
+      options: [
+        { id: 'WAIT', label: 'Wait it out and start late', likely: 'The crowd comes in as the parade ends.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
+          result: 'The van got through at six. Doors went up late and nobody minded.' },
+        { id: 'CARRY', label: 'Carry the gear in from three blocks away', likely: 'Costs an hour of your day.',
+          effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Amps went down the sidewalk behind the band from the high school.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'BREMERTON_WA_NIGHT_SHIFT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3], months: [6, 7, 8, 9] },
+      telegraph: 'The man next door works nights and is back to sleep by ten.',
+      title: 'The neighbor in the next house',
+      body: 'A shipyard worker in the next house is asleep by ten and calls in a noise complaint in the middle of a summer yard show.',
+      options: [
+        { id: 'QUIET', label: 'Turn it down and go acoustic', likely: 'Short and quiet.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'The last two bands played unplugged on the grass.' },
+        { id: 'PAY', label: 'Go knock on his door and apologize', likely: 'Costs twenty-five dollars in earplugs and baked goods.',
+          effects: [{ op: 'MONEY', amount: -25 }, { op: 'REGULARS', pct: .02 }],
+          result: 'He took the apology and the plate of cookies and the show went on.' },
+        { id: 'ACCEPT', label: 'Run it and hope', likely: 'The next call comes with a patrol car.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'A patrol car rolled by at nine and the crowd scattered.' }
+      ] }
+  ]
 });

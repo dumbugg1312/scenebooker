@@ -182,7 +182,7 @@ SB.module('Mail', function (SB) {
       dateLong: day != null ? SB.time.fmt(day, 'dow') + ' the ' + SB.text.ordinal(t.d) : null, dow: day != null ? SB.time.fmt(day, 'dow') : null,
       date: t ? t.d : null, band: b ? b.name : null, touring: touring ? touring.name : null,
       home: touring && touring.place ? touring.place.name : null, room: room ? room.name : null,
-      fee: p.fee || null, role: p.role || null, pay: p.pay && typeof p.pay === 'object' ? p.pay.amount : null,
+      fee: p.fee || null, role: p.role || null, slotVerb: ({ OPEN: 'open', CLOSE: 'close' })[p.wantSlot] || 'play', pay: p.pay && typeof p.pay === 'object' ? p.pay.amount : null,
       n: deal.members || null, bands: show && show.bill ? show.bill.slots.length : null,
       curfew: room && room.curfew ? SB.time.clock(room.curfew) : null, amount: p.amount || null,
       guarantee: deal.guarantee || null, doorDeal: deal.shape === 'DOOR', lodging: !!deal.lodging,
@@ -608,9 +608,15 @@ SB.module('Mail', function (SB) {
             SB.Shows.addBand(state, show.id, a.toId, { role: 'TOURING', askId: a.id });
             if (p.date != null && p.date !== show.day) {
               hold = holdOf(state, show.roomId, p.date, show.id);
-              if (hold || !show.roomId) { r = SB.Shows.move(state, show.id, { roomId: show.roomId, day: p.date, hold: hold }); if (r && r.records) records = records.concat(r.records); }
+              if (hold || !show.roomId) { r = SB.Shows.move(state, show.id, { roomId: show.roomId, day: p.date, hold: hold, quiet: true }); if (r && r.records) records = records.concat(r.records); }
             }
             if (SB.Requests && SB.Requests.accept) SB.Requests.accept(state, a.requestId, show.id, show.deal);
+            /* the offer already told them where they sleep ("You're sleeping at {stay}": the room's host, else your
+             * place): their yes settles the floor, so it is not a job left for the player to find */
+            if (show.deal && show.deal.lodging && show.crew && !show.crew.lodging) {
+              b = roomOf(state, show.roomId);
+              SB.Shows.assignCrew(state, show.id, 'lodging', b && b.ownerId && personOf(state, b.ownerId) ? b.ownerId : 'player');
+            }
           }
           break;
         case 'BAND_PLAY':
@@ -619,7 +625,7 @@ SB.module('Mail', function (SB) {
         case 'ROOM_HOLD':
           if (show) {
             hold = holdOf(state, a.toId, p.day, show.id) || (res.counter && res.counter.hold) || { rank: 1, expires: null };
-            r = SB.Shows.move(state, show.id, { roomId: a.toId, day: p.day == null ? show.day : p.day, slot: p.slot, hold: hold });
+            r = SB.Shows.move(state, show.id, { roomId: a.toId, day: p.day == null ? show.day : p.day, slot: p.slot, hold: hold, quiet: true });
             if (r && r.records) records = records.concat(r.records);
             records = records.concat(SB.Rooms.firmUp(state, show.id, day) || []);   // their yes books it when nothing is missing
           }
@@ -631,7 +637,7 @@ SB.module('Mail', function (SB) {
           if (show) {
             hold = holdOf(state, p.roomId, p.day, show.id) || { rank: 1, expires: null };
             hold.rank = 1;
-            r = SB.Shows.move(state, show.id, { roomId: p.roomId || show.roomId, day: p.day == null ? show.day : p.day, hold: hold });
+            r = SB.Shows.move(state, show.id, { roomId: p.roomId || show.roomId, day: p.day == null ? show.day : p.day, hold: hold, quiet: true });
             if (r && r.records) records = records.concat(r.records);
             records = records.concat(SB.Rooms.firmUp(state, show.id, day) || []);
           }

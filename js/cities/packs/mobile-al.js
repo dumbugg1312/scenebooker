@@ -1,12 +1,14 @@
 SB.Cities.register('mobile-al', {
   v: 1,
   slug: 'mobile-al',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['university of south alabama', 'south alabama', 'spring hill college', 'press-register', 'press register', 'lagniappe', 'wkrg', 'wala', 'wpmi', 'weiq',
            'wave transit', 'amtrak', 'airbus', 'george wallace', 'wallace tunnel', 'jubilee parkway', 'greater gulf state fair', 'gulf state fair', 'senior bowl',
            'azalea trail run', 'bayfest', 'ten sixty five', 'joe cain day', 'joe cain', 'moon pie', 'moon pies', 'waffle house', 'poarch creek', 'mobile bay area',
            'the causeway annex', 'three mile hall', 'oakleigh carport', 'the azalea room', 'dog river lodge', 'bayway social club', 'cochrane warehouse',
-           'the live oak porch', 'tillmans corner hall', 'government street basement', 'lundi gras lounge', 'the delta shed'],
+           'the live oak porch', 'tillmans corner hall', 'government street basement', 'lundi gras lounge', 'the delta shed',
+           'alabama contemporary art center', 'downtown mobile alliance', 'mobile area mardi gras association', 'hancock whitney stadium', 'mynbc15', 'nbc 15',
+           'yelp', 'mobile police department'],
   /* The dossier's own invented venue names are in banned: they are research, not content, and unchecked. WALA, WKRG and the other call letters are written
      whole. 'Lagniappe' is the weekly paper's name and is not used anywhere else. */
   blocklist: ['lagniappe*', 'press register*', 'bayfest*', 'airbus*', 'waffle house*', 'moon pie*', 'wave transit*'],
@@ -63,11 +65,38 @@ SB.Cities.register('mobile-al', {
     { id: 'theodore', name: 'Theodore and Tillmans Corner', route: 'work-side', note: 'Warehouses, trailer parks and subdivisions down the Dauphin Island Parkway. Sheds and garages.' }
   ],
 
+  rooms: [
+    { id: 'midtown-carport', kind: 'HOUSE', hood: 'midtown', cap: 40, curfew: 1320, pressure: 55, start: true,
+      note: 'A porch and carport on an old wood-frame block. The neighbors are organized and the ten o\'clock line is the clock.' },
+    { id: 'toulminville-yard', kind: 'HOUSE', hood: 'toulminville', cap: 50, curfew: 1350,
+      note: 'A backyard on a working-class block. The risk is outsiders drawing attention to it.' },
+    { id: 'theodore-shed', kind: 'HOUSE', hood: 'theodore', cap: 60, curfew: 1380, pressure: 35,
+      note: 'A shed and a garage on a big lot down the parkway. Few neighbors to call, but everybody has to drive.' },
+    { id: 'prichard-unit', kind: 'DIY', hood: 'prichard', cap: 80, curfew: 1380, pressure: 60, needs: ['VOUCH'],
+      note: 'A storefront unit with the cheapest rent in the county. A failed fire inspection or a sale of the building ends it.' },
+    { id: 'church-gym', kind: 'HALL', hood: 'west-mobile', cap: 120, curfew: 1320, ac: true, owner: 'CHURCH_CONTACT', pressure: 45,
+      note: 'A church gym rented by the night. Strict on language and curfew, with a loud air conditioner.' },
+    { id: 'main-bar', kind: 'BAR', hood: 'downtown', cap: 250, ages: ['A21'], curfew: 1500, ac: true, standing: [50, 65, 65],
+      note: 'The all-purpose music room: rock, punk, metal and comedy nearly every night. It has closed once and moved a few blocks.' },
+    { id: 'small-bar', kind: 'BAR', hood: 'downtown', cap: 120, ages: ['A21'], curfew: 1500, ac: true, pressure: 55,
+      note: 'A small bar stage on the strip. One of its neighbors went dark one spring and stayed that way.' },
+    { id: 'music-hall', kind: 'CLUB', hood: 'downtown', cap: 350, ages: ['A18', 'A21'], curfew: 1440, ac: true,
+      note: 'A downtown music hall. Some nights are 18-plus, some are not, and you find out when you ask.' },
+    { id: 'daytime-lawn', kind: 'OUTDOOR', hood: 'spring-hill', cap: 150, curfew: 1080,
+      note: 'A county lawn that has hosted free daytime all-ages bills. The afternoon storm is the threat.' },
+    { id: 'arena', kind: 'BIG', hood: 'west-mobile', cap: 1500, ages: ['ALL'], curfew: 1380, ac: true,
+      note: 'The arena-size hall for touring acts. It never books a local band.' }
+  ],
+
   contacts: ['pensacola', 'gulfport-ms', 'daphne-al', 'montgomery-al'],
 
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1320, weekend: 1320, inForce: false } },
+
   calendar: [
+    { id: 'carnival-jan', label: 'Mardi Gras parade weekend', tag: 'parade', month: 1, weeks: [4, 5], dows: [4, 5, 6], can: [.88, .82, .80], hoods: ['downtown', 'midtown'], elsewhere: [.97, .94, .94] },
     { id: 'carnival', label: 'Mardi Gras parade weekend', tag: 'parade', month: 2, weeks: [1, 3], dows: [4, 5, 6], can: [.78, .72, .68], hoods: ['downtown', 'midtown'], elsewhere: [.95, .90, .90] },
-    { id: 'fair', label: 'the fair', tag: 'fair', month: 10, week: 3, dows: [3, 4, 5, 6], can: [.90, .95, .97] },
+    { id: 'fair', label: 'the fair', tag: 'fair', month: 10, week: 5, dows: [3, 4, 5, 6], can: [.90, .95, .97] },
+    { id: 'fair-nov', label: 'the fair', tag: 'fair', month: 11, week: 1, dows: [3, 4, 5, 6], can: [.88, .93, .95] },
     { id: 'football-sep', label: 'high school football', tag: 'game', month: 9, weeks: [1, 5], dows: [4], can: [.88, 1, .97] },
     { id: 'football-oct', label: 'high school football', tag: 'game', month: 10, weeks: [1, 5], dows: [4], can: [.88, 1, .97] },
     { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
@@ -124,6 +153,23 @@ SB.Cities.register('mobile-al', {
         { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
           result: 'Two carloads went the long way around the bay. They\'ll remember that.' }
+      ] },
+
+    { id: 'MOBILE_AL_FAIR_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'The fair is on, with the rodeo the closing weekend, and the kids are already planning around it.',
+      title: 'The fair takes the kids',
+      body: 'The fair has pulled every kid in West Mobile out to the fairgrounds, and your porch show in Midtown is the same Saturday.',
+      options: [
+        { id: 'LATE', label: 'Push doors back until the fair lets out', likely: 'The ones who still want a night come late.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Doors an hour late. They came in smelling of funnel cake and glad of somewhere to sit.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A small crowd. Everyone knows everyone on the bill.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The fair had the casual crowd. The room was small and the bands knew every face.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
       ] }
   ]
 });

@@ -379,6 +379,23 @@ body.cb-dragging { user-select: none; }
 .cb-thing.cb-stephead.is-locked:hover, .cb-thing.cb-stephead.is-locked:focus-visible { transform: none; filter: none; }
 .cb-thing.cb-stephead.is-locked:hover .cb-strip { filter: none; }
 .cb-step > .cb-cardrows { margin: 0 0 calc(var(--p) * 3) calc(var(--p) * 14); }
+/* the bill step: who is playing (in running order, set time, arrows, drag to move), who is asked (pencil), what is still open */
+.cb-cardrows > li.cb-billhead { line-height: 1.2; padding: calc(var(--p) * 5) 0 calc(var(--p) * 1) calc(var(--p) * 6); }
+.cb-billhead .cb-typed { font-size: calc(var(--fs) * 10.5); font-weight: 700; letter-spacing: .05em; color: var(--toner-mid); }
+.cb-cardrows > li.cb-billrow { display: flex; align-items: center; }
+.cb-billrow.is-movable > .cb-cardrow { cursor: grab; touch-action: none; }
+.cb-billmv { display: flex; gap: calc(var(--p) * 1); margin-left: calc(var(--p) * 1); }
+.cb-thing.cb-mvbtn:disabled { opacity: .18; }
+/* under a band's sticker on the sheet: what helps them (ballpoint +), what holds them back (hot ink -), the small print */
+.cb-read { width: calc(var(--p) * 200); font-family: var(--f-type); font-size: calc(var(--fs) * 13); line-height: 1.3; color: var(--toner); margin-top: calc(var(--p) * -2); }
+.cb-read ul { list-style: none; margin: 0; padding: 0; }
+.cb-read li { position: relative; padding-left: 1.15em; font-weight: 700; }
+.cb-read li::before { position: absolute; left: 0; top: -.08em; font-weight: 700; font-size: 1.15em; }
+.cb-read-plus li { color: var(--ink-ball, #2F4FB5); }
+.cb-read-plus li::before { content: "+"; }
+.cb-read-minus li { color: #B4261E; }
+.cb-read-minus li::before { content: "\2212"; }
+.cb-read-small { margin: calc(var(--p) * 3) 0 0; font-size: calc(var(--fs) * 11); color: var(--toner-mid); }
 .cb-nightfoot { flex: 0 0 auto; flex-direction: column; align-items: stretch; justify-content: flex-end; gap: calc(var(--p) * 3); margin-top: 0; padding: calc(var(--p) * 4) calc(var(--p) * 4) 0 0; border-top: calc(var(--p) * 2) solid var(--toner); }
 .cb-clockrow { display: flex; align-items: center; justify-content: space-between; gap: calc(var(--p) * 10); }
 .cb-clockslot { min-width: 0; }
@@ -416,3 +433,16 @@ body.cb-dragging { user-select: none; }
 .cb-hasit { text-transform: uppercase; }
 .cb-pick .cb-flyerjob { align-self: stretch; }
 .cb-pick .cb-flyerjob .cb-note { transform: none; margin: 0; }
+
+/* NEXT never squeezes its sentence into a column: the text keeps a readable width and the button or the
+   "call it a night" hint drops under it instead (the hint is nowrap and long) */
+.cb-next { flex-wrap: wrap; row-gap: calc(var(--p) * 4); }
+.cb-nexttext { flex: 1 1 calc(var(--p) * 170); }
+.cb-next.is-night .cb-nexthint { flex: 1 0 100%; text-align: right; }
+/* the status stamp hung onto the date's last digits ("1/29" under CONFIRMED): a size smaller, pushed into the gutter */
+.cb-card .cb-statstamp { right: calc(var(--p) * -26); top: calc(var(--p) * 2); transform: scale(.86); transform-origin: 100% 0; }
+/* a played show: what is still yours (the debrief), above the record */
+.cb-aftertodo { display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 8) calc(var(--p) * 16); margin: 0 0 calc(var(--p) * 10); padding: calc(var(--p) * 8) calc(var(--p) * 12);
+  background: var(--pp-white); color: var(--toner); box-shadow: var(--sh-s) 0 rgba(0, 0, 0, .55); transform: rotate(-.3deg); }
+.cb-aftertodo-h { margin: 0; font-weight: 700; }
+.cb-aftertodo-row { display: flex; align-items: center; gap: calc(var(--p) * 8); }

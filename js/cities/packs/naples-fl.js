@@ -7,7 +7,12 @@ SB.Cities.register('naples-fl', {
            'swamp buggy', 'swamp buggy races', 'lpga', 'naples half marathon', 'pickleball championship', 'swamp cabbage festival', 'collier area transit',
            'paradise coast', 'seminole casino', 'macdill', 'american legion', 'vfw', 'elks',
            'the estates annex', 'estates annex', 'pine ridge carport', 'cypress knee hall', 'the lanai', 'lely flex unit 9', 'bayshore back lot',
-           'tamiami tire and hall', 'the retention pond', 'gate grid garage', 'camp keais barn', 'the sawgrass room', 'airport road unit c'],
+           'tamiami tire and hall', 'the retention pond', 'gate grid garage', 'camp keais barn', 'the sawgrass room', 'airport road unit c',
+           'collier county fair', 'collier county fairgrounds', 'swamp buggy days', 'terry langford memorial fall classic', 'florida sports park', 'the edge skate park',
+           'johnny nocera', 'wheels skate and bmx park', 'golden gate community center', 'late night skate', 'retro skate naples', 'dimension event center',
+           'seminole casino hotel', 'naples press', 'gulfshore life', 'fox 4', 'wink news', 'collier county sheriff', 'collier sheriff',
+           'collier county code enforcement', 'mercato', 'mercato nights', 'fleischmann park', 'visit florida', 'cape coral yacht club', 'ave maria town center',
+           '305 fest', 'sound and fury'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Storms are written only as 'the storm' in game text. */
   blocklist: ['naples daily news*', 'fgcu*', 'florida gulf coast*', 'publix*', 'waffle house*', 'estates annex*', 'cypress knee hall*', 'sawgrass room*'],
 
@@ -47,7 +52,18 @@ SB.Cities.register('naples-fl', {
     { id: 'immokalee-hood', name: 'Immokalee', route: 'old-side', note: 'A young farm town with church halls, backyards and community rooms.' }
   ],
 
-  contacts: ['cape-coral-fl'],
+  contacts: ['cape-coral-fl', 'sarasota-fl', 'miami', 'tampa'],
+
+  calendar: [
+    { id: 'county-fair', label: 'the county fair', tag: 'fair', month: 3, weeks: [3, 4], dows: [3, 4, 5, 6], can: [.90, .85, .85], hoods: ['golden-gate-hood', 'estates'], elsewhere: [1, .97, .97] },
+    { id: 'mud-truck-spring', label: 'the mud-truck race weekend', tag: 'race', month: 3, week: 2, dows: [5, 6], can: [.95, .90, .90] },
+    { id: 'mud-truck-fall', label: 'the mud-truck race weekend', tag: 'race', month: 11, week: 1, dows: [5, 6], can: [.95, .90, .90] },
+    { id: 'half-marathon', label: 'the half marathon', tag: 'race', month: 1, weeks: [1, 2], dows: [6], can: [.95, .92, .90], hoods: ['old-naples'], elsewhere: [1, 1, 1] },
+    { id: 'golf-finale', label: 'the golf finale and big pickleball week', tag: 'race', month: 11, weeks: [2, 4], dows: [3, 4, 5, 6], can: [.92, .90, .88], hoods: ['industrial', 'east-naples'], elsewhere: [1, .97, .97] },
+    { id: 'football-fall', label: 'home football', tag: 'game', month: 10, weeks: [1, 4], dows: [4], can: [.85, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
 
   points: [
     { name: 'Fort Lauderdale', state: 'FL', lat: 26.12, lon: -80.14, pop: 185000 },
@@ -81,6 +97,37 @@ SB.Cities.register('naples-fl', {
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
           result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'NAPLES_FL_SEASON_LOTS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 5], calendar: 'race' },
+      telegraph: 'The big week is on, and every hotel and parking lot in town has a sign out front.',
+      title: 'No place to park on the strip',
+      body: 'The finale week has taken every lot on the industrial strip. A van of kids from up the coast circles for an hour and the bill is short on bodies.',
+      options: [
+        { id: 'LATE', label: 'Hold doors until the lots clear out', likely: 'A late start, but the ones who come stay.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Doors an hour late. The lots emptied out and the van finally got in.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list gives up on parking.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'Half the list never found a spot. The room was thin and friendly.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'NAPLES_FL_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'The midway lights are up east of town and the kids are talking about nothing else.',
+      title: 'The midway takes the kids',
+      body: 'Fair week has pulled the east-side kids to the carnival rides, and the only other show in town is a bar night that is 21 and over.',
+      options: [
+        { id: 'LATE', label: 'Start late, after the midway closes', likely: 'The kids who still have energy come over.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The midway closed and a crowd drifted in smelling of fried dough.' },
+        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The midway wins the night.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
+          result: 'Most of the list was on the Ferris wheel. The ones who came got the floor to themselves.' }
       ] }
   ]
 });

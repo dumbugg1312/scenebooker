@@ -12,9 +12,9 @@
  * gray scraps are one background canvas. The SVG stays as the fallback (and is what the Node smoke test sees).
  * Reads the game only through engine views (Game.strip, Week.view, Mail, Shows, Jobs.flyerSpec, Bands, Rooms,
  * Money, People, Notebook, Legacy, Cities) and state.clock / state.player / state.seed.
- * The tape deck is the time control (design/spec/10-night-clock.md): pressing it calls it a night and the night plays
- * out to the next evening. Tonight's clock (SB.Clock: the hours left as pencil boxes, the stay-up hour in hot ink, and
- * a crunch warning when the work due soon needs more hours than there are) is a slip taped under the deck.
+ * The tape deck plays the night out (design/spec/10-night-clock.md): it pauses and plays it on and closes the week.
+ * Calling it a night is the pinned clock's alone (js/ui/nightclock.js, user 2026-11-21: one place); pressed at an
+ * evening, the deck nudges that clock.
  * Also registers the 'desk' route: the home of a running game. It shows nothing in #main except a hidden week
  * screen that keeps the play loop (js/ui/screens/week.js) running while you sit at the desk.
  */
@@ -35,7 +35,7 @@
     state: {
       week: 'WEEK {n}: {from}-{to}', late: '{n} LATE', lateOne: '1 LATE', flyersNone: 'NONE YET', flyers: '{n} MADE', flyersStar: '{n} MADE, {k} STARRED',
       keysNone: 'NO KEYS YET', keys: '{n} [?one: ROOM | ROOMS]', keysHeld: '{n} [?one: ROOM | ROOMS], {k} HELD', phoneNone: 'QUIET', phone: '{n} NEED YOU',
-      paperNone: 'NOTHING TO FLYER', paperTodo: '{when}: NOT MADE', paperDone: '{when}: MADE', clipsNone: 'NOTHING BOOKED',
+      paperNone: 'NOTHING TO FLYER', paperTodo: '{when}: NOT MADE', paperDone: '{when}: MADE', clipsNone: 'NOTHING BOOKED: START ONE',
       clip: '{when}', clipDays: '{when} · {n} DAYS', clipToday: '{when} · TONIGHT', clipTomorrow: '{when} · TOMORROW',
       stickers: '{n} LOCAL', stickersNone: 'NONE YET', notebook: '{n} THINGS', notebookNew: 'NEW PAGE', tin: '{total}', tinDue: '{what} IN {n} DAYS', tinToday: '{what} DUE TODAY',
       mug: '{zone}', book: '{n} PEOPLE', bookNone: 'NONE', drawer: 'SAVES', jacket: '{n} ON IT', jacketNone: 'BARE', new: 'NEW'
@@ -46,11 +46,30 @@
       keysNone: 'no keys yet', keys: '{n} [?one: room | rooms] you know(?more:, {more} more to find)', keysHeld: '{n} [?one: room | rooms], {k} dates held(?more:, {more} more to find)',
       phoneNone: 'nothing needs you', phone: '{n} need an answer', phoneOne: '1 needs an answer',
       paperNone: 'nothing to flyer yet', paperTodo: 'flyer for {when}: not made', paperDone: 'flyer for {when}: made',
-      clipsNone: 'no shows on the way', clip: '{when}: {days}', today: 'tonight', tomorrow: 'tomorrow', days: '{n} days out',
+      clipsNone: 'no shows on the way: press to start one', clip: '{when}: {days}', today: 'tonight', tomorrow: 'tomorrow', days: '{n} days out',
       stickers: '{n} local bands', stickersNone: 'no local bands yet', notebook: '{n} things learned', notebookNew: 'something new in here',
       tin: 'fund {fund}, bank {bank}', tinDue: 'fund {fund}, {what} due {when}', mug: 'stress: {zone}',
-      book: '{n} people you can call', bookNone: 'nobody in here yet', drawer: 'settings and saves',
+      book: '{n} people you can call', bookNone: 'nobody in here yet', drawer: 'settings and saves', lampNight: 'call it a night on the clock in the corner',
       jacket: '{n} patches and buttons on it', jacketNone: 'nothing sewn on yet'
+    },
+    /* the hover slip (js/ui/tooltip.js): what each thing on the desk is for */
+    tip: {
+      calendar: 'Your week, night by night: what is planned, jobs due, and closing out the week.',
+      flyers: 'Every flyer you have made. Star the ones worth remembering.',
+      map: 'Your town and the road: the places you can go and who is out there.',
+      keys: 'The rooms you know: book dates, see their rules, find new ones.',
+      phone: 'Messages from bands and rooms. Answer here; a band asking for a night starts a show.',
+      paper: 'The flyer for your next show. Make it before the show to bring people in.',
+      clips: 'Your shows on the way. Open one to work through its card.',
+      clip: 'This show\'s card: room, bands, sound, flyer, money. NEXT on it says what is left.',
+      stickers: 'The local bands you know and how they feel about you.',
+      notebook: 'What you have learned so far.',
+      tin: 'Your money: the scene fund, your bank, and what is due.',
+      mug: 'How stressed you are. Rest or stop early if it climbs.',
+      book: 'People you can call for help: sound, door, rides.',
+      lamp: 'The tape deck: music while you work. The night itself is ended on the clock in the corner.',
+      drawer: 'Settings and saves.',
+      jacket: 'Patches and buttons you have earned.'
     },
     zone: { STEADY: 'steady', STRETCHED: 'stretched', FRIED: 'fried', BURNING_OUT: 'burning out', BURNT_OUT: 'burnt out' },
     words: { notes: 'NOTES', safe: 'get home safe', nothing: 'NOTHING BOOKED', flyersHere: 'NO FLYERS YET', mom: 'call mom',
@@ -312,8 +331,9 @@
       return k.paper(x, y, w, h, { seed: v.seed + 'cal', stock: 'white', torn: 't', inner: inner, burn: 0.7 }) + k.staple(x + w / 2, y + 14, { rot: -6 });
     }
 
-    /* the tape deck: a xeroxed cut-out; pressed, it calls it a night (the night plays out), pauses, closes the week;
-       the tape's label is the week. Stopped at an evening, playing while the night plays out. */
+    /* the tape deck: a xeroxed cut-out; pressed, it pauses or plays on the night playing out, closes the week (at an
+       evening it points at the pinned clock); the tape's label is the week. Stopped at an evening, playing while the
+       night plays out. */
     function deckDown(v) {
       var st = v.st, key = v.lamp ? v.lamp.key : '';
       return v.playing ? 'PLAY' : (key === 'night' || key === 'close' || st.phase === 'CLOSE' ? 'STOP' : (st.phase === 'PLAY' ? 'PAUSE' : ''));
@@ -625,7 +645,7 @@
 
     function zoneWord(v) { return safe(function () { return L('zone.' + v.st.stress.zone); }, ''); }
     function objects(v) {
-      var st = v.st, list = [], sh = nextShow(v), clips = clipShows(v), learnedNew = lastLearned !== null && seenLearned !== null && lastLearned !== seenLearned,
+      var st = v.st, list = [], night, sh = nextShow(v), clips = clipShows(v), learnedNew = lastLearned !== null && seenLearned !== null && lastLearned !== seenLearned,
           due = v.due, nf = Math.max(v.flyered.length, v.binder.length), dd = due ? due.day - v.today : 0, what = due ? String(due.label || 'bills').toUpperCase() : '';
       function add(id, box, name, tag, state, hotNow, route, params, extra) {
         list.push({ id: id, box: box, name: name, tag: tag, strip: L('strip.' + (/^clip\d/.test(id) ? 'clip' : id)), state: state || '', hot: !!hotNow, route: route, params: params || {}, cls: extra && extra.cls,
@@ -633,7 +653,8 @@
       }
       add('calendar', BOX.calendar, L('names.calendar'), v.late ? L('tag.late', { n: v.late }) : L('tag.week', { n: st.week + 1, from: md(st.from), to: md(st.to) }),
           v.late ? L(v.late === 1 ? 'state.lateOne' : 'state.late', { n: v.late }) : L('state.week', { n: st.week + 1, from: md(st.from), to: md(st.to) }), v.late > 0, 'week');
-      add('lamp', BOX.lamp, L('names.lamp'), (v.lamp ? v.lamp.text : '') + clockSay(v), v.lamp ? String(v.lamp.text).toUpperCase() : '', false, null, {}, { cls: 'is-lamp' });
+      night = !!v.lamp && v.lamp.key === 'night';
+      add('lamp', BOX.lamp, L('names.lamp'), (night ? L('tag.lampNight') : (v.lamp ? v.lamp.text : '')) + clockSay(v), v.lamp && !night ? String(v.lamp.text).toUpperCase() : '', false, null, {}, { cls: 'is-lamp' });
       add('mug', BOX.mug, L('names.mug'), L('tag.mug', { zone: zoneWord(v) }), zoneWord(v).toUpperCase(), false, null, {}, { cls: 'is-mug' });
       add('paper', BOX.paper, L('names.paper'),
           !sh ? L('tag.paperNone') : L(sh.promo && sh.promo.flyer ? 'tag.paperDone' : 'tag.paperTodo', { when: dowShort(sh.day) + ' ' + md(sh.day) }),
@@ -850,17 +871,13 @@
       var vb = vbOf(o.box), art = h('div', { class: 'dk-ink', aria: { hidden: 'true' } }), cv = canvasEl('dk-cut'), live = h('div', { class: 'dk-live', aria: { hidden: 'true' } }),
           name = h('span', { class: 'dk-strip', text: o.strip }), state = h('span', { class: 'dk-state' }),
           strips = h('span', { class: 'dk-strips', aria: { hidden: 'true' } }, [name, state]),
-          clock = o.id === 'lamp' ? h('div', { class: 'dk-clock', aria: { hidden: 'true' } }) : null,
           obj = h('span', { class: 'dk-obj' }, cv ? [art, cv, live, strips] : [art, live, strips]),
           pad = h('span', { class: 'dk-pad', aria: { hidden: 'true' } }),
-          /* the clock slip sits in the button, not in the drawing, so it lies on top of whatever overlaps the deck (the mug) */
-          b = h('button', { type: 'button', class: 'dk-hit ' + (o.cls || ''), data: { obj: o.id }, on: { click: function () { open(o.id); } } }, [pad, obj, clock]);
+          b = h('button', { type: 'button', class: 'dk-hit ' + (o.cls || ''), data: { obj: o.id }, on: { click: function () { open(o.id); } } }, [pad, obj]);
       pad.style.left = pct(M, vb[2]); pad.style.top = pct(M, vb[3]); pad.style.width = pct(o.box[2], vb[2]); pad.style.height = pct(o.box[3], vb[3]);
       put(b, o);
       strips.style.left = pct(M - 12, vb[2]); strips.style.top = pct(M - 27, vb[3]);
-      /* the clock slip: taped across the deck's front edge, under its keys */
-      if (clock) { clock.style.left = pct(M - 14, vb[2]); clock.style.right = pct(M - 14, vb[2]); clock.style.top = pct(M + o.box[3] - 6, vb[3]); }
-      built[o.id] = { b: b, art: art, cv: cv, live: live, state: state, obj: obj, clock: clock };
+      built[o.id] = { b: b, art: art, cv: cv, live: live, state: state, obj: obj };
       return b;
     }
     /* where a thing sits and how big it is shown (fit): its button covers its drawing box, scaled */
@@ -886,6 +903,10 @@
         var p = built[o.id], k2, svg, vb;
         if (!p) return;
         p.b.setAttribute('aria-label', o.name + (o.tag ? ': ' + o.tag : ''));
+        k2 = SB.Content.ui.desk && SB.Content.ui.desk.tip ? SB.Content.ui.desk.tip[/^clip\d/.test(o.id) ? 'clip' : o.id] : '';
+        p.b.setAttribute('data-tip-head', o.name);
+        p.b.setAttribute('data-tip', (o.tag ? o.tag.charAt(0).toUpperCase() + o.tag.slice(1) + '.' : '') + (k2 ? '\n' + k2 : ''));
+        k2 = undefined;
         if (p.state.textContent !== o.state) p.state.textContent = o.state;
         p.state.hidden = !o.state;
         p.b.classList.toggle('is-hot', o.hot);
@@ -901,22 +922,10 @@
           p.obj.classList.remove('is-copied');
           raster(o.id, p.cv, svg, vb, v.seed + o.id, (function (obj) { return function () { obj.classList.add('is-copied'); }; })(p.obj), o.disp);
         }
-        if (o.id === 'lamp') { drawLive(p, v, o); drawClock(p, v, s); }
+        if (o.id === 'lamp') drawLive(p, v, o);
         if (o.id === 'jacket') drawJacket(p, o, s);
         if (o.id === 'phone') p.live.innerHTML = v.needs > 0 ? '<svg viewBox="' + vbOf(o.box).join(' ') + '"><rect class="dk-glow" x="' + (o.box[0] + 12) + '" y="' + (o.box[1] + 36) + '" width="' + (o.box[2] - 24) + '" height="' + (o.box[3] - 84) + '" fill="#fffbe0" fill-opacity=".16"/></svg>' : '';
       });
-    }
-    /* tonight's clock under the deck (SB.Clock.slip), redrawn only when what it says changes */
-    function drawClock(p, v, s) {
-      var t = v.tonight, key;
-      if (!p.clock) return;
-      if (!t || !SB.Clock || v.st.phase !== 'PLAY') { if (p.clockKey !== '') { SB.UI.clear(p.clock); p.clockKey = ''; } return; }
-      key = JSON.stringify([t.day, t.cap, t.left, t.spent, t.reserved, t.stay, t.tired, t.show, t.off, t.called, t.burnt, v.hot,
-                            v.crunch.slice(0, 1).map(function (c) { return [c.day, c.need, c.have]; })]);
-      if (p.clockKey === key) return;
-      p.clockKey = key;
-      SB.UI.clear(p.clock);
-      p.clock.appendChild(SB.Clock.slip(s, { tonight: t, list: v.crunch, crunch: 1, hot: v.hot, split: true }));
     }
     function drawLive(p, v, o) {
       var out = '';
@@ -955,14 +964,19 @@
       if (hits) { if (info && info.closeup) hits.setAttribute('inert', ''); else hits.removeAttribute('inert'); }
     }
 
-    /** open(id): pick up a thing on the desk: its route opens as a close-up, the tape deck calls it a night, the coffee answers. */
+    /** open(id): pick up a thing on the desk: its route opens as a close-up, the tape deck plays the night out (at an
+     *  evening it points at the pinned clock, the one place a night is called), the coffee answers. */
     function open(id) {
       var o = null, i;
       for (i = 0; i < current.length; i++) if (current[i].id === id) o = current[i];
       if (!o) return;
       if (SB.Rungs && SB.UI.game && SB.UI.game() && SB.Rungs.isNew(SB.UI.game(), id)) SB.UI.act(function (st) { SB.Rungs.opened(st, id); });
       if (id === 'notebook') { seenLearned = lastLearned; memo.notebook = null; }
-      if (id === 'lamp') { if (SB.UI.lamp) SB.UI.lamp.pull(); return; }
+      if (id === 'lamp') {
+        if (SB.UI.lamp && (SB.UI.lamp.label() || {}).key === 'night') { if (SB.NightClock) SB.NightClock.nudge(); }
+        else if (SB.UI.lamp) SB.UI.lamp.pull();
+        return;
+      }
       if (id === 'mug') { if (SB.DeskCloseup) SB.DeskCloseup.stress(); return; }
       if (o.route) SB.UI.go(o.route, o.params);
     }

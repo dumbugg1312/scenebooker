@@ -1,16 +1,20 @@
 SB.Cities.register('lynchburg-va', {
   v: 1,
   slug: 'lynchburg-va',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['liberty university', 'flames', 'randolph college', 'university of lynchburg', 'virginia university of lynchburg',
            'central virginia community college', 'sweet briar', 'sweet briar college', 'longwood university', 'hampden-sydney',
            'virginia military institute', 'vmi', 'virginia tech', 'uva', 'hillcats', 'lynchburg hillcats', 'carolina league', 'cleveland guardians',
            'virginia 10 miler', '10 miler', 'news & advance', 'news and advance', 'gltc', 'amtrak', 'greyhound', 'american eagle', 'waffle house',
            'cook out', 'kemper street station', 'vines center', 'williams stadium', 'baptist', 'vfw', 'american legion', 'the foundry annex',
            'kemper siding', 'candler\'s cellar', 'lodge 1142', 'third hill hall', 'the tobacco barn room', 'st. anselm\'s fellowship hall',
-           'lowwater skate and supply', 'the rail yard rec', 'old forest social club', 'garland street garage', 'the piedmont pie room'],
+           'lowwater skate and supply', 'the rail yard rec', 'old forest social club', 'garland street garage', 'the piedmont pie room',
+           'lynchburg police department', 'wset', 'wdbj', 'wdbj7', 'wsls', 'cardinal news', 'style weekly', 'rvamag', 'rva magazine', 'c-ville weekly',
+           'macaroni kid', 'livability', 'e.c. glass', 'ec glass', 'lynchburg city stadium', 'lynchburg art festival', 'lynchburg art club',
+           'centerfest', 'lynchburg elvis festival', 'lynchburg tourism', 'lynchburg parks and recreation', 'virginia folklife program', 'liberty arena',
+           'midweek on the mountain', 'berglund center', 'john paul jones arena'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
-  blocklist: ['liberty university*', 'hillcats*', 'virginia 10 miler*', 'news & advance*', 'waffle house*', 'cook out*', 'randolph college*'],
+  blocklist: ['liberty university*', 'hillcats*', 'virginia 10 miler*', 'news & advance*', 'waffle house*', 'cook out*', 'randolph college*', 'cardinal news*', 'wset*', 'berglund center*'],
 
   blurb: ['A city of seven hills on the James River in the Blue Ridge foothills, with no interstate and a huge religious campus on the mountain.',
           'A few dozen kids keep shows going in church halls and damp basements, and half the bill drives in from the county. The best bands move to Richmond.'],
@@ -51,7 +55,39 @@ SB.Cities.register('lynchburg-va', {
     { id: 'east-end', name: 'the east end and the rail strip', route: 'work-side', note: 'Old foundry and warehouse land along the river and tracks. Industrial space where it exists, and a history to treat with care.' }
   ],
 
-  contacts: ['roanoke-va', 'charlottesville-va', 'harrisonburg-va'],
+  rooms: [
+    { id: 'rivermont-house', kind: 'HOUSE', hood: 'rivermont', cap: 40, curfew: 1290, ac: false, sketch: 20, standing: [65, 60, 45], pressure: 55, start: true,
+      note: 'A rented house with a basement and a shared backyard in the leafy west end. The older neighbors call the police, and the quiet rule is nine.' },
+    { id: 'hills-basement', kind: 'HOUSE', hood: 'hill-streets', cap: 30, curfew: 1290, ac: false, sketch: 25, standing: [65, 55, 45], pressure: 55,
+      note: 'A cramped basement up a steep street with nowhere to park a van. The block is being flipped and the rent keeps rising.' },
+    { id: 'sober-house', kind: 'HOUSE', hood: 'hill-streets', cap: 80, hostCut: 0, curfew: 1260, ac: false, outdoor: true, sketch: 10, standing: [75, 70, 60], pressure: 40,
+      note: 'An old house run as a nonprofit, with a backyard stage and a donation door. No drugs and no drinking, and young local bands start here.' },
+    { id: 'arcade-bar', kind: 'BAR', hood: 'downtown', cap: 250, soundFee: 60, pa: .7, ages: ['ALL', 'A18'], matinee: true, curfew: 1410, ac: true, following: .3, sketch: 20, standing: [50, 65, 70],
+      note: 'A two-floor arcade bar on the bluff that mixes metal, punk and emo. Kids are out of the room by nine on most nights, and the age line has moved before.' },
+    { id: 'arts-hall', kind: 'HALL', hood: 'downtown', cap: 100, rent: 150, deposit: 50, pa: .6, curfew: 1320, ac: true, seated: true, sketch: 5, standing: [60, 65, 65], owner: 'HALL_MANAGER',
+      note: 'A small seated room run by the town arts center. It suits quiet and folk bills more than a pit, and they decide who plays.' },
+    { id: 'old-theater', kind: 'BIG', hood: 'downtown', cap: 800, curfew: 1350, ac: true, seated: true, sketch: 5, standing: [45, 70, 70],
+      note: 'The historic theater downtown. Local bands open for a touring name now and then. Far too big for a first booking.' },
+    { id: 'foundry-corner', kind: 'DIY', hood: 'east-end', cap: 60, rent: 50, curfew: 1290, ac: false, sketch: 35, standing: [55, 60, 45], pressure: 60, needs: ['VOUCH'],
+      note: 'A corner of an old foundry building by the tracks, if the landlord has not noticed. Cheap, dark and loud.' },
+    { id: 'heights-yard', kind: 'OUTDOOR', hood: 'madison-heights-hood', cap: 80, rent: 15, curfew: 1350, sketch: 35, standing: [60, 55, 40],
+      note: 'A backyard across the river under the county sheriff. An old way around the city rules, with a longer curfew and a longer drive.' }
+  ],
+
+  contacts: ['roanoke-va', 'charlottesville-va', 'harrisonburg-va', 'richmond', 'greensboro-nc'],
+
+  calendar: [
+    { id: 'road-race', label: 'the long-distance road race', tag: 'race', month: 9, week: 4, dows: [5], can: [.92, .88, .88], hoods: ['rivermont'], elsewhere: [1, 1, 1] },
+    { id: 'art-fest', label: 'the juried art festival', tag: 'festival', month: 9, week: 3, dows: [5], can: [.92, .90, .90], hoods: ['rivermont'], elsewhere: [1, 1, 1] },
+    { id: 'fourth', label: 'the Fourth of July fireworks', tag: 'holiday', month: 7, week: 1, dows: [3, 4, 5, 6], can: [.92, .90, .90], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 3], dows: [5], can: [.9, .95, .95], hoods: ['wards-road'], elsewhere: [1, 1, 1] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 3], dows: [5], can: [.9, .95, .95], hoods: ['wards-road'], elsewhere: [1, 1, 1] },
+    { id: 'football-nov', label: 'home football', tag: 'game', month: 11, weeks: [1, 2], dows: [5], can: [.9, .95, .95], hoods: ['wards-road'], elsewhere: [1, 1, 1] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1380, weekend: 1380, inForce: true } },
 
   points: [
     { name: 'Richmond', state: 'VA', lat: 37.54, lon: -77.44, pop: 1300000 },
@@ -67,5 +103,58 @@ SB.Cities.register('lynchburg-va', {
     hood: ['Rivermont', 'Garland Hill', 'Federal Hill', 'Daniel\'s Hill', 'Diamond Hill', 'College Hill', 'Tinbridge Hill', 'Fort Hill', 'Madison Heights'],
     thing: ['church basement', 'seven hills', 'chili dog', 'milkshake tray', 'tobacco barn', 'biscuit', 'skate shop', 'fellowship hall'],
     weather: ['humid afternoon', 'snow day']
-  }
+  },
+
+  events: [
+    { id: 'LYNCHBURG_VA_ROAD_RACE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 5], calendar: 'race' },
+      telegraph: 'The long road race closes the west end from before sunrise on Saturday.',
+      title: 'The van cannot get to Rivermont',
+      body: 'The roads around the west end are blocked for the race, and the van\'s route to your house show is cut. The kids who ran this morning are tired.',
+      options: [
+        { id: 'DETOUR', label: 'Send the bands round by the back roads', likely: 'Late, but everyone arrives.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
+          result: 'The van came in through the hills an hour late. The tired runners still came.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A thin crowd, and nobody is fresh.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The runners went to bed early. A quiet night.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'LYNCHBURG_VA_TWO_QUIET_HOURS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 2] },
+      telegraph: 'The city has two different night hours, and a neighbor has read the early one.',
+      title: 'The police at 9:10',
+      body: 'A neighbor calls at ten past nine about the singing. The officer says the quiet hour has not started yet, but the neighbor is still on the porch.',
+      options: [
+        { id: 'TURN_DOWN', label: 'Turn it down for the rest of the set', likely: 'A quieter night. Most stay.',
+          effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The drums went to brushes and the officer left. The neighbor stayed on the porch.' },
+        { id: 'END', label: 'End it early', likely: 'A short night. No trouble.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'You stopped at ten. Nobody argued, and the street stayed loud for another hour.' },
+        { id: 'ACCEPT', label: 'Argue the clock and play on', likely: 'The host pays for it later.',
+          effects: [{ op: 'MONEY', amount: -25 }],
+          result: 'The officer was right about the clock and the neighbor called again at ten. The host got a ticket.' }
+      ] },
+
+    { id: 'LYNCHBURG_VA_KIDS_CLEARED', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3] },
+      telegraph: 'The door at the bar clears the kids out at nine, and the early band has a lot of them.',
+      title: 'The door clears the room at nine',
+      body: 'At nine the door staff clear everyone under the age line. The opening band\'s whole crowd is about to be on the sidewalk, and the headliner is not on until ten.',
+      options: [
+        { id: 'REORDER', label: 'Move the all-ages bands first', likely: 'The young crowd sees their bands and leaves on time.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'The kids got their sets and were out by nine. The late crowd found a half-empty room.' },
+        { id: 'STREET', label: 'Let the kids wait outside', likely: 'Half of them go home.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'Half the kids waited on the sidewalk and half went home. The sidewalk was loud.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] }
+  ]
 });

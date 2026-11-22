@@ -1,8 +1,8 @@
 SB.Cities.register('cedar-rapids-ia', {
   v: 1,
   slug: 'cedar-rapids-ia',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
-  banned: ['quaker oats', 'collins aerospace', 'aegon', 'crst', 'pepsico', 'pepsi', 'kirkwood', 'kirkwood community college', 'coe college',
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
+  banned: ['freedom festival', 'cedar rapids freedom festival', 'houby days', 'houby', 'linn county fair', 'little village', 'little village magazine', 'impact 89fm', 'tourism cedar rapids', 'traveliowa', 'travel iowa', 'iowa public radio', 'bandsintown', 'jambase', 'cr pride', 'cedar rapids pride', 'quaker oats', 'collins aerospace', 'aegon', 'crst', 'pepsico', 'pepsi', 'kirkwood', 'kirkwood community college', 'coe college',
            'mount mercy', 'mount mercy university', 'cornell college', 'university of iowa', 'hawkeyes', 'hawkeye', 'iowa state', 'cyclones',
            'university of northern iowa', 'the gazette', 'cedar rapids gazette', 'kgan', 'kcrg', 'kfxa', 'iheart', 'iheartmedia', 'townsquare',
            'cedar rapids kernels', 'kernels', 'roughriders', 'fifth season races', 'city of five seasons', 'five seasons', 'city of five smells',
@@ -54,7 +54,34 @@ SB.Cities.register('cedar-rapids-ia', {
     { id: 'college-hill', name: 'the college blocks', route: 'campus', note: 'A small urban campus and its rentals; a thin student crowd.' }
   ],
 
+  rooms: [
+    { id: 'wellington-house', kind: 'HOUSE', hood: 'wellington-heights', cap: 40, curfew: 1320, ac: false, pressure: 55, start: true, note: 'A porch and basement room on a cheap old street near downtown, run by a kid from a hardcore band. The neighbors and the noise rule decide how long it lasts.' },
+    { id: 'moundview-garage', kind: 'HOUSE', hood: 'moundview', cap: 30, curfew: 1320, ac: false, outdoor: false, note: 'A garage bill with a drum kit and a space heater in the postwar northeast. Most house shows in this region are thirty minutes south, so the turnout is small.' },
+    { id: 'storefront-diy', kind: 'DIY', hood: 'downtown', cap: 80, curfew: 1350, pressure: 60, note: 'An all-ages, no-alcohol storefront on Second Avenue that has moved more than once. The door cuts are small and the lease is always the question.' },
+    { id: 'arts-center', kind: 'HALL', hood: 'newbo', cap: 250, curfew: 1380, ac: true, note: 'A community arts hall that does folk nights and weddings and lends itself to winter metal showcases. The staff set the curfew, and it is early.' },
+    { id: 'volunteer-gallery', kind: 'HALL', hood: 'downtown', cap: 100, curfew: 1350, ac: true, note: 'A volunteer-run arts space with a gallery wall behind the amps. It runs on grants and goodwill, and the early crowd is gentle.' },
+    { id: 'skate-shop', kind: 'SHOP', hood: 'collins-road', cap: 60, curfew: 1260, ac: true, note: 'A skate shop that clears its floor on a Saturday afternoon. Over by nine, and the landlord cares more about sales than noise.' },
+    { id: 'theater-bar', kind: 'BAR', hood: 'newbo', cap: 200, ages: ['ALL', 'A21'], matinee: true, curfew: 1500, ac: true, note: 'A bar attached to a theater, with a real stage. Pop-punk and emo nights fill it, and an early all-ages slot is sometimes possible.' },
+    { id: 'island-bar', kind: 'BAR', hood: 'downtown', cap: 150, ages: ['A21'], curfew: 1500, ac: true, note: 'A stage bar out back on the island where punk benefits land. The bar crowd stays after the kids leave.' },
+    { id: 'river-hall', kind: 'CLUB', hood: 'kingston', cap: 300, ages: ['A18'], curfew: 1440, ac: true, note: 'A rebuilt hall on the west bank that books tours when it can. Eighteen and up, and over by midnight.' },
+    { id: 'old-theater', kind: 'BIG', hood: 'newbo', cap: 900, curfew: 1380, ac: true, note: 'The historic theater and the one room that feels like a real stage. The whole scene turns up in August, and the building has been for sale.' },
+    { id: 'river-pavilion', kind: 'OUTDOOR', hood: 'czech-village', cap: 150, curfew: 1200, note: 'A riverside pavilion on the heritage strip. Daytime only, and the city permit and the weather decide it.' }
+  ],
+
   contacts: ['iowa-city-ia', 'davenport-ia', 'des-moines-ia'],
+
+  calendar: [
+    { id: 'river-fest', label: 'the summer river festival', tag: 'festival', month: 6, weeks: [3, 4], dows: [4, 5, 6], can: [.90, .88, .85], hoods: ['downtown'], elsewhere: [1, .98, .98] },
+    { id: 'heritage-fest', label: 'the heritage strip festival', tag: 'festival', month: 5, week: 3, dows: [4, 5, 6], can: [.90, .88, .85], hoods: ['czech-village'], elsewhere: [1, 1, 1] },
+    { id: 'county-fair', label: 'the county fair', tag: 'fair', month: 6, weeks: [4, 5], dows: [3, 4, 5, 6], can: [.92, .92, .90] },
+    { id: 'metal-fest', label: 'the underground metal festival', tag: 'festival', month: 8, week: 2, dows: [4, 5], can: [1.10, 1.10, 1.05], hoods: ['newbo'], elsewhere: [.90, .90, .90] },
+    { id: 'football-sep', label: 'game-day Saturdays', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [.85, .95, .95] },
+    { id: 'football-oct', label: 'game-day Saturdays', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [.85, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { curfewMinors: { weeknight: 1380, weekend: 1380, inForce: false } },
 
   points: [
     { name: 'Chicago', state: 'IL', lat: 41.88, lon: -87.63, pop: 9400000 },
@@ -71,5 +98,55 @@ SB.Cities.register('cedar-rapids-ia', {
     hood: ['Czech Village', 'NewBo', 'New Bohemia', 'Kingston', 'Wellington Heights', 'Oakhill Jackson', 'Moundview', 'Noelridge', 'Kenwood Park', 'Mays Island', 'Marion'],
     thing: ['skywalk', 'sandbag', 'kolache', 'tenderloin', 'grain elevator', 'sump pump', 'tornado siren', 'donation jar', 'raffle', 'hall rental', 'metal fest'],
     weather: ['river crest', 'windstorm']
-  }
+  },
+
+  events: [
+    { id: 'CEDAR_RAPIDS_IA_ROOM_MOVES', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3] },
+      telegraph: 'The flyer has a new storefront on Second Avenue and a nervous line saying the vibe is the same.',
+      title: 'The room moved again',
+      body: 'The all-ages room lost its lease and found another storefront two blocks away. The new place has no stage, no sign and a landlord who has not been told what it is for.',
+      options: [
+        { id: 'NEWPLACE', label: 'Play the new storefront', likely: 'Half the regulars will find it. Bare floor, loud.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
+          result: 'The new room was cold and bare, and the ones who found it stayed to the end.' },
+        { id: 'HOUSE', label: 'Move the bill to a house', likely: 'Smaller and warmer. Everyone knows a basement.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 0.6 }],
+          result: 'A basement took the bill with a day to spare, and the floor was packed.' },
+        { id: 'LATE', label: 'Push doors back and set up a map', likely: 'A late start while people find the address.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
+          result: 'Doors an hour late. Everybody got there eventually.' }
+      ] },
+
+    { id: 'CEDAR_RAPIDS_IA_FEST_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], calendar: 'festival' },
+      telegraph: 'The metal festival is this weekend and every kid in the scene is working a table.',
+      title: 'The festival has everyone',
+      body: 'The big theater is full all day and every kid in the scene is working the merch table, loading in or watching. Nobody is free to run a house show.',
+      options: [
+        { id: 'LATE', label: 'Start after the festival lets out', likely: 'The crowd that wants more shows up late.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
+          result: 'Doors at ten. The festival crowd came in loud and hungry for more.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The scene is busy elsewhere.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
+          result: 'Only the ones with nowhere else to be came, and they were glad.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] },
+
+    { id: 'CEDAR_RAPIDS_IA_GAME_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'game' },
+      telegraph: 'It is a home game down in Iowa City and the interstate is full.',
+      title: 'Game day on the interstate',
+      body: 'Half your crowd lives or works in the college town to the south. They are stuck in game traffic and will arrive an hour late with a plate of hot food.',
+      options: [
+        { id: 'LATE', label: 'Push doors back an hour', likely: 'They show up, tired and loud.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
+          result: 'An hour late, and the room filled up all at once.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The south-bound crowd misses the openers.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
+          result: 'The openers played to the bartender and the loyal.' }
+      ] }
+  ]
 });

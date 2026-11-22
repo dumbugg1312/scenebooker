@@ -51,6 +51,16 @@ body.sy-guiding .sb-toasts { bottom: calc((100vh - var(--u) * 1000) / 2 + var(--
 .sy-strip-say { margin: 0; }
 .sy-strip-open:not(.sy-strip-say):hover, .sy-strip-x:hover { background: var(--toner); color: var(--pp-bond); }
 .sy-strip-open:not(.sy-strip-say):hover .sy-strip-from { background: var(--pp-bond); color: var(--toner); }
+/* while the guided show runs: a small tab on top of the strip's right end, "skip the walkthrough", asked once */
+.sy-strip-skip { position: absolute; right: calc(var(--u) * 12); bottom: 100%; margin-bottom: calc(var(--u) * -1); display: flex; align-items: baseline; flex-wrap: wrap;
+  gap: calc(var(--u) * 4) calc(var(--u) * 10); max-width: calc(100% - var(--u) * 60); padding: calc(var(--u) * 4) calc(var(--u) * 10) calc(var(--u) * 3);
+  background: var(--pp-buff); color: var(--toner); font: 400 calc(var(--u) * 14 * var(--scale, 1))/1.25 var(--f-type); transform: rotate(.8deg);
+  box-shadow: var(--sh-s) 0 var(--pitch); }
+.sy-strip-skip button { all: unset; box-sizing: border-box; cursor: pointer; font: inherit; }
+.sy-skip-link, .sy-skip-no { text-decoration: underline; text-decoration-thickness: calc(var(--u) * 1.5); text-underline-offset: calc(var(--u) * 3); }
+.sy-skip-yes { padding: calc(var(--u) * 3) calc(var(--u) * 8) calc(var(--u) * 2); background: var(--toner); color: var(--pp-bond); text-transform: uppercase; letter-spacing: .06em; }
+.sy-strip-skip button:hover, .sy-strip-skip button:focus-visible { background: var(--hl-solid); color: var(--toner); }
+.sy-strip-skip.is-asking { z-index: 1; }
 
 /* ---------- the card a new patch lands on: slapped down on the desk, its patch stamped ---------- */
 .sy-card.pz-paper, .sy-card-leaving.pz-paper {

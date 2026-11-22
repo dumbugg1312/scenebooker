@@ -1,7 +1,7 @@
 SB.Cities.register('sioux-falls-sd', {
   v: 1,
   slug: 'sioux-falls-sd',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['augustana university', 'augustana', 'university of sioux falls', 'south dakota state university', 'sdsu', 'university of south dakota',
            'dakota state university', 'dordt university', 'dordt', 'mount marty university', 'mount marty', 'dakota wesleyan university', 'dakota wesleyan',
            'argus leader', 'wells fargo', 'citigroup', 'hy-vee', 'hy vee', 'casey\'s', 'kum & go', 'kum and go', 'taco john\'s', 'culver\'s', 'pizza ranch',
@@ -10,7 +10,7 @@ SB.Cities.register('sioux-falls-sd', {
            'jefferson lines', 'sioux area metro', 'south dakota public broadcasting', 'corn palace', 'ellsworth', 'sioux falls regional airport',
            'the quartzite room', 'split rock hall', 'the packer\'s annex', 'packer\'s annex', 'skywalk basement', 'the falls overlook post',
            'falls overlook post', 'east bank dock door', 'terrace park shed', 'st. anselm\'s fellowship hall', 'minnehaha rec', 'the cold storage',
-           'sod house social', 'the 41st street unit'],
+           'sod house social', 'the 41st street unit', 'slamdakota', 'slamdakota death fest', 'not just a phase fest', '605 revue', 'levitt at the falls', 'fridays on the plaza', 'sioux falls municipal band', 'w.h. lyon fairgrounds', 'lyon fairgrounds', 'hot summer nites', 'experience sioux falls', 'dakota news now', 'the dakota scout', 'pigeon605', 'pigeon 605', 'kikn', 'kkrc', 'kxrb', 'ksfy', 'dtsf', 'downtown sioux falls inc', 'sioux falls skyforce', 'sioux falls stampede', 'sioux falls police department', 'sioux falls canaries'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Colleges and events appear in game text only as generic words. */
   blocklist: ['argus leader*', 'augustana*', 'empire mall*', 'sculpturewalk*', 'sod house*', 'quartzite room*', 'split rock*', 'hy-vee*'],
 
@@ -52,7 +52,35 @@ SB.Cities.register('sioux-falls-sd', {
     { id: 'north-side', name: 'the north side', route: 'work-side', note: 'Working-class streets along the river near the pork plant; cheap and ignored, with garages and backyards.' }
   ],
 
-  contacts: ['fargo-nd', 'lincoln-ne', 'minneapolis', 'des-moines-ia'],
+  rooms: [
+    { id: 'cathedral-basement', kind: 'HOUSE', hood: 'cathedral', cap: 40, curfew: 1350, ac: false, outdoor: false, start: true, note: 'A basement under an old brick house, door shut for the sound. It lives or dies by the neighbors and the 10:30 line.' },
+    { id: 'north-garage', kind: 'HOUSE', hood: 'north-side', cap: 50, curfew: 1350, ac: false, outdoor: true, note: 'A garage and backyard on a working-class street. Summer nights, until the thunderstorm rolls in.' },
+    { id: 'park-rental', kind: 'HOUSE', hood: 'mckennan', cap: 35, curfew: 1350, ac: false, outdoor: false, note: 'A student and nurse rental by the park. A small living-room night with a thin crowd, and a landlord who reads the lease.' },
+    { id: 'record-shop', kind: 'SHOP', hood: 'downtown', cap: 50, curfew: 1320, ac: true, note: 'The record shop on Phillips Avenue. In-stores and small bills, over by ten.' },
+    { id: 'phillips-bar', kind: 'BAR', hood: 'downtown', cap: 150, ages: ['A21'], curfew: 1590, ac: true, note: 'A bar with a stage that runs a free punk night on the first Friday. The doors are 21 and the night runs long.' },
+    { id: 'metal-bar', kind: 'BAR', hood: '41st', cap: 300, ages: ['A21'], curfew: 1500, ac: true, note: 'A sports bar and billiards hall on 41st Street with an indoor room and a parking-lot stage. The local metal room, and nobody under 21 gets near it.' },
+    { id: 'event-hall', kind: 'CLUB', hood: 'downtown', cap: 250, ages: ['A18'], curfew: 1470, ac: true, note: 'An event hall and lounge that books hardcore and metalcore. Eighteen and up, and the early all-ages slot is the one you want.' },
+    { id: 'dock-room', kind: 'DIY', hood: 'east-bank', cap: 80, curfew: 1380, ac: false, needs: ['VOUCH'], note: 'A loading-dock room in an old packing building by the river. It lasts until the building is sold.' },
+    { id: 'strip-unit', kind: 'DIY', hood: '41st', cap: 60, curfew: 1350, ac: false, needs: ['VOUCH'], note: 'A rented strip-mall unit between leases. Cheap, with a landlord and the fire code to worry about.' },
+    { id: 'parish-hall', kind: 'HALL', hood: 'cathedral', cap: 120, curfew: 1320, ac: true, note: 'A parish hall rented by the night. All ages, no beer, and it needs a sponsor.' },
+    { id: 'river-pavilion', kind: 'OUTDOOR', hood: 'north-side', cap: 100, curfew: 1290, note: 'A pavilion by the river trail. Summer only, with daylight and the weather as the rules.' },
+    { id: 'arena', kind: 'BIG', hood: 'downtown', cap: 700, curfew: 1380, ac: true, note: 'The arena and the large hall. Touring bills pass through, and a local bill never fills it.' }
+  ],
+
+  contacts: ['omaha', 'fargo-nd', 'minneapolis', 'lincoln-ne', 'des-moines-ia'],
+
+  calendar: [
+    { id: 'county-fair', label: 'the county fair', tag: 'fair', month: 8, week: 1, dows: [1, 2, 3, 4, 5, 6], can: [.88, .85, .85] },
+    { id: 'river-festival', label: 'the river festival', tag: 'festival', month: 9, week: 3, dows: [5], can: [.90, .85, .85], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'metal-festival', label: 'the extreme-metal festival', tag: 'festival', month: 7, week: 2, dows: [5], can: [1.05, 1.10, 1.05], hoods: ['41st'], elsewhere: [.95, .95, .95] },
+    { id: 'home-music-day', label: 'the home-grown music day', tag: 'festival', month: 7, week: 3, dows: [5], can: [.95, .92, .92], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [.88, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [.88, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1350, curfewMinors: { weeknight: 1380, weekend: 1380, inForce: false } },
 
   points: [
     { name: 'Sioux City', state: 'IA', lat: 42.5, lon: -96.4, pop: 85800 },
@@ -68,5 +96,55 @@ SB.Cities.register('sioux-falls-sd', {
     hood: ['the East Bank', 'the Cathedral District', 'McKennan Park', 'Whittier', 'Pettigrew Heights', 'Brandon'],
     thing: ['chislic', 'kuchen', 'block heater', 'church basement', 'Morton building', 'pork tenderloin', 'fry bread', 'blizzard warning', 'gas-station pizza', 'campus room'],
     weather: ['blizzard', 'ground blizzard', 'tornado warning']
-  }
+  },
+
+  events: [
+    { id: 'SIOUX_FALLS_SD_LOT_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [6, 7, 8], weather: 'RAIN' },
+      telegraph: 'A line of thunderstorms is marching across the plains toward the festival weekend.',
+      title: 'The parking-lot stage loses its power',
+      body: 'A storm has knocked out the generator on the parking-lot stage. The bar says the bands can play inside, but the under-21 crowd cannot follow them through the door.',
+      options: [
+        { id: 'INSIDE', label: 'Move the bands inside and lose the kids', likely: 'Fewer people, but the music goes on.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The bands crammed into the bar. The kids stood out in the rain and went home.' },
+        { id: 'WAIT', label: 'Wait out the storm', likely: 'A late start. The crowd gets restless.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The power came back near ten. Half the crowd was still there.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] },
+
+    { id: 'SIOUX_FALLS_SD_FAIR_CURFEW', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'The county fair is in town, and it has its own curfew for kids 17 and under.',
+      title: 'The fair takes the kids',
+      body: 'Fair week has its own curfew for anyone 17 and under, and the late show is the one thing the kids on your list cannot get to.',
+      options: [
+        { id: 'EARLY', label: 'Start early so the kids can get in and out', likely: 'Most of them make it. A short night.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
+          result: 'Doors early and done by the curfew. The kids went home on time.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids stay away.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The fair kept the kids. The regulars over eighteen came.' }
+      ] },
+
+    { id: 'SIOUX_FALLS_SD_BLIZZARD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [11, 12, 1, 2, 3] },
+      telegraph: 'A blizzard warning is up for the whole eastern half of the state.',
+      title: 'The interstate is shut',
+      body: 'A blizzard warning has closed I-29 the afternoon the Twin Cities band is due. The opener is here and the headliner is stuck in a drift.',
+      options: [
+        { id: 'LONG', label: 'Let the opener play a long set', likely: 'A thin night, but the ones who came are glad.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'The opener played all night to a half-full room. Nobody minded.' },
+        { id: 'WAIT', label: 'Hold the doors for the van', likely: 'A late start. The crowd gets restless.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The van dug in at ten. You started late and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] }
+  ]
 });

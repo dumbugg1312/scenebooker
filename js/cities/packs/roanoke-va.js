@@ -1,8 +1,9 @@
 SB.Cities.register('roanoke-va', {
   v: 1,
   slug: 'roanoke-va',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
-  banned: ['virginia tech', 'vt', 'hollins university', 'hollins', 'roanoke college', 'radford university', 'virginia western', 'virginia military institute', 'vmi',
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
+  banned: ['elmwood park', 'strawberry festival', 'salem fair', 'olde salem days', 'jazz in july', 'homegrown harvest festival', 'go outside festival', 'henry street festival', 'harrison museum', 'st. patrick\'s day parade', 'shamrock festival', 'downtown roanoke inc', 'visit roanoke', 'cardinal news', 'roanoke rambler', 'the roanoker', 'rvamag', 'star city',
+           'virginia tech', 'vt', 'hollins university', 'hollins', 'roanoke college', 'radford university', 'virginia western', 'virginia military institute', 'vmi',
            'washington and lee', 'liberty university', 'carilion', 'roanoke star', 'mill mountain star', 'city market', 'history museum', 'grandin theatre',
            'berglund center', 'roanoke civic center', 'salem red sox', 'salem civic center', 'salem fair', 'martinsville speedway', 'd-day memorial',
            'local colors', 'strawberry festival', 'down by downtown', 'festival in the park', 'henry street heritage festival', 'go fest', 'dickens of a christmas',
@@ -56,6 +57,34 @@ SB.Cities.register('roanoke-va', {
 
   contacts: ['lynchburg-va', 'harrisonburg-va', 'charlottesville-va', 'greensboro-nc', 'johnson-city-tn'],
 
+  rooms: [
+    { id: 'old-sw-basement', kind: 'HOUSE', hood: 'old-southwest', cap: 60, curfew: 1320, outdoor: false, pressure: 55, start: true, note: 'A split Victorian with a damp stone basement and one narrow stair. One neighbor call and the landlord hears about it.' },
+    { id: 'wasena-yard', kind: 'HOUSE', hood: 'wasena', cap: 40, curfew: 1320, outdoor: true, note: 'A yard and porch show by the greenway. The weather and the neighbors decide it.' },
+    { id: 'southeast-garage', kind: 'HOUSE', hood: 'southeast', cap: 50, curfew: 1350, outdoor: false, pressure: 35, note: 'A garage on a brick block where nobody watches. Cheap, and a long way from the bars.' },
+    { id: 'southeast-storefront', kind: 'DIY', hood: 'southeast', cap: 120, curfew: 1350, pressure: 60, needs: ['VOUCH'], note: 'A bay with a few friends on the lease. When the building sells, it is gone.' },
+    { id: 'strip-bay', kind: 'DIY', hood: 'williamson-road', cap: 100, curfew: 1380, pressure: 55, note: 'A practice-room bay turned show room. The landlord and the fire marshal are the risks.' },
+    { id: 'post-hall', kind: 'HALL', hood: 'downtown', cap: 150, curfew: 1320, owner: 'HALL_MANAGER', note: 'A post hall that has taken punk bills lately. It wants a member to sign you in, and the bar rules apply.' },
+    { id: 'market-bar', kind: 'BAR', hood: 'downtown', cap: 150, ages: ['ALL', 'A21'], matinee: true, curfew: 1440, standing: [45, 60, 65], note: 'A small bar with a stage that books some punk. Early doors can be all ages; the owner worries about pay, the pit and damage.' },
+    { id: 'downtown-club', kind: 'CLUB', hood: 'downtown', cap: 250, ages: ['ALL', 'A18'], curfew: 1410, needs: ['FULL_BILL'], note: 'A small downtown club with all-ages punk nights, ten dollars at the door. It depends on the owner\'s say.' },
+    { id: 'ballroom', kind: 'BIG', hood: 'downtown', cap: 1200, ages: ['ALL'], curfew: 1410, note: 'An old bank ballroom, standing room only. Too big for a punk bill; the dream room.' },
+    { id: 'park-stage', kind: 'OUTDOOR', hood: 'downtown', cap: 800, curfew: 1320, ac: false, note: 'The amphitheater in the downtown park, for summer and fall. The daytime fests use the same lawn.' },
+    { id: 'market-lot', kind: 'OUTDOOR', hood: 'downtown', cap: 200, curfew: 1260, rent: 0, note: 'An early-evening set in the market, hosted by the downtown group. Free, and over by nine.' }
+  ],
+
+  calendar: [
+    { id: 'park-festival', label: 'the spring park festival', tag: 'festival', month: 5, week: 1, dows: [4, 5], can: [0.9, 0.88, 0.88], hoods: ['downtown'], elsewhere: [1, 0.97, 0.97] },
+    { id: 'county-fair', label: 'the county fair next door', tag: 'fair', month: 7, weeks: [1, 2], dows: [0, 1, 2, 3, 4, 5, 6], can: [0.95, 0.9, 0.88] },
+    { id: 'heritage-festival', label: 'the heritage street festival', tag: 'festival', month: 9, weeks: [2, 4], dows: [5], can: [0.9, 0.9, 0.88], hoods: ['gainsboro'], elsewhere: [1, 0.97, 0.97] },
+    { id: 'outdoor-festival', label: 'the outdoor festival', tag: 'festival', month: 10, week: 3, dows: [4, 5, 6], can: [0.92, 0.9, 0.9] },
+    { id: 'patrick-parade', label: 'the St. Patrick\'s parade', tag: 'parade', month: 3, week: 3, dows: [5], can: [1.05, 1.05, 1], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [0.9, 0.95, 0.95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [0.9, 0.95, 0.95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.1] }
+  ],
+
+  rules: { curfewMinors: { weeknight: 1380, weekend: 1440, inForce: false } },
+
   points: [
     { name: 'Richmond', state: 'VA', lat: 37.54, lon: -77.44, pop: 1370000 },
     { name: 'Danville', state: 'VA', lat: 36.59, lon: -79.40, pop: 42000 },
@@ -70,5 +99,55 @@ SB.Cities.register('roanoke-va', {
     hood: ['Old Southwest', 'Grandin', 'Raleigh Court', 'Wasena', 'Gainsboro', 'Southeast', 'Vinton', 'Salem'],
     thing: ['railyard', 'Victorian porch', 'bluegrass jam', 'mountain overlook', 'Foursquare', 'caboose', 'fellowship hall', 'brewery patio', 'stone basement'],
     weather: ['mountain fog', 'hurricane remnant', 'summer thunderstorm']
-  }
+  },
+
+  events: [
+    { id: 'ROANOKE_VA_FAIR_WEEKS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'The county fair next door runs two weeks and every school kid has a wristband.',
+      title: 'The fair has the kids',
+      body: 'The fair next door is in its second week. The Salem and Vinton kids are on the rides, and your Saturday bill is all school-age bands in a town full of carnival noise.',
+      options: [
+        { id: 'EARLY', label: 'Open early and let them come after the rides', likely: 'Some come over. Short and loud.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
+          result: 'Doors an hour early. The ones who came still smelled like fried dough.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The fair wins the kids.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The kids stayed on the midway. The regulars came.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'ROANOKE_VA_STREET_CLOSED', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'festival' },
+      telegraph: 'A street festival closes the old Henry Street blocks on Saturday.',
+      title: 'The street is closed',
+      body: 'The street festival has Henry Street shut to cars all day, and the hall wants the stage down by dark. The crew has to carry gear past the barricades.',
+      options: [
+        { id: 'CARRY', label: 'Hand-carry the gear and start on time', likely: 'Costs an hour of your day. Most get in.',
+          effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Amps went past the barricades one at a time. The stage was ready by dark.' },
+        { id: 'LATE', label: 'Push doors back until the street reopens', likely: 'The crowd that wants a night out shows up.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
+          result: 'Doors an hour late. The festival crowd drifted in.' },
+        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'A lot of people give up on the barricades.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'Half the list never found a way past the cones.' }
+      ] },
+
+    { id: 'ROANOKE_VA_LOT_PATROL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3], months: [5, 6, 7, 8, 9] },
+      telegraph: 'City police have been parked near downtown lots on Saturday nights.',
+      title: 'The patrol car in the lot',
+      body: 'A late bill is ending and the parents are idling in the lot. A patrol car is waiting, and the curfew for kids under seventeen is on everybody\'s mind.',
+      options: [
+        { id: 'EARLY', label: 'End the night early and clear the lot', likely: 'A short night, no trouble.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Done before the cutoff. The lot was empty by eleven.' },
+        { id: 'ACCEPT', label: 'Run it and watch the clock', likely: 'Nervous parents leave early.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The patrol car sat there all night and half the kids were pulled out early.' }
+      ] }
+  ]
 });

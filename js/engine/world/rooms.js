@@ -206,7 +206,7 @@ SB.module('Rooms', function (SB) {
   /* ------------------------------------------------------------------ */
 
   /* Why the owner would not grant the player a hold. day may be null (bookable "today", any weeknight). */
-  function holdGate(state, room, day) {
+  function holdGate(state, room, day, showId) {
     var r = typeof room.ownerRel === 'number' ? room.ownerRel : C.OWNER.start, c, path = ownerPath(state, room, 'HOLD_NO');
     var slots = { room: room.name, date: day === null ? '' : SB.time.date(day).d, dow: day === null ? '' : SB.time.fmt(day, 'dow') };
     if (!room.open) return refuse(state, 'TAKEN', null, slots);
@@ -221,6 +221,9 @@ SB.module('Rooms', function (SB) {
     if (day !== null) {
       if (day < today(state)) return refuse(state, 'INVALID', null, slots);
       c = cell(room, day);
+      if (showId && c && c.holds.some(function (h) { return h.by === 'player' && h.showId !== showId && liveShow(state, h.showId); })) {
+        return U.no('TAKEN', 'You already hold that night for another show.');
+      }
       var ns = nightState(c);
       if (ns === 'OWN' || ns === 'CONFIRMED') return refuse(state, 'TAKEN', path, slots);
       if (c && c.holds.length >= maxHolds(room)) return refuse(state, 'TOO_MANY', path, slots);
@@ -550,6 +553,7 @@ SB.module('Rooms', function (SB) {
       if (h.by === 'player' && h.state !== 'CONFIRMED') {
         c.holds.splice(i, 1);
         records.push(rec(state, 'HOLD', { roomId: room.id, night: day, change: 'LOST' }, '', h.showId));
+        if (liveShow(state, h.showId) && SB.Shows && SB.Shows.notice) SB.Shows.notice(state, state.shows[h.showId], 'roomGone');
       }
     }
     tidyNight(room, day);
@@ -613,6 +617,11 @@ SB.module('Rooms', function (SB) {
       if (h.by !== 'player') {
         var o = otherShowById(state, h.showId);
         if (o) state.otherShows = state.otherShows.filter(function (x) { return x.id !== o.id; });
+      } else if (h.showId && h.showId !== showId) {
+        /* another of the player's own shows held this night: it loses it, with no dead roomId or hold left */
+        var lost = state.shows && state.shows[h.showId];
+        if (lost && lost.roomId === room.id && lost.day === show.day) { lost.hold = null; lost.roomId = null; }
+        records.push(rec(state, 'HOLD', { roomId: room.id, night: show.day, change: 'RELEASED' }, '', h.showId));
       }
     }
     tidyNight(room, show.day);
@@ -700,7 +709,7 @@ SB.module('Rooms', function (SB) {
   function holdSend(state, ask) {
     var room = getRoom(state, ask.toId, 'Rooms.answerAsk'), p = payload(ask), r = SB.rng.stream(state, E.STREAM.ROOMS);
     if (typeof p.day !== 'number') SB.fail('Rooms.answerAsk', 'ROOM_HOLD needs payload.day');
-    var w = waitFor(room), gate = holdGate(state, room, p.day);
+    var w = waitFor(room), gate = holdGate(state, room, p.day, p.showId);
     var will = gate.ok ? 'YES' : 'NO';
     if (!p.inPerson && w.silent > 0 && r.chance(w.silent)) will = 'SILENT';
     return { days: sendDays(r, w, p.inPerson), will: will, counter: null };
@@ -710,7 +719,7 @@ SB.module('Rooms', function (SB) {
     var room = getRoom(state, ask.toId, 'Rooms.answerAsk'), p = payload(ask), records = [];
     var slots = { room: room.name, date: SB.time.date(p.day).d, dow: SB.time.fmt(p.day, 'dow'), curfew: SB.time.clock(room.curfew || 1380) };
     var willNo = ask.hid && ask.hid.will === 'NO';
-    var gate = holdGate(state, room, p.day);
+    var gate = holdGate(state, room, p.day, p.showId);
     if (willNo || !gate.ok) {
       return { status: 'NO', text: gate.ok ? line(state, ownerPath(state, room, 'HOLD_NO'), slots) : gate.why, counter: null, records: records };
     }

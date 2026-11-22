@@ -24,7 +24,7 @@ SB.module('Tutorial', function (SB) {
    * show is built on its card (design/spec/11-booking-pipeline.md): ANSWER is BOOK IT on the band's message, which
    * makes the show; until the show exists there is no clip, so the phone it is. A stage can also say `wait: true`
    * (HOLD:HELD with nothing left to get): then it is 'lamp' too, so nobody is sent to a row with nothing to press. */
-  var STAGE_TARGET = { WAIT: 'lamp', PLAY: 'lamp' };
+  var STAGE_TARGET = { WAIT: 'lamp', PLAY: 'lamp', OPEN: 'lamp' };
   var RIG_DAYS = 2;
   var NUDGE_DAYS = 2, BILL_MIN = 3, PROMO_MIN = 2, LATE_FLYER_DAYS = 3;
 
@@ -74,7 +74,7 @@ SB.module('Tutorial', function (SB) {
         o = SB.Chapters.billOrder(state, s);
         if (o.n >= BILL_MIN && o.ok) { delete t.wrong.BILL; return true; }
         if (o.n >= 2 && !o.ok) t.wrong.BILL = o.why;
-        if (s.bill.locked || played(s) || s.night) { if (!o.ok && !t.wrong.BILL) t.wrong.BILL = o.why || 'SHORT'; return true; }
+        if (s.bill.locked || played(s) || s.night) { if (o.ok) delete t.wrong.BILL; else if (!t.wrong.BILL) t.wrong.BILL = o.why || 'SHORT'; return true; }
         return false;
       case 'SOUND': return !!s && (!!(s.crew && s.crew.sound) || played(s));
       case 'FLYER':
@@ -198,7 +198,7 @@ SB.module('Tutorial', function (SB) {
         if (!o.next || !(o.n < PROMO_MIN || state.jobs[o.next].type === 'MAKE_FLYER')) return { stage: 'WAIT' };
         return o.fits ? { stage: 'PLAN', jobId: o.next } : { stage: 'WAIT', jobId: o.next };
       case 'WAIT': return { stage: 'PLAY' };
-      case 'DOOR': return { stage: s && s.night ? 'DOOR' : 'PLAY' };
+      case 'DOOR': return { stage: s && s.night ? 'DOOR' : (s && today(state) >= s.day ? 'OPEN' : 'PLAY') };
       case 'SETTLE': return { stage: 'SETTLE' };
       case 'CLOSEOUT': return { stage: 'READ' };
     }
@@ -247,8 +247,21 @@ SB.module('Tutorial', function (SB) {
     return (q.dates || []).some(function (x) { return typeof x === 'number' && x > d; });
   }
 
+  /* the show fell through after the room said yes (the hold lapsed, the room said no, the show was cancelled):
+   * -> 'HOLD' to go back and find a room, 'END' when there is no show and the band's request is gone, else null */
+  function fellThrough(state, t, s) {
+    var q;
+    if (!t.step || STEPS.indexOf(t.step) <= STEPS.indexOf('HOLD')) return null;
+    if (s) return s.status === 'CONFIRMED' || played(s) || s.night ? null : 'HOLD';
+    q = t.requestId && state.requests ? state.requests[t.requestId] : null;
+    return q && (q.status === 'NEW' || q.status === 'REPLIED' || q.status === 'NEGOTIATING') ? 'HOLD' : 'END';
+  }
+
   function advance(state, t) {
-    var out = [], guard = 0, s, i;
+    var out = [], guard = 0, s, i, f;
+    f = t.on ? fellThrough(state, t, showOf(state, t)) : null;
+    if (f === 'HOLD') { t.step = 'HOLD'; t.nudgedAt = today(state); }
+    else if (f === 'END') { t.on = false; t.step = null; t.done = week(state); t.lapsed = true; return out; }   // lapsed: no "that's a show" text
     while (t.on && t.step && guard++ < STEPS.length + 1) {
       s = showOf(state, t);
       if (s && t.showId !== s.id) t.showId = s.id;
@@ -288,20 +301,31 @@ SB.module('Tutorial', function (SB) {
    * object to go to for it, more the stage's own line (null when it has none);
    * nudge is the "you there?" text once the player has left the step alone for NUDGE_DAYS days (null before that);
    * wrong is the line for a step being done badly (the bill out of order), else null. */
+  function mailWaiting(state) { try { return !!(SB.Mail && SB.Mail.needsYou && SB.Mail.needsYou(state).length); } catch (e) { return true; } }
   function current(state) {
-    var t = peek(state), s, o, ctx, base, w, g, tx, step, sg;
+    var t = peek(state), s, o, ctx, base, w, g, tx, step, sg, f;
     if (!t || !t.on || !t.step) return null;
     s = showOf(state, t);
+    /* the show fell through: back to finding a room, or nothing left to walk through (advance() writes it down) */
+    f = fellThrough(state, t, s);
+    if (f === 'END') return null;
     o = s ? SB.Chapters.billOrder(state, s) : { touring: null, closer: null };
     ctx = SB.Chapters.slots(state, 'tutorial');
-    step = t.step;
-    w = t.step === 'BILL' && s && o.n >= 2 && !o.ok ? o.why : null;
-    g = stageOf(state, t, t.step, s);
+    step = f === 'HOLD' ? 'HOLD' : t.step;
+    w = step === 'BILL' && s && o.n >= 2 && !o.ok ? o.why : null;
+    g = stageOf(state, t, step, s);
     /* Everybody on the bill is asked: ask sound in the same sitting, so the bands and sound answer over one wait.
      * (done() is given a scratch record: this is a read.) */
-    if (t.step === 'BILL' && g.stage === 'WAIT' && s && cast(state).sound) {
+    if (step === 'BILL' && g.stage === 'WAIT' && s && cast(state).sound) {
       sg = stageOf(state, t, 'SOUND', s);
       if (sg.stage === 'ASK' && !done(state, { replied: t.replied, wrong: {} }, 'SOUND', s)) { step = 'SOUND'; g = sg; w = null; }
+    }
+    /* Waiting on the bands with the room confirmed: the flyer does not wait on them (bands go on it as TBA), so the
+     * evenings spent waiting go to the flyer instead of a dead night (Marisol: flyer the day you confirm) */
+    if ((step === 'BILL' || step === 'SOUND') && g.stage === 'WAIT' && s && s.status === 'CONFIRMED') {
+      if (!done(state, { replied: t.replied, wrong: {} }, 'FLYER', s)) { step = 'FLYER'; g = stageOf(state, t, 'FLYER', s); w = null; }
+      /* the flyer is designed: making it (and the promo due soonest) is tonight's work when it fits */
+      else { sg = stageOf(state, t, 'PROMO', s); if (sg.stage === 'PLAN' || sg.jobId) { step = 'PROMO'; g = sg; w = null; } }   // PLAN, or a job waiting for tomorrow's hours
     }
     base = 'story.tutorial.steps.' + step;
     tx = g.stage ? say(base + '.stages.' + g.stage, ctx) : '';
@@ -309,7 +333,8 @@ SB.module('Tutorial', function (SB) {
              stage: g.stage, bandId: g.bandId || null, slot: g.slot || null, personId: g.personId || null, jobId: g.jobId || null,
              showId: s ? s.id : null, requestId: (s && s.requestId) || t.requestId || null,
              text: say(base + '.text', ctx), more: tx || null,
-             nudge: today(state) - (t.nudgedAt || 0) >= NUDGE_DAYS ? say(base + '.nudge', ctx) : null,
+             /* the wait's nudge is about mail: only when the phone has something that needs an answer */
+             nudge: today(state) - (t.nudgedAt || 0) >= NUDGE_DAYS && !(step === 'WAIT' && !mailWaiting(state)) ? say(base + '.nudge', ctx) : null,
              wrong: w ? say(base + '.wrong', ctx) : null };
   }
 

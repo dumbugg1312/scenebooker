@@ -103,7 +103,9 @@ module.exports = function (t) {
     t.eq(fight.frames[0].bleed, 'near', 'the band is playing when it starts');
     const first = CA.plan(Object.assign({ key: 'GOING_AWAY_open' }, cuts.GOING_AWAY_open), {});
     t.eq(first.frames[0].paper, ['cs.shutter'], 'a scene opens on the shutter');
-    t.eq(first.frames[5].amb, first.frames[4].amb, 'the tin holds the bed of the picture before it');
+    const tin = cuts.GOING_AWAY_open.frames.findIndex(f => f.art === 'HANDS_TIN');
+    t.ok(tin > 0, 'the going-away scene has the tin');
+    t.eq(first.frames[tin].amb, first.frames[tin - 1].amb, 'the tin holds the bed of the picture before it');
     t.eq(CA.plan(Object.assign({ key: 'ROOM_GONE' }, cuts.ROOM_GONE), { POLICE: true }).frames[0].art, 'POLICE_LIGHTS', 'a cause-keyed picture is resolved');
     t.eq(CA.plan(Object.assign({ key: 'ROOM_GONE' }, cuts.ROOM_GONE), {}).frames[0].paper, ['cs.note'], 'the note is taped up');
     t.eq(CA.plan({ key: 'M_KNOCK_NEW_1', kind: 'PANELS', frames: [{ art: 'DOOR_TABLE' }, { art: 'CROWD_FRONT', sfx: 'cs.cheer', amb: null, bleed: 'far' }] }, {}).frames

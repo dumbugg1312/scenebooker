@@ -501,7 +501,8 @@ function main() {
       played.push('GOING_AWAY_open');
       for (let i = 0; i < 8 && cut(); i++) {
         if (fakeDocument.querySelectorAll('.cs-root').length !== 1) throw new Error('two cutscenes at once');
-        played.push(SB.Chapters.nextCutscene(state).key);
+        const nq = SB.Chapters.nextCutscene(state);   // the queue's, or the outgoing booker's call for the step (js/ui/story.js coach)
+        played.push(nq ? nq.key : 'TUT_' + SB.Tutorial.current(state).step + '_' + SB.Tutorial.current(state).stage);
         skipCut();
       }
       if (cut() || SB.Chapters.nextCutscene(state)) throw new Error('the cutscene queue did not empty: ' + JSON.stringify(state.story.cutscenes.map(c => c.key)));
@@ -579,9 +580,9 @@ function main() {
     } catch (e) { report('shell placeholder', e); }
   }
 
-  /* the tape deck (the old lamp): a new game sits down at its first evening; pressing the deck calls it a night
-     (Week.endNight) and the night plays out; pressed again it pauses ('sb-play' { cmd: 'pause' }); 'next' plays the night
-     out in one go, to the next stop */
+  /* the corner clock (#nightclock) holds the one CALL IT A NIGHT: a new game sits down at its first evening; pressing the
+     tape deck only nudges the clock; its button calls it a night (Week.endNight) and the night plays out; the deck then
+     pauses ('sb-play' { cmd: 'pause' }); 'next' plays the night out in one go, to the next stop */
   if (wanted('shell')) {
     try {
       const lamp = () => fakeDocument.querySelector('#desk .dk-hit[data-obj="lamp"]');
@@ -590,11 +591,16 @@ function main() {
       if (!btn) throw new Error('no lamp on the desk');
       const stop = () => state.clock.stop ? state.clock.stop.kind : 'none';
       if (stop() !== 'EVENING') throw new Error('the game is not at an evening at the desk (stop ' + stop() + ', phase ' + state.clock.phase + ')');
-      if (!btn.querySelector('.dk-clock .ck-boxes')) throw new Error('no clock under the tape deck');
-      if (SB.UI.lamp.label().key !== 'night') throw new Error('the tape deck does not call it a night at an evening: ' + JSON.stringify(SB.UI.lamp.label()));
+      const nc = fakeDocument.getElementById('nightclock');
+      if (!nc || nc.hidden || !nc.querySelector('.ck-ruler')) throw new Error('no clock in the corner at an evening');
+      if (SB.UI.lamp.label().key !== 'night') throw new Error('the tape deck does not offer a night at an evening: ' + JSON.stringify(SB.UI.lamp.label()));
       const day0 = state.clock.day;
       btn.click();
-      if (stop() === 'EVENING') throw new Error('pressing the tape deck did not call it a night');
+      if (stop() !== 'EVENING') throw new Error('pressing the tape deck at an evening should only nudge the clock (stop ' + stop() + ')');
+      const call = nc.querySelector('.ck-call');
+      if (!call) throw new Error('no CALL IT A NIGHT button on the corner clock');
+      call.click();
+      if (stop() === 'EVENING') throw new Error('the clock\'s button did not call it a night');
       if (!SB.UI.playing()) throw new Error('SB.UI.playing() is false after calling it a night');
       let heard = null;
       fakeDocument.addEventListener('sb-play', e => { heard = e.detail && e.detail.cmd; });
@@ -602,7 +608,7 @@ function main() {
       if (heard !== 'pause' || SB.UI.playing()) throw new Error('Pause did not send sb-play { cmd: pause }');
       SB.UI.fire('sb-play', { cmd: 'next' });
       if (stop() === 'none') throw new Error('the night played out to no stop');
-      report('shell lamp (call it a night, pause, played out from day ' + day0 + ' to day ' + state.clock.day + ' ' + stop() + ')');
+      report('shell lamp (call it a night from the clock, pause, played out from day ' + day0 + ' to day ' + state.clock.day + ' ' + stop() + ')');
     } catch (e) { report('shell play', e); }
   }
 

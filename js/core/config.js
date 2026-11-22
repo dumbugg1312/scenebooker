@@ -302,8 +302,9 @@
   /* ============================== 3. THE WEEK (mechanics 3) ============================== */
 
   /* The night clock (spec 10). One pool of hours a day, spent on the spot: a work day leaves 4, a day off has 10.
+   * With no day job at all, every day has 8 (noJob): the rest of life still takes its share.
    * The DAY / NIGHT split is only how the pool is drawn; nothing is tied to a half any more. Half hours are legal. */
-  C.HOURS = { shift: { DAY: 0, NIGHT: 4 }, off: { DAY: 5, NIGHT: 5 } };
+  C.HOURS = { shift: { DAY: 0, NIGHT: 4 }, off: { DAY: 5, NIGHT: 5 }, noJob: { DAY: 4, NIGHT: 4 } };
   C.SHIFTS = { FULL: [0, 1, 2, 3, 4], PART: [0, 2, 4], NONE: [] };   // weekdays worked (0 = Monday)
   C.BILLS_OFF_BUSY = [0, 2, 4];    // with bills off, three short days stand in for a life: 52 hours a week
   C.OVERTIME_MAX = 1;              // staying up: at most this far past tonight's hours; it costs stress, and tomorrow that much

@@ -192,13 +192,16 @@ SB.module('Money', function (SB) {
   /* what security costs on the night: the hired person's rate */
   function securityRate(state, crew) { return crew && crew.security ? personRate(state, crew.security) : 0; }
 
+  /* a deal's guarantee is owed only while the touring band is on the bill (as Night's settle) */
+  function hasTouring(slots) { return slots.some(function (s) { return s && s.role === 'TOURING'; }); }
+
   function exposure(state, showId) {
     var show = getShow(state, showId, 'Money.exposure'), lines = [], t = roomTerms(state, show), kind = roomKind(state, show),
         deal = show.deal || {}, slots = (show.bill && show.bill.slots) || [], crew = show.crew || {}, door = show.door || {},
         paidDeposit = false, i, l, total = 0, plan, job, price, comps, sound;
-    function add(cat, amount, lbl) {
+    function add(cat, amount, lbl, back) {
       amount = Math.round(amount || 0);
-      if (amount > 0) lines.push({ cat: cat, amount: amount, label: lbl || label('money.' + cat) });
+      if (amount > 0) lines.push(back ? { cat: cat, amount: amount, label: lbl || label('money.' + cat), back: true } : { cat: cat, amount: amount, label: lbl || label('money.' + cat) });
     }
     for (i = 0; i < state.money.ledger.length; i++) {
       l = state.money.ledger[i];
@@ -206,14 +209,14 @@ SB.module('Money', function (SB) {
     }
     if (t) {
       add(E.MONEY.ROOM, (t.rent || 0) + (t.houseCosts || 0));
-      add(E.MONEY.DEPOSIT, t.deposit || 0);
+      add(E.MONEY.DEPOSIT, t.deposit || 0, null, true);   // money down, but it comes back at the settle (7.11): not in the total
       if (kind === 'HOUSE') add(E.MONEY.HOST, t.hostCut || 0);
     }
     sound = (t && t.soundFee) ? t.soundFee : personRate(state, crew.sound);
     add(E.MONEY.SOUND, sound);
     add(E.MONEY.SECURITY, securityRate(state, crew));
     add(E.MONEY.INSURANCE, insuranceDue(state, show));
-    if (deal.shape === 'GUARANTEE' || deal.shape === 'GUARANTEE_PLUS' || deal.shape === 'VERSUS') add(E.MONEY.TOURING, deal.guarantee || 0);
+    if (hasTouring(slots) && (deal.shape === 'GUARANTEE' || deal.shape === 'GUARANTEE_PLUS' || deal.shape === 'VERSUS')) add(E.MONEY.TOURING, deal.guarantee || 0);
     for (i = 0; i < slots.length; i++) if (slots[i] && slots[i].role === 'LOCAL' && slots[i].fee > 0) add(E.MONEY.LOCAL, slots[i].fee);
     // money already spent on the show (print, push, food, helpers, art), except what the lines above already count
     for (i = 0; i < state.money.ledger.length; i++) {
@@ -221,7 +224,7 @@ SB.module('Money', function (SB) {
       if (l.showId !== showId || l.amount >= 0 || COUNTED[l.cat]) continue;
       add(l.cat, -l.amount);
     }
-    if (paidDeposit) { /* the deposit line above is the deposit held; it is owed either way */ }
+    if (paidDeposit) { /* the deposit line above is the deposit held; it comes back at the settle */ }
     // the priced choices and paid helpers of jobs planned and not yet done
     plan = (state.week && state.week.plan) || [];
     for (i = 0; i < plan.length; i++) {
@@ -230,7 +233,7 @@ SB.module('Money', function (SB) {
       if (plan[i].opt) add(C.JOBS[job.type] && C.JOBS[job.type].opt === 'PRINT_RUN' ? E.MONEY.PRINT : E.MONEY.PROMO, optCost(state, job.type, plan[i].opt));
       if (plan[i].pay && plan[i].pay.kind === 'CASH') add(E.MONEY.HELPER, plan[i].pay.amount || 0);
     }
-    for (i = 0; i < lines.length; i++) total += lines[i].amount;
+    for (i = 0; i < lines.length; i++) if (!lines[i].back) total += lines[i].amount;
     price = door.price || 0; comps = door.comps || 0;
     return { total: total, lines: lines,
              breakEven: (door.donation || price <= 0) ? null : Math.ceil(total / price) + comps };
@@ -297,7 +300,7 @@ SB.module('Money', function (SB) {
     else off(label('settle.SOUND'), sound);
     off(label('settle.SECURITY'), securityRate(state, crew));
     after = Math.max(0, deal.afterCosts === false ? G : G - offSum);
-    switch (deal.shape) {
+    switch (hasTouring(slots) ? deal.shape : null) {
       case 'DOOR': guarantee = 0; touringShare = Math.round((deal.pct || 0) * after); break;
       case 'GUARANTEE': guarantee = deal.guarantee || 0; break;
       case 'GUARANTEE_PLUS': guarantee = deal.guarantee || 0; break;
@@ -311,7 +314,7 @@ SB.module('Money', function (SB) {
       }
     }
     left = Math.max(0, G - offSum - guarantee - touringShare - localSum);
-    if (deal.shape === 'GUARANTEE_PLUS') { touringShare = Math.round(C.PLUS_SHARE * left); left -= touringShare; }
+    if (deal.shape === 'GUARANTEE_PLUS' && hasTouring(slots)) { touringShare = Math.round(C.PLUS_SHARE * left); left -= touringShare; }
     else if (deal.shape === 'GUARANTEE' || !deal.shape) {
       // the custom split of what is left: touring / locals / player
       if (slots.some(function (s) { return s && s.role === 'TOURING'; })) touringShare = Math.round(C.SPLIT.custom[0] * left);

@@ -43,7 +43,7 @@ module.exports = function (t) {
   if (!H.needs(t, ['Night', 'Money', 'Model', 'Forecast', 'Notebook'], 'settling')) return;
   const SB = H.fresh({ packs: ['pensacola'] });
   const E = SB.Enums, C = SB.Config;
-  const ORDER = ['ROOM', 'SOUND', 'SECURITY', 'HOST', 'GUARANTEE', 'LOCAL', 'SHARE', 'INSURANCE', 'DAMAGES', 'COSTS', 'YOU'];
+  const ORDER = ['ROOM', 'DEPOSIT', 'SOUND', 'SECURITY', 'HOST', 'GUARANTEE', 'LOCAL', 'SHARE', 'INSURANCE', 'DAMAGES', 'COSTS', 'YOU'];
   const clone = x => JSON.parse(JSON.stringify(x));
 
   function toSettle(mutate) {
@@ -70,6 +70,18 @@ module.exports = function (t) {
     t.near(sv.left, exp.left, 2, 'what is left after the off-the-top, the guarantee and the locals');
     t.near(line('SHARE'), exp.plusShare, 2, 'the touring band\'s half of what is left');
     t.near(sv.gap, exp.gap, 1, 'gap');
+  });
+
+  H.section(t, 'a deposit comes back outside the split', () => {
+    const f = toSettle(g => { g.state.money.fund += 100; SB.Money.spend(g.state, 100, 'DEPOSIT', '', { showId: 's1' }); });
+    const sv = SB.Night.settleView(f.state, 's1');
+    t.near(sv.lines.filter(l => l.k === 'ROOM').reduce((s, l) => s + l.amount, 0), 225, 1, 'the full rent comes off the top with a deposit paid');
+    t.near(sv.lines.filter(l => l.k === 'DEPOSIT').reduce((s, l) => s + l.amount, 0), 100, 1, 'the deposit back is its own line');
+    t.ok(/100/.test(sv.lines.filter(l => l.k === 'ROOM')[0].label), 'the room line says how much of the rent was paid already');
+    const r = SB.Night.settle(f.state, 's1', { shortfall: null, keep: sv.split.fairMax, extraToLocals: 0, gas: 0 });
+    t.ok(r && r.ok !== false, 'the night with a deposit settles');
+    const led = f.state.money.ledger.filter(l => l.showId === 's1').reduce((s, l) => s + l.amount, 0);
+    t.eq(led, f.state.shows.s1.result.playerNet, 'the show\'s ledger total is what the player made (' + led + ')');
   });
 
   H.section(t, 'each deal shape', () => {
@@ -100,6 +112,13 @@ module.exports = function (t) {
       const v = SB.Night.settleView(g.state, 's1');
       const opt = v.shortfall.filter(s => s.k === k)[0];
       if (!opt || opt.enabled === false) { t.note('settle: shortfall ' + k + ' is not offered here' + (opt && opt.why ? ' (' + opt.why + ')' : '')); return; }
+      t.ok(opt.preview && typeof opt.preview.pocket === 'number', 'shortfall ' + k + ' has a preview of its outcome');
+      t.eq(v.shortfall.length, SB.Night.settleView(g.state, 's1').shortfall.length, 'previewing changes nothing');
+      if (k === 'SHORT_SILENT') {
+        const n = g.state.shows.s1.night, was = n.shortfall; n.shortfall = k;
+        const sv2 = SB.Night.settleView(g.state, 's1'); n.shortfall = was;
+        t.ok(sv2.lines.some(l => typeof l.paid === 'number' && l.paid < l.amount), 'paying short shows a line paid less than owed');
+      }
       const before = JSON.stringify([g.state.money.fund, g.state.money.bank]);
       const r = SB.Night.settle(g.state, 's1', { shortfall: k, keep: 0, extraToLocals: 0, gas: 0 });
       t.ok(r && r.ok !== false, 'shortfall ' + k + ' settles');

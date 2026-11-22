@@ -73,6 +73,9 @@
     marker:     [['marker', -16, 0, 0.05]],
     strike:     [['marker', -13, 0, 0.05, 1.08]],
     erase:      [['erase', -17, 0, 0.05]],
+    booked:     [['thudSoft', -24, 0, 0.04, 1.1], ['thudHeavy', -10, 140, 0.04], ['wood', -21, 140, 0.04, 0.85], ['place', -30, 145, 0.05]],
+    win:        [['coins', -15, 0, 0.05], ['coins', -19, 160, 0.05, 1.15]],
+    loss:       [['place', -20, 0, 0.06, 0.8]],
     stamp:      [['thudSoft', -24, 0, 0.04, 1.1], ['thudHeavy', -11, 140, 0.04], ['wood', -22, 140, 0.04, 0.85], ['place', -30, 145, 0.05]],
     tear:       [['tear', -13, 0, 0.05]],
     rip:        [['rip', -12, 0, 0.04], ['place', -26, 700, 0.06]],
@@ -150,7 +153,7 @@
   /* the engine's verbs: a cue when one goes through (a function gets the args and the result and returns a cue or null) */
   var VERBS = {
     'Mail.ask': 'send', 'Mail.reply': 'send', 'Mail.chase': 'send', 'Mail.withdraw': 'down.phone', 'Mail.setNeedBy': 'write',
-    'Shows.create': 'stamp', 'Shows.setBill': 'slide', 'Shows.dropBand': 'strike', 'Shows.cancel': 'rip',
+    'Shows.create': 'booked', 'Shows.setBill': 'slide', 'Shows.dropBand': 'strike', 'Shows.cancel': 'rip',
     'Shows.setDoor': 'write', 'Shows.setCrew': 'write', 'Shows.setLabel': 'write', 'Shows.setInsurance': 'write', 'Shows.setBilling': 'write',
     'Week.plan': 'write', 'Week.addJob': 'write', 'Week.decide': 'tick', 'Week.unplan': 'erase', 'Week.removeJob': 'erase',
     'Week.close': 'pageTear', 'Week.nextWeek': 'flip', 'Week.payBills': 'cash', 'Week.setDayJob': 'write', 'Week.dropShift': 'erase',
@@ -160,7 +163,7 @@
     'Jobs.setFlyer': 'glue', 'Jobs.promise': 'write',
     'Harm.add': 'marker', 'Harm.remove': 'erase', 'Harm.act': 'marker',
     'Territory.startTour': 'map',
-    'Legacy.end': 'down.notebook', 'Legacy.answerOffer': 'stamp',
+    'Legacy.end': 'down.notebook', 'Legacy.answerOffer': 'booked',
     'Flyer.learn': 'write', 'Notebook.seeTerm': 'flip',
     'Night.begin': 'doorOpen', 'Night.next': null, 'Night.auto': null, 'Night.settle': 'cash',
     'Game.setSetting': 'tap'
@@ -169,7 +172,7 @@
   /* ---------------------------------------------------------------- */
   /* the engine                                                        */
   /* ---------------------------------------------------------------- */
-  var ctx = null, master = null, verb = null, bus = null, buffers = {}, pools = {}, last = {}, lastAt = {}, voices = 0;
+  var ctx = null, master = null, verb = null, bus = null, sweet = null, gloss = null, noiseBuf = null, buffers = {}, pools = {}, last = {}, lastAt = {}, voices = 0;
   var loading = false, ready = false, hissSrc = null, hissGain = null;
   var BASE = (W && W.SB_ASSET_BASE) || '';             // a page in a subfolder (design/sample) sets this to '../../'
   var MAX_VOICES = 28;
@@ -196,6 +199,20 @@
     return ir;
   }
 
+  /** a bigger, brighter space than the desk's room, only for the sweeteners: the polish on a boxed game's UI */
+  function hallIR(c) {
+    var len = Math.floor(c.sampleRate * 1.6), ir = c.createBuffer(2, len, c.sampleRate), ch, d, i, t, lp, k;
+    for (ch = 0; ch < 2; ch++) {
+      d = ir.getChannelData(ch); lp = 0;
+      for (i = 0; i < len; i++) {
+        t = i / c.sampleRate; k = 0.55 + 0.4 * Math.min(1, t / 1.2);
+        lp += (Math.random() * 2 - 1 - lp) * (1 - k);
+        d[i] = lp * Math.exp(-t / 0.42) * (t < 0.012 ? t / 0.012 : 1) * 0.6;
+      }
+    }
+    return ir;
+  }
+
   function build() {
     if (ctx || !AC) return !!ctx;
     try {
@@ -207,6 +224,10 @@
       bus = ctx.createGain(); bus.connect(master);
       verb = ctx.createConvolver(); verb.buffer = roomIR(ctx);
       var wet = ctx.createGain(); wet.gain.value = 1; verb.connect(wet); wet.connect(master);
+      /* the sweeteners (see SWEET): their own fader into the master, and a longer, brighter hall for the stings' tails */
+      sweet = ctx.createGain(); sweet.gain.value = 1; sweet.connect(master);
+      gloss = ctx.createConvolver(); gloss.buffer = hallIR(ctx);
+      var gwet = ctx.createGain(); gwet.gain.value = 0.9; gloss.connect(gwet); gwet.connect(master);
       setLevel();
     } catch (e) { ctx = null; }
     return !!ctx;
@@ -303,7 +324,112 @@
           g = L[1] + (o.gain || 0) + (Math.random() * 2 - 1) * 1.2;
       if (key) voice(key, g, base + L[2] / 1000, rate, Math.max(-1, Math.min(1, pan + (Math.random() - 0.5) * 0.08)), L[5] === undefined ? 0.16 : L[5]);
     });
+    sweeten(name, base, pan, o);
     return true;
+  }
+
+
+  /* ---------------------------------------------------------------- */
+  /* the sweeteners                                                    */
+  /* The recordings are the thing itself; a boxed game also tells you how it went. On top of a cue, a little made      */
+  /* sound: a weight under a stamp, air when a thing comes up to your face, a heavier slam when a show is booked.      */
+  /* Never a tune: short, so the desk stays the desk.                                                                  */
+  /* ---------------------------------------------------------------- */
+  function noise() {
+    if (noiseBuf) return noiseBuf;
+    var n = ctx.sampleRate * 2, d, i;
+    noiseBuf = ctx.createBuffer(1, n, ctx.sampleRate); d = noiseBuf.getChannelData(0);
+    for (i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    return noiseBuf;
+  }
+  /** route one made voice: gain envelope -> pan -> sweet bus, with a send to the hall */
+  function out(src, nodeIn, t, a, dur, gainDb, pan, send) {
+    var g = ctx.createGain(), p = null, s = ctx.createGain(), pk = db(gainDb + sweetOff), end = t + a + dur;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(pk, t + Math.max(a, 0.002));
+    g.gain.exponentialRampToValueAtTime(0.0001, end);
+    nodeIn.connect(g);
+    if (ctx.createStereoPanner) { p = ctx.createStereoPanner(); p.pan.value = pan || 0; g.connect(p); p.connect(sweet); } else g.connect(sweet);
+    s.gain.value = send === undefined ? 0.25 : send; g.connect(s); s.connect(gloss);
+    voices++;
+    src.onended = function () { voices--; try { src.disconnect(); nodeIn.disconnect(); g.disconnect(); s.disconnect(); if (p) p.disconnect(); } catch (e) { /* gone */ } };
+    src.start(t); src.stop(end + 0.05);
+  }
+  /** a tone: type, from f to f2, attack a, decay dur, through a lowpass that can close as it goes */
+  function tone(type, f, t, dur, gainDb, o) {
+    if (voices >= MAX_VOICES + 8) return;
+    o = o || {};
+    var v = ctx.createOscillator(), lp = ctx.createBiquadFilter(), a = o.a || 0.004;
+    v.type = type; v.frequency.setValueAtTime(f, t); if (o.detune) v.detune.value = o.detune;
+    if (o.f2) v.frequency.exponentialRampToValueAtTime(o.f2, t + a + dur * (o.glide || 1));
+    lp.type = 'lowpass'; lp.frequency.setValueAtTime(o.lp || 12000, t); lp.Q.value = o.q || 0.7;
+    if (o.lp2) lp.frequency.exponentialRampToValueAtTime(o.lp2, t + a + dur);
+    v.connect(lp);
+    out(v, lp, t, a, dur, gainDb, o.pan, o.send);
+  }
+  /** air: band-passed noise swept from f to f2 */
+  function air(t, dur, gainDb, f, f2, o) {
+    if (voices >= MAX_VOICES + 8) return;
+    o = o || {};
+    var n = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), a = o.a || dur * 0.45;
+    n.buffer = noise(); n.playbackRate.value = 0.9 + Math.random() * 0.2;
+    bp.type = 'bandpass'; bp.Q.value = o.q || 1.1;
+    bp.frequency.setValueAtTime(f, t); bp.frequency.exponentialRampToValueAtTime(f2, t + a + dur);
+    n.connect(bp);
+    out(n, bp, t, a, dur * 0.6, gainDb, o.pan, o.send === undefined ? 0.15 : o.send);
+  }
+  /** weight: a sine that drops, felt more than heard */
+  function thump(t, gainDb, f, f2, dur) { tone('sine', f || 120, t, dur || 0.22, gainDb, { f2: f2 || 42, glide: 0.5, a: 0.002, send: 0.04 }); }
+
+  /* No notes, no jingles, no chimes: a sweetener is weight, air and a clean edge on the real sound, the way a film
+   * mix makes a door land. The game's mood comes from the mixtape; the effects only make the hands feel heavier. */
+  /** a click with no pitch: the edge of a press */
+  function snap(t, gainDb, pan, f) { air(t, 0.014, gainDb, f || 4200, (f || 4200) * 0.7, { a: 0.001, q: 0.9, pan: pan, send: 0 }); }
+  var SWEET = {
+    tap:        function (t, p) { snap(t, -27, p); thump(t, -30, 160, 90, 0.05); },
+    'hover.ui': function (t, p) { snap(t, -40, p, 5200); },
+    hover:      function (t, p) { air(t, 0.12, -40, 900, 2200, { pan: p }); },
+    nope:       function (t, p) { thump(t, -17, 85, 48, 0.16); air(t, 0.06, -30, 500, 300, { a: 0.002, pan: p }); },
+    tick:       function (t, p) { snap(t, -26, p, 3600); },
+    flip:       function (t, p) { air(t, 0.16, -32, 1400, 4200, { pan: p }); },
+    switch:     function (t, p) { snap(t, -30, p, 3000); thump(t, -30, 140, 80, 0.05); },
+    /* a thing comes up off the desk: air rising under it; set down: air falling, a soft weight */
+    up:         function (t, p) { air(t, 0.26, -27, 320, 2800, { pan: p }); thump(t + 0.04, -30, 90, 55, 0.16); },
+    down:       function (t, p) { air(t, 0.22, -30, 2400, 300, { pan: p }); thump(t + 0.12, -25, 100, 45, 0.18); },
+    stamp:      function (t, p) { thump(t + 0.14, -11, 130, 38, 0.3); air(t + 0.135, 0.05, -26, 2600, 900, { a: 0.002, pan: p }); },
+    booked:     function (t, p) { thump(t + 0.14, -8, 120, 34, 0.42); air(t + 0.135, 0.06, -22, 2400, 700, { a: 0.002, pan: p, send: 0.35 }); },
+    send:       function (t, p) { air(t + 0.3, 0.22, -29, 800, 4200, { pan: p }); },
+    buzz:       function (t, p) { thump(t, -24, 70, 55, 0.25); },
+    coins:      function (t, p) { thump(t + 0.02, -28, 120, 70, 0.08); },
+    cash:       function (t, p) { thump(t + 0.08, -17, 110, 45, 0.2); },
+    bills:      function (t, p) { air(t, 0.14, -33, 1800, 4800, { pan: p }); },
+    win:        function (t) { thump(t, -10, 110, 36, 0.45); air(t, 0.5, -30, 300, 2600, { send: 0.3 }); },
+    loss:       function (t) { thump(t, -16, 70, 32, 0.4); },
+    strike:     function (t, p) { thump(t + 0.02, -26, 110, 60, 0.1); },
+    rip:        function (t, p) { thump(t + 0.05, -16, 110, 40, 0.3); },
+    pageTear:   function (t) { air(t, 0.4, -28, 500, 3500); },
+    map:        function (t) { air(t, 0.5, -28, 300, 2400); thump(t + 0.1, -24, 90, 50, 0.2); },
+    scrap:      function (t, p) { air(t, 0.18, -33, 700, 2600, { pan: p }); thump(t + 0.06, -28, 100, 55, 0.12); },
+    tear:       function (t, p) { air(t, 0.18, -35, 2600, 600, { pan: p }); },
+    note:       function (t, p) { air(t, 0.18, -32, 600, 2400, { pan: p }); },
+    lampOff:    function (t) { thump(t + 0.05, -11, 70, 30, 0.6); air(t, 1.2, -32, 150, 900, { a: 0.9, send: 0.4 }); },
+    doorOpen:   function (t) { air(t, 1.0, -31, 200, 1000, { a: 0.6 }); },
+    doorClose:  function (t) { thump(t + 0.02, -18, 80, 38, 0.3); }
+  };
+  /* what the up. and down. families share */
+  function sweetFor(name) {
+    if (SWEET[name]) return SWEET[name];
+    if (name.indexOf('up.') === 0) return SWEET.up;
+    if (name.indexOf('down.') === 0) return SWEET.down;
+    return null;
+  }
+  var sweetOff = 0;                                    // dB: a cue played quieter on purpose (opts.gain) brings its sweetener down with it
+  function sweeten(name, t, pan, o) {
+    var fn = sweetFor(name);
+    if (!fn || !sweet || o.sweet === false) return;
+    sweetOff = o.gain || 0;
+    try { fn(t, pan, o); } catch (e) { /* sound never breaks the game */ }
+    sweetOff = 0;
   }
 
   function panOf(el) {
@@ -469,7 +595,7 @@
     else if (r.t === 'POST') play('scrap', { pan: 0.35, gap: 120 });
     else if (r.t === 'SET_START' || r.t === 'SET_END') play('tick', { el: D && D.querySelector('.nt-setlist'), gap: 120 });
     else if (r.t === 'SETTLE_LINE') play(Math.random() < 0.5 ? 'bills' : 'chips', { el: D && D.querySelector('.nt-cash'), gap: 160 });
-    else if (r.t === 'SETTLE_DONE') play('cash', { gap: 200 });
+    else if (r.t === 'SETTLE_DONE') { play('cash', { gap: 200 }); play(typeof r.playerNet === 'number' && r.playerNet < 0 ? 'loss' : 'win', { delay: 420, gap: 400 }); }
     else if (r.t === 'STAGE') play('note', { gap: 200 });
   }
   /** a decision note slid onto the surface */

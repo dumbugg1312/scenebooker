@@ -1,8 +1,8 @@
 SB.Cities.register('green-bay-wi', {
   v: 1,
   slug: 'green-bay-wi',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
-  banned: ['green bay packers', 'packers', 'lambeau field', 'lambeau', 'titletown', 'packerland', 'uw-green bay', 'uwgb', 'university of wisconsin-green bay',
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
+  banned: ['green bay press-gazette', 'press-gazette', 'fox 11', 'nbc26', 'wisconsin public radio', 'discover green bay', 'downtown green bay inc', 'green bay police department', 'gbpd', 'artfest', 'fridays on the fox', 'grooves on the green', 'ignight', 'hagemeister park', 'green bay botanical garden', 'billie kress amphitheater', 'wings of freedom', 'tattoo fest', 'titletown district', 'wisconsin state statutes', 'green bay packers', 'packers', 'lambeau field', 'lambeau', 'titletown', 'packerland', 'uw-green bay', 'uwgb', 'university of wisconsin-green bay',
            'st. norbert college', 'northeastern wisconsin technical college', 'nwtc', 'kwik trip', 'spotted cow', 'cellcom', 'brown county fair', 'eaa',
            'airventure', 'chicago bears', 'minnesota vikings', 'vikings', 'knights of columbus', 'vfw', 'american legion', 'cheesehead',
            'brown county back room', 'the booyah hall', 'fox street annex', 'packerland pole barn', 'slough road garage', 'mason bridge loft', 'third ward lanes',
@@ -28,7 +28,11 @@ SB.Cities.register('green-bay-wi', {
     { id: 'pulaski', kind: 'FEEDER', name: 'Pulaski', minutes: 25, bearing: 315, note: 'A Polish-heritage farm town to the northwest.' },
     { id: 'seymour', kind: 'FEEDER', name: 'Seymour, Denmark and Brillion', minutes: 25, bearing: 245, note: 'Dairy and farm towns whose teens have cars and garage bands.' },
     { id: 'oconto', kind: 'FEEDER', name: 'Oconto', minutes: 30, bearing: 15, note: 'A small bay-shore town up the highway; no known scene.' },
-    { id: 'appleton', kind: 'FEEDER', name: 'Appleton and the Fox Cities', minutes: 35, bearing: 215, scene: 400, note: 'A bigger college and arts-leaning neighbor with a scene of its own; Green Bay is the blue-collar rival.' },
+    { id: 'appleton', kind: 'FEEDER', name: 'Appleton and the Fox Cities', minutes: 35, bearing: 215, scene: 400, note: 'A bigger college and arts-leaning neighbor with a scene of its own; Green Bay is the blue-collar rival.',
+      rooms: [
+        { id: 'fox-cities-basement', kind: 'DIY', hood: 'appleton-hood', zone: 'appleton', cap: 60, pa: .4, curfew: 1350, ac: false, outdoor: false, pressure: 50,
+          note: 'A basement in the Fox Cities where the punk and hardcore shows are said to live. Green Bay kids drive thirty-five minutes for it.' }
+      ] },
     { id: 'manitowoc', kind: 'FEEDER', name: 'Manitowoc and Two Rivers', minutes: 40, bearing: 150, note: 'Lakeshore shipbuilding and factory towns to the southeast.' },
     { id: 'shawano', kind: 'FEEDER', name: 'Shawano', minutes: 40, bearing: 285, note: 'A farm and lake town to the west; its teens drive east for shows.' },
     { id: 'oshkosh', kind: 'FEEDER', name: 'Oshkosh', minutes: 50, bearing: 200, note: 'A university town down the interstate.' },
@@ -48,10 +52,50 @@ SB.Cities.register('green-bay-wi', {
     { id: 'ashwaubenon', name: 'Ashwaubenon and the stadium strip', route: 'work-side', note: 'Chain hotels, big-box retail and strip-mall units. Garages and practice spaces, wrecked by game days.' },
     { id: 'de-pere-hood', name: 'De Pere', route: 'campus', note: 'A small college city on both banks of the river with student houses near campus.' },
     { id: 'allouez', name: 'Allouez', route: 'work-side', note: 'A quiet older suburb to the south with a few basements and higher rent.' },
-    { id: 'bay-campus', name: 'the bay-shore campus', route: 'campus', note: 'A university on a bluff at the edge of town. Dorms and apartments; far out for kids without cars.' }
+    { id: 'bay-campus', name: 'the bay-shore campus', route: 'campus', note: 'A university on a bluff at the edge of town. Dorms and apartments; far out for kids without cars.' },
+    { id: 'appleton-hood', name: 'Appleton and the Fox Cities', route: 'town:appleton', note: 'A bigger college and arts neighbor up the river, where the basement punk shows are said to live.' }
   ],
 
-  contacts: ['madison-wi', 'eau-claire-wi', 'duluth-mn', { name: 'Appleton', state: 'WI', lat: 44.26, lon: -88.42 }],
+  rooms: [
+    { id: 'east-side-basement', kind: 'HOUSE', hood: 'east-side', cap: 40, hostCut: 0, pa: .4, curfew: 1320, ac: false, outdoor: false, pressure: 55, start: true,
+      note: 'A basement under an old duplex on the east side, found by word of mouth. One noise complaint ends it.' },
+    { id: 'de-pere-house', kind: 'HOUSE', hood: 'de-pere-hood', cap: 50, hostCut: 0, pa: .4, curfew: 1350, ac: false, outdoor: false, pressure: 50,
+      note: 'A student house across the river. Packed in term and empty from May to August.' },
+    { id: 'broadway-storefront', kind: 'DIY', hood: 'broadway', cap: 80, pa: .5, curfew: 1320, ac: false, pressure: 55,
+      note: 'An old brick storefront in the revival district. Cheap for now, and the rent is climbing.' },
+    { id: 'record-shop', kind: 'SHOP', hood: 'broadway', cap: 60, ages: ['ALL'], curfew: 1260, ac: true,
+      note: 'A record-and-oddities shop that clears the floor for punk shows. A lease, not a license, so it ends early.' },
+    { id: 'parish-hall', kind: 'HALL', hood: 'west-side', cap: 150, ages: ['ALL'], curfew: 1320, ac: true,
+      note: 'A parish hall on the near west side, rented by the night. Sometimes a raffle comes with it, and a cash bar.' },
+    { id: 'broadway-bar', kind: 'BAR', hood: 'broadway', cap: 250, ages: ['A21'], curfew: 1500, ac: true, matinee: true,
+      note: 'A long-running stage room on the Broadway strip under a newer owner. Underage only early, if the owner says so.' },
+    { id: 'tracks-hall', kind: 'CLUB', hood: 'broadway', cap: 300, ages: ['A21'], curfew: 1500, ac: true,
+      note: 'A restored music hall by the tracks that books touring bands. Bar rules apply and the house wants a bill.' },
+    { id: 'brewery-club', kind: 'CLUB', hood: 'downtown', cap: 400, ages: ['A21'], curfew: 1500, ac: true,
+      note: 'A new mid-size room in an old brewery building, aimed at the gap between small rooms and big ones.' },
+    { id: 'washington-bar', kind: 'BAR', hood: 'downtown', cap: 150, ages: ['A21'], curfew: 1560, ac: true, pressure: 50,
+      note: 'A bar on the late block downtown. The police watch the sidewalk for kids after curfew.' },
+    { id: 'riverfront-stage', kind: 'OUTDOOR', hood: 'downtown', cap: 500, ages: ['ALL'], curfew: 1260, rent: 25,
+      note: 'A park stage on the riverfront. Permitted, polite and summer only, with the whole city invited.' },
+    { id: 'stadium-plaza', kind: 'BIG', hood: 'ashwaubenon', cap: 3000, ages: ['ALL'], curfew: 1380, ac: true,
+      note: 'The hotels, the arena and a nightlife plaza by the stadium. Touring only, and game days eat the whole strip.' }
+  ],
+
+  contacts: ['madison-wi', 'eau-claire-wi', 'duluth-mn', 'milwaukee', { name: 'Appleton', state: 'WI', lat: 44.26, lon: -88.42 }],
+
+  calendar: [
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 4], dows: [6], can: [0.8, 0.85, 0.85], hoods: ['ashwaubenon', 'downtown'], elsewhere: [.92,.92,.92] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 4], dows: [6], can: [0.8, 0.85, 0.85], hoods: ['ashwaubenon', 'downtown'], elsewhere: [.92,.92,.92] },
+    { id: 'football-nov', label: 'home football', tag: 'game', month: 11, weeks: [1, 4], dows: [6], can: [0.8, 0.85, 0.85], hoods: ['ashwaubenon', 'downtown'], elsewhere: [.92,.92,.92] },
+    { id: 'county-fair', label: 'the county fair', tag: 'fair', month: 8, week: 3, dows: [4, 5, 6], can: [0.88, 0.85, 0.88] },
+    { id: 'art-fair', label: 'the downtown art fair', tag: 'festival', month: 8, week: 4, dows: [5, 6], can: [0.92, 0.9, 0.9], hoods: ['downtown', 'broadway'], elsewhere: [1,1,1] },
+    { id: 'summer-fridays', label: 'the free Friday summer concerts', tag: 'festival', month: 7, week: 2, dows: [4], can: [0.9, 0.95, 1], hoods: ['downtown', 'broadway'], elsewhere: [1,1,1] },
+    { id: 'st-pats', label: 'St. Patrick\'s weekend', tag: 'holiday', month: 3, weeks: [2, 3], dows: [4, 5], can: [1.05, 1.1, 1.05], hoods: ['downtown'], elsewhere: [.95,.95,.95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.1] }
+  ],
+
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1320, weekend: 1320, inForce: true } },
 
   points: [
     { name: 'Milwaukee', state: 'WI', lat: 43.04, lon: -87.91, pop: 570000 },
@@ -68,5 +112,58 @@ SB.Cities.register('green-bay-wi', {
     hood: ['the east side', 'the west side', 'Allouez', 'Ashwaubenon', 'De Pere', 'Astor', 'Navarino'],
     thing: ['fish fry', 'bar pizza', 'cheese curds', 'brat', 'booyah', 'pole barn', 'parish hall', 'custard stand', 'draw bridge', 'carpool'],
     weather: ['lake-effect snow', 'January cold']
-  }
+  },
+
+  events: [
+    { id: 'GREEN_BAY_WI_GAME_THURSDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'game' },
+      telegraph: 'A home game is on Sunday, and the pep rally takes downtown on Thursday afternoon.',
+      title: 'The football-weekend squeeze',
+      body: 'A hall show on the near west side lands on game week. The rally eats downtown, every sober driver is hired as a shuttle, and the hotels are full.',
+      options: [
+        { id: 'LATE', label: 'Push doors back until the traffic clears', likely: 'The crowd that wants a night out shows up. Later than planned.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Doors an hour late. The ones who came were loud and happy.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd has other plans.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The casual crowd stayed in. The regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'GREEN_BAY_WI_FEBRUARY_SNOW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [12, 1, 2, 3] },
+      telegraph: 'The county road is drifting shut, and the farm-town kids are an hour out.',
+      title: 'The county road closes',
+      body: 'A snow squall shut the county road the day of the basement show. The farm-town kids cannot get in, and the van from the north is two hours late.',
+      options: [
+        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'A thin night, but the ones who came are glad.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'Two bands and a long, loose night. The basement was half full and warm.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'A late start. The crowd gets restless.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The van pulled in at ten. You started late and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] },
+
+    { id: 'GREEN_BAY_WI_CURFEW_WALK', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
+      if: { daysOut: [0, 3] },
+      telegraph: 'City police cited a kid for curfew on the bar block last month. The all-ages set ends at ten.',
+      title: 'The curfew walk',
+      body: 'A kid on the downtown bar block was cited for curfew at ten, right after the all-ages set let out. Parents have started calling.',
+      options: [
+        { id: 'EARLY', label: 'End the night early and walk the crowd to their rides', likely: 'Short and safe, and the parents notice.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Done by nine-thirty, with a line of parents at the door.' },
+        { id: 'BASEMENT', label: 'Move the bill off the bar block to a basement', likely: 'Smaller and out of sight.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'A basement took the bill. Loud, packed and out of sight.' },
+        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Some parents keep their kids home.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'A few kids stayed in rather than risk the sidewalk.' }
+      ] }
+  ]
 });

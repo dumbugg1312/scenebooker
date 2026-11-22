@@ -75,10 +75,11 @@ SB.module('Week', function (SB) {
   /* cap from HOURS, less COUCH.hours spread over days off, less FRIED.hoursOffDay on days off when fried, less what
    * was stayed up the night before (player.tired), zero until burnoutUntil (5.4). */
   function capsFor(state, W, n) {
-    var cap = [], i, off, left, fried, z, d, tired;
+    var cap = [], i, off, left, fried, z, d, tired,
+        free = billsOn(state) && !(C.SHIFTS[state.player.dayJob] || []).length ? C.HOURS.noJob : C.HOURS.off;   // no day job: 8 a day
     for (i = 0; i < 7; i++) {
       off = !W.shifts[i] || W.dropped.indexOf(i) >= 0;
-      cap.push({ DAY: off ? C.HOURS.off.DAY : C.HOURS.shift.DAY, NIGHT: off ? C.HOURS.off.NIGHT : C.HOURS.shift.NIGHT });
+      cap.push({ DAY: off ? free.DAY : C.HOURS.shift.DAY, NIGHT: off ? free.NIGHT : C.HOURS.shift.NIGHT });
     }
     if (state.player.couch) {
       left = -C.MONEY.COUCH.hours;
@@ -329,10 +330,18 @@ SB.module('Week', function (SB) {
     return ot;
   }
 
+  /* the night is called, or the week is over: nothing more goes on tonight's clock */
+  function nightClosed(state) {
+    var c = state.clock;
+    return nightCalled(state) || !!(c.stop && c.stop.kind === E.STOP.END_OF_WEEK);
+  }
+  function nightClosedNo() { return U.no(E.REFUSE.PHASE, label(has('clock.nightOver') ? 'clock.nightOver' : 'refuse.PHASE')); }
+
   /* Would `hours` fit tonight? -> Result (NO_TIME with the numbers, BURNT_OUT, OVER). Reads only. */
   function fits(state, hours) {
     if (state.clock.phase === E.PHASE.OVER) return no(E.REFUSE.OVER);
     if (!state.week) return U.yes();
+    if (nightClosed(state)) return nightClosedNo();
     return fitsNo(state, todayIdx(state), hours) || U.yes();
   }
 
@@ -342,6 +351,7 @@ SB.module('Week', function (SB) {
     var idx, refuse, records = [], ot;
     if (state.clock.phase === E.PHASE.OVER) return no(E.REFUSE.OVER);
     if (!state.week) return U.yes({ day: null, hours: 0, overtime: 0, records: records });
+    if (nightClosed(state)) return nightClosedNo();
     idx = todayIdx(state);
     refuse = fitsNo(state, idx, hours);
     if (refuse) return refuse;
@@ -1425,6 +1435,6 @@ SB.module('Week', function (SB) {
     tonight: tonight, canDoNow: canDoNow, doNow: doNow, endNight: endNight, crunch: crunch,
     /* not in the manifest: E1a's own helpers, used by Game; fits / spend / refund are the clock as SB.Mail charges it */
     blankWeek: blankWeek, refreshHours: refreshHours, resetShape: resetShape, recap: recap,
-    fits: fits, spend: spend, refund: refund
+    fits: fits, spend: spend, refund: refund, eveningOpen: eveningOpen
   };
 });

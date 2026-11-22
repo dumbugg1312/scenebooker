@@ -1,12 +1,13 @@
 SB.Cities.register('utica-ny', {
   v: 1,
   slug: 'utica-ny',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['observer-dispatch', 'observer dispatch', 'boilermaker', 'utica club', 'matt brewery', 'f.x. matt', 'colgate', 'hamilton college', 'suny poly', 'suny polytechnic',
            'mohawk valley community college', 'utica university', 'utica college', 'fort drum', 'griffiss', 'utica comets', 'utica city fc', 'adirondack bank center',
            'oneida nation', 'turning stone', 'vfw', 'american legion', 'elks', 'state liquor authority',
            'canal street annex', 'hillside social club', 'polish hall annex', 'st. casimir\'s undercroft', 'the knit mill loft', 'harbor flats', 'oneida square parlor',
-           'the double on rutger', 'bagg\'s back room', 'the parkway garage', 'mohawk valley hall of mirrors', 'the tomato pie basement', 'the black river grange'],
+           'the double on rutger', 'bagg\'s back room', 'the parkway garage', 'mohawk valley hall of mirrors', 'the tomato pie basement', 'the black river grange',
+           'oneida county tourism', 'oneida county sheriff', 'utica zoo', 'utica summer fest', 'munson-williams-proctor', 'nys music', 'nysmusic', 'mohawk valley living', 'wibx', 'big frog', 'utica police', 'oneida county fair', 'great new york state fair', 'boilermaker walk', 'boilermaker experience', 'new york civil liberties union', 'nyclu', 'rit reporter', 'daily orange', 'syracuse new times', 'upstate concerts', 'bandsintown', 'songkick'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['observer-dispatch*', 'boilermaker*', 'utica club*', 'canal street annex*', 'colgate*', 'turning stone*'],
 
@@ -49,7 +50,41 @@ SB.Cities.register('utica-ny', {
     { id: 'new-hartford-side', name: 'New Hartford and Whitesboro', route: 'campus', note: 'The suburban edge most people mean when they say they are from Utica.' }
   ],
 
-  contacts: ['syracuse-ny', 'ithaca-ny'],
+  rooms: [
+    { id: 'cornhill-basement', kind: 'HOUSE', hood: 'cornhill', cap: 40, curfew: 1320, ac: false, start: true, pressure: 50,
+      note: 'A cold, low basement under a wood-frame double, with an upstairs neighbor who is family. A noise call is the threat.' },
+    { id: 'west-garage', kind: 'HOUSE', hood: 'west-utica', cap: 30, curfew: 1320, ac: false, pressure: 55,
+      note: 'A garage or a yard behind a two-family in summer. The walls are shared, so the noise rule bites hardest here.' },
+    { id: 'hartford-yard', kind: 'OUTDOOR', hood: 'new-hartford-side', cap: 25, curfew: 1290, outdoor: true,
+      note: 'A backyard with a generator or a borrowed outlet. Weather kills it from October to April.' },
+    { id: 'old-theater', kind: 'HALL', hood: 'downtown', cap: 250, ages: ['ALL'], curfew: 1350, ac: true, rent: 300, deposit: 100, pressure: 45,
+      note: 'A restored 1920s theater, rented for early all-ages bills at seven. Costs are high and nothing is promised from one night to the next.' },
+    { id: 'vintage-shop', kind: 'SHOP', hood: 'downtown', cap: 80, curfew: 1350, ac: true, standing: [60, 65, 70],
+      note: 'A clothing store that opens its floor after hours as a favor. One bad night or one sold lease ends it.' },
+    { id: 'east-club-hall', kind: 'HALL', hood: 'east-utica', cap: 150, curfew: 1320, ac: true, owner: 'HALL_MANAGER',
+      note: 'A social-club hall on a corner, cheap rent, a cheap-beer bar and an older member watching the door.' },
+    { id: 'victorian-hall', kind: 'DIY', hood: 'south-utica', cap: 60, curfew: 1350, ac: false, needs: ['VOUCH'],
+      note: 'A church hall or a hall with a stage in a Victorian block, rented a night at a time. Fire code and the people in charge are the limit.' },
+    { id: 'back-room-bar', kind: 'BAR', hood: 'downtown', cap: 120, ages: ['A21'], curfew: 1500, ac: true,
+      note: 'A back-room stage with a bar in front. All ages only for an early set, and only if the owner allows it.' },
+    { id: 'mid-club', kind: 'CLUB', hood: 'downtown', cap: 300, ages: ['A18'], curfew: 1470, ac: true,
+      note: 'A mid-size club that books tribute and regional rock. Hardcore rents it on slow nights.' },
+    { id: 'arena', kind: 'BIG', hood: 'downtown', cap: 3000, ages: ['ALL'], curfew: 1380, ac: true,
+      note: 'The arena for hockey and touring acts. A punk bill here is the opener on someone else\'s night.' }
+  ],
+
+  contacts: ['syracuse-ny', 'ithaca-ny', 'albany-ny', 'buffalo'],
+
+  calendar: [
+    { id: 'road-race', label: 'the road race weekend', tag: 'race', month: 7, week: 2, dows: [5, 6], can: [.88, .85, .85] },
+    { id: 'parade', label: 'the St. Patrick\'s parade', tag: 'parade', month: 3, week: 2, dows: [5], can: [.85, .85, .90], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'summer-concerts', label: 'the downtown summer concert series', tag: 'festival', month: 7, weeks: [1, 4], dows: [0], can: [.93, .95, 1], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'arts-fest', label: 'the arts festival', tag: 'festival', month: 6, week: 2, dows: [4, 5, 6], can: [.92, .92, .92], hoods: ['south-utica'], elsewhere: [1, 1, 1] },
+    { id: 'county-fair', label: 'the county fair', tag: 'fair', month: 8, weeks: [3, 4], dows: [4, 5, 6], can: [.90, .92, .95] },
+    { id: 'college-break', label: 'the college break', tag: 'graduation', month: 5, week: 3, dows: [4, 5, 6], can: [.85, .90, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
 
   points: [
     { name: 'Albany', state: 'NY', lat: 42.65, lon: -73.76, pop: 900000 },
@@ -65,5 +100,69 @@ SB.Cities.register('utica-ny', {
     hood: ['Cornhill', 'East Utica', 'West Utica', 'Bagg\'s Square', 'New Hartford', 'Whitesboro', 'Yorkville'],
     thing: ['chicken riggies', 'tomato pie', 'half-moon cookie', 'utica greens', 'double', 'social club', 'bocce', 'snowbank', 'club hall', 'lake-effect'],
     weather: ['lake effect', 'nor\'easter']
-  }
+  },
+
+  events: [
+    { id: 'UTICA_NY_SHOP_AFTER_HOURS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3] },
+      telegraph: 'The vintage shop says yes to the bill, but the owner is out of town.',
+      title: 'The shop after closing',
+      body: 'The shop will let the bill in after closing, but the owner is away and a rack of fragile stock sits where the pit will be. It has to be cleared by six.',
+      options: [
+        { id: 'CLEAR', label: 'Clear the racks yourself', likely: 'Costs the afternoon and a little trust.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
+          result: 'You carried every rack to the back and left the place cleaner than you found it.' },
+        { id: 'HALL', label: 'Move to the club hall', likely: 'Roomier, and nobody is watching a rack.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 1.4 }],
+          result: 'The hall took the bill. Bigger room, thinner crowd.' },
+        { id: 'ACCEPT', label: 'Run it and keep people out of the stock', likely: 'Tight and nervous.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
+          result: 'You roped off the racks and kept the crowd to the middle of the floor.' }
+      ] },
+
+    { id: 'UTICA_NY_PARADE_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'parade' },
+      telegraph: 'Saturday is the parade and the whole main street is shut until evening.',
+      title: 'The closed street',
+      body: 'The main street is shut until evening, the bars are full, and the load-in to the theater has to go around the blocks.',
+      options: [
+        { id: 'LATE', label: 'Load in late, doors late', likely: 'The street opens up at seven.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Doors at nine. The parade crowd had drifted to the bars and the kids came in.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' },
+        { id: 'ACCEPT', label: 'Carry the gear around the closure', likely: 'Slow, but the night holds.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 45 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'The amps went the long way around. The doors were late and the crowd was thin.' }
+      ] },
+
+    { id: 'UTICA_NY_RACE_PARKING', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 5], calendar: 'race' },
+      telegraph: 'The race weekend has the hotels packed and a touring van is circling for a place to park.',
+      title: 'Six blocks from the hall',
+      body: 'The hotels are full and a touring band can only find parking six blocks from the hall. Half the street is closed for the race.',
+      options: [
+        { id: 'SHUTTLE', label: 'Ferry the gear in by hand', likely: 'Slow load-in, and the band is tired.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'Four trips with the amps. The set was ragged but the room was warm.' },
+        { id: 'ACCEPT', label: 'Let the band find its own spot', likely: 'They get there when they get there.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The van turned up late and the crowd waited.' }
+      ] },
+
+    { id: 'UTICA_NY_BASEMENT_FAMILY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [10, 11, 12, 1, 2, 3, 4] },
+      telegraph: 'The upstairs neighbor, who is family, is cooking for everyone before the show.',
+      title: 'The quiet hour comes at ten',
+      body: 'The basement is full and the upstairs neighbor is cooking for the whole bill. The noise rule still starts at ten.',
+      options: [
+        { id: 'EARLY', label: 'Start early, finish by ten', likely: 'Short and loud, and everyone eats.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.05 }],
+          result: 'Doors at six. The bands played hard and tight, and the whole room ate after.' },
+        { id: 'ACCEPT', label: 'Run it as planned and watch the clock', likely: 'The neighbors may call.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }, { op: 'MONEY', amount: -25 }],
+          result: 'The bill ran past ten and someone called it in. You paid for the trouble.' }
+      ] }
+  ]
 });

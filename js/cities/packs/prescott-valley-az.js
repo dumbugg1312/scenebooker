@@ -7,7 +7,12 @@ SB.Cities.register('prescott-valley-az', {
            'courthouse plaza', 'walmart', 'costco', 'taco bell', 'jack in the box', 'sonic', 'circle k', 'dutch bros', 'northern arizona university', 'nau',
            'bradshaw mountain high school', 'prescott high', 'humboldt unified', 'vfw', 'american legion', 'elks', 'national guard', 'wickenburg',
            'the heliograph room', 'glassford annex', 'lynx creek social hall', 'cordes junction rec hall', 'the caliche', 'black canyon carport',
-           'dewey feed & grain', 'dewey feed and grain', 'fain road unit 9', 'the windsong garage', 'the bradshaw basement', 'mingus grade rest stop', 'long look lanes'],
+           'dewey feed & grain', 'dewey feed and grain', 'fain road unit 9', 'the windsong garage', 'the bradshaw basement', 'mingus grade rest stop', 'long look lanes',
+           'red white and boom', 'red, white & boom', 'prescott valley days', 'fandomania', 'prescott frontier days', 'world\'s oldest rodeo', 'rodeo parade',
+           'whiskey row boot race', 'rodeo days fine arts', 'cowboy poets gathering', 'cowboy poets', 'yavapai county courthouse', 'experience prescott',
+           'prescott now', 'prescott living', 'prescott visitors guide', 'phoenix new times', '5enses', 'state press', 'azfamily', 'review-journal',
+           'arizona highways', 'aarp', 'eventbrite', 'bandsintown', 'festivalnet', 'issuu', 'talking glass media', 'raxx direct', 'bear nation',
+           'town of prescott valley', 'prescott valley chamber of commerce', 'department of liquor licenses and control', 'dllc'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['findlay toyota*', 'frontier days*', 'whiskey row*', 'whiskey off-road*', 'prescott daily*', 'yavaline*', 'embry*', 'dutch bros*'],
 
@@ -49,7 +54,19 @@ SB.Cities.register('prescott-valley-az', {
     { id: 'prescott-hood', name: 'downtown Prescott', route: 'downtown', note: 'The old courthouse square and its historic bars, ten minutes west. All-ages afternoons and back rooms, tourist-heavy and pricey.' }
   ],
 
-  contacts: ['flagstaff-az'],
+  contacts: ['flagstaff-az', 'phoenix', 'tucson'],
+
+  calendar: [
+    { id: 'july-fourth', label: 'the Fourth of July show', tag: 'holiday', month: 7, week: 1, dows: [0, 1, 2, 3, 4, 5, 6], can: [.85, .80, .80], hoods: ['town-center', 'glassford-hill'], elsewhere: [.97, .95, .95] },
+    { id: 'rodeo-week', label: 'the rodeo and parade', tag: 'parade', month: 7, week: 1, dows: [4, 5, 6], can: [.92, .88, .85], hoods: ['prescott-hood'], elsewhere: [1, .98, .98] },
+    { id: 'bike-race', label: 'the mountain-bike race weekend', tag: 'race', month: 4, weeks: [3, 4], dows: [5, 6], can: [.95, .92, .92], hoods: ['prescott-hood'], elsewhere: [1, 1, 1] },
+    { id: 'football-9', label: 'home football', tag: 'game', month: 9, weeks: [1, 4], dows: [4], can: [.88, .95, .95] },
+    { id: 'football-10', label: 'home football', tag: 'game', month: 10, weeks: [1, 4], dows: [4], can: [.88, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1320, weekend: 1320, inForce: false } },
 
   points: [
     { name: 'Phoenix', state: 'AZ', lat: 33.45, lon: -112.07, pop: 1650000 },

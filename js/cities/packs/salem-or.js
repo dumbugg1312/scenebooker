@@ -1,8 +1,9 @@
 SB.Cities.register('salem-or', {
   v: 1,
   slug: 'salem-or',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
-  banned: ['willamette university', 'corban university', 'chemeketa community college', 'chemeketa', 'western oregon university',
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
+  banned: ['punx in the park', 'marion square', 'mall rats music festival', 'salem reporter', 'willamette collegian', 'clypian', 'kptv', 'katu', 'fox 12', 'willamette week', 'portland mercury', 'the stranger', 'bend source', 'viva salem', 'make music day', 'hoopla', 'englewood forest festival', 'awesome 3000', 'salem saturday market', 'noble fest', 'oregon expo', 'oregon state fair and exposition center', 'salem-keizer', 'keizer high school',
+           'willamette university', 'corban university', 'chemeketa community college', 'chemeketa', 'western oregon university',
            'oregon state university', 'oregon state fair', 'state fair', 'salem art fair', 'world beat festival', 'bite of salem',
            'salem capital pride', 'keizerfest', 'statesman journal', 'capital press', 'salem business journal', 'salem magazine', 'cherriots',
            'amtrak', 'coast starlight', 'amtrak cascades', 'greyhound', 'olcc', 'chemawa indian school', 'confederated tribes of the grand ronde',
@@ -51,7 +52,43 @@ SB.Cities.register('salem-or', {
     { id: 'keizer-side', name: 'Keizer', route: 'work-side', note: 'The big suburb north of the river: garages, basements and all-ages shows in somebody\'s house.' }
   ],
 
-  contacts: ['eugene-or', 'olympia-wa', 'bend-or'],
+  rooms: [
+    { id: 'keizer-garage', kind: 'HOUSE', hood: 'keizer-side', cap: 50, curfew: 1320, ac: false, outdoor: true, pressure: 50, start: true,
+      note: 'A garage and carport with a canopy for the rain. A neighbor\'s noise call ends it.' },
+    { id: 'basement-shop', kind: 'SHOP', hood: 'downtown', cap: 80, curfew: 1320, pa: 0.5, ac: false, outdoor: false, standing: [65, 65, 70], following: 0.2,
+      note: 'A vintage clothing store with a basement stage. Always all ages, ten dollars at the door, and the lease is the threat.' },
+    { id: 'skatepark-day', kind: 'OUTDOOR', hood: 'downtown', cap: 300, curfew: 1200, rent: 15, ac: false, outdoor: true, pressure: 45,
+      note: 'A free daytime bill at the downtown skatepark each September. It needs a permit and clear air.' },
+    { id: 'lodge-hall', kind: 'HALL', hood: 'downtown', cap: 250, curfew: 1350, rent: 300, ac: true,
+      note: 'A rented lodge room, a night at a time. Beer is the sticking point.' },
+    { id: 'lancaster-bay', kind: 'DIY', hood: 'lancaster', cap: 100, curfew: 1380, ac: false, pressure: 55, needs: ['VOUCH'],
+      note: 'A shop bay in a strip of auto shops and warehouses. The cheapest space in town, with a landlord and a fire marshal.' },
+    { id: 'rail-warehouse', kind: 'DIY', hood: 'downtown', cap: 120, curfew: 1380, ac: false, pressure: 55, needs: ['VOUCH'],
+      note: 'A borrowed warehouse by the tracks for hardcore nights. It is never the same room twice.' },
+    { id: 'north-bungalow', kind: 'HOUSE', hood: 'north-salem', cap: 60, curfew: 1320, ac: false, outdoor: false, pressure: 45,
+      note: 'An old bungalow with a real basement on a rough block. Cheap, and nobody calls.' },
+    { id: 'west-garage', kind: 'HOUSE', hood: 'west-salem', cap: 50, curfew: 1320, ac: false, outdoor: false, pressure: 55,
+      note: 'A subdivision garage where the parents and the neighbors set the rules.' },
+    { id: 'metal-club', kind: 'CLUB', hood: 'downtown', cap: 250, ages: ['A21'], curfew: 1440, ac: true, following: 0.4,
+      note: 'A club with a real stage. The loud local bills here are 21 and over.' },
+    { id: 'main-strip-bar', kind: 'BAR', hood: 'downtown', cap: 120, soundFee: 50, ages: ['A21'], curfew: 1470, ac: true, following: 0.3,
+      note: 'A bar with a back-room stage on the main strip. Rooms like it close without warning.' },
+    { id: 'mall-box', kind: 'BIG', hood: 'lancaster', cap: 900, curfew: 1440, rent: 1800, ac: true,
+      note: 'A big empty store inside a mall, used for a one-day festival. All ages, doors at five, and a big step up.' }
+  ],
+
+  contacts: ['eugene-or', 'olympia-wa', 'bend-or', 'portland'],
+
+  calendar: [
+    { id: 'late-summer-fair', label: 'the late-summer fair', tag: 'fair', month: 8, weeks: [4, 5], dows: [0, 1, 2, 3, 4, 5, 6], can: [0.75, 0.7, 0.7], hoods: ['north-salem'], elsewhere: [0.88, 0.85, 0.85] },
+    { id: 'skatepark-day', label: 'the free skatepark day', tag: 'festival', month: 9, week: 2, dows: [5], can: [0.9, 0.9, 0.9], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'metal-fest', label: 'the one-day metal and punk fest', tag: 'festival', month: 12, week: 1, dows: [5], can: [0.9, 0.9, 0.9], hoods: ['lancaster'], elsewhere: [0.88, 0.88, 0.88] },
+    { id: 'riverfront-fest', label: 'the riverfront world-music weekend', tag: 'festival', month: 6, weeks: [2, 3], dows: [4, 5, 6], can: [0.92, 0.9, 0.9], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [4], can: [0.85, 0.95, 0.95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [4], can: [0.85, 0.95, 0.95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.1] }
+  ],
 
   points: [
     { name: 'Portland', state: 'OR', lat: 45.52, lon: -122.68, pop: 650000 },
@@ -67,5 +104,58 @@ SB.Cities.register('salem-or', {
     hood: ['West Salem', 'Highland', 'Northgate', 'Sunnyslope', 'Hayesville', 'Four Corners', 'Keizer', 'Grant'],
     thing: ['taco truck', 'grange hall', 'filbert orchard', 'hop field', 'cannery', 'teriyaki shop', 'garage canopy', 'marionberry stand', 'church hall', 'canopy'],
     weather: ['week of rain', 'wildfire smoke', 'ice storm']
-  }
+  },
+
+  events: [
+    { id: 'SALEM_OR_FAIR_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'The fairgrounds fair is on, and downtown parking is already full.',
+      title: 'The fair takes the weekend',
+      body: 'The fair is eleven days long and nobody books against it. Half your door goes to the fairgrounds, and the other half cannot find a spot downtown.',
+      options: [
+        { id: 'LATE', label: 'Push doors back until the fair lets out', likely: 'The crowd that wants a night out shows up late.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
+          result: 'Doors an hour late. The kids came off the midway still smelling of fried dough.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Fewer people, no trouble.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.7 }],
+          result: 'The fair kept most of the list. The ones who came had room to move.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'SALEM_OR_SMOKE_WEEK', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [8, 9] },
+      telegraph: 'The sky over the valley has gone orange and the air has a taste.',
+      title: 'Smoke over the valley',
+      body: 'A week of wildfire smoke is parked on the valley and the outdoor bill is two days away. The sound crew wants to cancel.',
+      options: [
+        { id: 'INSIDE', label: 'Move it indoors into a garage or hall', likely: 'Smaller and louder. Nobody has to breathe the sky.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 0.6 }],
+          result: 'A garage took the bill. It was packed and the door stayed shut.' },
+        { id: 'MASKS', label: 'Run it outside and hand out masks', likely: 'Costs a little. The crowd is thin and the day is short.',
+          effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
+          result: 'Masks and a short set. The ones who came coughed through the choruses.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The air did not clear.' }
+      ] },
+
+    { id: 'SALEM_OR_QUIET_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], weather: 'RAIN', months: [10, 11, 3, 4, 5] },
+      telegraph: 'The week of rain has everyone under the canopy and the neighbors inside with their windows shut.',
+      title: 'The ten o\'clock call',
+      body: 'The garage bill is crowded under a canopy in the rain, and a neighbor has called in the quiet-hour limit while the second band is still setting up.',
+      options: [
+        { id: 'SHORT', label: 'Cut it short and clear the street', likely: 'The host keeps the garage. A thin night.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
+          result: 'You stopped at ten. The host stayed on speaking terms with the street.' },
+        { id: 'KNOCK', label: 'Go talk to the neighbor', likely: 'Costs a little. A smaller crowd while you do.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }, { op: 'REGULARS', pct: .02 }],
+          result: 'The neighbor listened. The night ended at half past ten with no call back.' },
+        { id: 'ACCEPT', label: 'Keep playing', likely: 'Risks the host\'s garage.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
+          result: 'The call came back at eleven, and the host got a warning.' }
+      ] }
+  ]
 });

@@ -35,12 +35,12 @@
     moneyIn: 'in',
     moneyOut: 'out',
     net: 'this week',
-    owed: 'owed in the next eight weeks',
+    owed: 'promised costs, next eight weeks (rooms, sound, guarantees)',
     nothingSaid: 'Nobody said much.',
     nothingLearned: 'Nothing new in the notebook.',
     noPeople: 'Nobody moved much.',
     regulars: 'regulars',
-    stressWas: 'from {from}',
+    stressWas: 'from {from}', stressLine: 'stress {to} of 100, was {from} last week', trustUp: 'trusts you more', trustDown: 'trusts you less',
     causes: 'what wore on you',
     notebook: 'notebook',
     openNote: 'Open the notebook at {cause}',
@@ -502,6 +502,7 @@
             h('span', { text: r.name || '' }),
             h('span', { class: 'cc-person-d', role: 'img', aria: { label: up ? SB.text.label('ui.c.more') : SB.text.label('ui.c.less') } },
               kt.pic(22, 22, SB.DeskKit.arrow(11, up ? 20 : 2, 11, up ? 2 : 20, { seed: 'ta' + i, sw: 3, head: 8 }))),
+            h('span', { class: 'cc-person-why', text: L(up ? 'trustUp' : 'trustDown') }),
             r.stageChanged && r.stage ? h('span', { text: word('stage.' + r.stage, String(r.stage).toLowerCase()) }) : null
           ]);
         }),
@@ -531,7 +532,7 @@
         h('div', { class: 'cc-figure cc-mug', role: 'img', aria: { label: zone + ', ' + (num(x.from) ? x.from : '?') + ' > ' + (num(x.to) ? x.to : '?') } }, [
           kt.pic(290, 200, coffeeArt(x.to)),
           h('span', { class: 'cc-mug-tape' }, [kt.mk(zone.toUpperCase(), 26, { say: false }),
-            h('span', { text: (num(x.to) ? x.to : '?') + ' · ' + L('stressWas', { from: num(x.from) ? x.from : '?' }) })])
+            h('span', { text: L('stressLine', { to: num(x.to) ? x.to : '?', from: num(x.from) ? x.from : '?' }) })])
         ]),
         x.causes && x.causes.length ? h('div', { class: 'cc-causes', role: 'group', aria: { label: L('causes') } }, x.causes.map(function (c, i) {
           return h('span', { class: 'cc-causechip' }, [kt.sheet(i % 2 ? 'bone' : 'white', 'cz' + i), h('span', { text: (c.label || '') + ' ' + kt.chipText({ k: 'STRESS', v: c.d }) })]);

@@ -26,9 +26,9 @@ const SHOTS = [
   { name: 'start', kind: 'fresh', desc: 'the start screen of a new browser (no game, no saves)' },
   { name: 'city', kind: 'fresh', desc: 'start flow: choose your city' },
   { name: 'tune', kind: 'fresh', desc: 'start flow: tune the city (the questions about your scene)' },
-  { name: 'name', kind: 'fresh', desc: 'start flow: name your booking outfit, with the marks and the flyer' },
-  { name: 'setup', kind: 'fresh', desc: 'start flow: bills, fog, windows, and the stapler' },
   { name: 'opening', kind: 'fresh', desc: 'the opening cutscene (the going-away show)' },
+  { name: 'ask', kind: 'fresh', desc: 'the setup asked in the going-away show: the first question (bills)' },
+  { name: 'name', kind: 'fresh', desc: 'the going-away show: name your booking outfit, with the marks and the flyer' },
   { name: 'desk-fresh', kind: 'fresh', desc: 'the desk of a fresh game with the guided first show on (tutorial tape)' },
 
   { name: 'desk', kind: 'mid', desc: 'the desk, week 9 of a Pensacola game (tutorial off)', go: ['desk', '{}'] },
@@ -305,26 +305,32 @@ async function main() {
         await ev('(function () { SB.UI.go("tune", { slug: ' + JSON.stringify(slug) + ' }); return 1; })()');
         await ev('__settle(1000)');
       });
-      await step('name', async () => {
+      await step('opening', async () => {
         await ev('(function () { SB.UI.go("city"); return 1; })()'); await sleep(500);
         await ev('(function () { __click("[data-fk=\\"city-pensacola\\"]"); return 1; })()'); await sleep(400);
         await ev('(function () { __click("[data-fk=\\"city-pick\\"]"); return 1; })()');
-        for (let i = 0; i < 40 && !(await ev('!!__q("[data-fk=\\"name-in\\"]")')); i++) await sleep(250);
-        await sleep(400);
-        await ev('(function () { var i = __q("[data-fk=\\"name-in\\"] input") || __q("input[data-fk=\\"name-in\\"]") || __q(".st-namefield input"); if (!i) throw new Error("no name field"); i.focus(); i.value = "Extension Cord Booking"; i.dispatchEvent(new Event("input", { bubbles: true })); return 1; })()');
-        await ev('__settle(1500)');
-      });
-      await step('setup', async () => {
-        await ev('(function () { __click("[data-fk=\\"name-next\\"]"); return 1; })()');
-        await ev('__settle(1200)');
-        if (!(await ev('!!__q("[data-fk=\\"staple\\"]")'))) throw new Error('the setup screen did not come up');
-      });
-      await step('opening', async () => {
-        await ev('(function () { __click("[data-fk=\\"staple\\"]"); return 1; })()');
         for (let i = 0; i < 30 && !(await ev('!!__q(".cs-root")')); i++) await sleep(250);
         await sleep(2500);
       });
+      await step('ask', async () => {
+        await ev('(function () { __click(".cs-root .cs-skip"); return 1; })()');
+        for (let i = 0; i < 30 && !(await ev('!!__q(".cs-root .cs-reply")')); i++) await sleep(250);
+        await ev('__settle(2000)');
+      });
+      await step('name', async () => {
+        /* answer each question with its first reply till the booking name is asked */
+        for (let i = 0; i < 60 && !(await ev('!!__q(".cs-ask-name input")')); i++) {
+          await ev('(function () { var b = __q(".cs-root .cs-reply:not([disabled])"); if (b) b.click(); return 1; })()'); await sleep(400);
+        }
+        await sleep(1500);
+        await ev('(function () { var i = __q(".cs-ask-name input"); if (!i) throw new Error("no name field"); i.focus(); i.value = "Extension Cord Booking"; i.dispatchEvent(new Event("input", { bubbles: true })); return 1; })()');
+        await ev('__settle(1500)');
+      });
       await step('desk-fresh', async () => {
+        await ev('(function () { __click("[data-fk=\\"name-done\\"]"); return 1; })()');
+        for (let i = 0; i < 30 && !(await ev('!!__q(".cs-root .cs-reply:not([disabled])")')); i++) await sleep(250);
+        await ev('(function () { __click(".cs-root .cs-reply"); return 1; })()');   /* yes, walk me through it */
+        for (let i = 0; i < 30 && await ev('!!__q(".cs-root .cs-reply")'); i++) await sleep(250);
         await ev('(function () { var g = 0; while (__q(".cs-root .cs-skip") && g++ < 12) __q(".cs-root .cs-skip").click(); return 1; })()');
         for (let i = 0; i < 20 && !(await ev('SB.UI.route() === "desk" && !__q(".cs-root")')); i++) await sleep(300);
         await ev('__settle(1800)');

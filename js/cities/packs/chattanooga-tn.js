@@ -1,14 +1,14 @@
 SB.Cities.register('chattanooga-tn', {
   v: 1,
   slug: 'chattanooga-tn',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['volkswagen', 'bluecross blueshield', 'bluecross', 'unum', 'chattanooga bakery', 'moon pie', 'moon pies', 'mckee foods', 'lee university',
            'university of tennessee', 'university of tennessee at chattanooga', 'utc', 'chattanooga state', 'southern adventist university',
            'covenant college', 'bryan college', 'tennessee wesleyan', 'berry college', 'bonnaroo', 'ironman', 'ironman chattanooga',
            'head of the hooch', 'krystal', 'waffle house', 'rc cola', 'times free press', 'chattanooga times free press', 'nooga.com', 'vfw',
            'american legion', 'arnold air force base', 'gig city', 'epb', 'scopes trial', 'wauhatchie grange', 'the tunnel room',
            'orchard knob social club', 'cowart street laundry', 'glass mill annex', 'moccasin hall', 'lupton ironworks loft', 'citico rec center',
-           'post 214 legion hall', 'tiftonia pavilion', 'walden basement'],
+           'post 214 legion hall', 'tiftonia pavilion', 'walden basement', 'riverbend festival', 'ironman 70.3', 'ironman 703', 'erlanger chattanooga marathon', 'erlanger', 'jfest', 'bacon and barrel', 'make music day', 'nightfall music series', 'miller plaza', 'coolidge park', 'tennessee riverpark', 'first horizon pavilion', 'ibma', 'world of bluegrass', 'world food truck festival', 'reflection riding', 'wutc', 'do ya hear we', 'noogatoday', '6am city', 'chattanoogan', 'chattanooga pulse', 'chattanooga public library', 'wdef', 'newschannel 9', 'visit chattanooga', 'mocs', 'southern conference'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Storms are written only as 'the spring storms'. */
   blocklist: ['bonnaroo*', 'riverbend*', 'moon pie*', 'waffle house*', 'times free press*', 'volkswagen*'],
 
@@ -59,7 +59,35 @@ SB.Cities.register('chattanooga-tn', {
     { id: 'rossville-side', name: 'the Georgia side', route: 'work-side', note: 'The strip across the state line, with cheap rent and different police.' }
   ],
 
-  contacts: ['huntsville-al', 'asheville-nc'],
+  rooms: [
+    { id: 'highland-house', kind: 'HOUSE', hood: 'highland-park', cap: 60, curfew: 1320, ac: false, outdoor: false, start: true, note: "A big divided house with a basement, run by a few people who book mixed bills for locals. One neighbor's call or one burnout ends it." },
+    { id: 'elmo-basement', kind: 'HOUSE', hood: 'st-elmo', cap: 40, curfew: 1320, ac: false, outdoor: false, note: 'A hillside basement with a long history of shows. The floor is uneven and the rent next door keeps climbing.' },
+    { id: 'hixson-garage', kind: 'HOUSE', hood: 'red-bank', cap: 50, curfew: 1320, ac: false, outdoor: false, note: 'A ranch-house garage where the teenage bands start. The parents and the neighbors are the threat.' },
+    { id: 'church-hall', kind: 'HALL', hood: 'north-shore', cap: 150, curfew: 1350, ac: true, note: "A church room that has hosted punk and metal on weekends. It is a church on Sunday, so the pastor's patience is the rent." },
+    { id: 'record-shop', kind: 'SHOP', hood: 'downtown', cap: 100, curfew: 1260, ac: true, note: 'The record store. Early, low-key bills between the shelves for about ten dollars, and the floor is the limit.' },
+    { id: 'punk-bar', kind: 'BAR', hood: 'downtown', cap: 120, ages: ['A21'], curfew: 1500, ac: true, note: 'A longtime punk bar on the main strip, with a stage. Half the yearly DIY weekend is here, so the kids wait outside.' },
+    { id: 'mid-hall', kind: 'CLUB', hood: 'downtown', cap: 250, ages: ['A18'], curfew: 1380, ac: true, note: 'A mid-size hall for punk and touring bills. Eighteen and up, and nobody under eighteen without an adult.' },
+    { id: 'coffee-hall', kind: 'CLUB', hood: 'north-shore', cap: 200, ages: ['ALL'], curfew: 1380, ac: true, note: 'A coffee shop with a stage and a hall. All ages, and it said once it might close over money.' },
+    { id: 'lot-room', kind: 'DIY', hood: 'southside', cap: 150, curfew: 1350, ac: false, needs: ['VOUCH'], note: 'A small indoor-and-outdoor lot in the old warehouse blocks. The breweries and the apartments are crowding it.' },
+    { id: 'big-hall', kind: 'BIG', hood: 'downtown', cap: 1200, curfew: 1410, ac: true, note: 'The big all-ages concert hall that touring metalcore packs fill. It changed hands lately, and a local bill is a long way from it.' },
+    { id: 'skate-lot', kind: 'OUTDOOR', hood: 'brainerd', cap: 100, curfew: 1140, note: 'A skatepark or a shopping-center lot for a daytime show. The sun and a shop owner end it.' }
+  ],
+
+  contacts: ['knoxville-tn', 'huntsville-al', 'asheville-nc', 'nashville', 'atlanta'],
+
+  calendar: [
+    { id: 'triathlon', label: 'the triathlon', tag: 'race', month: 9, week: 4, dows: [6], can: [.85, .85, .88], hoods: ['downtown', 'red-bank', 'north-shore'], elsewhere: [1, .97, .97] },
+    { id: 'half-triathlon', label: 'the half triathlon', tag: 'race', month: 5, week: 3, dows: [6], can: [.90, .90, .92], hoods: ['downtown', 'red-bank', 'north-shore'], elsewhere: [1, 1, 1] },
+    { id: 'marathon', label: 'marathon weekend', tag: 'race', month: 3, week: 3, dows: [5, 6], can: [.92, .90, .90], hoods: ['downtown', 'north-shore'], elsewhere: [1, 1, 1] },
+    { id: 'friday-concerts', label: 'the free Friday concerts', tag: 'festival', month: 6, week: 2, dows: [4], can: [.88, .85, .85], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'diy-fest', label: 'the DIY punk fest', tag: 'festival', month: 6, week: 2, dows: [4, 5], can: [1.05, 1.10, 1.05], hoods: ['downtown'], elsewhere: [.95, .95, .95] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [.88, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [.88, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1320, weekend: 1440, inForce: false } },
 
   points: [
     { name: 'Atlanta', state: 'GA', lat: 33.75, lon: -84.39, pop: 6100000 },
@@ -75,5 +103,55 @@ SB.Cities.register('chattanooga-tn', {
     hood: ['the Southside', 'the North Shore', 'St. Elmo', 'Highland Park', 'Fort Wood', 'Glenwood', 'Alton Park', 'Red Bank', 'Hixson', 'East Ridge', 'Brainerd', 'Missionary Ridge', 'Lookout Mountain'],
     thing: ['carport', 'tall boy', 'sweet tea', 'meat and three', 'kudzu', 'foundry', 'incline', 'ridge road', 'church show', 'poster archive', 'pit', 'all-ages hall'],
     weather: ['afternoon thunderstorm', 'tornado watch', 'mountain fog', 'ice']
-  }
+  },
+
+  events: [
+    { id: 'CHATTANOOGA_TN_TRIATHLON_ROADS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 5], calendar: 'race' },
+      telegraph: 'The triathlon shuts the riverfront and US 27 from five in the morning.',
+      title: 'The roads are shut',
+      body: 'Race day closes every road to the riverfront and US 27 from dawn. The bands, the van and the crowd are on the wrong side of the river.',
+      options: [
+        { id: 'HALL', label: 'Move the bill to a church hall on the right side', likely: 'Smaller and quieter. The pastor will want it out by ten.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'A church hall took the bill. Everyone who could get there came.' },
+        { id: 'EARLY', label: 'Open early and tell everyone the back way', likely: 'Most get in before the closures bite.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
+          result: 'Doors an hour early. The ones who came used the back roads.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Many of them give up on the roads.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The closures held all day. Half the list never got across.' }
+      ] },
+
+    { id: 'CHATTANOOGA_TN_FRIDAY_TOWING', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3], calendar: 'festival' },
+      telegraph: 'The free concerts downtown fill every lot by six on Friday.',
+      title: 'The lots are full',
+      body: 'The free concerts downtown have taken every parking lot just as the bar night starts, and the tow trucks are working the side streets.',
+      options: [
+        { id: 'PARK', label: 'Tell everyone to park on the ridge and walk', likely: 'Costs some of the crowd.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'lateMin', v: 30 }],
+          result: 'Most of them walked down from the ridge. A few lost cars to the tow trucks anyway.' },
+        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The casual crowd stays home.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The lots stayed full. The regulars found a way.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'CHATTANOOGA_TN_DIY_FEST_SPLIT', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
+      if: { daysOut: [0, 4], months: [6] },
+      telegraph: 'The DIY weekend splits across a bar night and an all-ages night.',
+      title: 'The bar night shuts the kids out',
+      body: 'One of your bands is on the bar night, but its youngest member is under 21. The kids on your list can only get in to the all-ages night.',
+      options: [
+        { id: 'DOOR', label: 'Ask the bar to let the youngest member in', likely: 'Costs a favor. The band plays.',
+          effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: 1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
+          result: 'The bar let the kid in for the set, then out again. The band played well.' },
+        { id: 'SWAP', label: 'Swap the band to the all-ages night', likely: 'The bar night thins.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The band played the all-ages night and the kids packed the floor.' }
+      ] }
+  ]
 });

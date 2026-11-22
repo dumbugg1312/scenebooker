@@ -52,7 +52,36 @@ SB.Cities.register('oklahoma-city', {
     "oklahoma county",
     "braum's",
     "sonic drive-in",
-    "myriad gardens"
+    "myriad gardens",
+    "freepressokc",
+    "405 magazine",
+    "metrofamily",
+    "news9",
+    "news 9",
+    "okc fox",
+    "kgou",
+    "oklahoma today",
+    "oklahoma farm report",
+    "visit okc",
+    "visitokc",
+    "welcome to bricktown",
+    "oklahoma history center",
+    "oklahoma farm bureau",
+    "able commission",
+    "juneteenth on the east",
+    "pride on 39th",
+    "pride on 39th street",
+    "oklahoma city zoo",
+    "okc philharmonic",
+    "oklahoma city philharmonic",
+    "oklahoma city fair park",
+    "state fair park",
+    "festival of the arts",
+    "oklahoma city festival of the arts",
+    "pawnee bill",
+    "oklahoma free fall",
+    "downtown okc",
+    "oklahoma sooners football"
   ],
   "blocklist": [
     "the oklahoman*",
@@ -117,7 +146,8 @@ SB.Cities.register('oklahoma-city', {
       "name": "Moore",
       "minutes": 20,
       "bearing": 185,
-      "note": "A working-class suburb. Kids with older friends driving."
+      "note": "A working-class suburb. Kids with older friends driving.",
+      "scene": 80
     },
     {
       "id": "yukon",
@@ -134,7 +164,8 @@ SB.Cities.register('oklahoma-city', {
       "minutes": 25,
       "bearing": 10,
       "note": "A big suburb of kids. The first house shows in the metro were out here.",
-      "bands": 3
+      "bands": 3,
+      "scene": 80
     },
     {
       "id": "norman",
@@ -143,7 +174,8 @@ SB.Cities.register('oklahoma-city', {
       "minutes": 25,
       "bearing": 185,
       "note": "Students and house venues that come and go.",
-      "bands": 3
+      "bands": 3,
+      "scene": 80
     },
     {
       "id": "mustang",
@@ -246,19 +278,19 @@ SB.Cities.register('oklahoma-city', {
       "id": "moore-mwc",
       "name": "Moore and Midwest City",
       "note": "Working-class suburbs with military families and cheap garages.",
-      "route": "work-side"
+      "route": "town:moore"
     },
     {
       "id": "edmond-hood",
       "name": "Edmond",
       "note": "A big northern suburb of kids and rented houses.",
-      "route": "campus"
+      "route": "town:edmond"
     },
     {
       "id": "norman-hood",
       "name": "Norman",
       "note": "A college town south of the city. House venues come and go.",
-      "route": "campus"
+      "route": "town:norman"
     }
   ],
   "points": [
@@ -399,6 +431,572 @@ SB.Cities.register('oklahoma-city', {
           "result": "The warning lasted two hours. Most people went home to their own cellars."
         }
       ]
+    },
+    {
+      "id": "OKLAHOMA_CITY_NORMAN_CITATION",
+      "when": "WEEK",
+      "tier": "HARD",
+      "weight": 2,
+      "cooldown": 45,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          4
+        ]
+      },
+      "telegraph": "A neighbor in Norman has been counting the cars outside the house, and the city has a counting rule of its own.",
+      "title": "The third citation",
+      "body": "Your show runs long at the house in Norman, a neighbor calls it in, and it is the third citation this year. The city can shut off the water to a house that gets three.",
+      "options": [
+        {
+          "id": "STOP",
+          "label": "Stop at ten and send everyone home",
+          "likely": "The host is safe. A short night.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.85
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": -90
+            }
+          ],
+          "result": "You pulled the plug at ten. The host kept the water on, and the crowd grumbled home."
+        },
+        {
+          "id": "MOVE",
+          "label": "Move the bill to a bigger room",
+          "likely": "Costs trust with the host.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 0,
+              "toKind": "DIY",
+              "respect": false
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "capMul",
+              "v": 1.2
+            }
+          ],
+          "result": "A building on the south side took the bill. The house kept its water."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Run it and hope",
+          "likely": "If it goes long again, the host pays.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            },
+            {
+              "op": "MONEY",
+              "amount": -40
+            }
+          ],
+          "result": "It went long again. The host paid the fine, and you paid half."
+        }
+      ]
+    },
+    {
+      "id": "OKLAHOMA_CITY_FAIR_TRAFFIC",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 2,
+      "cooldown": 40,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          4
+        ],
+        "calendar": "fair"
+      },
+      "telegraph": "The state fair opens this week and the northwest is already one long line of brake lights.",
+      "title": "The fair has the road",
+      "body": "Fair weekend puts every family in the metro on the road to the fairgrounds, and the van is stuck in it on the way to load-in.",
+      "options": [
+        {
+          "id": "LATE",
+          "label": "Push doors back for the van",
+          "likely": "The crowd waits. A late start.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": 60
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.95
+            }
+          ],
+          "result": "Doors an hour late. The van finally crawled in with ten minutes to spare."
+        },
+        {
+          "id": "EARLY",
+          "label": "Start early and finish ahead of it",
+          "likely": "Most make it. The night starts thin.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": -60
+            }
+          ],
+          "result": "Doors early, the van took the back roads and made it."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Run it as planned",
+          "likely": "Kids are at the midway.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.8
+            }
+          ],
+          "result": "The kids were on the midway. The regulars came."
+        }
+      ]
+    },
+    {
+      "id": "OKLAHOMA_CITY_CANAL_CURFEW",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 1,
+      "cooldown": 50,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          3
+        ],
+        "months": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      "telegraph": "The strip by the canal has an early curfew for kids under eighteen, and the bill is late.",
+      "title": "Out by nine",
+      "body": "The outdoor show by the canal hits the nine o’clock curfew for unaccompanied minors. The kids have to leave before the headliner.",
+      "options": [
+        {
+          "id": "SWAP",
+          "label": "Flip the bill so the headliner goes first",
+          "likely": "The kids hear the best set. The rest is thin.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "qAdd",
+              "v": -1
+            }
+          ],
+          "result": "The headliner played at eight to a full crowd. After nine it was a quiet patio."
+        },
+        {
+          "id": "EARLY",
+          "label": "Start at five",
+          "likely": "Most make it. A long, hot afternoon.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": -120
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.85
+            }
+          ],
+          "result": "Doors at five. The kids heard everyone and were gone by nine."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Run it as planned and lose the kids",
+          "likely": "The early crowd leaves.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.7
+            }
+          ],
+          "result": "The kids were told to leave and did. The headliner played to the bar crowd."
+        }
+      ]
     }
-  ]
+  ],
+  "rooms": [
+    {
+      "id": "nw-bungalow",
+      "kind": "HOUSE",
+      "hood": "northwest",
+      "cap": 40,
+      "curfew": 1350,
+      "note": "A rented bungalow with a living-room stage and a back patio. The landlord and the neighbors are the only real threat.",
+      "start": true,
+      "pressure": 50
+    },
+    {
+      "id": "edmond-garage",
+      "kind": "HOUSE",
+      "hood": "edmond-hood",
+      "cap": 30,
+      "curfew": 1320,
+      "note": "A garage set on a small suburban lot for kids with a driver. The neighbors and the street rules are close.",
+      "pressure": 55
+    },
+    {
+      "id": "norman-living",
+      "kind": "HOUSE",
+      "hood": "norman-hood",
+      "cap": 60,
+      "curfew": 1380,
+      "note": "A student-run living space with an ID check and wristbands. One house here ran to 3:30 and lost its lease.",
+      "pressure": 60
+    },
+    {
+      "id": "opry-space",
+      "kind": "DIY",
+      "hood": "south-side",
+      "cap": 120,
+      "curfew": 1380,
+      "note": "A cheap old building on the south side that bands rent by the night. Rent and the fire marshal are the worry.",
+      "rent": 70,
+      "pressure": 55
+    },
+    {
+      "id": "plaza-patio",
+      "kind": "DIY",
+      "hood": "plaza",
+      "cap": 60,
+      "curfew": 1380,
+      "note": "A small all-ages room with a back patio and a punk streak. One bad neighbor from trouble.",
+      "rent": 50,
+      "pressure": 55
+    },
+    {
+      "id": "norman-coop",
+      "kind": "DIY",
+      "hood": "norman-hood",
+      "cap": 80,
+      "curfew": 1380,
+      "note": "A music space that shut for most of a year and came back run by young musicians. Money is the worry.",
+      "rent": 50,
+      "pressure": 50
+    },
+    {
+      "id": "karate-school",
+      "kind": "SHOP",
+      "hood": "south-side",
+      "cap": 50,
+      "curfew": 1320,
+      "note": "A karate school with the mats rolled to the wall. About seventy-five kids on and off, and a landlord who worries.",
+      "pressure": 50
+    },
+    {
+      "id": "rented-hall",
+      "kind": "HALL",
+      "hood": "moore-mwc",
+      "cap": 150,
+      "curfew": 1320,
+      "note": "A rented church or fraternal hall with a deposit and a rules sheet. All ages, out by ten.",
+      "deposit": 100
+    },
+    {
+      "id": "midtown-bar",
+      "kind": "BAR",
+      "hood": "midtown",
+      "cap": 100,
+      "curfew": 1500,
+      "note": "A stage in the back of a bar. Twenty-one and over, and a late start.",
+      "ages": [
+        "A21"
+      ]
+    },
+    {
+      "id": "nw-hall",
+      "kind": "CLUB",
+      "hood": "northwest",
+      "cap": 300,
+      "curfew": 1410,
+      "note": "A mid-size pro-level hall that is all ages unless it says otherwise. It leans to guaranteed draws over locals.",
+      "ages": [
+        "ALL"
+      ],
+      "owner": "TALENT_BUYER",
+      "needs": [
+        "FULL_BILL"
+      ]
+    },
+    {
+      "id": "western-club",
+      "kind": "CLUB",
+      "hood": "northwest",
+      "cap": 250,
+      "curfew": 1410,
+      "note": "The all-ages workhorse for punk, metal and hardcore, with a packed calendar. It stayed strong while the warehouses closed.",
+      "ages": [
+        "ALL"
+      ],
+      "owner": "TALENT_BUYER"
+    },
+    {
+      "id": "central-dive",
+      "kind": "CLUB",
+      "hood": "midtown",
+      "cap": 350,
+      "curfew": 1470,
+      "note": "A dive where the hardcore vets drink, with crowds from a hundred to five hundred. Older heads and heavy touring bills.",
+      "ages": [
+        "A18"
+      ],
+      "owner": "TALENT_BUYER"
+    },
+    {
+      "id": "plaza-theater",
+      "kind": "BIG",
+      "hood": "plaza",
+      "cap": 900,
+      "curfew": 1380,
+      "note": "A bigger theater for touring metal and hardcore. Costs push the bills toward safe draws.",
+      "ages": [
+        "ALL"
+      ]
+    },
+    {
+      "id": "canal-stage",
+      "kind": "OUTDOOR",
+      "hood": "bricktown",
+      "cap": 500,
+      "curfew": 1260,
+      "note": "An outdoor stage by the canal. Mostly tourists, and the minor curfew starts early.",
+      "outdoor": true,
+      "ac": false
+    }
+  ],
+  "contacts": [
+    "tulsa",
+    "wichita-ks",
+    "dallas",
+    "kansas-city"
+  ],
+  "calendar": [
+    {
+      "id": "state-fair",
+      "label": "the state fair",
+      "tag": "fair",
+      "month": 9,
+      "weeks": [
+        3,
+        4
+      ],
+      "dows": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.9,
+        0.88,
+        0.88
+      ]
+    },
+    {
+      "id": "pride-strip",
+      "label": "the Pride weekend",
+      "tag": "festival",
+      "month": 6,
+      "week": 1,
+      "dows": [
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.92,
+        0.9,
+        0.9
+      ],
+      "hoods": [
+        "midtown"
+      ],
+      "elsewhere": [
+        1,
+        1,
+        0.97
+      ]
+    },
+    {
+      "id": "juneteenth",
+      "label": "the Juneteenth festival",
+      "tag": "festival",
+      "month": 6,
+      "week": 3,
+      "dows": [
+        3,
+        4,
+        5
+      ],
+      "can": [
+        0.95,
+        0.93,
+        0.93
+      ]
+    },
+    {
+      "id": "fourth-week",
+      "label": "the Fourth of July week",
+      "tag": "holiday",
+      "month": 7,
+      "week": 1,
+      "dows": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.9,
+        0.92,
+        0.92
+      ]
+    },
+    {
+      "id": "diy-weekend",
+      "label": "the DIY festival weekend",
+      "tag": "festival",
+      "month": 8,
+      "week": 4,
+      "dows": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "can": [
+        1.05,
+        1.05,
+        1
+      ],
+      "hoods": [
+        "plaza",
+        "midtown"
+      ],
+      "elsewhere": [
+        0.97,
+        0.97,
+        0.97
+      ]
+    },
+    {
+      "id": "football-sep",
+      "label": "home football",
+      "tag": "game",
+      "month": 9,
+      "weeks": [
+        1,
+        5
+      ],
+      "dows": [
+        5
+      ],
+      "can": [
+        0.85,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "football-oct",
+      "label": "home football",
+      "tag": "game",
+      "month": 10,
+      "weeks": [
+        1,
+        5
+      ],
+      "dows": [
+        5
+      ],
+      "can": [
+        0.85,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "halloween",
+      "label": "Halloween weekend",
+      "tag": "holiday",
+      "month": 10,
+      "weeks": [
+        4,
+        5
+      ],
+      "dows": [
+        4,
+        5
+      ],
+      "can": [
+        1.08,
+        1.05,
+        1
+      ]
+    },
+    {
+      "id": "thanksgiving-eve",
+      "label": "the night before Thanksgiving",
+      "tag": "holiday",
+      "month": 11,
+      "week": 4,
+      "dows": [
+        2
+      ],
+      "can": [
+        1.05,
+        1.15,
+        1.1
+      ]
+    }
+  ],
+  "rules": {
+    "curfewMinors": {
+      "weeknight": 1440,
+      "weekend": 1500,
+      "inForce": true
+    }
+  }
 });

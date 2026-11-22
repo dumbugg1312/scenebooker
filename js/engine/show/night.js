@@ -16,7 +16,7 @@ SB.module('Night', function (SB) {
   var E = SB.Enums, C = SB.Config, CH = C.CHANNELS, EMPTY = [];
   var ORDER = ['SHOW_RESULT', 'LEDGER', 'LUCK', 'COMMENT', 'LEARNED', 'DRAW', 'TRUST', 'REGULARS', 'NAME', 'WORD', 'MEMORY', 'STAGE', 'FIRST'];
   var LEARNED_MAX = 6;
-  var SETTLE_ORDER = ['ROOM', 'SOUND', 'SECURITY', 'HOST', 'GUARANTEE', 'LOCAL', 'SHARE', 'INSURANCE', 'DAMAGES', 'COSTS', 'YOU'];
+  var SETTLE_ORDER = ['ROOM', 'DEPOSIT', 'SOUND', 'SECURITY', 'HOST', 'GUARANTEE', 'LOCAL', 'SHARE', 'INSURANCE', 'DAMAGES', 'COSTS', 'YOU'];
 
   function num(v, d) { return (typeof v === 'number' && v === v && v !== Infinity && v !== -Infinity) ? v : d; }
   function clamp(x, lo, hi) { return x < lo ? lo : (x > hi ? hi : x); }
@@ -261,8 +261,10 @@ SB.module('Night', function (SB) {
     push(records, has('Director', 'resolve') ? SB.Director.resolve(state, dec, answer.optionId) : []);
     if (!show.night) { log(state, records); return { records: records, stop: { kind: 'SETTLE', showId: showId } }; }   // the option ended the show
     night.choices.push({ decisionId: dec.id, eventId: dec.eventId || null, optionId: answer.optionId, text: opt.label || '' });
-    if (night.dispute && night.dispute.decision === dec) {
-      night.dispute.answered = true; night.at = { kind: 'SETTLE', showId: showId };
+    /* compare by id: after a reload the dispute's decision is a copy, not the same object. A decision after the night ended is never an ordinary stop. */
+    if (night.ended || (night.dispute && night.dispute.decision && night.dispute.decision.id === dec.id)) {
+      if (night.dispute) night.dispute.answered = true;
+      night.at = { kind: 'SETTLE', showId: showId };
       step = { records: records, stop: night.at };
     } else {
       night.idx += 1;
@@ -315,11 +317,11 @@ SB.module('Night', function (SB) {
     if (room.kind === 'CLUB') {
       hc = Math.min(G, num(terms.houseCosts, 0));
       rentDue = hc + Math.round((1 - clamp(num(terms.split, 1), 0, 1)) * Math.max(0, G - hc));
-    } else if (room.kind !== 'HOUSE' && room.kind !== 'BAR' && num(terms.rent, 0) > 0) {
-      dep = spentOn(state, show, ['DEPOSIT']).reduce(function (a, l) { return a + l.amount; }, 0);
-      rentDue = Math.max(0, num(terms.rent, 0) - dep);
-    }
-    if (rentDue > 0) add('ROOM', room.ownerId, rentDue);
+    } else if (room.kind !== 'HOUSE' && room.kind !== 'BAR' && num(terms.rent, 0) > 0) rentDue = Math.round(num(terms.rent, 0));
+    /* a deposit already paid is not part of the split: the full rent comes off the top and the deposit comes back to the player.
+     * Ledger lines carry the show, not the room, so every deposit held for this show counts. */
+    dep = depositHeld(state, show);
+    if (rentDue > 0) { x = add('ROOM', room.ownerId, rentDue); if (dep > 0 && dep <= rentDue && SB.text.has('strings.settle.ROOM_DEP')) x.label = SB.text.label('settle.ROOM_DEP', { rent: rentDue, dep: dep }); }
     amt = show.crew && show.crew.sound ? crewPay(state, show, 'sound') : Math.round(num(terms.soundFee, 0));
     if (amt > 0) add('SOUND', (show.crew && show.crew.sound) || room.ownerId, amt);
     amt = crewPay(state, show, 'security');
@@ -401,16 +403,19 @@ SB.module('Night', function (SB) {
       extra = (slots.length - (ts ? 1 : 0)) > 0 ? clamp(Math.round(num(choice.extraToLocals, 0)), 0, keep) : 0; keep -= extra;
     }
     if (ts && tFix + tGive + gas > 0) add('SHARE', ts.bandId, tFix + tGive + gas, tFix > 0).paid = tFix + tGive + gas;
+    /* every share line says whose it is: a local's cut used to read "the touring band's share" too */
+    function shareOf(id) { var bd = state.bands && state.bands[id]; return bd && bd.name ? SB.text.label('settle.SHARE_OF', { band: bd.name }) : null; }
     x = lGive + extra;
     if (x > 0) {
       b = shareLocals.length ? shareLocals : slots.filter(function (q) { return q.role !== 'TOURING'; }).map(function (q) { return q.bandId; });
-      b.forEach(function (id, j) { var part = Math.floor(x / b.length) + (j < x % b.length ? 1 : 0); if (part > 0) add('SHARE', id, part, false).paid = part; });
+      b.forEach(function (id, j) { var part = Math.floor(x / b.length) + (j < x % b.length ? 1 : 0); if (part > 0) { var sl = add('SHARE', id, part, false); sl.paid = part; sl.label = shareOf(id) || sl.label; } });
     }
     costs = spentOn(state, show, ['PRINT', 'PROMO', 'FOOD', 'HELPER', 'FLYER', 'MOTEL']);
     costs.forEach(function (c) { costSum += c.amount; });
     /* event insurance, bought when the date confirmed, and the damages of a serious incident: the insurance pays them, or you do */
     ins = spentOn(state, show, ['INSURANCE']).reduce(function (a, c) { return a + c.amount; }, 0);
     if (ins > 0) add('INSURANCE', null, ins).paid = 0;
+    if (dep > 0) add('DEPOSIT', null, dep).paid = dep;      // back to the player, outside the split: not from the box
     dmg = night.damages && num(night.damages.amount, 0) > 0 ? night.damages : null;
     if (dmg) { x = add('DAMAGES', room.ownerId, dmg.amount); x.paid = 0; x.insured = !!dmg.insured; if (dmg.insured) x.label = SB.text.label('settle.DAMAGES_COVERED'); }
     dmgOwed = dmg && !dmg.insured ? dmg.amount : 0;
@@ -429,11 +434,32 @@ SB.module('Night', function (SB) {
              custom: custom, keepMax: keepMax, fairMax: Math.floor(C.SPLIT.FAIR_SHARE * left), keep: keep, shortfall: shortfall, chosen: gap > 0 ? sf : null,
              pocket: pocket, unpaid: unpaid, short: short, touringAgreed: ts ? tDeal + tFix : 0,
              touringBand: ts ? ts.bandId : null, fixed: fixed, tFix: tFix, costs: costs, costSum: costSum, playerNet: keep - costSum - pocket - ins - dmgOwed, hatAdded: sf === 'HAT' && gap > 0 ? hatAmt : 0,
-             insurance: ins, damages: dmg ? dmg.amount : 0, damagesOwed: dmgOwed };
+             insurance: ins, damages: dmg ? dmg.amount : 0, damagesOwed: dmgOwed, depBack: dep };
+  }
+
+  /* the deposit paid for this show and not yet given back */
+  function depositHeld(state, show) {
+    var led = (state.money && state.money.ledger) || EMPTY, i, t = 0;
+    for (i = 0; i < led.length; i++) if (led[i].showId === show.id && led[i].cat === 'DEPOSIT') t -= led[i].amount;
+    return Math.max(0, Math.round(t));
   }
 
   function emptyView() {
     return { door: { paid: 0, price: 0, gross: 0, hat: 0 }, lines: [], gap: 0, shortfall: [], left: 0, split: { custom: [0, 0, 0], keepMax: 0, fairMax: 0 }, dispute: null };
+  }
+
+  /* each shortfall answer's outcome, figured as if chosen (figure changes nothing): who gets what, and what you pay */
+  function previewShortfall(state, show, f) {
+    return f.shortfall.map(function (o) {
+      var p, g, sum = function (test) { return p.lines.reduce(function (a, l) { return a + (test(l) ? num(l.paid, 0) : 0); }, 0); };
+      o = SB.util.copy(o);
+      if (!o.enabled) return o;
+      p = figure(state, show, { shortfall: o.k });
+      g = function (l) { return !!p.touringBand && l.toId === p.touringBand && (l.k === 'GUARANTEE' || l.k === 'SHARE'); };
+      o.preview = { pocket: p.pocket, unpaid: p.unpaid, hat: p.hatAdded, touring: p.touringBand ? sum(g) : null,
+                    locals: sum(function (l) { return l.k === 'LOCAL'; }), room: sum(function (l) { return l.k === 'ROOM'; }) };
+      return o;
+    });
   }
 
   function settleView(state, showId) {
@@ -441,14 +467,14 @@ SB.module('Night', function (SB) {
     if (!night || !night.demand || !roomOf(state, show)) return emptyView();
     f = figure(state, show, night.shortfall ? { shortfall: night.shortfall } : null);
     return { door: { paid: f.out.paid, price: door.donation ? num(door.suggested, 0) : num(door.price, 0), gross: f.gross, hat: f.hat },
-             lines: f.lines.map(function (l) { return { k: l.k, label: l.label, toId: l.toId, amount: l.amount, agreed: l.agreed, disputed: l.disputed }; }),
-             gap: f.gap, shortfall: f.shortfall, left: f.left, split: { custom: f.custom, keepMax: f.keepMax, fairMax: f.fairMax, fixed: f.fixed },
+             lines: f.lines.map(function (l) { return { k: l.k, label: l.label, toId: l.toId, amount: l.amount, paid: NOT_FROM_THE_BOX[l.k] ? l.amount : l.paid, agreed: l.agreed, disputed: l.disputed }; }),
+             gap: f.gap, shortfall: f.gap > 0 ? previewShortfall(state, show, f) : f.shortfall, left: f.left, split: { custom: f.custom, keepMax: f.keepMax, fairMax: f.fairMax, fixed: f.fixed },
              net: f.playerNet,
              dispute: night.dispute && !night.dispute.answered ? night.dispute.decision : null };
   }
 
   var LINE_CAT = { ROOM: 'ROOM', SOUND: 'SOUND', SECURITY: 'SECURITY', HOST: 'HOST', GUARANTEE: 'TOURING', LOCAL: 'LOCAL' };
-  var NOT_FROM_THE_BOX = { YOU: 1, COSTS: 1, INSURANCE: 1, DAMAGES: 1 };   // settle lines the cash box does not pay
+  var NOT_FROM_THE_BOX = { YOU: 1, COSTS: 1, INSURANCE: 1, DAMAGES: 1, DEPOSIT: 1 };   // settle lines the cash box does not pay
 
   function settle(state, showId, choice) {
     var show = showOf(state, showId, 'Night.settle'), night = show.night, records = [], f, i, l, cat, running, res, ts, S = C.SHORTFALL, slots, acc, tTotal = 0, paidTo = {}, room, b, tr, memo;
@@ -463,6 +489,7 @@ SB.module('Night', function (SB) {
     if (has('Money', 'earn')) {
       if (f.gross > 0) SB.Money.earn(state, f.gross, show.door && show.door.donation ? 'HAT' : 'DOOR', memo, { showId: showId });
       if (f.hat > 0) SB.Money.earn(state, f.hat, 'HAT', memo, { showId: showId });
+      if (f.depBack > 0) SB.Money.earn(state, f.depBack, 'DEPOSIT', memo, { showId: showId });   // the deposit comes back, outside the split
     }
     if (num(night.theft, 0) > 0 && has('Money', 'spend')) SB.Money.spend(state, Math.round(night.theft), 'THEFT', memo, { showId: showId });
     running = f.G;
@@ -477,7 +504,7 @@ SB.module('Night', function (SB) {
       }
       running -= l.paid;
       if (l.toId) paidTo[l.toId] = (paidTo[l.toId] || 0) + l.paid;
-      records.push(rec(show, 'SETTLE_LINE', '', { k: l.k, label: l.label, toId: l.toId, amount: l.paid, running: Math.max(0, running) }));
+      records.push(rec(show, 'SETTLE_LINE', '', { k: l.k, label: l.label, toId: l.toId, amount: l.paid, owed: l.amount, running: Math.max(0, running) }));
     }
     /* uninsured damages come out of your own pocket */
     if (f.damagesOwed > 0 && has('Money', 'spend')) SB.Money.spend(state, f.damagesOwed, 'DAMAGES', memo, { showId: showId });
@@ -497,7 +524,8 @@ SB.module('Night', function (SB) {
     if (f.hatAdded > 0) night.hatPassed = true;
     /* the split of what was left (only where the deal fixed no share of it) */
     night.splitTrust = 0;
-    if (f.left > 0 && !f.fixed) {
+    /* only a keep the player chose is judged: a shortfall answer leaves what the hat raised past the gap with them */
+    if (f.left > 0 && !f.fixed && typeof choice.keep === 'number') {
       if (f.keep === 0) {
         slots.forEach(function (s) { push(records, [SB.Bands.addTrust(state, s.bandId, 'GAVE_ALL', { showId: showId })]); });
         if (has('Territory', 'adjustWord')) push(records, [SB.Territory.adjustWord(state, C.SPLIT.takeNothing.word, 'GAVE_ALL')]);

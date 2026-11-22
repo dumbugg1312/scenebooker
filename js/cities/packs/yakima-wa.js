@@ -1,8 +1,8 @@
 SB.Cities.register('yakima-wa', {
   v: 1,
   slug: 'yakima-wa',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
-  banned: ['yakima valley college', 'heritage university', 'central washington university', 'cwu', 'pacific northwest university of health sciences', 'yakima training center',
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
+  banned: ['yakima edge fest', 'edge fest', 'katsfm', 'kats fm', 'newstalkkit', 'newstalk kit', 'visit yakima', 'yakima valley tourism', 'yakima police', 'commonfest', 'common ground concert series', 'downtown summer nights', 'yakima cinco de mayo cultural festival', 'songkick', 'bandsintown', 'spokesman-review', 'nwpb', 'interlochen', 'yakima valley college', 'heritage university', 'central washington university', 'cwu', 'pacific northwest university of health sciences', 'yakima training center',
            'yakima herald-republic', 'herald-republic', 'whirlpool', 'seahawks', 'seattle seahawks', 'fresh hop ale festival', 'fresh-hop ale festival', 'folklife festival',
            'central washington state fair', 'state fair park', 'ellensburg rodeo', 'toppenish pow wow', 'pow-wow', 'fiestas patrias', 'palm springs of washington', 'yakistan',
            'yakama', 'yakama nation', 'vfw', 'eagles', 'elks', 'grange', 'washington state liquor and cannabis board', 'liquor and cannabis board', 'amtrak', 'wsdot',
@@ -27,7 +27,11 @@ SB.Cities.register('yakima-wa', {
     { id: 'city', kind: 'CITY', name: 'Yakima' },
     { id: 'selah', kind: 'FEEDER', name: 'Selah', minutes: 10, bearing: 355, note: 'An orchard commuter town just north; a source of garage bands.' },
     { id: 'union-gap', kind: 'FEEDER', name: 'Union Gap', minutes: 10, bearing: 180, note: 'The retail city to the south: big-box lots and light-industrial units, no scene of its own.' },
-    { id: 'moxee', kind: 'FEEDER', name: 'Moxee', minutes: 15, bearing: 95, note: 'Hop country and barn-show territory.' },
+    { id: 'moxee', kind: 'FEEDER', name: 'Moxee', minutes: 15, bearing: 95, note: 'Hop country and barn-show territory.', scene: 50,
+      rooms: [
+        { id: 'hop-barn', kind: 'DIY', hood: 'moxee-hood', zone: 'moxee', cap: 80, pa: .4, curfew: 1320, ac: false, outdoor: false, pressure: 45,
+          note: 'A barn out in the hops, fifteen minutes from the city. Far from the neighbors and far from a ride.' }
+      ] },
     { id: 'naches', kind: 'FEEDER', name: 'Naches', minutes: 20, bearing: 300, note: 'A tiny foothill orchard town on the road toward the pass.' },
     { id: 'wapato', kind: 'FEEDER', name: 'Wapato', minutes: 20, bearing: 150, note: 'A small farm town with a tight-knit rock and metal crowd.' },
     { id: 'toppenish', kind: 'FEEDER', name: 'Toppenish', minutes: 25, bearing: 190, note: 'A small town of murals and a branch college, with some scene overlap.' },
@@ -47,10 +51,50 @@ SB.Cities.register('yakima-wa', {
     { id: 'nob-hill', name: 'Nob Hill Boulevard and the college strip', route: 'campus', note: 'Strip-mall cheap: chain restaurants, auto shops, shop-bay practice rooms and church halls.' },
     { id: 'terrace-heights', name: 'Terrace Heights', route: 'work-side', note: 'A quiet bluff suburb across the river; easy to be stuck over the bridge with no ride.' },
     { id: 'northwest', name: 'the northwest side and Fruitvale', route: 'old-side', note: 'Older houses with real basements near the river trails. Slowly gentrifying.' },
-    { id: 'warehouses', name: 'the rail warehouses', route: 'work-side', note: 'Leftover fruit warehouses near the tracks: the best DIY space if the landlords stay indifferent.' }
+    { id: 'warehouses', name: 'the rail warehouses', route: 'work-side', note: 'Leftover fruit warehouses near the tracks: the best DIY space if the landlords stay indifferent.' },
+    { id: 'fairgrounds', name: 'the fairgrounds', route: 'work-side', note: 'The grandstand and expo halls west of downtown. Quiet all year except for the fair, when it eats the traffic.' },
+    { id: 'moxee-hood', name: 'Moxee', route: 'town:moxee', note: 'Hop country out east: barns, pole sheds and a long dark road home.' }
   ],
 
-  contacts: ['kennewick-wa', 'spokane-wa'],
+  rooms: [
+    { id: 'west-valley-garage', kind: 'HOUSE', hood: 'west-valley', cap: 40, hostCut: 0, pa: .4, curfew: 1320, ac: false, outdoor: false, pressure: 55, start: true,
+      note: 'A big garage on an orchard-edge lot with a borrowed PA. Out by ten, and half the kids need a ride home.' },
+    { id: 'northwest-basement', kind: 'HOUSE', hood: 'northwest', cap: 50, hostCut: 0, pa: .4, curfew: 1320, ac: false, outdoor: false, pressure: 50,
+      note: 'An old house near the river trails with a real basement, the one true basement in town. The block is slowly getting nicer.' },
+    { id: 'southeast-yard', kind: 'HOUSE', hood: 'southeast', cap: 60, hostCut: 0, pa: .4, curfew: 1380, ac: false, outdoor: true, pressure: 55,
+      note: 'A backyard on the Southeast side where punk bands share the night with cumbia and norteño. Loud, friendly, and one noise call from over.' },
+    { id: 'rail-warehouse', kind: 'DIY', hood: 'warehouses', cap: 120, pa: .5, curfew: 1380, ac: false, pressure: 55,
+      note: 'A leftover fruit warehouse by the tracks. The best room you can get, as long as the landlord stays indifferent.' },
+    { id: 'music-hall', kind: 'CLUB', hood: 'downtown', cap: 250, ages: ['ALL', 'A21'], curfew: 1380, ac: true, pressure: 40,
+      note: 'The all-ages music hall on the main avenue, with the bar walled off. It has already lost one building and nobody is sure about the next.' },
+    { id: 'downtown-bar', kind: 'BAR', hood: 'downtown', cap: 150, ages: ['A21'], curfew: 1500, ac: true,
+      note: 'A pizza-and-beer room with a stage that books the rock nights the all-ages hall cannot. Every new bar like it squeezes the kids out.' },
+    { id: 'strip-hall', kind: 'HALL', hood: 'nob-hill', cap: 200, ages: ['ALL'], curfew: 1350, ac: true,
+      note: 'A strip-mall music room out on the boulevard. Cheap and all ages, until the landlord leases the unit to someone else.' },
+    { id: 'bay-shop', kind: 'SHOP', hood: 'nob-hill', cap: 40, ages: ['ALL'], curfew: 1290, ac: false,
+      note: 'An auto-shop bay with the door rolled up. Cold in winter, and over by half past nine.' },
+    { id: 'street-series', kind: 'OUTDOOR', hood: 'downtown', cap: 600, ages: ['ALL'], curfew: 1260, rent: 25,
+      note: 'The downtown street where the city runs its free summer evenings. Not a punk room, but a one-off slot for a night.' },
+    { id: 'fairgrounds', kind: 'BIG', hood: 'fairgrounds', cap: 1500, ages: ['ALL'], curfew: 1380, ac: true,
+      note: 'The grandstand and expo halls at the fairgrounds. Touring acts only; nothing a new booker can rent.' }
+  ],
+
+  contacts: ['kennewick-wa', 'spokane-wa', 'seattle', 'portland'],
+
+  calendar: [
+    { id: 'state-fair-sep', label: 'the state fair', tag: 'fair', month: 9, weeks: [4, 5], dows: [4, 5, 6], can: [0.85, 0.85, 0.9], hoods: ['fairgrounds'], elsewhere: [.93,.9,.9] },
+    { id: 'state-fair-oct', label: 'the state fair', tag: 'fair', month: 10, week: 1, dows: [4, 5, 6], can: [0.88, 0.88, 0.9] },
+    { id: 'fresh-hop', label: 'the fresh-hop beer festival', tag: 'festival', month: 10, week: 2, dows: [5], can: [0.95, 0.9, 0.9], hoods: ['downtown'], elsewhere: [1,1,1] },
+    { id: 'cinco', label: 'the spring street festival', tag: 'festival', month: 5, week: 1, dows: [4, 5, 6], can: [0.9, 0.88, 0.9], hoods: ['southeast', 'downtown'], elsewhere: [1,1,1] },
+    { id: 'summer-thursdays', label: 'the free summer concerts', tag: 'festival', month: 7, week: 2, dows: [3], can: [0.88, 0.95, 1], hoods: ['downtown'], elsewhere: [1,1,1] },
+    { id: 'metal-day', label: 'the metal and punk festival day', tag: 'festival', month: 10, week: 1, dows: [5], can: [1.05, 1.05, 1], hoods: ['downtown'], elsewhere: [.95,.95,.95] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 2], dows: [4], can: [0.85, 0.95, 0.95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [2, 3], dows: [4], can: [0.85, 0.95, 0.95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.1] }
+  ],
+
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1410, weekend: 1440, inForce: false } },
 
   points: [
     { name: 'Seattle', state: 'WA', lat: 47.61, lon: -122.33, pop: 4000000 },
@@ -67,5 +111,58 @@ SB.Cities.register('yakima-wa', {
     hood: ['Terrace Heights', 'West Valley', 'Fruitvale', 'the Gap', 'Union Gap', 'Selah', 'Moxee'],
     thing: ['hop kiln', 'fruit bin', 'packing shed', 'espresso stand', 'taco truck', 'orchard row', 'wildfire smoke', 'generator', 'space heater', 'sagebrush ridge'],
     weather: ['wildfire smoke', 'heat wave', 'pass closure']
-  }
+  },
+
+  events: [
+    { id: 'YAKIMA_WA_SMOKE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [7, 8, 9] },
+      telegraph: 'The sky has gone orange and the air tastes like a campfire. The yard show is still on the flyer.',
+      title: 'The smoke settles in the valley',
+      body: 'A wildfire to the west has parked its smoke over the whole valley. Your yard show in West Valley is outdoors, the air is bad, and half of your list has asthma.',
+      options: [
+        { id: 'GARAGE', label: 'Squeeze the show into a garage with the door shut', likely: 'Hot and loud and close. The ones who come really want to.',
+          effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }],
+          result: 'A space heater in July, a garage, and one open crack of door. Sweaty, tight and packed.' },
+        { id: 'ACCEPT', label: 'Run it in the yard and hand out masks', likely: 'The kids who can handle it show up. The rest stay in.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'A thinner crowd in dusty orange light. Nobody stayed long.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, and the smoke may not clear.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The air was better, the crowd was not.' }
+      ] },
+
+    { id: 'YAKIMA_WA_PASS_CLOSED', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [11, 12, 1, 2, 3] },
+      telegraph: 'The pass is closing with the snow, and the western band is on the wrong side of it.',
+      title: 'Snow shuts the pass',
+      body: 'The band from the coast was due over the mountains today. The road is closed and the bill has a hole in the middle.',
+      options: [
+        { id: 'LOCALS', label: 'Rebuild the bill from valley kids and the college town', likely: 'A shorter, scrappier night. Whoever can drive here, will.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'Three garage bands and a friend of a friend. The room was loose and loud.' },
+        { id: 'WAIT', label: 'Hold the doors and hope the road reopens', likely: 'A late start. The crowd waits in the cold.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The van rolled in at ten. You started late and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could make it, did.' }
+      ] },
+
+    { id: 'YAKIMA_WA_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'The fair is in town and every kid you know is on a ride.',
+      title: 'The fair eats the weekend',
+      body: 'The all-ages hall has lost another building, the fairgrounds are lit up across town, and the traffic into downtown is a crawl.',
+      options: [
+        { id: 'YARD', label: 'Move the show to a yard on the Southeast side', likely: 'Smaller, closer, and away from the traffic.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
+          result: 'A backyard took the bill with an hour to spare.' },
+        { id: 'LATE', label: 'Push doors back until the fair crowd thins out', likely: 'The crowd that wants a night out shows up late.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Doors an hour late. The ones who came were glad to sit down.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list is at the fair.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The kids who wanted the fair went to the fair.' }
+      ] }
+  ]
 });

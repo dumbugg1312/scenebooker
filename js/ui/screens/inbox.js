@@ -958,7 +958,7 @@
         });
         return h('div', { class: 'ph-fringe ph-dock', role: 'group', aria: { label: d.title || L('reply') }, on: { keydown: function (e) {
           var n = parseInt(e.key, 10), o = (d.options || [])[n - 1];
-          if (o && o.enabled !== false && n >= 1 && n <= 4) { e.preventDefault(); act(function (x) { return SB.Week.decide(x, d.id, o.id); }); }
+          if (o && o.enabled !== false && n >= 1 && n <= 4) { e.preventDefault(); e.stopPropagation(); act(function (x) { return SB.Week.decide(x, d.id, o.id); }); }
         } } }, tabs);
       }
       if (ask) {

@@ -9,8 +9,8 @@
  * page: the shows coming up, the answers you are waiting on, what is on the phone.
  * One sign per kind of action (2b): a tear-off tab chooses or acts, a drawn box ticks, a label strip opens. Reading
  * matter carries none of them. The city's hot ink is only for what needs the player now.
- * Time: the turn is one evening. The engine stops at each evening (E.STOP.EVENING); CALL IT A NIGHT (the tape deck on
- * the desk, or the tab under tonight's clock here) is Week.endNight, and the play loop below then plays the night out:
+ * Time: the turn is one evening. The engine stops at each evening (E.STOP.EVENING); CALL IT A NIGHT (on the pinned
+ * clock, js/ui/nightclock.js: the one place a night is called) is Week.endNight, and the play loop below then plays it out:
  * the show if there is one, the evening send, the next morning, up to the next evening, a decision, a show night or
  * the end of the week. A decision arrives as a note slapped on top with its choices as tear-off tabs showing their
  * costs. The loop also runs while this screen is mounted hidden at the desk (js/desk/scene.js).
@@ -77,8 +77,6 @@
     dayLog: 'What happened on {day}',
     moreLines: '+{n} more',
     closeWeek: 'tear off the week',
-    callNight: 'call it a night',
-    callNightSay: 'Call it a night: the night plays out to tomorrow evening',
     burnt: 'You\'re burnt out. The days are handed over.',
     running: 'the night plays out. the tape deck pauses it.',
     replyTitle: 'An answer came back',
@@ -382,10 +380,10 @@
       ]);
     }
 
-    /** The head: the week, the next show, the heads-up; tonight's clock with CALL IT A NIGHT under it (or, at the end of
-     *  the week, the tab that tears the week off). */
+    /** The head: the week, the next show, the heads-up; at the end of the week, the tab that tears the week off.
+     *  Tonight's clock and CALL IT A NIGHT are the pinned clock's (js/ui/nightclock.js). */
     function head(s, v) {
-      var stop = s.clock.stop, endOfWeek = stop && stop.kind === 'END_OF_WEEK', t = v.tonight, evening = !!(t && t.open),
+      var stop = s.clock.stop, endOfWeek = stop && stop.kind === 'END_OF_WEEK',
           from = s.clock.week * 7, to = from + 6, same = SB.time.month(from) === SB.time.month(to),
           range = SB.time.fmt(from, 'md') + '-' + (same ? SB.time.date(to).d : SB.time.fmt(to, 'md'));
       var nx = nextShow(s);
@@ -401,9 +399,7 @@
           h('ul', null, v.risks.slice(0, 3).map(function (r) { return r.text ? h('li', { text: r.text }) : null; }))
         ]) : null,
         h('div', { class: 'cc-tonight' }, [
-          v.phase === 'PLAY' && t && SB.Clock ? SB.Clock.slip(s, { tonight: t, list: v.crunch || [], crunch: 2, hot: HOT }) : null,
           running ? h('p', { class: 'cc-run', text: L('running') }) : null,
-          evening && !running ? tab({ label: L('callNight'), say: L('callNightSay'), hot: t.left <= 0, fk: 'callnight', tut: 'week-night', cls: 'cc-tab--big', n: false, on: callNight }) : null,
           endOfWeek && v.phase === 'PLAY' ? tab({ label: L('closeWeek'), hot: true, fk: 'closeweek', tut: 'week-play', cls: 'cc-tab--big', on: closeWeek }) : null
         ])
       ]);
@@ -479,7 +475,7 @@
                stay: { max: over, used: over, left: 0 }, show: d.shows.length > 0, off: !d.shift || d.dropped };
     }
     function dayWord(t) {
-      var w = t.show ? L('showDay') : L(t.off ? 'off' : 'work', { h: SB.Clock ? SB.Clock.cost(t.cap) || '0' : t.cap });
+      var w = t.show ? L('showDay') : L(t.off ? 'off' : 'work', { h: SB.Clock ? SB.Clock.span(t) : t.cap });
       return w + (t.tired > 0 ? ' · ' + L('tired') : '');
     }
 
@@ -502,7 +498,7 @@
         ]),
         h('div', { class: 'cc-dayhrs', aria: { hidden: 'true' } }, [
           h('span', { class: 'cc-dayword' + (t.show ? ' is-show' : ''), text: dayWord(t) }),
-          SB.Clock ? SB.Clock.boxes(t, { hot: HOT, say: false }) : null
+          SB.Clock ? SB.Clock.ruler(t, { hot: HOT, mini: true, say: false }) : null
         ]),
         h('div', { class: 'cc-dbody' }, [
           shiftOn ? h('div', { class: 'cc-work' }, [
@@ -625,11 +621,6 @@
       id = r.jobId;
       d = doNow(id);
       if (!d || d.ok === false) act(function (x) { return SB.Week.removeJob(x, id); });
-    }
-
-    function callNight() {
-      var r = act(function (x) { return SB.Week.endNight(x); });
-      if (r && r.ok !== false) { userPaused = false; resume(); }
     }
 
     /* ---------------- the pad of notes, on the table beside the page ---------------- */
@@ -878,7 +869,8 @@
           jv.showId && s.shows[jv.showId] ? h('span', { class: 'cc-note-thumb' }, flyerThumbOnly(s, jv.showId, 36)) : null,
           h('span', null, [hand(jv.label || '', 17, { max: 260 }), sub ? h('span', { class: 'cc-note-who', text: sub }) : null])
         ]),
-        SB.Clock ? SB.Clock.slip(s, { crunch: 0, hot: HOT, extra: r.ok ? r.hours : 0 }) : null,
+        /* the note is held over everything (the pinned clock too): its own ruler shows what doing it tonight takes */
+        (function () { var tn = SB.Clock ? safe(function () { return SB.Week.tonight(s); }, null) : null; return tn ? SB.Clock.ruler(tn, { hot: HOT, extra: r.ok ? r.hours : 0, cls: 'cc-held-ruler' }) : null; })(),
         h('div', { class: 'cc-held-row' }, [
           (function () { var d = SB.Clock ? SB.Clock.due(jv, { today: s.clock.day }) : null; return d ? h('span', { class: 'cc-note-due' + (d.late ? ' is-late' : ''), text: d.text }) : null; })(),
           jv.window && jv.window.label && jv.window.state !== 'LATE' ? h('span', { class: 'cc-held-win cc-held-win--' + String(jv.window.state || '').toLowerCase(), text: jv.window.label }) : null

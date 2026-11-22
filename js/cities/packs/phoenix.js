@@ -7,7 +7,9 @@ SB.Cities.register('phoenix', {
            'arizona coyotes', 'phoenix mercury', 'mlb spring training', 'super bowl', 'waste management phoenix open', 'phoenix open', 'arizona state fair',
            'first friday', 'tempe festival of the arts', 'luke air force base', 'intel', 'banner health', 'honeywell', 'state farm', 'phoenix sky harbor',
            'sky harbor', 'salt river project', 'srp', 'apache gold', 'hurricane hilary', 'monsoon season', 'roosevelt row', 'valley metro', 'footprint center',
-           'chase field', 'mill avenue merchants', 'rhythm room', 'crescent ballroom', 'valley bar', 'club red', 'the nile theater', 'hail mary', 'lost leaf'],
+           'chase field', 'mill avenue merchants', 'rhythm room', 'crescent ballroom', 'valley bar', 'club red', 'the nile theater', 'hail mary', 'lost leaf',
+           'wm phoenix open', 'tpc scottsdale', 'fiesta bowl', 'vrbo fiesta bowl', 'phoenix pride', 'arizona renaissance festival', 'renaissance festival',
+           'country thunder', 'cactus league', 'thunderbirds', 'state farm stadium', 'phoenix magazine', 'phoenix pd', 'desert ridge'],
   /* "The state university", "the air base", "the light rail", "the spring training crowd". Tempe, Mesa and the rest are places and are used as places. */
   blocklist: ['rhythm room*', 'crescent ballroom*', 'valley bar*', 'club red*', 'arizona republic*', 'phoenix new times*', 'luke air force*', 'sky harbor*'],
 
@@ -52,7 +54,48 @@ SB.Cities.register('phoenix', {
     { id: 'east-valley', name: 'Mesa, Chandler and Gilbert', route: 'campus', note: 'Newer suburban sprawl. Garages, church halls and teen bands.' }
   ],
 
-  contacts: ['tucson', 'flagstaff-az', 'el-paso-tx'],
+  rooms: [
+    { id: 'tempe-rental', kind: 'HOUSE', hood: 'tempe', cap: 60, curfew: 1350, ac: false, outdoor: true, pressure: 55, start: true,
+      note: 'A rental house hosted by a band member, promoted online. Turnout swings, and the landlord and the roommates are the weak points.' },
+    { id: 'tempe-second', kind: 'HOUSE', hood: 'tempe', cap: 40, curfew: 1320, ac: false, pressure: 55,
+      note: 'A second rental on the campus streets, part of the same circuit. Same landlord worries, same neighbors with a phone.' },
+    { id: 'maryvale-garage', kind: 'HOUSE', hood: 'maryvale', cap: 50, curfew: 1290, ac: false, outdoor: true, pressure: 40,
+      note: 'A tract-house garage with the door up and a fan going. Where the kids start.' },
+    { id: 'sunnyslope-unit', kind: 'DIY', hood: 'sunnyslope', cap: 150, rent: 60, curfew: 1380, ac: false, pressure: 60,
+      note: 'An all-ages commercial unit that grew out of backyard shows. Mostly punk and metal, often outside, and short of money.' },
+    { id: 'arts-room', kind: 'DIY', hood: 'downtown', cap: 120, rent: 60, curfew: 1350, ac: true, pressure: 55, needs: ['VOUCH'],
+      note: 'A volunteer-run all-ages room in the arts district. It has already lost one home to a landlord and may lose the next.' },
+    { id: 'grand-warehouse', kind: 'DIY', hood: 'grand-ave', cap: 100, rent: 50, curfew: 1380, ac: false, pressure: 60,
+      note: 'A warehouse unit on the old railroad road. Bring your own fan; one complaint about the use of the unit ends it.' },
+    { id: 'tattoo-shop', kind: 'SHOP', hood: 'downtown', cap: 60, curfew: 1320, ac: true,
+      note: 'A tattoo shop that hosts all-ages nights. Small, and the shop\'s hours and neighbors set the limit.' },
+    { id: 'gym-lot', kind: 'OUTDOOR', hood: 'south-phoenix', cap: 400, rent: 25, curfew: 1320, ac: false, pressure: 55,
+      note: 'A boxing gym\'s parking lot, all-ages hardcore about monthly. It lasts on the owner\'s goodwill and the police\'s patience.' },
+    { id: 'east-valley-hall', kind: 'HALL', hood: 'east-valley', cap: 150, curfew: 1320, ac: true,
+      note: 'A rented church or teen-dance hall with an adult at the door. All ages, tidy and out by ten.' },
+    { id: 'tempe-bar', kind: 'BAR', hood: 'tempe', cap: 120, ages: ['A21'], curfew: 1500, ac: true,
+      note: 'A bar with a small stage that books local punk. Anyone under 21 needs a barrier or a guardian, so it is mostly adults.' },
+    { id: 'downtown-club', kind: 'CLUB', hood: 'downtown', cap: 300, ages: ['ALL'], curfew: 1380, ac: true,
+      note: 'A club that does an early all-ages show, then clears the kids at nine for the drinkers.' },
+    { id: 'big-hall', kind: 'BIG', hood: 'downtown', cap: 800, ages: ['A18'], curfew: 1410, ac: true,
+      note: 'A theater-size room for a booked-out tour stop. The big heavy room out east is gone.' }
+  ],
+
+  contacts: ['tucson', 'flagstaff-az', 'el-paso-tx', 'los-angeles', 'san-diego'],
+
+  calendar: [
+    { id: 'fair', label: 'the state fair', tag: 'fair', month: 10, weeks: [1, 4], dows: [3, 4, 5, 6], can: [.92, .88, .88], hoods: ['maryvale', 'downtown'], elsewhere: [1, .97, .97] },
+    { id: 'bowl-parade', label: 'the bowl game parade weekend', tag: 'parade', month: 1, week: 1, dows: [4, 5], can: [.95, .90, .90], hoods: ['downtown', 'garfield'], elsewhere: [1, .97, .97] },
+    { id: 'golf-week', label: 'the golf tournament week', tag: 'festival', month: 2, weeks: [1, 2], dows: [3, 4, 5, 6], can: [.97, .94, .94] },
+    { id: 'pride', label: 'the pride parade', tag: 'parade', month: 10, week: 2, dows: [6], can: [.92, .90, .90], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [2, 4], dows: [5], can: [.90, .95, .95], hoods: ['tempe'], elsewhere: [1, 1, 1] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 3], dows: [5], can: [.90, .95, .95], hoods: ['tempe'], elsewhere: [1, 1, 1] },
+    { id: 'football-nov', label: 'home football', tag: 'game', month: 11, weeks: [1, 2], dows: [5], can: [.90, .95, .95], hoods: ['tempe'], elsewhere: [1, 1, 1] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1380, curfewMinors: { weeknight: 1320, weekend: 1320, inForce: true } },
 
   points: [
     { name: 'Los Angeles', state: 'CA', lat: 34.05, lon: -118.24, pop: 12800000 },
@@ -103,6 +146,40 @@ SB.Cities.register('phoenix', {
         { id: 'RAIL', label: 'Tell everyone to take the light rail', likely: 'Two hours of your day. Most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
           result: 'A train full of kids with guitar cases. The last one home at midnight.' }
+      ] },
+
+    { id: 'PHOENIX_STATE_FAIR_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'It is fair season and the west-side roads are jammed from the fairgrounds to the freeway.',
+      title: 'The fair jams the west side',
+      body: 'Saturday traffic is backed up for miles. The band lost its load-in slot in the line of cars and the crowd is trickling in late.',
+      options: [
+        { id: 'LATE', label: 'Push doors back an hour and wait for the roads', likely: 'The ones who wanted to come make it, tired.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Doors an hour late. The crowd came in off the freeway sweating and loud.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A thin early set.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The first band played to the bartender. The floor filled by ten.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'PHOENIX_ART_WALK_SWEEP', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3] },
+      telegraph: 'The monthly art walk downtown has extra police out, and they are checking the clock for kids under sixteen.',
+      title: 'The curfew sweep',
+      body: 'The police are walking the arts district looking for minors out past ten. Your all-ages bill has a floor of fifteen-year-olds and a headliner at ten.',
+      options: [
+        { id: 'KIDS_FIRST', label: 'Put the youngest bands on first and clear them by ten', likely: 'The kids get their set. The late crowd is older and thinner.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The kids played first and were home by ten. The headliner played to a thinner, older room.' },
+        { id: 'HOUSE', label: 'Move the whole bill to a rental house', likely: 'Smaller, and out of the sweep.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'A rental house took the bill with an hour to spare. Hot, packed and quiet on the porch.' },
+        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Some parents get a call.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The police came through at ten. Half the floor left with a parent mid-song.' }
       ] }
   ]
 });

@@ -121,3 +121,8 @@
   :root:not([data-motion="full"]) .mb-hub { animation: none; }
   :root:not([data-motion="full"]) .mb-tape, :root:not([data-motion="full"]) .mb-deck { transition: none; }
 }
+
+/* tonight's clock sits just left of the tape in the bottom-right corner (css/clock.css .nc): the song strip and the
+   keys go up above the tape there, so they never cover CALL IT A NIGHT */
+body.nc-on .mb.at-br .mb-deck { right: 0; bottom: calc(100% + calc(var(--p) * 10)); transform: translateY(calc(var(--p) * 14)); }
+body.nc-on .mb.at-br.is-open .mb-deck, body.nc-on .mb.at-br.is-peek .mb-deck { transform: none; }

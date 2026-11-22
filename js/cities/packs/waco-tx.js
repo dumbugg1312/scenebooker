@@ -1,8 +1,10 @@
 SB.Cities.register('waco-tx', {
   v: 1,
   slug: 'waco-tx',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
-  banned: ['baylor', 'baylor university', 'baylor bubble', 'baylor lariat', 'magnolia market', 'magnolia silos', 'fixer upper', 'dr pepper', 'whataburger',
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
+  banned: ['silobration', 'heart o\' texas fair', 'heart of texas fair and rodeo', 'cultural arts of waco', 'waco cultural arts fest', 'festival on the brazos',
+           'waco cotton palace pageant', 'destination waco', 'waco insider', 'great waco duck race', 'brazos nights', 'wacotrib', 'tourtexas',
+           'texas appleseed', 'hb 1819', 'dia de los muertos parade', 'baylor', 'baylor university', 'baylor bubble', 'baylor lariat', 'magnolia market', 'magnolia silos', 'fixer upper', 'dr pepper', 'whataburger',
            'h-e-b', 'tstc', 'texas state technical college', 'mclennan community college', 'university of mary hardin-baylor', 'umhb', 'tarleton',
            'tarleton state', 'hill college', 'fort hood', 'fort cavazos', 'texas eagle', 'amtrak', 'waco tribune-herald', 'tribune-herald', 'waco citizen',
            'kwbu', 'kcen', 'kwtx', 'waco transit', 'cotton palace', 'brazos river festival', 'ironman', 'diadeloso', 'heart of texas fair',
@@ -52,7 +54,45 @@ SB.Cities.register('waco-tx', {
     { id: 'lake-shore', name: 'China Spring and the lake shore', route: 'work-side', note: 'Rural acreage west and northwest. Field parties and generator shows nobody hears.' }
   ],
 
-  contacts: ['killeen-tx', 'college-station-tx', 'tyler-tx'],
+  rooms: [
+    { id: 'west-living-room', kind: 'HOUSE', hood: 'west-waco', cap: 40, curfew: 1320, ac: true, outdoor: false, sketch: 20, standing: [65, 60, 50], pressure: 50, start: true,
+      note: 'A living room or a backyard with a box fan going. Everyone heard no for years before this one said yes, and the neighbors still count the cars.' },
+    { id: 'bellmead-garage', kind: 'HOUSE', hood: 'bellmead', cap: 60, curfew: 1350, ac: false, outdoor: true, sketch: 30, standing: [65, 60, 45], pressure: 45,
+      note: 'An open garage with a box fan and a lot of kids. There are no basements in this clay, so the garage door is the stage curtain.' },
+    { id: 'east-warehouse', kind: 'DIY', hood: 'east-waco', cap: 150, rent: 60, curfew: 1380, ac: false, sketch: 45, standing: [60, 65, 40], pressure: 55, needs: ['VOUCH'],
+      note: 'A pair of cinderblock buildings behind chain-link, with a food truck out front before the music. The main hardcore room, and the block has a reputation it does not deserve.' },
+    { id: 'skate-park', kind: 'OUTDOOR', hood: 'downtown', cap: 100, rent: 10, pa: .4, curfew: 1260, sketch: 35, standing: [55, 55, 45],
+      note: 'A city skate park with a generator and a fight over the power. Done by nine, and nobody at the city office answers on a weekend.' },
+    { id: 'rented-unit', kind: 'DIY', hood: 'south-waco', cap: 80, rent: 50, curfew: 1320, ac: false, sketch: 40, standing: [55, 60, 40], pressure: 55, needs: ['VOUCH'],
+      note: 'A warehouse unit rented for one night: load in, play, and be gone before the landlord finds out.' },
+    { id: 'record-shop', kind: 'SHOP', hood: 'downtown', cap: 80, pa: .4, curfew: 1260, ac: true, sketch: 5, standing: [70, 70, 75], following: .2,
+      note: 'The record store used to hold ninety a show. Now the floor is stacked with vinyl and shows are rare.' },
+    { id: 'dive-bar', kind: 'BAR', hood: 'downtown', cap: 120, soundFee: 50, pa: .6, ages: ['A21'], curfew: 1500, ac: true, following: .3, sketch: 15, standing: [45, 65, 70],
+      note: 'A dive bar with a small stage. Twenty-one and up, and half the bars in town book only country and church bands.' },
+    { id: 'arts-club', kind: 'CLUB', hood: 'downtown', cap: 250, houseCosts: 150, split: .8, pa: .85, ages: ['A18'], curfew: 1410, ac: true, following: .5, sketch: 15,
+      standing: [45, 70, 65], owner: 'TALENT_BUYER', notice: 42, needs: ['FULL_BILL'],
+      note: 'The established small venue downtown. It books a punk night now and then between other things, and the rents around it keep climbing.' },
+    { id: 'lodge-hall', kind: 'HALL', hood: 'north-waco', cap: 200, rent: 200, deposit: 75, pa: .6, curfew: 1350, ac: true, sketch: 10, standing: [55, 60, 65],
+      owner: 'HALL_MANAGER', note: 'A rented lodge or dance hall with an occupancy sign by the door and a manager who counts heads.' },
+    { id: 'fair-arena', kind: 'BIG', hood: 'south-waco', cap: 1500, rent: 1800, deposit: 500, pa: .9, ages: ['A18'], curfew: 1380, ac: true, sketch: 10, standing: [40, 65, 70],
+      owner: 'TALENT_BUYER', note: 'The fairgrounds arena on the south edge. Rodeo and carnival most of the year, and a touring metal or pop-punk package now and then.' }
+  ],
+
+  contacts: ['killeen-tx', 'college-station-tx', 'tyler-tx', 'austin', 'dallas'],
+
+  calendar: [
+    { id: 'homecoming', label: 'homecoming parade weekend', tag: 'parade', month: 11, week: 1, dows: [4, 5], can: [.85, .80, .90], hoods: ['downtown', 'campus'], elsewhere: [.97, .95, .95] },
+    { id: 'fair', label: 'the fair and rodeo', tag: 'fair', month: 10, weeks: [2, 3], dows: [3, 4, 5, 6], can: [.90, .88, .88] },
+    { id: 'fall-fest', label: 'the downtown fall festival', tag: 'festival', month: 10, week: 4, dows: [3, 4, 5, 6], can: [.90, .88, .88], hoods: ['downtown', 'east-waco'], elsewhere: [.97, .95, .95] },
+    { id: 'river-fest', label: 'the spring river festival', tag: 'festival', month: 4, week: 4, dows: [3, 4, 5, 6], can: [.92, .88, .88], hoods: ['campus', 'downtown'], elsewhere: [1, .97, .97] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [.85, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [.85, .95, .95] },
+    { id: 'football-nov', label: 'home football', tag: 'game', month: 11, weeks: [1, 4], dows: [5], can: [.85, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1320 },
 
   points: [
     { name: 'Austin', state: 'TX', lat: 30.27, lon: -97.74, pop: 980000 },
@@ -69,5 +109,58 @@ SB.Cities.register('waco-tx', {
     hood: ['North Waco', 'South Waco', 'East Waco', 'Sanger Heights', 'Castle Heights', 'Lake Air', 'Bellmead', 'Woodway', 'Hewitt', 'China Spring', 'Speegleville'],
     thing: ['carport', 'box fan', 'kolache', 'breakfast taco', 'pecan tree', 'live oak', 'fellowship hall', 'lodge hall', 'strip-mall unit', 'youth group', 'garage door', 'dry room'],
     weather: ['hail', 'tornado watch', 'ice storm']
-  }
+  },
+
+  events: [
+    { id: 'WACO_TX_HOMECOMING_FRIDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'parade' },
+      telegraph: 'The parade route is posted, and Austin Avenue closes at dawn on Saturday.',
+      title: 'Homecoming closes the street',
+      body: 'The parade shuts the downtown streets from before sunrise, and the lot behind your room is filling with alumni cars. The van cannot get within four blocks.',
+      options: [
+        { id: 'EARLY', label: 'Load in Friday night, before the barricades', likely: 'Tight, but the gear is inside.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The gear was in by dark and the street closed around you. A short, loud night.' },
+        { id: 'CART', label: 'Hand-carry the amps from a lot across the river', likely: 'Slow. Everyone is tired.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'You walked amps across a bridge in a crowd of alumni. Doors went late.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'The parade crowd is not your crowd.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The bars took the crowd and the regulars made do.' }
+      ] },
+
+    { id: 'WACO_TX_SKATE_POWER', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
+      if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
+      telegraph: 'The city has not confirmed the power for the skate park, and the office is closed until Monday.',
+      title: 'The city shuts off the power',
+      body: 'Halfway through the second set the city cut the outlets at the skate park. The office will not answer until Monday, and there is a crowd and a generator in the truck.',
+      options: [
+        { id: 'GEN', label: 'Rent a generator and run the night', likely: 'Costs a little. Loud, and the neighbors hear.',
+          effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'A generator coughed on and the set went on. The park rangers drove past twice.' },
+        { id: 'ACOUSTIC', label: 'Go acoustic and keep it short', likely: 'A strange, small night.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'REGULARS', pct: .02 }],
+          result: 'Three bands played guitars and shouted. Nobody forgot it.' },
+        { id: 'GARAGE', label: 'Move the whole bill to a garage', likely: 'Smaller and louder. A garage has its own power.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'A garage took the bill, and the floor was packed.' }
+      ] },
+
+    { id: 'WACO_TX_FAIR_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'The carnival and the rodeo are in town and every kid is at the fairgrounds until late.',
+      title: 'The kids are at the rodeo',
+      body: 'Your all-ages bill is the same night as the rodeo and the carnival, and the kids will not be done until eleven. The room has to be quiet by ten.',
+      options: [
+        { id: 'LATE', label: 'Push doors back to catch them after the rodeo', likely: 'A good crowd, a short set list.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Doors an hour late. The kids came in smelling of funnel cake and played the room loud and short.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the fair.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The regulars came. Everyone else rode the Ferris wheel.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] }
+  ]
 });

@@ -20,6 +20,16 @@ SB.module('Game', function (SB) {
   /* a new game                                                          */
   /* ------------------------------------------------------------------ */
 
+  function keepGoingAway(state, g) {
+    var e = state.story && state.story.chapters && state.story.chapters.GOING_AWAY, refs = {}, k;
+    if (!g || typeof g !== 'object' || !e) return;
+    ['band1', 'band2', 'band2Home', 'band3'].forEach(function (n) { if (isStr(g[n])) refs[n] = g[n]; });
+    if (!refs.band1 || !refs.band2 || !refs.band3) return;
+    refs.bands = [refs.band1, refs.band2, refs.band3];
+    e.refs = e.refs || {};
+    for (k in refs) e.refs[k] = refs[k];
+  }
+
   function newGame(opts) {
     var o = opts || {}, set = o.settings || {}, state, pack, bills;
     if (!isStr(o.seed)) SB.fail('Game.newGame', 'opts.seed must be a non-empty string');
@@ -72,7 +82,6 @@ SB.module('Game', function (SB) {
                                : { tutorial: { on: false, step: null, skipped: false, nudgedAt: 0 }, chapters: {}, cutscenes: [], seen: [] },
       patches: {}
     };
-    if (state.settings.noText) SB.text.off = true;
 
     pack = SB.Cities.pack(state);                        // fails clearly when the pack is not loaded
     if (bills) {
@@ -100,6 +109,10 @@ SB.module('Game', function (SB) {
     /* the guided first show is on until the start screen skips it (opts.tutorial === false starts with it skipped) */
     if (o.tutorial !== false) SB.Tutorial.start(state);
     SB.Chapters.check(state);
+    /* the going-away show's bill as the player watched it: the way in plays that scene on a first draft of this game
+       and asks the setup questions in it, and "I've done this before" can free a different local draw for the first
+       show. Kept on the chapter so the scene watched again shows the same three bands. */
+    keepGoingAway(state, o.goingAway);
     SB.Patches.check(state);
     return state;
   }

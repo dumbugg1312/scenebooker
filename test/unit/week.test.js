@@ -153,6 +153,25 @@ module.exports = function (t) {
   });
 
   /* ---- raise, and the week after ---- */
+  H.section(t, 'room notices', () => {
+    const state = H.newGame(SB, { seed: 'week-1', tutorial: false }), d = draftShow(state);
+    if (!d) { t.fail('no draft show'); return; }
+    const show = SB.Shows.get(state, d.showId), jobs = SB.Jobs.forShow(state, d.showId);
+    const ann = jobs.filter(j => j.type === 'ANNOUNCE')[0];
+    if (ann) t.ok(SB.Jobs.canDo(state, ann.id, 0, 'AM').ok === false, 'ANNOUNCE waits until a band has said yes');
+    const n0 = (state.mail.messages || []).length, to = SB.Shows.get(state, d.showId).day + 1;
+    const mv = SB.Shows.move(state, d.showId, { roomId: show.roomId, day: to, hold: { rank: 1, expires: null } });
+    if (ok(mv)) {
+      const m = state.mail.messages.slice(n0).filter(x => x.refs && x.refs.showId === d.showId)[0];
+      t.ok(!!m && /moved to/.test(m.body), 'a show moved to another night sends one phone message');
+    }
+    const n1 = state.mail.messages.length;
+    if (ok(SB.Shows.cancel(state, d.showId, 'ROOM'))) {
+      const m = state.mail.messages.slice(n1).filter(x => x.refs && x.refs.showId === d.showId)[0];
+      t.ok(!!m && /closed/.test(m.body), 'a room that cancels the show sends one phone message');
+    }
+  });
+
   H.section(t, 'raise', () => {
     const state = fresh('week-raise');
     const dec = { id: 'dtest', kind: 'BURNOUT', eventId: null, showId: null, day: 7, half: 'DAY', at: null, tier: null, title: 'test', body: 'test',

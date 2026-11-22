@@ -126,8 +126,61 @@
 .cs-msg-you { background: var(--pp-bond); color: var(--toner); align-self: flex-end; clip-path: var(--edge-cut-2); }
 .cs-cap-drop { position: absolute; left: calc(var(--p) * -16); top: calc(var(--p) * -26); font-size: calc(var(--fs) * 13); white-space: nowrap; }
 
-/* reduced motion: no pan (the moves switch themselves off, css/finish.css) */
+/* ---------- people that move (js/ui/cutscene.js pieces(), SB.Scenes.layered) ----------
+ * The room is one canvas (.cs-room) in a box that takes the picture's place (and its pan, in a scene); each person is a
+ * photocopied cut-out piece over it (.cs-pc, placed in % of the room), slapped on in turn (--pd), then held frames on a
+ * loop about its bottom edge (.cs-pc-in: --per, --dl; the up pose is --a % of its height, --sk, --sy). In a scene a
+ * piece also pans a little further than the room (--kx/--ky: its depth, in its own % of the room's pan). */
+.cs-layers { position: relative; overflow: hidden; }
+.cs-layers > .cs-room { display: block; width: 100%; height: 100%; }
+.cs-pc { position: absolute; pointer-events: none; transform-origin: 50% 100%; animation: cs-paste 210ms steps(1, end) var(--pd, 0ms) backwards; }
+.cs-k-scene .cs-pc { animation: cs-paste 210ms steps(1, end) var(--pd, 0ms) backwards, cs-par 18s steps(3, end) var(--pt, 0ms) both; }
+.cs-pc-in {
+  display: block; width: 100%; height: 100%; transform-origin: 50% 100%;
+  animation-duration: var(--per, 3s); animation-delay: var(--dl, 0s); animation-timing-function: steps(1, end); animation-iteration-count: infinite;
+}
+.cs-pc-band > .cs-pc-in, .cs-pc-drums > .cs-pc-in { animation-name: cs-bob; }
+.cs-pc-crowd > .cs-pc-in { animation-name: cs-jump; }
+.cs-pc-person > .cs-pc-in { animation-name: cs-shift; }
+.cs-pc-calm > .cs-pc-in { animation-name: cs-calm; }
+@keyframes cs-paste {
+  0%   { opacity: 0; }                                                       /* off the page while it waits its turn */
+  1%   { opacity: 1; translate: 0 -3%; rotate: var(--pr, 3deg); scale: 1.08; }
+  40%  { opacity: 1; translate: 0 -1%; rotate: calc(var(--pr, 3deg) * -.3); scale: 1.025; }
+  70%  { opacity: 1; translate: 0 .4%; rotate: 0deg; scale: .994; }
+  100% { opacity: 1; translate: 0 0; rotate: 0deg; scale: 1; }
+}
+@keyframes cs-par {
+  from { transform: translate(calc(var(--px0, 0%) * var(--kx, 0)), calc(var(--py0, 0%) * var(--ky, 0))); }
+  to   { transform: translate(calc(var(--px1, 0%) * var(--kx, 0)), calc(var(--py1, 0%) * var(--ky, 0))); }
+}
+/* the band on the beat: down, up (two held frames a bar) */
+@keyframes cs-bob {
+  0%   { transform: none; }
+  50%  { transform: translateY(calc(var(--a, 0) * -1%)) skewX(var(--sk, 0deg)) scaleY(var(--sy, 1)); }
+}
+/* the crowd: stood, up, landing */
+@keyframes cs-jump {
+  0%   { transform: none; }
+  45%  { transform: translateY(calc(var(--a, 0) * -1%)) skewX(var(--sk, 0deg)) scaleY(var(--sy, 1)); }
+  75%  { transform: translateY(calc(var(--a, 0) * -.3%)) skewX(calc(var(--sk, 0deg) * -.5)); }
+}
+/* weight from one foot to the other */
+@keyframes cs-shift {
+  0%   { transform: none; }
+  50%  { transform: skewX(var(--sk, 0deg)) scaleY(var(--sy, 1)); }
+}
+/* a breath */
+@keyframes cs-calm {
+  0%   { transform: none; }
+  35%  { transform: scaleY(var(--sy, 1)); }
+  70%  { transform: skewX(var(--sk, 0deg)) scaleY(calc((var(--sy, 1) + 1) / 2)); }
+}
+
+/* reduced motion: no pan, nobody moves (the moves switch themselves off, css/finish.css) */
 .cs-still .cs-art, :root[data-motion="reduce"] .cs-art { animation: none; }
+.cs-still :is(.cs-pc, .cs-pc-in), :root[data-motion="reduce"] :is(.cs-pc, .cs-pc-in) { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   :root:not([data-motion="full"]) .cs-art { animation: none; }
+  :root:not([data-motion="full"]) :is(.cs-pc, .cs-pc-in) { animation: none; }
 }

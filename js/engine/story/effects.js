@@ -764,7 +764,11 @@ SB.module('Effects', function (SB) {
       if (p) { p.hid = p.hid || {}; p.hid.skill = p.hid.skill || {}; if (typeof eff.skill === 'number' || p.hid.skill[R] === undefined) p.hid.skill[R] = typeof eff.skill === 'number' ? eff.skill : .35; }
     } else if (to === 'PLAYER') pid = 'player';
     else if (to) pid = refIds(state, ctx, to)[0] || null;
-    var res = SB.Shows.setCrew(state, show.id, role, pid);
+    /* the event hands you this person (a stand-in, the closer's PA): they are on the show without an ask of their own.
+     * setCrew wants an asked yes, which refused the swap ("Something else has to be done first.") and left the old
+     * crew on the show, paid and quoted */
+    var res = pid && pid !== 'player' && (to === 'NEW' || to === 'BAND') ? (SB.Shows.assignCrew(state, show.id, role, pid), { ok: true })
+                                                                         : SB.Shows.setCrew(state, show.id, role, pid);
     if (res && !res.ok && ctx.out) ctx.out.text = res.why;
     return out;
   }

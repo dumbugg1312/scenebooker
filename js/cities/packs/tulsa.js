@@ -48,7 +48,30 @@ SB.Cities.register('tulsa', {
     "tulsa ballet",
     "tulsa opera",
     "tulsa police",
-    "tulsa county"
+    "tulsa county",
+    "midbrow",
+    "tulsa kids",
+    "tulsa people",
+    "public radio tulsa",
+    "news on 6",
+    "news 9",
+    "kgou",
+    "route 66 news",
+    "visit tulsa",
+    "downtown tulsa partnership",
+    "tulsa council",
+    "expo square",
+    "chapman green",
+    "saint francis tulsa tough",
+    "tulsa juneteenth festival",
+    "tulsa pride",
+    "route 66 centennial",
+    "tulsa botanic garden",
+    "bmx grand nationals",
+    "able commission",
+    "tulsa police department",
+    "inner dispersal loop",
+    "greenwood historic district"
   ],
   "blocklist": [
     "tulsa world*",
@@ -136,7 +159,8 @@ SB.Cities.register('tulsa', {
       "minutes": 20,
       "bearing": 285,
       "note": "A working-class river town of garages.",
-      "beyond": "river-bridges"
+      "beyond": "river-bridges",
+      "scene": 80
     },
     {
       "id": "broken-arrow",
@@ -256,6 +280,12 @@ SB.Cities.register('tulsa', {
       "name": "Riverside and Midtown",
       "note": "A river parkway, campus edges and student rentals.",
       "route": "campus"
+    },
+    {
+      "id": "sand-springs-hood",
+      "name": "Sand Springs",
+      "route": "town:sand-springs",
+      "note": "A working-class river town west of the city with garages and carports. The parents are next door."
     }
   ],
   "points": [
@@ -321,5 +351,611 @@ SB.Cities.register('tulsa', {
       "ice storm",
       "tornado warning"
     ]
-  }
+  },
+  "rooms": [
+    {
+      "id": "kw-bungalow",
+      "kind": "HOUSE",
+      "hood": "kendall-whittier",
+      "cap": 40,
+      "curfew": 1320,
+      "note": "A living room, a porch and a crawlspace under an old bungalow, with a name of its own. It depends on one or two tired people.",
+      "start": true,
+      "pressure": 50
+    },
+    {
+      "id": "hill-house",
+      "kind": "HOUSE",
+      "hood": "crosbie-heights",
+      "cap": 50,
+      "curfew": 1320,
+      "note": "A hillside house with a yard and a basement. The neighbors are close.",
+      "pressure": 55
+    },
+    {
+      "id": "sand-garage",
+      "kind": "HOUSE",
+      "hood": "sand-springs-hood",
+      "cap": 30,
+      "curfew": 1350,
+      "note": "A garage show with the parents next door. Across the river from everything.",
+      "pressure": 50
+    },
+    {
+      "id": "north-arts",
+      "kind": "DIY",
+      "hood": "north-tulsa",
+      "cap": 150,
+      "curfew": 1380,
+      "note": "A community arts space for punk and hardcore with two open rooms for moshing. Money and a thin volunteer crew are the worry.",
+      "rent": 80,
+      "pressure": 50
+    },
+    {
+      "id": "route-room",
+      "kind": "DIY",
+      "hood": "west-tulsa",
+      "cap": 80,
+      "curfew": 1350,
+      "note": "A rehearsal space and small room on the old highway with one main room. Shoegaze, punk and emo bills.",
+      "rent": 60,
+      "pressure": 50
+    },
+    {
+      "id": "pearl-store",
+      "kind": "DIY",
+      "hood": "pearl",
+      "cap": 100,
+      "curfew": 1350,
+      "note": "A storefront stage that could reopen under a new crew. The district is getting expensive.",
+      "rent": 70,
+      "pressure": 55
+    },
+    {
+      "id": "fellowship-hall",
+      "kind": "HALL",
+      "hood": "cherry-street",
+      "cap": 200,
+      "curfew": 1320,
+      "note": "A rented fellowship hall or lodge with a deposit and a curfew from the renter.",
+      "deposit": 100
+    },
+    {
+      "id": "kw-bar",
+      "kind": "BAR",
+      "hood": "kendall-whittier",
+      "cap": 150,
+      "curfew": 1500,
+      "note": "A bar that books punk, noise, hardcore and death metal on one calendar. Welcoming, but nobody under twenty-one gets in.",
+      "ages": [
+        "A21"
+      ]
+    },
+    {
+      "id": "dome-bar",
+      "kind": "BAR",
+      "hood": "blue-dome",
+      "cap": 250,
+      "curfew": 1530,
+      "note": "A downtown bar that makes its money on drinks and wants a twenty-one crowd.",
+      "ages": [
+        "A21"
+      ]
+    },
+    {
+      "id": "dome-club",
+      "kind": "CLUB",
+      "hood": "blue-dome",
+      "cap": 300,
+      "curfew": 1440,
+      "note": "A club hall with an 18-plus night, hurt by downtown violence and a landlord who can say no.",
+      "ages": [
+        "A18"
+      ],
+      "owner": "TALENT_BUYER"
+    },
+    {
+      "id": "main-street-big",
+      "kind": "BIG",
+      "hood": "blue-dome",
+      "cap": 500,
+      "curfew": 1380,
+      "note": "The big downtown room, mostly all ages, with metal and hardcore beside country and pop on tour packages.",
+      "ages": [
+        "ALL"
+      ]
+    },
+    {
+      "id": "river-pavilion",
+      "kind": "OUTDOOR",
+      "hood": "riverside",
+      "cap": 120,
+      "curfew": 1260,
+      "note": "A pavilion by the river parkway for an afternoon show. Heat, storms and park rules decide it.",
+      "outdoor": true,
+      "ac": false
+    }
+  ],
+  "contacts": [
+    "oklahoma-city",
+    "fayetteville-ar",
+    "springfield-mo",
+    "wichita-ks"
+  ],
+  "calendar": [
+    {
+      "id": "state-fair-sep",
+      "label": "the state fair",
+      "tag": "fair",
+      "month": 9,
+      "weeks": [
+        4,
+        5
+      ],
+      "dows": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.9,
+        0.88,
+        0.88
+      ]
+    },
+    {
+      "id": "state-fair-oct",
+      "label": "the state fair",
+      "tag": "fair",
+      "month": 10,
+      "week": 1,
+      "dows": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.9,
+        0.88,
+        0.88
+      ]
+    },
+    {
+      "id": "spring-arts",
+      "label": "the spring arts festival",
+      "tag": "festival",
+      "month": 5,
+      "week": 5,
+      "dows": [
+        4,
+        5
+      ],
+      "can": [
+        0.92,
+        0.9,
+        0.9
+      ],
+      "hoods": [
+        "blue-dome"
+      ],
+      "elsewhere": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "race-weekend",
+      "label": "race weekend",
+      "tag": "race",
+      "month": 6,
+      "week": 1,
+      "dows": [
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.9,
+        0.88,
+        0.88
+      ],
+      "hoods": [
+        "blue-dome"
+      ],
+      "elsewhere": [
+        1,
+        1,
+        0.97
+      ]
+    },
+    {
+      "id": "juneteenth",
+      "label": "the Juneteenth festival",
+      "tag": "festival",
+      "month": 6,
+      "week": 3,
+      "dows": [
+        3,
+        4,
+        5
+      ],
+      "can": [
+        0.93,
+        0.9,
+        0.9
+      ],
+      "hoods": [
+        "north-tulsa"
+      ],
+      "elsewhere": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "football-sep",
+      "label": "home football",
+      "tag": "game",
+      "month": 9,
+      "weeks": [
+        1,
+        5
+      ],
+      "dows": [
+        5
+      ],
+      "can": [
+        0.85,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "football-oct",
+      "label": "home football",
+      "tag": "game",
+      "month": 10,
+      "weeks": [
+        1,
+        5
+      ],
+      "dows": [
+        5
+      ],
+      "can": [
+        0.85,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "halloween",
+      "label": "Halloween weekend",
+      "tag": "holiday",
+      "month": 10,
+      "weeks": [
+        4,
+        5
+      ],
+      "dows": [
+        4,
+        5
+      ],
+      "can": [
+        1.08,
+        1.05,
+        1
+      ]
+    },
+    {
+      "id": "thanksgiving-eve",
+      "label": "the night before Thanksgiving",
+      "tag": "holiday",
+      "month": 11,
+      "week": 4,
+      "dows": [
+        2
+      ],
+      "can": [
+        1.05,
+        1.15,
+        1.1
+      ]
+    }
+  ],
+  "rules": {
+    "curfewMinors": {
+      "weeknight": 1380,
+      "weekend": 1440,
+      "inForce": true
+    }
+  },
+  "events": [
+    {
+      "id": "TULSA_DOWNTOWN_CURFEW",
+      "when": "WEEK",
+      "tier": "HARD",
+      "weight": 2,
+      "cooldown": 45,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          3
+        ]
+      },
+      "telegraph": "The inner loop has an early curfew for kids under eighteen on weekend nights.",
+      "title": "Kids out by nine",
+      "body": "Under-eighteen fans have to be out of the downtown inner loop by nine. The big room’s headliner is due at ten.",
+      "options": [
+        {
+          "id": "FLIP",
+          "label": "Move the headliner up to a quarter past eight",
+          "likely": "The kids hear the best set. The rest is thin.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": -90
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.92
+            }
+          ],
+          "result": "The headliner went on at eight-fifteen. Kids lined the sidewalk to leave early."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Run it as planned and lose the kids",
+          "likely": "The young crowd leaves early.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.75
+            }
+          ],
+          "result": "The kids were out by nine. The headliner played to the grown-ups."
+        },
+        {
+          "id": "MOVE",
+          "label": "Move it a day",
+          "likely": "Breaks the date. Costs trust with the bands.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 1,
+              "respect": false
+            }
+          ],
+          "result": "You moved it a day. Not everyone could make the new one."
+        }
+      ]
+    },
+    {
+      "id": "TULSA_JUNETEENTH_PARKING",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 2,
+      "cooldown": 40,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          4
+        ],
+        "calendar": "festival",
+        "months": [
+          6
+        ]
+      },
+      "telegraph": "The Juneteenth festival has the north side blocked off this weekend.",
+      "title": "No parking on the north side",
+      "body": "The festival has taken every parking space around the arts space on the north side, the same weekend as your show.",
+      "options": [
+        {
+          "id": "MOVE",
+          "label": "Move the show up a day",
+          "likely": "Breaks the date. A smaller crowd.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 1,
+              "respect": false
+            }
+          ],
+          "result": "You moved it a day. The ones who could come, came."
+        },
+        {
+          "id": "SHUTTLE",
+          "label": "Run it and send people to park far away",
+          "likely": "Most walk it.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": 30
+            }
+          ],
+          "result": "People parked half a mile off and walked in. A late, warm night."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Run it as planned",
+          "likely": "The families are at the festival.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.75
+            }
+          ],
+          "result": "The festival kept the crowd. The ones who came stayed to the end."
+        }
+      ]
+    },
+    {
+      "id": "TULSA_CRAWLSPACE_FLOOD",
+      "when": "WEEK",
+      "tier": "HARD",
+      "weight": 2,
+      "cooldown": 40,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          3
+        ],
+        "months": [
+          4,
+          5,
+          6
+        ],
+        "weather": "RAIN"
+      },
+      "telegraph": "A spring storm is sitting over the river and the yards in the old neighborhoods are already wet.",
+      "title": "The crawlspace floods",
+      "body": "A storm has put the yard under the bungalow under an inch of water. The host is out there with a bucket and the crawlspace show is in four hours.",
+      "options": [
+        {
+          "id": "MOVE",
+          "label": "Move the bill to the front room",
+          "likely": "Smaller and louder.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 0,
+              "toKind": "HOUSE",
+              "respect": false
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "capMul",
+              "v": 0.6
+            }
+          ],
+          "result": "The bill went in the living room. It was packed and dry."
+        },
+        {
+          "id": "BAIL",
+          "label": "Bail it out and run it",
+          "likely": "A short night and a muddy floor.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.85
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": 60
+            }
+          ],
+          "result": "You bailed until eight and opened at nine. Wet shoes and a happy room."
+        },
+        {
+          "id": "MOVE_DAY",
+          "label": "Move it a day",
+          "likely": "Breaks the date.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 1,
+              "respect": false
+            }
+          ],
+          "result": "You moved it a day, after the yard drained."
+        }
+      ]
+    },
+    {
+      "id": "TULSA_RACE_CLOSURES",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 2,
+      "cooldown": 40,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          5
+        ],
+        "calendar": "race"
+      },
+      "telegraph": "Race weekend closes the streets around the bars downtown.",
+      "title": "The streets are shut",
+      "body": "The race has closed the streets around the bars, and your load-in is two blocks past the barricades with a drum kit and a cart.",
+      "options": [
+        {
+          "id": "EARLY",
+          "label": "Load in at noon, before the barricades",
+          "likely": "Most get in. A long wait.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": -60
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.92
+            }
+          ],
+          "result": "You were set up by two. The crowd walked in through the closed streets."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Carry it in by hand",
+          "likely": "A late start.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": 60
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.85
+            }
+          ],
+          "result": "You hauled everything on a cart. Doors were an hour late."
+        },
+        {
+          "id": "MOVE",
+          "label": "Move it a day",
+          "likely": "Breaks the date.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 1,
+              "respect": false
+            }
+          ],
+          "result": "You moved it a day. The barricades were gone and so was half the list."
+        }
+      ]
+    }
+  ]
 });

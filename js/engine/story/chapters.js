@@ -128,8 +128,12 @@ SB.module('Chapters', function (SB) {
     m = null;
     if (q && state.mail && isArr(state.mail.messages)) state.mail.messages.forEach(function (x) { if (x && (x.id === q.messageId || (x.refs && x.refs.requestId === q.id)) && x.fromName) m = x; });
     o.sender = (m && m.fromName) || o.touring;
+    /* whoever is actually running sound on the show (Destiny can send a buddy): the texts name them, not the usual */
+    if (w.show && w.show.crew && w.show.crew.sound && w.show.crew.sound !== 'player' && person(state, w.show.crew.sound)) o.sound = person(state, w.show.crew.sound);
     sp = cast.sound && state.people ? state.people[cast.sound] : null;
     o.soundRate = sp && typeof sp.rate === 'number' && sp.rate > 0 ? sp.rate : ((C.PAY && C.PAY.SOUND && C.PAY.SOUND[0]) || 40);
+    /* a band that writes its name in lowercase ("houses we left") reads as a broken sentence in a text: quote it */
+    ['touring', 'local', 'kids', 'sender'].forEach(function (k) { if (typeof o[k] === 'string' && /^[a-z]/.test(o[k]) && !/^the (touring|local) band$|^the kids$/.test(o[k])) o[k] = '\u201c' + o[k] + '\u201d'; });
     o.closer = o.local; o.band = o.touring;
     /* the going-away bill: the kids, a band that drove in (not the one asking you), the draw */
     m = away.filter(function (b) { return !tour || b.id !== tour.id; })[0] || away[0] || null;

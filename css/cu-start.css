@@ -165,3 +165,5 @@
 @media (prefers-reduced-motion: reduce) {
   :root:not([data-motion="full"]) .st .st-draw { animation: none; stroke-dashoffset: 0; }
 }
+.st-tape { display: flex; flex-direction: column; align-items: center; }
+.st-tape-ago { margin-top: calc(var(--p) * -2); padding: 0 calc(var(--p) * 6); font: 400 calc(var(--fs) * 12)/1.3 var(--f-type); color: var(--toner); background: var(--pp-bond); transform: rotate(-1deg); }

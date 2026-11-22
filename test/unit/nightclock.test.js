@@ -49,7 +49,7 @@ module.exports = function (t) {
   const askBand = (state, showId, b) => SB.Mail.ask(state, 'BAND_PLAY', b, { showId: showId, pay: 'FREE', fee: 0, wantSlot: 'OPEN', inPerson: false });
 
   H.section(t, 'the clock: hours and costs', () => {
-    t.eq(C.HOURS, { shift: { DAY: 0, NIGHT: 4 }, off: { DAY: 5, NIGHT: 5 } }, 'a work day leaves 4 hours, a day off has 10');
+    t.eq(C.HOURS, { shift: { DAY: 0, NIGHT: 4 }, off: { DAY: 5, NIGHT: 5 }, noJob: { DAY: 4, NIGHT: 4 } }, 'a work day leaves 4 hours, a day off has 10, no day job has 8');
     t.eq(C.OVERTIME_MAX, 1, 'staying up is at most an hour');
     t.eq(C.MAIL.hours, 0.5, 'a message is half an hour'); t.eq(C.MAIL.freePerDay, 0, 'and none is free');
     t.eq(C.FLYER.HOURS, { ROUGH: 1, STANDARD: 2, SHARP: 4 }, 'a flyer is 1 / 2 / 4 hours');
@@ -65,6 +65,10 @@ module.exports = function (t) {
     t.ok(v.tonight && v.tonight.left === 4 && Array.isArray(v.crunch), 'Week.view carries tonight and the crunch');
     t.ok(SB.Game.strip(state).tonight.cap === 4, 'and so does the strip');
     t.eq(SB.Week.suggest(state), [], '"the usual" is retired: it suggests nothing');
+    const jobless = H.newGame(SB, { seed: 'clock-nojob', tutorial: false });
+    jobless.player.dayJob = 'NONE';
+    const jw = SB.Week.blankWeek(jobless, jobless.week.n);
+    t.eq(jw.cap.map(c => c.DAY + c.NIGHT), [8, 8, 8, 8, 8, 8, 8], 'with no day job every day has 8 hours');
   });
 
   /* ---- doing a job tonight ---- */
@@ -426,5 +430,15 @@ module.exports = function (t) {
     SB.Week.endNight(state);
     const r = SB.Week.step(state);
     t.ok(r.stop && r.stop.kind === 'SHOW_NIGHT' && r.stop.showId === n.showId, 'calling the night opens the doors (' + JSON.stringify(r.stop) + ')');
+  });
+
+  H.section(t, 'the night called: nothing more goes on the clock', () => {
+    const state = H.newGame(SB, { seed: 'clock-called' });
+    if (!toEvening(state)) { t.fail('no evening to call'); return; }
+    t.ok(ok(SB.Week.fits(state, 0.5)), 'an open evening takes half an hour');
+    SB.Week.endNight(state);
+    const f = SB.Week.fits(state, 0.5), s = SB.Week.spend(state, 0.5);
+    t.ok(f.ok === false && f.code === 'PHASE', 'once the night is called nothing fits (' + (f.code || 'ok') + ')');
+    t.ok(s.ok === false && s.code === 'PHASE', 'and nothing is spent (' + (s.code || 'ok') + ')');
   });
 };

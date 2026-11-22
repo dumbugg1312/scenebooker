@@ -469,6 +469,14 @@ SB.module('Shows', function (SB) {
   /* move and cancel                                                     */
   /* ------------------------------------------------------------------ */
 
+  /* one phone message from the room about the player's show; its card opens from the message */
+  function notice(state, show, key) {
+    var room = roomOf(state, show), t;
+    if (!SB.Mail || !SB.Mail.post || !SB.text.has('jobs.notice.' + key)) return;
+    t = SB.text.label('jobs.notice.' + key, { room: room ? room.name : 'The room', date: SB.time.fmt(show.day, 'dow3') + ' ' + SB.time.fmt(show.day, 'md') });
+    SB.Mail.post(state, { kind: 'ROOM', fromId: room && room.ownerId || null, fromName: room ? room.name : '', subject: '', body: t, needs: false, refs: { showId: show.id } });
+  }
+
   function move(state, showId, to) {
     var show = getShow(state, showId, 'Shows.move'), room, hold, records = [], wasConfirmed, oldRoom, r, scale;
     if (over(state)) return no('OVER');
@@ -480,7 +488,21 @@ SB.module('Shows', function (SB) {
     room = roomId && state.rooms ? state.rooms[roomId] : null;
     if (roomId && !room && !(SB.Rooms && SB.Rooms.get(state, roomId))) SB.fail('Shows.move', 'unknown room "' + roomId + '"');
     hold = to.hold || (roomId ? playerHold(state, roomId, day, show.id) : null);
-    var same = roomId === show.roomId && day === show.day;
+    var same = roomId === show.roomId && day === show.day, oldDay = show.day;
+    if (day !== show.day) {
+      /* a confirmed band already playing another show that night cannot come along */
+      var oldStatus = show.status, clash = null;
+      show.status = 'CANCELLED';          // so this show's own slots do not count against the new night
+      try {
+        show.bill.slots.forEach(function (s) {
+          if (!clash && s.confirmed && SB.Bands && SB.Bands.isFree && !SB.Bands.isFree(state, s.bandId, day)) clash = s;
+        });
+      } finally { show.status = oldStatus; }
+      if (clash) {
+        var b = SB.Bands.get ? SB.Bands.get(state, clash.bandId) : null;
+        return U.no('BUSY', ((b && b.name) || 'A band') + ' is already booked that night.');
+      }
+    }
     if (!hold && !same) return U.no('NEEDS', SB.text.label('refuse.NEEDS'));
     wasConfirmed = show.status === 'CONFIRMED';
     if (wasConfirmed && !same) {
@@ -509,6 +531,7 @@ SB.module('Shows', function (SB) {
     if (room && room.ages && room.ages.indexOf(show.door.ages) < 0 && !(show.door.ages === 'ALL' && show.slot === 'MATINEE' && room.matinee)) show.door.ages = room.ages[0];
     ensure(state, show);
     r = log(state, records);
+    if (day !== oldDay && !to.quiet) notice(state, show, 'moved');
     return U.yes({ records: r });
   }
 
@@ -546,19 +569,20 @@ SB.module('Shows', function (SB) {
       if (tier.regulars && SB.Crowd && SB.Crowd.loseRegulars) SB.Crowd.loseRegulars(state, Math.abs(tier.regulars) * f, null, 'CANCELLED');
     }
     if (committed && SB.Stress && SB.Stress.add) SB.Stress.add(state, C.CANCEL.stress, 'CANCELLED');
-    if (show.roomId && SB.Rooms && SB.Rooms.release) SB.Rooms.release(state, show.id);
+    if (SB.Rooms && SB.Rooms.release) SB.Rooms.release(state, show.id);   // any hold, even one the show never picked up (a yes for a night it had moved off)
     show.status = 'CANCELLED';
     show.cancelled = { day: today(state), why: why };
     show.hold = null;
     ensure(state, show);
     records = log(state, records);
+    if (why === 'ROOM') notice(state, show, 'roomClosed');
     return U.yes({ records: records });
   }
 
   return {
     create: create, get: get, list: list, view: view, setBill: setBill, setBilling: setBilling, setDoor: setDoor,
     setLabel: setLabel, setDeal: setDeal, setCrew: setCrew, setInsurance: setInsurance, addBand: addBand, dropBand: dropBand, lock: lock,
-    onConfirmed: onConfirmed, move: move, cancel: cancel,
+    onConfirmed: onConfirmed, move: move, cancel: cancel, notice: notice,
     /* internal outside the manifest (see the header) */
     assignCrew: assignCrew, billing: function (state, showId) { return billing(state, getShow(state, showId, 'Shows.billing')); }
   };

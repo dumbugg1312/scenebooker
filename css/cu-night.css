@@ -75,6 +75,8 @@
 .nt-env-lines { list-style: none; margin: calc(var(--p) * 8) 0 calc(var(--p) * 6); padding: 0; }
 .nt-env-line { display: flex; align-items: baseline; gap: calc(var(--p) * 10); padding: calc(var(--p) * 1) 0; border-bottom: calc(var(--p) * 1) solid var(--toner-soft); }
 .nt-env-label { flex: 1; font-size: calc(var(--fs) * 13); }
+.nt-env-owed { display: block; font: 400 calc(var(--fs) * 12)/1.3 var(--f-mono); color: var(--toner); }
+.nt-env-line.is-short .nt-fig { text-decoration: underline wavy var(--toner-mid); }
 .nt-env-run { font: 400 calc(var(--fs) * 12)/1 var(--f-mono); color: var(--toner-mid); min-width: calc(var(--p) * 58); text-align: right; }
 .nt-env-line.is-you { border-bottom: 0; margin-top: calc(var(--p) * 4); background: linear-gradient(transparent 40%, var(--hl-swipe) 40%, var(--hl-swipe) 88%, transparent 88%); }
 .nt-fig { font: 400 calc(var(--fs) * 17)/1 var(--f-mono); }

@@ -8,7 +8,10 @@ SB.Cities.register('kingsport-tn', {
            'kingsport times-news', 'times-news', 'wkpt', 'whhg', 'whgg', 'dobyns-bennett', 'dobyns bennett', 'creeper trail', 'barter theatre', 'model city',
            'the fellowship annex', 'fellowship annex', 'circle room', 'holston door', 'model city hall of records', 'the fourth shift', 'fourth shift',
            'long island social club', 'warrior\'s carport', 'lee highway roller rink', 'the pressroom at stone drive', 'greenbelt pavilion annex',
-           'cliffside upstairs', 'the derby lanes', 'derby lanes'],
+           'cliffside upstairs', 'the derby lanes', 'derby lanes',
+           'santa\'s depot', 'bristol rhythm and roots', 'rhythm & roots', 'bristol dragway', 'bristol herald courier', 'kingsport times news', 'visit kingsport',
+           'jettie baker center', 'niswonger performing arts center', 'meadowview', 'wuot', 'sunset concert series', 'j. fred johnson stadium', 'drkmttr',
+           'nameless fest', 'bandsintown', 'eventbrite'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The chemical plant is written only as 'the plant'. */
   blocklist: ['waffle house*', 'hardee*', 'dobyns*', 'fun fest*', 'santa train*', 'east tennessee state*'],
 
@@ -50,7 +53,20 @@ SB.Cities.register('kingsport-tn', {
     { id: 'bloomingdale', name: 'Bloomingdale and the county edge', route: 'campus', note: 'Rural-suburban land, barns and yards with no neighbors in earshot.' }
   ],
 
-  contacts: ['johnson-city-tn', 'asheville-nc', 'roanoke-va'],
+  contacts: ['johnson-city-tn', 'asheville-nc', 'roanoke-va', 'knoxville-tn'],
+
+  calendar: [
+    { id: 'july-fest', label: 'the July street festival', tag: 'festival', month: 7, weeks: [3, 4], dows: [4, 5], can: [.85, .85, .80], hoods: ['downtown', 'riverfront'], elsewhere: [1, .95, .95] },
+    { id: 'holiday-train', label: 'the holiday train', tag: 'parade', month: 11, weeks: [3, 4], dows: [5], can: [.85, .85, .80], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'roots-fest', label: 'the roots festival', tag: 'festival', month: 9, weeks: [2, 3], dows: [4, 5, 6], can: [.92, .88, .85] },
+    { id: 'race-spring', label: 'race weekend', tag: 'race', month: 4, week: 2, dows: [4, 5, 6], can: [.92, .90, .88] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 4], dows: [4], can: [.80, .90, .90] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 4], dows: [4], can: [.80, .90, .90] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { curfewMinors: { weeknight: 1440, weekend: 1440, inForce: false } },
 
   points: [
     { name: 'Knoxville', state: 'TN', lat: 35.96, lon: -83.92, pop: 900000 },
@@ -66,5 +82,58 @@ SB.Cities.register('kingsport-tn', {
     hood: ['Lynn Garden', 'Colonial Heights', 'Orebank', 'Fairacres', 'Cliffside', 'Allandale', 'Bloomingdale', 'Riverview'],
     thing: ['shift change', 'pinto beans and cornbread', 'drive-through', 'church camp', 'fellowship hall', 'stack', 'greenbelt', 'carpool', 'football Friday'],
     weather: ['mountain fog', 'ice storm']
-  }
+  },
+
+  events: [
+    { id: 'KINGSPORT_TN_CARPORT_NEIGHBOR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3] },
+      telegraph: 'The carport show is running long and the neighbor across the narrow street keeps looking out the window.',
+      title: 'The neighbor at the property line',
+      body: 'A woman is standing at the property line with her phone out. Whether the sheriff or the city police come depends on which side of the line she calls.',
+      options: [
+        { id: 'QUIET', label: 'Turn it down and finish acoustic', likely: 'Everyone stays and the neighbor goes inside.',
+          effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The last bands played quiet and the neighbor shut her door.' },
+        { id: 'END', label: 'End it early before anyone calls', likely: 'A short night. Nobody is hurt.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'The set list got cut and everyone was home before the lights came.' },
+        { id: 'ACCEPT', label: 'Play on', likely: 'Louder. Someone will call.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'MONEY', amount: -25 }],
+          result: 'The cruiser rolled up at the last song and the crowd scattered.' }
+      ] },
+
+    { id: 'KINGSPORT_TN_FESTIVAL_BARN', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'festival' },
+      telegraph: 'The street festival has every downtown room blocked and a storm is on the radar.',
+      title: 'The festival takes the hall',
+      body: 'The nine-day festival has taken every downtown block. A barn out past Bloomingdale has opened, with a thunderstorm forecast and one tarp.',
+      options: [
+        { id: 'BARN', label: 'Move the bill to the barn', likely: 'No neighbors to hear it. The weather is a gamble.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'OUTDOOR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'The bill fit under the barn roof and the storm held off until the last song.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The festival crowd had gone home.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A block-long walk past the barricades.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'Load-in was on foot and the crowd was whoever could park.' }
+      ] },
+
+    { id: 'KINGSPORT_TN_HOLIDAY_TRAIN', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'parade' },
+      telegraph: 'Downtown is closed to cars on the Saturday before Thanksgiving.',
+      title: 'Behind the barricades',
+      body: 'The hall you booked is a block inside the barricades for the holiday train. Load-in is on foot and the crowd will be families.',
+      options: [
+        { id: 'CARRY', label: 'Carry the gear in on foot', likely: 'A long night for the van and the drummer.',
+          effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Two hours of carrying amps past strollers. The show went fine.' },
+        { id: 'LATE', label: 'Push doors back until the crowds are gone', likely: 'A late start but a clear street.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Doors an hour late. The street was empty by then.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] }
+  ]
 });

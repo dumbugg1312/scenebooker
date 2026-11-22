@@ -1,12 +1,15 @@
 SB.Cities.register('bridgeport-ct', {
   v: 1,
   slug: 'bridgeport-ct',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['university of bridgeport', 'sacred heart university', 'fairfield university', 'housatonic community college', 'university of new haven', 'connecticut post', 'ctinsider',
            'wpkn', 'wice', 'bridgeport bluefish', 'bridgeport sound tigers', 'bridgeport islanders', 'hartford yard goats', 'webster bank arena', 'harbor yard amphitheater',
            'hartford healthcare amphitheater', 'barnum museum', 'p.t. barnum', 'bridgeport hospital', 'st. vincent\'s', 'sikorsky', 'lycoming', 'bridgeport & port jefferson ferry',
            'port jefferson ferry', 'bridgeport brass', 'general electric', 'hubbell', 'people\'s united bank', 'webster bank', 'metro-north', 'amtrak', 'merritt parkway',
-           'capulet fest', 'connecticut metal fest', 'connecticut death fest', 'hurricane sandy', 'hurricane irene', 'hurricane gloria', 'ct post', 'long island sound'],
+           'capulet fest', 'connecticut metal fest', 'connecticut death fest', 'hurricane sandy', 'hurricane irene', 'hurricane gloria', 'ct post', 'long island sound', 'barnum festival', 'great street parade', 'wing ding parade', 'skyblast', 'harambee festival', 'seaside park',
+           'pleasure beach', 'steelpointe harbor', 'beardsley zoo', 'pseg power', 'new haven independent', 'new haven arts', 'new journal at yale', 'connecticut public',
+           'ct mirror', 'news12', 'wshu', 'daily voice', 'hartford courant', 'stereogum', 'louder sound', 'bandsintown', 'songkick', 'nonoise', 'municode', 'ecode360',
+           'aclu of connecticut'],
   blocklist: ['connecticut post*', 'ctinsider*', 'sikorsky*', 'barnum museum*', 'webster bank*', 'connecticut metal fest*', 'connecticut death fest*'],
 
   blurb: ['A faded factory and harbor city that gave the early Connecticut punk shows and a metalcore sound the whole state still chases.',
@@ -53,7 +56,44 @@ SB.Cities.register('bridgeport-ct', {
     { id: 'the-hollow', name: 'the Hollow', route: 'work-side', note: 'Mixed residential and industrial near the river.' }
   ],
 
+  rooms: [
+    { id: 'west-flat', kind: 'HOUSE', hood: 'west-side', cap: 40, curfew: 1320, ac: false, start: true,
+      note: 'A front room and basement in a two-family flat on the west side. The downstairs neighbor is the whole threat.' },
+    { id: 'east-end-flat', kind: 'HOUSE', hood: 'east-end', cap: 60, curfew: 1350, ac: false, pressure: 55,
+      note: 'A ground-floor flat and a garage behind a triple-decker. It floods in a nor\'easter and the landlord lives upstairs.' },
+    { id: 'factory-loft', kind: 'DIY', hood: 'east-end', cap: 100, curfew: 1380, needs: ['VOUCH'], pressure: 60,
+      note: 'A loft in an old factory building, shared with a studio. Rent hikes close rooms like this one, and everyone knows it.' },
+    { id: 'avenue-cafe', kind: 'HALL', hood: 'downtown', cap: 120, curfew: 1350, ac: true,
+      note: 'A cafe on the avenue that books punk-adjacent bills in the evening. All ages, daytime-business hours and a lease it depends on.' },
+    { id: 'rock-bar', kind: 'BAR', hood: 'black-rock', cap: 90, ages: ['A21'], curfew: 1500,
+      note: 'A neighborhood bar with a corner stage, in a block of bungalows. The people next door call early and often.' },
+    { id: 'avenue-club', kind: 'CLUB', hood: 'downtown', cap: 300, ages: ['ALL', 'A21'], curfew: 1380, following: .5,
+      note: 'A club that took over when the Black Rock room closed. All-ages metal one night, a 21-plus tribute the next, so the age line moves.' },
+    { id: 'harbor-arena', kind: 'BIG', hood: 'downtown', cap: 1500, ages: ['ALL'], curfew: 1380,
+      note: 'The arena and the amphitheater by the harbor. Tours of other genres, and not the room a new booker gets.' },
+    { id: 'north-shop', kind: 'SHOP', hood: 'north-end', cap: 30, curfew: 1140, ac: true,
+      note: 'A shop on a strip beside the houses. An in-store set after hours, over by seven.' },
+    { id: 'shore-lawn', kind: 'OUTDOOR', hood: 'south-end', cap: 200, curfew: 1200, rent: 20, pressure: 45,
+      note: 'A pavilion and a lawn on the shore used for the summer festivals. It needs the city\'s blessing and goes quiet at dusk.' },
+    { id: 'club-hall', kind: 'HALL', hood: 'the-hollow', cap: 150, curfew: 1320, ac: true,
+      note: 'A rented parish or club hall near the river. The neighbors\' lease, not the cops, is the worry.' }
+  ],
+
   contacts: ['new-haven-ct', 'hartford', 'providence', 'new-york'],
+
+  calendar: [
+    { id: 'street-parade', label: 'the big parade weekend', tag: 'parade', month: 6, weeks: [3, 4], dows: [4, 5, 6], can: [.88, .82, .85], hoods: ['downtown', 'south-end', 'north-end'], elsewhere: [.97, .95, .95] },
+    { id: 'juneteenth', label: 'the Juneteenth parade', tag: 'parade', month: 6, week: 2, dows: [5], can: [.95, .90, .92], hoods: ['south-end'], elsewhere: [1, 1, 1] },
+    { id: 'pr-parade', label: 'the Puerto Rican parade weekend', tag: 'parade', month: 7, week: 2, dows: [5, 6], can: [.92, .85, .88], hoods: ['south-end', 'east-side'], elsewhere: [1, .97, .97] },
+    { id: 'fourth', label: 'the Fourth of July fireworks', tag: 'holiday', month: 7, week: 1, dows: [3, 4, 5, 6], can: [.90, .88, .90], hoods: ['south-end', 'black-rock'], elsewhere: [.97, .97, .97] },
+    { id: 'arena-winter', label: 'home basketball and hockey', tag: 'game', month: 1, weeks: [1, 3], dows: [4, 5], can: [.90, .97, .97], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'noreaster', label: 'nor\'easter season', tag: 'holiday', month: 2, week: 2, dows: [4, 5, 6], can: [.80, .85, .90] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] },
+    { id: 'thanksgiving-weekend', label: 'Thanksgiving weekend', tag: 'holiday', month: 11, week: 4, dows: [4, 5, 6], can: [.75, .85, .90] }
+  ],
+
+  rules: { curfewMinors: { weeknight: 1380, weekend: 1440, inForce: false } },
 
   points: [
     { name: 'New York', state: 'NY', lat: 40.71, lon: -74.01, pop: 19900000 },
@@ -87,6 +127,40 @@ SB.Cities.register('bridgeport-ct', {
         { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
           result: 'Two carloads took the back roads together. They will remember that.' }
+      ] },
+
+    { id: 'BRIDGEPORT_CT_PARADE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'parade' },
+      telegraph: 'The parade route is posted along the avenue, and the cafe\'s block is on it.',
+      title: 'The parade has the avenue',
+      body: 'A parade and a street festival shut the avenue and half the blocks around the room. The van has to park three streets away in Brooklawn.',
+      options: [
+        { id: 'EARLY', label: 'Open early and tell everyone where to park', likely: 'Most get in before the barricades. Thinner than usual.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
+          result: 'Doors an hour early. The ones who came parked a mile away and carried the amps.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The street stayed shut. Half the list never found a place to leave the car.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'BRIDGEPORT_CT_NOREASTER', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3], months: [12, 1, 2, 3] },
+      telegraph: 'A nor\'easter is stacking up over the Sound, and the shore highway is already slow.',
+      title: 'The highway is shut at the river',
+      body: 'The storm closed the highway at the river. The band from New Haven can\'t get in, and a Stratford garage band is the only act within walking distance of the room.',
+      options: [
+        { id: 'LOCAL', label: 'Let the garage band fill the slot', likely: 'A thin night, but the ones who came are glad.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'One local band and a long, loose night. The room was half full and warm.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for the plows', likely: 'A late start. The crowd gets restless.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The van pulled in at ten. You started late and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
       ] }
   ]
 });

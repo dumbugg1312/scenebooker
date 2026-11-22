@@ -1,14 +1,17 @@
 SB.Cities.register('johnson-city-tn', {
   v: 1,
   slug: 'johnson-city-tn',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['east tennessee state', 'east tennessee state university', 'etsu', 'buccaneers', 'ballad health', 'milligan university', 'milligan', 'king university', 'tusculum',
            'walters state', 'eastman chemical', 'eastman', 'appalachian state', 'virginia tech', 'tri-cities regional airport', 'johnson city transit', 'tweetsie trail',
            'founders park', 'fountain square', 'food city', 'ingles', 'hurricane helene', 'helene', 'csx', 'science hill', 'daniel boone high', 'model city', 'greyhound',
            'va medical center', 'johnson city press', 'wjhl', 'wets', 'wetb', 'wjcw', 'wqut', 'bristol rhythm', 'rhythm and roots', 'rhythm & roots', 'national storytelling festival',
            'storytelling festival', 'covered bridge days', 'fun fest', 'sycamore shoals', 'bristol motor speedway', 'waffle house', 'cook out', 'mountain dew', 'tabc',
            'the boilerhouse', 'boilerhouse', 'rayon hall', 'fountain annex', 'the switchyard', 'nolichucky room', 'hollow ridge hall', 'the roundhouse back lot',
-           'lowgap social club', 'quarry lane garage', 'sycamore door', 'depot street basement', 'the gap'],
+           'lowgap social club', 'quarry lane garage', 'sycamore door', 'depot street basement', 'the gap',
+           'visit johnson city', 'king commons', 'blue plum', 'brewgrass', 'east tennessean', 'northeast tennessee', 'bristol night race', 'food city 500', 'bass pro',
+           'bristol dragway', 'tipton street', 'covered bridge jams', 'fridays after 5', 'william b. greene', 'greene stadium', 'southern conference', 'tennessee tech', 'samford',
+           'west georgia', 'western carolina', 'watauga dam', 'bandsintown', 'songkick', 'setlist.fm'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The university, the paper, the festivals and the storm are written only in generic form. */
   blocklist: ['johnson city press*', 'ballad health*', 'tweetsie*', 'bristol rhythm*', 'waffle house*', 'cook out*', 'food city*'],
 
@@ -52,7 +55,42 @@ SB.Cities.register('johnson-city-tn', {
     { id: 'mountain-home', name: 'Mountain Home', route: 'old-side', note: 'Institutional hospital and veteran ground: not a show space, but it matters for the crowd.' }
   ],
 
-  contacts: ['kingsport-tn', 'asheville-nc', 'roanoke-va', 'chattanooga-tn'],
+  contacts: ['kingsport-tn', 'asheville-nc', 'roanoke-va', 'knoxville-tn', 'chattanooga-tn'],
+
+  rooms: [
+    { id: 'walnut-porch', kind: 'HOUSE', hood: 'campus', cap: 40, curfew: 1380, ac: false, outdoor: false, pressure: 55, start: true,
+      note: 'A rented front room and porch by campus. The eleven o\'clock limit and a landlord are the whole threat.' },
+    { id: 'tree-yard', kind: 'HOUSE', hood: 'tree-streets', cap: 60, curfew: 1380, ac: false, outdoor: true, pressure: 55,
+      note: 'A backyard show on a small frame lot, one long extension cord and neighbors a fence away.' },
+    { id: 'shop-room', kind: 'DIY', hood: 'bristol-highway', cap: 80, curfew: 1380, ac: false, outdoor: false,
+      note: 'A practice room turned venue in a metal-roofed shop. The landlord and the fire marshal are the risks.' },
+    { id: 'main-street-club', kind: 'CLUB', hood: 'downtown', cap: 150, ages: ['A18'], curfew: 1620, ac: true, pressure: 60, standing: [60, 65, 65],
+      note: 'The only real punk and hardcore room in town: a small stage, cans of beer, and a second noise violation could cost the license.' },
+    { id: 'stage-bar', kind: 'BAR', hood: 'downtown', cap: 200, curfew: 1500, ac: true, standing: [50, 60, 60],
+      note: 'A bar with a stage a few doors from the club, booking punk on the nights between cover bands.' },
+    { id: 'listening-room', kind: 'BAR', hood: 'downtown', cap: 250, curfew: 1440, ac: true, standing: [45, 60, 60],
+      note: 'An old listening room with a long history of independent bookings. Roots music is the rule and punk the exception.' },
+    { id: 'post-hall', kind: 'HALL', hood: 'north-roan', cap: 150, curfew: 1320, ac: false, pressure: 45,
+      note: 'A fellowship hall or veterans\' post rented by the night. The host\'s rules decide what you can play.' },
+    { id: 'creek-lot', kind: 'OUTDOOR', hood: 'boones-creek', cap: 120, curfew: 1320, ac: false, outdoor: true, pressure: 55,
+      note: 'A farm lot or skatepark with a generator, and the city and county arguing over who polices it.' },
+    { id: 'campus-hall', kind: 'BIG', hood: 'campus', cap: 800, curfew: 1380, ac: true, standing: [40, 60, 55],
+      note: 'A campus ballroom or arena a touring act might fill. The school books it and it is rarely punk.' }
+  ],
+
+  calendar: [
+    { id: 'downtown-fest', label: 'the downtown music-and-arts festival', tag: 'festival', month: 6, week: 1, dows: [4, 5], can: [.85, .85, .80], hoods: ['downtown'], elsewhere: [1, .95, .95] },
+    { id: 'race-spring', label: 'race weekend', tag: 'race', month: 4, week: 2, dows: [4, 5, 6], can: [.90, .88, .85] },
+    { id: 'race-fall', label: 'race weekend, fall', tag: 'race', month: 9, week: 2, dows: [3, 4, 5], can: [.90, .88, .85] },
+    { id: 'roots-fest', label: 'the roots festival', tag: 'festival', month: 9, weeks: [3, 4], dows: [4, 5, 6], can: [.92, .88, .85] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [.85, .92, .92], hoods: ['campus', 'downtown'], elsewhere: [1, 1, 1] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [.85, .92, .92], hoods: ['campus', 'downtown'], elsewhere: [1, 1, 1] },
+    { id: 'graduation', label: 'graduation weekend', tag: 'graduation', month: 5, week: 1, dows: [4, 5, 6], can: [.90, .85, .85], hoods: ['campus', 'tree-streets'], elsewhere: [1, 1, 1] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1380 },
 
   points: [
     { name: 'Knoxville', state: 'TN', lat: 35.96, lon: -83.92, pop: 190000 },
@@ -68,5 +106,58 @@ SB.Cities.register('johnson-city-tn', {
     hood: ['Boones Creek', 'Gray', 'Mountain Home', 'Piney Flats', 'Roan Mountain', 'Buffalo Mountain', 'the Tri-Cities'],
     thing: ['biscuit', 'pimento cheese', 'banana pudding', 'sweet tea', 'rail yard', 'tobacco barn', 'covered bridge', 'church sign', 'banjo', 'fiddle', 'porch', 'chain diner'],
     weather: ['mountain ice', 'valley fog', 'flash flood', 'thunderstorm']
-  }
+  },
+
+  events: [
+    { id: 'JOHNSON_CITY_TN_RACE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 5], calendar: 'race' },
+      telegraph: 'Every motel on the interstate is full and half the town has gone up the road to the track.',
+      title: 'Race weekend empties the club',
+      body: 'Everyone with a truck has left for the speedway. You have a full bill and a room that is going to hold ten people.',
+      options: [
+        { id: 'RUN', label: 'Run the full bill for whoever shows', likely: 'A tiny crowd and a loose, friendly night.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'REGULARS', pct: .02 }],
+          result: 'Ten people and five bands. It was the best sound check of the year.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' },
+        { id: 'PORCH', label: 'Move the bill to a porch and keep it small', likely: 'Smaller and louder, and nobody pays a cover.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'The bill fit on a porch and the neighbors were at the track too.' }
+      ] },
+
+    { id: 'JOHNSON_CITY_TN_NOISE_STRIKE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'festival' },
+      telegraph: 'The downtown streets are closed off for the festival and the cops are walking the strip.',
+      title: 'Another noise complaint',
+      body: 'A second noise violation landed on the club the night of the festival, and the license is two days short. The booker wants the bill quiet and early.',
+      options: [
+        { id: 'EARLY', label: 'Start early and finish before the hour', likely: 'A short, loud night with no trouble.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Doors early, done before the hour. The cops walked past twice and kept walking.' },
+        { id: 'MOVE', label: 'Move it to a house', likely: 'No license to lose. The neighbors are close.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'A porch took the bill with an hour to spare, and the floor was packed.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Some of the crowd stays out of the way.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The door was nervous all night and half the list stayed outside.' }
+      ] },
+
+    { id: 'JOHNSON_CITY_TN_FLASH_FLOOD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], weather: 'RAIN', months: [3, 4, 5, 6, 7, 8, 9] },
+      telegraph: 'Fog in the valley and a flash-flood watch for the creeks.',
+      title: 'The pass is under water',
+      body: 'A band booked from over the mountains is crawling around a closed road. They will reach the porch show three hours after load-in.',
+      options: [
+        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start. The crowd gets restless.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The van pulled in at ten. You started late and nobody left.' },
+        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'A thin night, but the ones who came are glad.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'Two bands and a long, loose night on a wet porch.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] }
+  ]
 });

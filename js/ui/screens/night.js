@@ -72,15 +72,18 @@
     cashSayPending: 'The cash box: counted at the end of the night.',
     counterSay: '{n} in the room: {k} kids, {m} in the middle, {o} old heads.',
     watch: 'Watch',
-    peak: 'peak',
-    heatSay: 'heat {n}',
+    peak: 'best set of the night',
+    heatSay: 'room got {n}/100 loud',
     likely: 'likely',
     cannot: 'can\'t:',
     keepCustom: 'the usual split',
     keepFair: 'only what is fair',
     keepNone: 'keep nothing',
-    youKeep: 'you keep {n}',
+    youKeep: 'you keep {n}', youKeepRest: 'you keep {n}, the local bands split {rest}',
     doorLine: '{paid} paid × {price}',
+    owedPaid: 'owed {owed}, paid {paid}',
+    youPay: 'you pay {n}', bandGets: 'the band gets {n}', localsGet: 'the locals get {n}', roomGets: 'the room gets {n}',
+    hatBrings: 'the hat brings {n}', leftUnpaid: '{n} left unpaid',
     tear: 'tear one off',
     lineN: 'the line: {n}',
     lineGone: 'the line: gone home',
@@ -162,7 +165,7 @@
       case 'POST': m.posts.push(r.text || L('postHeld')); break;
       case 'INCIDENT': m.incidents.push({ at: r.at, kind: r.kind, q: r.q, text: r.text || '' }); break;
       case 'NIGHT_END': m.ended = true; m.phase = 'leave'; m.turnedAway = r.turnedAway; if (num(r.heads)) m.heads = r.heads; break;
-      case 'SETTLE_LINE': m.lines.push({ k: r.k, label: r.label || '', amount: r.amount, running: r.running }); break;
+      case 'SETTLE_LINE': m.lines.push({ k: r.k, label: r.label || '', amount: r.amount, owed: num(r.owed) ? r.owed : r.amount, paid: r.amount, running: r.running }); break;
       case 'SETTLE_DONE': m.settled = true; break;
       default: break;
     }
@@ -283,6 +286,7 @@
       function pump() {
         var d;
         if (timer || !alive) return;
+        if (queue.length) playing(true);
         while (queue.length) {
           d = step();
           if (d > 0) { timer = setTimeout(function () { timer = null; pump(); }, d); return; }
@@ -295,7 +299,13 @@
         try { while (queue.length) step(); } finally { flushing = false; }
         drained();
       }
-      function drained() { paintStop(); paintButtons(); }
+      function playing(on) {
+        var b = typeof document !== 'undefined' && document.body;
+        if (!b || b.classList.contains('nt-playing') === !!on) return;
+        b.classList.toggle('nt-playing', !!on);
+        if (!on && SB.UI.story && SB.UI.story.retape) SB.UI.story.retape();      // the guide's line can come back now
+      }
+      function drained() { playing(false); paintStop(); paintButtons(); }
 
       /* ---------- actions ---------- */
       function begin() {
@@ -522,6 +532,18 @@
         if (typeof requestAnimationFrame === 'function') requestAnimationFrame(function () { try { var b = el2.querySelector('.nt-tab:not([disabled])'); if (b) b.focus(); } catch (e) { /* fine */ } });
         return el2;
       }
+      /* a shortfall answer's outcome, like the keep row's: who gets what, and what you pay */
+      function shortT(o) {
+        var p = o.preview, t = [];
+        if (!p) return null;
+        if ((o.k === 'ASK_LESS' || o.k === 'SHORT_SILENT') && num(p.touring)) t.push(L('bandGets', { n: money(p.touring) }));
+        if (o.k === 'LOCALS_GIVE') t.push(L('localsGet', { n: money(p.locals) }));
+        if (o.k === 'OFF_RENT') t.push(L('roomGets', { n: money(p.room) }));
+        if (o.k === 'HAT') t.push(L('hatBrings', { n: money(p.hat) }));
+        if (o.k === 'POCKET' || p.pocket > 0) t.push(L('youPay', { n: money(p.pocket) }));
+        if (p.unpaid > 0) t.push(L('leftUnpaid', { n: money(p.unpaid) }));
+        return t.join(', ') || null;
+      }
       function envelope(v, lines, done) {
         var kids = [], split, opts, shN = curShow(), hero, heroN, heroV, key, from;
         var netV = done && shN ? (shN.result && num(shN.result.playerNet) ? shN.result.playerNet : (shN.night && shN.night.settled ? shN.night.settled.playerNet : null)) : null;
@@ -547,9 +569,10 @@
         }
         kids.push(h('ol', { class: 'nt-env-lines' }, lines.map(function (l, i) {
           var fresh = i >= seenLines;
-          return h('li', { class: 'nt-env-line' + (l.k === 'YOU' ? ' is-you' : '') + (fresh ? ' mv-slap' : ''), style: { '--i': String(Math.max(0, i - seenLines)) }, data: { tut: ({ ROOM: 'settle-pay-room', SOUND: 'settle-pay-sound', SHARE: 'settle-pay-touring', LOCAL: 'settle-pay-local' })[l.k] || null, 'tut-ref': showId || null } }, [
-            h('span', { class: 'cb-typed nt-env-label', text: l.label || '' }),
-            h('span', { class: 'nt-fig', text: num(l.amount) ? money(l.amount) : '' }),
+          var shortL = num(l.owed) && num(l.paid) && l.paid < l.owed;     // paid less than agreed: say both
+          return h('li', { class: 'nt-env-line' + (l.k === 'YOU' ? ' is-you' : '') + (shortL ? ' is-short' : '') + (fresh ? ' mv-slap' : ''), style: { '--i': String(Math.max(0, i - seenLines)) }, data: { tut: ({ ROOM: 'settle-pay-room', SOUND: 'settle-pay-sound', SHARE: 'settle-pay-touring', LOCAL: 'settle-pay-local' })[l.k] || null, 'tut-ref': showId || null } }, [
+            h('span', { class: 'cb-typed nt-env-label' }, [l.label || '', shortL ? h('span', { class: 'nt-env-owed', text: L('owedPaid', { owed: money(l.owed), paid: money(l.paid) }) }) : null]),
+            h('span', { class: 'nt-fig', text: num(l.amount) ? (l.k === 'DEPOSIT' ? '+' : '') + money(l.amount) : '' }),
             num(l.running) ? h('span', { class: 'nt-env-run', text: money(l.running) }) : null
           ]);
         })));
@@ -558,14 +581,16 @@
           if (num(v.gap) && v.gap > 0) {
             var gapT = L('short', { gap: money(v.gap) }).toUpperCase(), gapW = K().markerWidth(gapT, 22) + 24;
             kids.push(h('p', { class: 'nt-env-gap' }, [D().art(D().swipe(0, 22, gapW - 10, 22) + K().marker(gapT, 6, 32, 22, { seed: 'gap' }), gapW, 44)]));
-            opts = (v.shortfall || []).map(function (o) { return { id: o.k, label: o.label || lower(o.k), costs: o.costs || [], enabled: o.enabled, why: o.why }; });
-            kids.push(tabRow(opts, function (o) { settle({ shortfall: o.id, keep: 0 }); }, L('short', { gap: money(v.gap) }), 'settle-done'));
+            opts = (v.shortfall || []).map(function (o) { return { id: o.k, label: o.label || lower(o.k), costs: o.costs || [], enabled: o.enabled, why: o.why, likely: o.enabled ? shortT(o) : null }; });
+            kids.push(tabRow(opts, function (o) { settle({ shortfall: o.id }); }, L('short', { gap: money(v.gap) }), 'settle-done'));
           } else {
             split = v.split || {};
             opts = [];
-            if (split.custom && num(split.custom[2])) opts.push({ id: 'custom', label: L('keepCustom'), costs: [], likely: L('youKeep', { n: money(split.custom[2]) }), keep: split.custom[2] });
-            if (num(split.fairMax)) opts.push({ id: 'fair', label: L('keepFair'), costs: [], likely: L('youKeep', { n: money(split.fairMax) }), keep: split.fairMax });
-            opts.push({ id: 'none', label: L('keepNone'), costs: [], likely: L('youKeep', { n: money(0) }), keep: 0 });
+            /* what you don't keep goes to the local bands: say so, or the three choices read like three prices */
+            var keepT = function (n) { return num(v.left) && v.left - n > 0 ? L('youKeepRest', { n: money(n), rest: money(v.left - n) }) : L('youKeep', { n: money(n) }); };
+            if (split.custom && num(split.custom[2])) opts.push({ id: 'custom', label: L('keepCustom'), costs: [], likely: keepT(split.custom[2]), keep: split.custom[2] });
+            if (num(split.fairMax)) opts.push({ id: 'fair', label: L('keepFair'), costs: [], likely: keepT(split.fairMax), keep: split.fairMax });
+            opts.push({ id: 'none', label: L('keepNone'), costs: [], likely: keepT(0), keep: 0 });
             kids.push(tabRow(opts, function (o) { settle({ shortfall: null, keep: o.keep }); }, L('envelope'), 'settle-done'));
           }
         }
@@ -657,7 +682,7 @@
           SB.UI.clear(host);
           host.className = 'nt-at nt-at--stop is-env'; quiet(false);
           try { savedView = SB.Night.settleView(S(), showId); } catch (e) { savedView = null; }
-          host.appendChild(envelope(savedView, savedView ? savedView.lines.map(function (l) { return { k: l.k, label: l.label, amount: l.amount }; }) : [], false));
+          host.appendChild(envelope(savedView, savedView ? savedView.lines.map(function (l) { return { k: l.k, label: l.label, amount: l.amount, owed: l.amount, paid: l.paid }; }) : [], false));
           paintDoor(); paintPiles(); paintCrowd(); paintSetList(); paintStamp();
           if (typeof requestAnimationFrame === 'function') requestAnimationFrame(function () { try { var b = host.querySelector('.nt-tab:not([disabled])'); if (b) b.focus(); } catch (e) { /* fine */ } });
           return;
@@ -749,7 +774,7 @@
       return {
         update: function () { if (phase === 'night' || phase === 'settled') { paint(); paintButtons(); } },
         flush: flush,
-        unmount: function () { alive = false; clearTimer(); if (ro) { try { ro.disconnect(); } catch (e) { /* fine */ } } if (onResize && typeof window !== 'undefined') window.removeEventListener('resize', onResize); }
+        unmount: function () { alive = false; clearTimer(); playing(false); if (ro) { try { ro.disconnect(); } catch (e) { /* fine */ } } if (onResize && typeof window !== 'undefined') window.removeEventListener('resize', onResize); }
       };
     }
   });

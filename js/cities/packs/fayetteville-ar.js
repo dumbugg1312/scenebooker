@@ -7,7 +7,10 @@ SB.Cities.register('fayetteville-ar', {
            'democrat-gazette', 'fayetteville flyer', 'arkansas traveler', 'northeastern state university', 'cherokee nation', 'fort chaffee',
            'crystal bridges', 'razorback greenway', 'arkansas abc', 'american legion', 'vfw', 'the dogtrot', 'low water crossing', 'persimmon hall',
            'the cistern', 'frisco grain', 'boston mountain social club', 'dewberry annex', 'sassafras hall', 'lot 49', 'the hickory room',
-           'pocket knife hall'],
+           'pocket knife hall',
+           'ammplify fest', 'ammplify', 'old friends music festival', 'fayetteville roots festival', 'roots fest', 'lights of the ozarks',
+           'fayetteville farmers market', 'joe martin stage race', 'square to square', 'kuaf', 'ozarks at large', 'nwa free weekly',
+           'idle class magazine', 'experience fayetteville', 'onlyinark', 'arkansas online', 'format festival', 'mutants of the monster'],
   /* The dossier's twelve invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['razorback*', 'bikes blues*', 'walmart*', 'democrat-gazette*', 'fayetteville flyer*', 'arkansas traveler*'],
 
@@ -58,7 +61,47 @@ SB.Cities.register('fayetteville-ar', {
     { id: 'sequoyah', name: 'Mount Sequoyah', route: 'campus', note: 'A steep, expensive hillside of professors and retirees; a skyline landmark, not a venue district.' }
   ],
 
-  contacts: ['springfield-mo', 'little-rock-ar'],
+  rooms: [
+    { id: 'wilson-house', kind: 'HOUSE', hood: 'wilson-park', cap: 40, curfew: 1320, ac: false, outdoor: false, pressure: 60, start: true,
+      note: 'A borrowed bungalow on the old house-show streets, since the main house room lost its house. The neighbors and the landlord can end it any week.' },
+    { id: 'walker-basement', kind: 'HOUSE', hood: 'walker-park', cap: 50, curfew: 1350, ac: false, pressure: 50,
+      note: 'A duplex with a basement that a band house has used for years. Fine until the lease gets read.' },
+    { id: 'mission-unit', kind: 'DIY', hood: 'mission', cap: 80, curfew: 1380, ac: false, pressure: 55, needs: ['VOUCH'],
+      note: 'A strip-mall unit with a hand-built stage, run by a small crew that also plays the bills.' },
+    { id: 'sound-house', kind: 'DIY', hood: 'walker-park', cap: 120, curfew: 1380, ac: false, pressure: 60, needs: ['VOUCH'],
+      note: 'A converted building that is part art space, part stage and part practice room. The rent and a possible sale hang over it.' },
+    { id: 'studio-yard', kind: 'OUTDOOR', hood: 'walker-park', cap: 250, curfew: 1260, ac: false, outdoor: true,
+      note: 'A yard at an art-and-studio complex that has held an all-day punk market. A stage, vendor tables, and over by dark.' },
+    { id: 'hilltop-site', kind: 'OUTDOOR', hood: 'sequoyah', cap: 150, curfew: 1260, ac: false, outdoor: true, pressure: 30,
+      note: 'A hilltop or trailside clearing for a festival-style one-off. The neighbors are far enough to forget, and the weather decides.' },
+    { id: 'post-hall', kind: 'HALL', hood: 'wilson-park', cap: 100, rent: 80, curfew: 1320, ac: true, owner: 'HALL_MANAGER',
+      note: 'A veterans post hall that hosts toy-drive shows. No alcohol, cheap, and the post wants the room back by night.' },
+    { id: 'square-shop', kind: 'SHOP', hood: 'square', cap: 60, curfew: 1200, ac: true,
+      note: 'A small downtown shop for an early in-store set, over before the bars fill the street.' },
+    { id: 'square-bar', kind: 'BAR', hood: 'square', cap: 150, ages: ['A21'], curfew: 1500, ac: true,
+      note: 'A bar back room with a PA. The bar keeps the drinks and you keep what is left of the door.' },
+    { id: 'dickson-bar', kind: 'BAR', hood: 'dickson', cap: 200, ages: ['A21'], curfew: 1500, ac: true, following: .3,
+      note: 'A bar stage on the strip, with students and game-day money. Some nights are 18-plus, but kids are rarely the point.' },
+    { id: 'strip-club', kind: 'CLUB', hood: 'dickson', cap: 300, ages: ['A18'], curfew: 1470, ac: true, needs: ['FULL_BILL'],
+      note: 'The room on the strip that books touring punk and hardcore, mostly 18-plus. It pays, and it checks IDs.' },
+    { id: 'wedington-hall', kind: 'BIG', hood: 'wedington', cap: 900, ages: ['ALL'], curfew: 1380, ac: true,
+      note: 'A big hall on the west side that books national metal and rock. Locals open only if a tour needs one.' }
+  ],
+
+  contacts: ['springfield-mo', 'tulsa', 'little-rock-ar', 'kansas-city'],
+
+  calendar: [
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 4], dows: [5], can: [.75, .65, .65], hoods: ['dickson', 'square'], elsewhere: [.92, .90, .90] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 4], dows: [5], can: [.75, .65, .65], hoods: ['dickson', 'square'], elsewhere: [.92, .90, .90] },
+    { id: 'football-nov', label: 'home football', tag: 'game', month: 11, weeks: [1, 4], dows: [5], can: [.75, .65, .65], hoods: ['dickson', 'square'], elsewhere: [.92, .90, .90] },
+    { id: 'spring-race', label: 'bike race weekend', tag: 'race', month: 5, week: 2, dows: [5, 6], can: [.92, .90, .90], hoods: ['square'], elsewhere: [1, .98, .98] },
+    { id: 'holiday-lights', label: 'the holiday lights on the Square', tag: 'holiday', month: 12, weeks: [1, 3], dows: [4, 5], can: [.92, .90, .90], hoods: ['square'], elsewhere: [1, 1, 1] },
+    { id: 'graduation', label: 'graduation and the long break', tag: 'graduation', month: 5, weeks: [1, 2], dows: [4, 5, 6], can: [.75, .80, .80] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1380 },
 
   points: [
     { name: 'Fort Smith', state: 'AR', lat: 35.39, lon: -94.40, pop: 89000 },
@@ -74,5 +117,58 @@ SB.Cities.register('fayetteville-ar', {
     hood: ['Wilson Park', 'Mount Nord', 'Walker Park', 'Mount Sequoyah', 'the Square'],
     thing: ['cheese dip', 'daylight basement', 'steep driveway', 'poultry truck', 'feed store', 'sweet tea', 'veterans hall', 'toy drive', 'hilltop', 'trail'],
     weather: ['ice storm', 'tornado watch']
-  }
+  },
+
+  events: [
+    { id: 'FAYETTEVILLE_AR_HOME_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'game' },
+      telegraph: 'It is a home Saturday, and the stadium traffic is already backed up past the strip.',
+      title: 'The stadium swallows the strip',
+      body: 'A home game fills every bar, hotel and lot below the ridge. Your bill is in the same part of town, and nobody can park.',
+      options: [
+        { id: 'SOUTH', label: 'Move the whole bill to a south-side unit', likely: 'Smaller, but away from the traffic.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
+          result: 'A unit on the south side took the bill. Smaller, loud, and nobody circled for parking.' },
+        { id: 'LATE', label: 'Push doors back until the game crowd thins', likely: 'The ones who want a real night come late.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'Doors an hour and a half late. The kids came in once the streets cleared.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
+          result: 'The casual crowd sat in traffic. The regulars found a place to park.' }
+      ] },
+
+    { id: 'FAYETTEVILLE_AR_HILLTOP_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [4, 5, 6, 9, 10] },
+      telegraph: 'Thunderstorms are forecast for the ridge, right over the hilltop day show.',
+      title: 'Thunder on the ridge',
+      body: 'The day show is set in a clearing on the hill, and the forecast has a line of storms coming through at four. The generator is already up there.',
+      options: [
+        { id: 'HALL', label: 'Move the bill to the veterans hall', likely: 'No beer and out by nine. Smaller, but dry.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'The post took the bill with a few hours to spare. Dry, close and over by nine.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' },
+        { id: 'ACCEPT', label: 'Run it on the hill and hope', likely: 'A lot of people watch the sky and stay home.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
+          result: 'The line of storms broke early. Half the list had already given up.' }
+      ] },
+
+    { id: 'FAYETTEVILLE_AR_ICE_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3], months: [12, 1, 2] },
+      telegraph: 'An ice storm is sitting on the mountain grade, and the interstate is down to one lane.',
+      title: 'The van is stuck north of town',
+      body: 'The touring band is stuck behind a jackknifed truck on the grade, and the local opener has been told to be ready to play twice.',
+      options: [
+        { id: 'SHORT', label: 'Run the short bill and let the opener play long', likely: 'A thin night, but the ones who came are glad.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'The opener played twice and the room stayed warm. The van never made it.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'A late start. The crowd gets restless.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The van pulled in at ten, glazed with ice. You started late and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] }
+  ]
 });

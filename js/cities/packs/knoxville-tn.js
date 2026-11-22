@@ -1,12 +1,16 @@
 SB.Cities.register('knoxville-tn', {
   v: 1,
   slug: 'knoxville-tn',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['university of tennessee', 'tennessee volunteers', 'vols', 'tennessee valley authority', 'tva', 'oak ridge national laboratory', 'ornl', 'y-12',
            'pellissippi state', 'carson-newman', 'maryville college', 'lincoln memorial university', 'knox news', 'knoxville news sentinel', 'metro pulse',
            'knoxville mercury', 'wbir', 'wate', 'wvlt', 'wuot', 'neyland stadium', 'thompson-boling arena', 'tennessee theatre', 'dollywood', 'covenant health',
            'university of tennessee medical center', 'pilot company', 'clayton homes', 'scripps', 'bijou theatre', 'tennessee valley fair', 'rhythm n blooms',
-           'big ears', 'great smoky mountains national park', 'market square', 'sundown in the city'],
+           'big ears', 'great smoky mountains national park', 'market square', 'sundown in the city',
+           'dogwood arts festival', 'dogwood arts', 'rossini festival', 'hola festival', 'regal celebration of lights', 'wivk christmas parade',
+           'christmas in the city', 'sosoko pride', 'world\'s fair park', 'sunsphere', 'chilhowee park', 'krutch park', 'neyland', 'ut daily beacon',
+           'daily beacon', 'inside of knoxville', 'blank news', 'knoxville opera', 'visit knoxville', 'knoxville hardcore fest', 'karns community fair',
+           'kat shuttle', 'knoxville area transit'],
   blocklist: ['rhythm n blooms*', 'big ears festival*', 'knoxville mercury*', 'metro pulse*', 'bijou theatre*', 'tennessee theatre*'],
 
   blurb: ['A river valley under the mountains where a few old punk houses and a deli patio keep the all-ages tradition alive.',
@@ -47,6 +51,50 @@ SB.Cities.register('knoxville-tn', {
     { id: 'west-knoxville', name: 'West Knoxville and Bearden', route: 'campus', note: 'Suburban. An early all-ages house venue was out here.' }
   ],
 
+  rooms: [
+    { id: 'gill-porch', kind: 'HOUSE', hood: 'fourth-gill', cap: 40, curfew: 1350, ac: false, outdoor: false, pressure: 55, start: true,
+      note: 'A living room and porch in an old frame house on the hill streets, the kind of place the scene has used for decades.' },
+    { id: 'sanders-basement', kind: 'HOUSE', hood: 'fort-sanders', cap: 60, curfew: 1320, ac: false, outdoor: false, pressure: 55,
+      note: 'A rented student Victorian with a basement. It runs while the lease year does and the summer empties it.' },
+    { id: 'river-yard', kind: 'HOUSE', hood: 'south-knoxville', cap: 50, curfew: 1350, ac: false, outdoor: true, pressure: 45,
+      note: 'Yard and porch shows across the river. Rain moves it to the kitchen.' },
+    { id: 'community-house', kind: 'HALL', hood: 'fourth-gill', cap: 49, curfew: 1320, ac: false, pressure: 55, standing: [70, 60, 55],
+      note: 'A hundred-year-old house run as a neighborhood center, booked all week, so punk shows fight for dates and upkeep money.' },
+    { id: 'karns-hall', kind: 'HALL', hood: 'west-knoxville', cap: 200, curfew: 1350, ac: false,
+      note: 'A community youth center far out west that takes touring hardcore bills, and you need a car to reach it.' },
+    { id: 'warehouse-room', kind: 'DIY', hood: 'western', cap: 80, ages: ['A18'], curfew: 1380, ac: false, outdoor: false,
+      note: 'A warehouse room with a PA and a folding table for merch. The landlord and the fire marshal are the threat.' },
+    { id: 'brick-club', kind: 'BAR', hood: 'old-city', cap: 150, ages: ['A18'], curfew: 1440, ac: true, standing: [55, 65, 65],
+      note: 'A brick indie club that books local punk nights with eighteen-and-over entry. It lives on bar sales.' },
+    { id: 'strip-bar', kind: 'BAR', hood: 'downtown', cap: 120, curfew: 1500, ac: true, standing: [45, 60, 60],
+      note: 'A bar with a back stage on the main strip. Game-day Saturdays eat the calendar.' },
+    { id: 'touring-room', kind: 'CLUB', hood: 'old-city', cap: 300, ages: ['A18'], curfew: 1410, ac: true, standing: [40, 60, 60],
+      note: 'A mid-size room for touring bills, where a local band gets a slot only by opening.' },
+    { id: 'holler-room', kind: 'CLUB', hood: 'happy-holler', cap: 200, ages: ['ALL'], curfew: 1350, ac: true, seated: true, standing: [50, 65, 60],
+      note: 'A cozy high-ceilinged room by a cafe, often seated, with all ages on most nights.' },
+    { id: 'deli-patio', kind: 'SHOP', hood: 'downtown', cap: 60, curfew: 1080, ac: false, outdoor: true,
+      note: 'A deli patio matinee, the only early-evening room in town.' },
+    { id: 'theater-hall', kind: 'BIG', hood: 'downtown', cap: 1000, curfew: 1380, ac: true, standing: [35, 60, 55],
+      note: 'A theater-sized room for the tours that stop here. A local band gets in only by winning a support slot.' }
+  ],
+
+  contacts: ['johnson-city-tn', 'kingsport-tn', 'chattanooga-tn', 'asheville-nc', 'nashville'],
+
+  calendar: [
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [.80, .90, .90], hoods: ['downtown', 'fort-sanders'], elsewhere: [.95, .97, .97] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [.80, .90, .90], hoods: ['downtown', 'fort-sanders'], elsewhere: [.95, .97, .97] },
+    { id: 'street-fair', label: 'the spring street fair', tag: 'festival', month: 4, week: 3, dows: [5, 6], can: [.88, .88, .85], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'arts-fest', label: 'the spring arts festival', tag: 'festival', month: 4, week: 4, dows: [4, 5, 6], can: [.90, .88, .85], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'county-fair', label: 'the county fair', tag: 'fair', month: 9, weeks: [2, 3], dows: [4, 5, 6], can: [.92, .90, .88], hoods: ['east-knoxville'], elsewhere: [1, 1, 1] },
+    { id: 'latino-fest', label: 'the Latino festival', tag: 'festival', month: 10, week: 2, dows: [5, 6], can: [.90, .88, .85], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'lights', label: 'the lights celebration', tag: 'holiday', month: 11, week: 4, dows: [4], can: [.85, .85, .80], hoods: ['downtown'], elsewhere: [1, .95, .95] },
+    { id: 'xmas-parade', label: 'the Christmas parade', tag: 'parade', month: 12, week: 1, dows: [4], can: [.85, .85, .80], hoods: ['downtown'], elsewhere: [1, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { curfewMinors: { weeknight: 1440, weekend: 1440, inForce: false } },
+
   points: [
     { name: 'Nashville', state: 'TN', lat: 36.16, lon: -86.78, pop: 2197416 },
     { name: 'Atlanta', state: 'GA', lat: 33.75, lon: -84.39, pop: 6400000 },
@@ -79,6 +127,41 @@ SB.Cities.register('knoxville-tn', {
         { id: 'TARP', label: 'Hang a tarp and play on', likely: 'Costs thirty dollars. The crowd thins.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'The tarp sagged and dripped on the drummer. The room stayed half full.' }
+      ] },
+
+    { id: 'KNOXVILLE_TN_GAME_DAY_PORCH', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'game' },
+      telegraph: 'A home game is on Saturday and the hill streets are already lined with parked cars.',
+      title: 'The football-day blockade',
+      body: 'Game-day traffic has the street at Fourth and Gill packed solid and your load-in is two blocks away. A neighbor is already on the phone about the porch.',
+      options: [
+        { id: 'LATE', label: 'Push doors back until the traffic clears', likely: 'The crowd that wants a night out shows up, late.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Doors an hour late. The street cleared and the porch filled.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The casual crowd stayed home. The regulars carried amps up the hill.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'KNOXVILLE_TN_PARADE_MATINEE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'parade' },
+      telegraph: 'The parade is about to close Gay Street and every room downtown with it.',
+      title: 'The street closes at six',
+      body: 'The only room still open is the deli patio, and only for a matinee. Bands and fans have to be in and out before the roads shut.',
+      options: [
+        { id: 'MATINEE', label: 'Move the bill to the patio matinee', likely: 'Early, small and sunny.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'SHOP', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'Four bands before the roads closed. Everyone was home by dark.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The streets were open and fewer people could come.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Everyone walks in past the barricades.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'Load-in was on foot and the door was slow.' }
       ] }
+
   ]
 });

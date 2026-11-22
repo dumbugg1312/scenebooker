@@ -6,9 +6,10 @@ SB.Cities.register('palm-bay-fl', {
            'space force station', 'port canaveral', 'general development', 'hurricane irma', 'irma', 'hurricane nicole', 'hurricane milton', 'waffle house', 'publix',
            'pub subs', 'wawa', 'checkers', 'beef o\'brady\'s', 'sonny\'s bbq', 'tijuana flats', 'vfw', 'american legion', 'space coast', 
            'the lanai', 'cabbage palm hall', 'slab ranch', 'canal nine', 'the platted lot', 'sandspur room', 'port malabar social hall',
-           'scrub jay annex', 'the carport annex', 'lagoon road rec', 'the retention pond', 'swale street studios'],
+           'scrub jay annex', 'the carport annex', 'lagoon road rec', 'the retention pond', 'swale street studios',
+           'spacecoast daily', 'space coast daily', 'clickorlando', 'wkmg', 'fox 35', 'orlando weekly', 'brevard live', 'harbor city local', 'black box blackout', 'punk in the park', 'thrash the 321', 'sonic waves', 'spaceport rocketry', 'fred poppe', 'palm bay multicultural festival', 'palm bay holiday light parade', 'palm bay independence day celebration', 'veterans day parade', 'puerto rican day parade', 'space coast harley-davidson', 'spacex', 'blue origin', 'new glenn', 'falcon 9', 'delta iv', 'king center', 'henegar center', 'intracoastal brewing', 'bandsintown', 'eventbrite', 'reverbnation', 'palm bay police department'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Real schools, press, chains and storms are written only in generic form; the region is written only as 'the coast'. */
-  blocklist: ['florida today*', 'waffle house*', 'cabbage palm*', 'slab ranch*', 'sandspur room*', 'swale street*', 'port malabar social*'],
+  blocklist: ['florida today*', 'waffle house*', 'cabbage palm*', 'slab ranch*', 'sandspur room*', 'swale street*', 'port malabar social*', 'sonic waves*', 'harbor city local*', 'intracoastal brewing*'],
 
   blurb: ['A huge, centerless city of platted lots on Florida\'s Atlantic coast, all ranch houses, canals and strip plazas with no walkable core.',
           'Hot and flat, with a carpool and a generator deciding whether anyone plays tonight. The scene lives in garages and carports, and the next town up the coast gets the credit.'],
@@ -47,7 +48,19 @@ SB.Cities.register('palm-bay-fl', {
     { id: 'north-border', name: 'the Babcock Street border with Melbourne', route: 'campus', note: 'Apartments, a commuter campus and plazas where the city line blurs.' }
   ],
 
-  contacts: ['port-st-lucie-fl', 'lakeland-fl', 'gainesville-fl'],
+  contacts: ['port-st-lucie-fl', 'orlando', 'daytona-beach-fl', 'lakeland-fl', 'gainesville-fl'],
+
+  calendar: [
+    { id: 'veterans-parade', label: 'the veterans\' parade', tag: 'parade', month: 11, week: 2, dows: [5], can: [.95, .97, 1] },
+    { id: 'light-parade', label: 'the holiday light parade', tag: 'parade', month: 12, week: 1, dows: [5], can: [.85, .88, .92] },
+    { id: 'multicultural', label: 'the multicultural festival', tag: 'festival', month: 3, week: 4, dows: [5], can: [.93, .95, .97] },
+    { id: 'ethnic-parade', label: 'the autumn parade and festival', tag: 'parade', month: 10, week: 4, dows: [5], can: [.97, .97, 1] },
+    { id: 'fourth', label: 'the Fourth of July fireworks', tag: 'holiday', month: 7, week: 1, dows: [4, 5, 6], can: [.7, .75, .8] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [4], can: [.85, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [4], can: [.85, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
 
   points: [
     { name: 'Orlando', state: 'FL', lat: 28.54, lon: -81.38, pop: 2700000 },

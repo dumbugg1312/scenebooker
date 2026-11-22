@@ -1,11 +1,14 @@
 SB.Cities.register('columbia-mo', {
   v: 1,
   slug: 'columbia-mo',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['university of missouri', 'mizzou', 'faurot', 'columbia college', 'stephens college', 'true/false', 'roots n blues', 'whiteman air force base',
            'lincoln university', 'central methodist', 'westminster college', 'missouri state fair', 'party cove', 'magic city', 'sharp end',
            'loop 70 rec', 'limestone room', 'rangeline annex', 'spur line hall', 'gravel road barn', 'fourth floor walkup', 'post 311',
-           'hinkson basement', 'katy siding', 'auction barn', 'providence pallet'],
+           'hinkson basement', 'katy siding', 'auction barn', 'providence pallet',
+           'the maneater', 'kbia', 'columbia missourian', 'vox magazine', 'riverfront times', 'columbia police department', 'kopn', 'ktgr',
+           'roots n blues n bbq festival', 'stephens lake park', 'memorial stadium', 'missouri theatre', 'show-me state games', 'anchor fest',
+           'discover the district', 'columbia parks and recreation', 'whiteman afb', 'southeastern conference'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['mizzou*', 'university of missouri*', 'true/false*', 'roots n blues*', 'columbia college*', 'stephens college*'],
 
@@ -27,7 +30,7 @@ SB.Cities.register('columbia-mo', {
   zones: [
     { id: 'city', kind: 'CITY', name: 'Columbia' },
     { id: 'ashland', kind: 'FEEDER', name: 'Ashland', minutes: 15, bearing: 190, note: 'A fast-growing commuter town; kids come in for shows.' },
-    { id: 'centralia', kind: 'FEEDER', name: 'Centralia', minutes: 25, bearing: 10, note: 'A small factory town; a few vanloads.' },
+    { id: 'centralia', kind: 'FEEDER', name: 'Centralia', minutes: 25, bearing: 10, scene: 60, note: 'A small factory town; a few vanloads.' },
     { id: 'jefferson-city', kind: 'FEEDER', name: 'Jefferson City', minutes: 30, bearing: 165, note: 'The state capital: straighter and bigger, with crowds that go both ways.', bands: 2 },
     { id: 'boonville', kind: 'FEEDER', name: 'Boonville', minutes: 30, bearing: 275, note: 'An old river town on the interstate.' },
     { id: 'moberly', kind: 'FEEDER', name: 'Moberly', minutes: 35, bearing: 345, note: 'A working-class rail town; kids come down for shows.' },
@@ -48,10 +51,45 @@ SB.Cities.register('columbia-mo', {
     { id: 'business-loop', name: 'the Business Loop', route: 'work-side', note: 'The old highway strip north of downtown: motels, pawn shops and cheap storefronts.' },
     { id: 'old-black-district', name: 'the old Black business district', route: 'old-side', note: 'A jazz-era district just north of Broadway; history to respect, not a cheap punk district.' },
     { id: 'south-side', name: 'south Columbia', route: 'campus', note: 'Newer subdivisions, chain restaurants and a bluff state park. Suburban teenagers.' },
-    { id: 'east-side', name: 'Paris Road and the east side', route: 'work-side', note: 'Apartment complexes, warehouses and light industry. Unit practice spaces and few neighbors.' }
+    { id: 'east-side', name: 'Paris Road and the east side', route: 'work-side', note: 'Apartment complexes, warehouses and light industry. Unit practice spaces and few neighbors.' },
+    { id: 'centralia-hood', name: 'Centralia', route: 'town:centralia', note: 'A small factory town up the highway with old fellowship halls that rent cheap to a sober crowd.' }
+  ],
+
+  rooms: [
+    { id: 'campus-house', kind: 'HOUSE', hood: 'campus-ring', cap: 60, curfew: 1350, ac: false, outdoor: false, pressure: 55, start: true,
+      note: 'A student-rented frame house with a basement and a porch. The lease holder takes the citation, and the crew turns over at graduation.' },
+    { id: 'east-warehouse', kind: 'DIY', hood: 'east-side', cap: 120, curfew: 1440, ac: false, pressure: 60, needs: ['VOUCH'],
+      note: 'A graffiti-covered warehouse with a stage and band rooms, run by a committee that splits the rent. The address goes by word of mouth and the police visit.' },
+    { id: 'small-basement', kind: 'HOUSE', hood: 'campus-ring', cap: 40, ages: ['A18'], curfew: 1320, ac: false, outdoor: false, pressure: 60,
+      note: 'A small basement show with a hand-written door list. Every neighbor with a phone can end it.' },
+    { id: 'broadway-bar', kind: 'BAR', hood: 'downtown', cap: 150, ages: ['A21'], curfew: 1530, ac: true,
+      note: 'A downtown bar with a corner that turns into a stage after dark. The band is the sideshow to the Broadway crowd.' },
+    { id: 'old-club', kind: 'CLUB', hood: 'downtown', cap: 300, ages: ['ALL', 'A18', 'A21'], curfew: 1380, ac: true, needs: ['FULL_BILL'],
+      note: 'An old downtown club that books local punk, hardcore and metal, mostly all ages. The money and the landlord are the threat.' },
+    { id: 'arts-hall', kind: 'CLUB', hood: 'north-village', cap: 250, curfew: 1380, ac: true, needs: ['FULL_BILL'],
+      note: 'A converted music hall near the galleries. Ticketed all-ages bills with a real door and sound, and a rent that wants a draw.' },
+    { id: 'old-theater', kind: 'BIG', hood: 'downtown', cap: 1000, curfew: 1380, ac: true,
+      note: 'A restored historic theater. Punk gets in only as an opener or a benefit, and with permission.' },
+    { id: 'fellowship-hall', kind: 'HALL', hood: 'centralia-hood', cap: 100, curfew: 1320, ac: true,
+      note: 'A small-town fellowship hall that rents cheap. A one-off hardcore matinee, if the crowd stays sober.' },
+    { id: 'record-shop', kind: 'SHOP', hood: 'downtown', cap: 40, ac: true,
+      note: 'The record shop downtown. An in-store set, and the way newcomers learn where the real shows are.' }
   ],
 
   contacts: ['lawrence-ks', 'springfield-mo', 'iowa-city-ia', 'champaign-il'],
+
+  calendar: [
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 3], dows: [5], can: [.85, .90, .85], hoods: ['downtown', 'campus-ring'], elsewhere: [.95, .97, .97] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 2], dows: [4, 5], can: [.85, .90, .85], hoods: ['downtown', 'campus-ring'], elsewhere: [.95, .97, .97] },
+    { id: 'football-nov', label: 'home football', tag: 'game', month: 11, weeks: [1, 4], dows: [5], can: [.85, .90, .85], hoods: ['downtown', 'campus-ring'], elsewhere: [.95, .97, .97] },
+    { id: 'roots-fest', label: 'the late-summer roots festival', tag: 'festival', month: 9, weeks: [3, 4], dows: [4, 5, 6], can: [.90, .88, .88], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'film-fest', label: 'the documentary film festival', tag: 'festival', month: 3, week: 1, dows: [3, 4, 5, 6], can: [.80, .80, .85], hoods: ['downtown', 'north-village'], elsewhere: [.95, .95, .97] },
+    { id: 'graduation', label: 'finals and graduation week', tag: 'graduation', month: 5, weeks: [1, 2], dows: [4, 5], can: [.70, .70, .75] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { curfewMinors: { weeknight: 1380, weekend: 1440, inForce: false } },
 
   points: [
     { name: 'Kansas City', state: 'MO', lat: 39.1, lon: -94.58, pop: 510000 },
@@ -68,5 +106,41 @@ SB.Cities.register('columbia-mo', {
     hood: ['North Village', 'East Campus', 'West Broadway', 'Grindstone', 'Rock Bridge', 'the Loop'],
     thing: ['limestone bluff', 'gravel road', 'grain bin', 'pallet', 'frame house', 'yard show', 'benefit bill', 'campus radio', 'torn-down room'],
     weather: ['humidity', 'ice storm']
-  }
+  },
+
+  events: [
+    { id: 'COLUMBIA_MO_GAME_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'game' },
+      telegraph: 'A home game is Saturday and every bar downtown is already planning for it.',
+      title: 'The town is stuffed',
+      body: 'Downtown is jammed with alumni and the lots are full. The east-side warehouse is the one place the crowd is not, but its address cannot be posted anywhere.',
+      options: [
+        { id: 'WORD', label: 'Pass the address by word of mouth', likely: 'The regulars find it. Nobody new does.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
+          result: 'The ones who knew where to ask came. It was a tight, loud, unpublicized night.' },
+        { id: 'LATE', label: 'Push doors back until the game crowd thins', likely: 'The night people show up. Later than planned.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Doors an hour late. The ones who wanted something else drifted in from the bars.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The casual crowd stayed downtown. The regulars came.' }
+      ] },
+
+    { id: 'COLUMBIA_MO_ICE_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [12, 1, 2] },
+      telegraph: 'Freezing rain is forecast for Friday and the roads will be glass by dark.',
+      title: 'Ice storm Friday',
+      body: 'The roads are glazed and half the town has lost power. The bar is dark, so the bill is moving to a basement where the furnace and one overloaded extension cord are the whole plan.',
+      options: [
+        { id: 'BASEMENT', label: 'Move the bill to a basement within walking distance', likely: 'Smaller and warmer. Watch the extension cord.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'The bill squeezed into a basement. The furnace held and the cord did not melt.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could make it, did.' },
+        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Only the people who can walk come.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
+          result: 'A handful of walkers and a cold room. It was a good story afterward.' }
+      ] }
+  ]
 });

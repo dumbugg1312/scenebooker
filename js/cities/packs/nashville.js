@@ -6,7 +6,10 @@ SB.Cities.register('nashville', {
            'fisk university', 'nashville scene', 'the tennessean', 'tennessean', 'nashville banner', 'wsmv', 'wkrn', 'wtvf', 'wpln', 'wrvu', 'nashville predators',
            'tennessee titans', 'nashville sc', 'nashville sounds', 'grand ole opry', 'opry', 'cma fest', 'country music hall of fame', 'ryman', 'bonnaroo', 'tootsie\'s',
            'fort campbell', 'hca healthcare', 'vanderbilt university medical center', 'nissan', 'nameless fest', 'music row', 'ascend amphitheater', 'bridgestone arena',
-           'nissan stadium', 'lower broadway', 'johnny cash museum'],
+           'nissan stadium', 'lower broadway', 'johnny cash museum',
+           'wmot', 'nashville cream', 'axios', 'city cast nashville', 'citycast', 'wnxp', 'americanafest', 'southern festival of books',
+           'nashville greek festival', 'music city hot chicken festival', 'nashville vegfest', 'tennessee state fair', 'nashville marathon',
+           'nashville pride', 'newschannel5', 'songkick', 'nashvillego', 'nashtoday', 'ghost ship fire'],
   blocklist: ['grand ole opry*', 'tootsie*', 'ryman*', 'cma fest*', 'bonnaroo*', 'the tennessean*', 'nashville scene*'],
 
   blurb: ['Country music sells the postcard. The kids book basements by DM and fill a nonprofit hall on the east side.',
@@ -50,8 +53,54 @@ SB.Cities.register('nashville', {
     { id: 'antioch', name: 'Antioch and Nolensville Pike', route: 'work-side', note: 'A big immigrant community, cheap apartments and warehouses.' },
     { id: 'madison', name: 'Madison', route: 'campus', note: 'A northeast suburb with odd spaces, like a hobby shop.' },
     { id: 'hillsboro', name: 'Hillsboro Village', route: 'campus', note: 'Near the private colleges. Coffee shops and students.' },
+    { id: 'joelton', name: 'Joelton and the northwest edge', route: 'work-side', note: 'Feed stores and scattered houses on the rural edge. Far from everything, cheap and tolerated.' },
     { id: 'bellevue', name: 'Bellevue', route: 'campus', note: 'A western bedroom town where kids start bands.' }
   ],
+
+  rooms: [
+    { id: 'south-house', kind: 'HOUSE', hood: 'hillsboro', cap: 40, curfew: 1380, ac: false, pressure: 55, start: true,
+      note: 'A living room booked by DM, with the address shared the day of. The landlord has ignored the roof for years and there is no central air.' },
+    { id: 'east-bungalow', kind: 'HOUSE', hood: 'east-nashville', cap: 30, curfew: 1350, ac: false, pressure: 55,
+      note: 'A bungalow living room off the pike. Parking complaints and rising rent are the clock.' },
+    { id: 'feed-store', kind: 'HOUSE', hood: 'joelton', cap: 60, curfew: 1350, ac: false, pressure: 35,
+      note: 'The back room of a feed store and the houses around it, out on the rural edge. A long drive, and nobody minds.' },
+    { id: 'pike-hall', kind: 'DIY', hood: 'dickerson', cap: 200, curfew: 1380, ac: true, pressure: 40, needs: ['VOUCH'],
+      note: 'A nonprofit all-ages hall in a converted commercial building. It started in a house, then a barbershop, and it runs a daytime program too.' },
+    { id: 'loading-dock', kind: 'DIY', hood: 'wedgewood', cap: 50, curfew: 1350, ac: false, pressure: 60, needs: ['VOUCH'],
+      note: 'A loading dock and a gallery in the old warehouses. Fire code and gentrifying rents are the worry.' },
+    { id: 'hobby-shop', kind: 'SHOP', hood: 'madison', cap: 60, curfew: 1320, ac: true,
+      note: 'The back room of a hobby shop in the northeast suburb. Punk and metal bands, done by ten.' },
+    { id: 'record-gallery', kind: 'SHOP', hood: 'east-nashville', cap: 50, curfew: 1320, ac: true,
+      note: 'A shop and gallery with a small stage. One shop moved and left its basement room behind.' },
+    { id: 'dive-bar', kind: 'BAR', hood: 'east-nashville', cap: 120, ages: ['A21'], curfew: 1500, ac: true,
+      note: 'A cheap dive that books locals most nights. Stripped-down sets and a 21-and-up wall.' },
+    { id: 'rock-club', kind: 'CLUB', hood: 'midtown', cap: 250, ages: ['ALL'], curfew: 1410, ac: true, owner: 'TALENT_BUYER', needs: ['FULL_BILL'],
+      note: 'An old rock club on the hospital-side strip. New management reopened it after a break.' },
+    { id: 'black-box', kind: 'CLUB', hood: 'east-nashville', cap: 200, ages: ['A18'], curfew: 1470, ac: true, owner: 'TALENT_BUYER', needs: ['FULL_BILL'],
+      note: 'A black-box punk and hardcore room in the east. Nobody is sure what the age policy is this month.' },
+    { id: 'heavy-room', kind: 'CLUB', hood: 'east-nashville', cap: 350, ages: ['ALL'], curfew: 1380, ac: true, owner: 'TALENT_BUYER', needs: ['FULL_BILL'],
+      note: 'A bigger room for the heavier touring bands and hardcore benefit nights.' },
+    { id: 'gulch-theater', kind: 'BIG', hood: 'downtown', cap: 1100, ages: ['ALL'], curfew: 1380, ac: true, owner: 'TALENT_BUYER',
+      note: 'The big touring rooms near the Gulch. Tourist-priced and out of reach for a new booker.' },
+    { id: 'house-yard', kind: 'OUTDOOR', hood: 'hillsboro', cap: 80, curfew: 1320,
+      note: 'The backyard at a house venue. Parties and small fests, as long as the weather and the neighbors hold.' }
+  ],
+
+  contacts: ['huntsville-al', 'chattanooga-tn', 'knoxville-tn', 'louisville', 'memphis'],
+
+  calendar: [
+    { id: 'country-festival', label: 'the country music festival', tag: 'festival', month: 6, week: 1, dows: [3, 4, 5, 6], can: [.80, .75, .75], hoods: ['downtown'], elsewhere: [.92, .90, .90] },
+    { id: 'camping-festival', label: 'the big camping festival to the south', tag: 'festival', month: 6, week: 2, dows: [3, 4, 5, 6], can: [.85, .80, .80] },
+    { id: 'fourth', label: 'the Fourth of July fireworks', tag: 'holiday', month: 7, week: 1, dows: [4, 5], can: [.85, .85, .85], hoods: ['downtown', 'east-nashville'], elsewhere: [.97, .97, .97] },
+    { id: 'roots-convention', label: 'the roots music convention', tag: 'festival', month: 9, week: 3, dows: [1, 2, 3], can: [.92, .90, .90], hoods: ['midtown', 'east-nashville'], elsewhere: [1, 1, 1] },
+    { id: 'hall-fest', label: 'the hall\'s own yearly fest', tag: 'festival', month: 10, week: 3, dows: [5, 6], can: [1.10, 1.08, 1.05], hoods: ['dickerson'], elsewhere: [.88, .90, .90] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [6], can: [.88, 1, .97] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [6], can: [.88, 1, .97] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1260 },
 
   points: [
     { name: 'Atlanta', state: 'GA', lat: 33.75, lon: -84.39, pop: 6400000 },
@@ -102,6 +151,40 @@ SB.Cities.register('nashville', {
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people stay home under a watch.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'The ones who came stayed in the basement and played anyway.' }
+      ] },
+
+    { id: 'NASHVILLE_BACHELORETTE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'festival', months: [6] },
+      telegraph: 'The bachelorette buses are already lined up on every block near the Gulch.',
+      title: 'The festival weekend takes the block',
+      body: 'The country festival has put a bachelorette bus at every bar and taken every parking space within a mile of the club. Your band is circling the block with the van.',
+      options: [
+        { id: 'EARLY', label: 'Open early and get the gear in before the buses', likely: 'Most get in. A short, thin night.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'Gear in by four, doors by six. The buses did not find the side door.' },
+        { id: 'EAST', label: 'Move the whole bill to the east side', likely: 'Smaller and louder. No tourists.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'A bungalow on the east side took the bill, and the floor was packed.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Half the list cannot park.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
+          result: 'Half the list gave up and went home. The bachelorettes wandered in at midnight.' }
+      ] },
+
+    { id: 'NASHVILLE_HEAT_WAVE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], weather: 'HEAT', months: [6, 7, 8, 9] },
+      telegraph: 'The forecast says a heat wave and the house has no central air.',
+      title: 'The living room is an oven',
+      body: 'It is a hundred degrees in a living room with a box fan, forty people and the landlord who has ignored the roof for years. Somebody has started opening windows toward the neighbors.',
+      options: [
+        { id: 'YARD', label: 'Move the bill out to the yard', likely: 'Cooler, but the neighbors can hear.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'OUTDOOR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The whole bill in the backyard under a string of lights. Someone called it a good night.' },
+        { id: 'FANS', label: 'Buy fans and ice and play on', likely: 'Costs twenty-five dollars. It stays hot.',
+          effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'Three fans and a cooler of ice. Everybody was soaked by the second band.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. It was still ninety-eight.' }
       ] }
   ]
 });

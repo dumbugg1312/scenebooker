@@ -51,6 +51,9 @@
 .rb-card .rb-name { display: block; font: 400 calc(var(--fs) * 20)/1 var(--f-gothic); letter-spacing: .04em; color: var(--toner); }
 .rb-card .rb-meta { font: 400 calc(var(--fs) * 13)/1.3 var(--f-type); color: var(--toner-mid); }
 .rb-card .rb-last { font: 400 calc(var(--fs) * 12)/1.3 var(--f-type); color: var(--toner-soft); }
+.rb-card .rb-read { width: auto; margin: 0; font-size: calc(var(--fs) * 12); }
+.rb-card .rb-pull { display: block; font: 400 calc(var(--fs) * 17)/1.1 var(--f-gothic); letter-spacing: .02em; color: var(--toner); margin: 0 0 calc(var(--p) * 2); }
+.rb-card .rb-pull.is-guess { color: var(--toner-mid); }
 .rb-card.is-dim .kt-photo, .rb-card.is-dim .rb-mark { opacity: .55; }
 .rb-tag { position: absolute; right: calc(var(--p) * -6); top: calc(var(--p) * 118); background: var(--toner); color: var(--pp-bond); padding: calc(var(--p) * 4) calc(var(--p) * 10); font: 400 calc(var(--fs) * 12)/1.1 var(--f-type); letter-spacing: .08em; transform: rotate(3deg); box-shadow: var(--sh-s) 0 rgba(0, 0, 0, .4); }
 

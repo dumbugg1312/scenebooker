@@ -1,0 +1,18 @@
+/* Scene Booker — the hover slip (js/ui/tooltip.js): a torn bit of buff paper by the pointer */
+.sb-tip {
+  position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none;
+  max-width: calc(var(--p) * 300); box-sizing: border-box;
+  display: flex; flex-direction: column; gap: calc(var(--p) * 4);
+  padding: calc(var(--p) * 8) calc(var(--p) * 11) calc(var(--p) * 9);
+  background: var(--pp-buff); border: calc(var(--p) * 2) solid var(--toner);
+  color: var(--toner); font: 400 calc(var(--fs) * 13)/1.35 var(--f-type);
+  transform: rotate(-.6deg);
+  filter: drop-shadow(calc(var(--p) * 3) calc(var(--p) * 4) 0 rgba(0, 0, 0, .5));
+  animation: sb-tip-in 120ms steps(2, end) backwards;
+}
+.sb-tip[hidden] { display: none; }
+.sb-tip-head { font: 400 calc(var(--fs) * 12)/1 var(--f-gothic); letter-spacing: .1em; text-transform: uppercase; }
+@keyframes sb-tip-in { from { opacity: 0; } }
+:root[data-motion="reduce"] .sb-tip { animation: none; }
+@media (prefers-reduced-motion: reduce) { :root:not([data-motion="full"]) .sb-tip { animation: none; } }
+@media (hover: none) { .sb-tip { display: none; } }

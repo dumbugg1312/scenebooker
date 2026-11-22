@@ -1,12 +1,12 @@
 SB.Cities.register('clarksville-tn', {
   v: 1,
   slug: 'clarksville-tn',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['fort campbell', 'the 101st', '101st airborne', 'austin peay', 'apsu', 'trane', 'amazon', 'fedex', 'google', 'hankook', 'bridgestone', 'vfw',
            'dodea', 'nashville international', 'outlaw field', 'ringgold mill', 'l&n station', 'wilma rudolph', 'western kentucky university', 'wku',
            'mtsu', 'middle tennessee state', 'tennessee tech', 'corvette plant', 'a. o. smith', 'chitlin\' circuit', 'strawberry alley',
            'red river annex', 'hilldale hall', 'dunbar door', 'depot back room', 'ringgold loading dock', 'fort boulevard unit 9', 'redbud lodge',
-           'highland rim skate and supply', 'palmyra road barn', 'quarter-mile carport', 'st. bethlehem grange', 'strawberry row basement'],
+           'highland rim skate and supply', 'palmyra road barn', 'quarter-mile carport', 'st. bethlehem grange', 'strawberry row basement', 'clarksville riverfest', 'riverfest', 'downtown at sundown', 'mic check monday', 'tour de ville', 'montgomery county fair', 'clarksville speedway', 'visit clarksville', 'clarksville now', 'clarksville online', 'ville magazine', 'deck the county', 'mudfest', 'bandsintown', 'reverbnation', 'nameless fest', 'tennessee alcoholic beverage commission'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Tornadoes are written only as 'the tornado'. */
   blocklist: ['fort campbell*', 'austin peay*', 'strawberry alley*', 'ringgold mill*', 'wilma rudolph*'],
 
@@ -47,7 +47,36 @@ SB.Cities.register('clarksville-tn', {
     { id: 'hilldale', name: 'Hilldale and Cumberland Heights', route: 'old-side', note: 'Older homeowners and church halls to the south. Quiet, and aging.' }
   ],
 
-  contacts: ['chattanooga-tn', 'johnson-city-tn', 'evansville-in'],
+  rooms: [
+    { id: 'campus-house', kind: 'HOUSE', hood: 'campus-edge', cap: 40, curfew: 1320, ac: false, outdoor: false, start: true, note: "A back room or porch of a rental by the university. Roommates turn over each semester and a neighbor's call ends it." },
+    { id: 'barn-yard', kind: 'HOUSE', hood: 'st-bethlehem', cap: 60, curfew: 1350, ac: false, outdoor: true, note: 'A shed or barn-side backyard on a cheap edge street. Room to spread out, and the rain is the problem.' },
+    { id: 'ranch-carport', kind: 'HOUSE', hood: 'madison-street', cap: 30, curfew: 1320, ac: false, outdoor: false, note: 'A carport and a living room in a cheap ranch rental, still patched from the tornado.' },
+    { id: 'strip-unit', kind: 'DIY', hood: 'highway-strip', cap: 100, curfew: 1380, ac: false, needs: ['VOUCH'], note: 'A vacant strip unit rented under a quiet name. It lasts until the landlord or the next tenant finds out.' },
+    { id: 'church-hall', kind: 'HALL', hood: 'hilldale', cap: 120, curfew: 1320, ac: true, note: 'A church hall rented by the night. Sober, and one complaint from a deacon ends it.' },
+    { id: 'brick-shop', kind: 'SHOP', hood: 'downtown', cap: 40, curfew: 1260, ac: true, note: 'A brick storefront with the floor cleared after closing. The rent is the threat.' },
+    { id: 'lawn-stage', kind: 'OUTDOOR', hood: 'downtown', cap: 300, curfew: 1260, note: 'A downtown lawn and a riverfront park with a free summer stage. Early and family-friendly, and a rain-out kills it.' },
+    { id: 'vineyard-yard', kind: 'OUTDOOR', hood: 'east-side', cap: 150, curfew: 1320, note: 'A vineyard-style grounds with weekend music from May to October. Family crowds, cover sets and soft ceilings on the volume.' },
+    { id: 'main-bar', kind: 'BAR', hood: 'downtown', cap: 120, ages: ['A21'], curfew: 1500, ac: true, note: 'A downtown bar with a weekend stage. They card at the door, and local bands share the night with covers.' },
+    { id: 'food-stage', kind: 'BAR', hood: 'downtown', cap: 80, ages: ['ALL'], curfew: 1380, ac: true, note: 'A restaurant with a stage that does not card. Food comes first, and the band is background.' },
+    { id: 'warehouse-club', kind: 'CLUB', hood: 'highway-strip', cap: 250, ages: ['A21'], curfew: 1500, ac: true, note: 'A big 21-plus warehouse room that has run metal nights. Far larger than the local crowd, and it may be inactive.' },
+    { id: 'event-center', kind: 'BIG', hood: 'downtown', cap: 1500, curfew: 1380, ac: true, note: 'An event center that hosts the touring country and rock acts. Not a booking a new scene gets.' }
+  ],
+
+  contacts: ['nashville', 'louisville', 'evansville-in', 'chattanooga-tn', 'memphis'],
+
+  calendar: [
+    { id: 'river-festival', label: 'the river festival', tag: 'festival', month: 9, week: 2, dows: [4, 5], can: [.88, .85, .85], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'county-fair', label: 'the county fair', tag: 'fair', month: 8, week: 4, dows: [1, 2, 3, 4, 5], can: [.90, .88, .88] },
+    { id: 'local-music-day', label: 'the local-music day', tag: 'festival', month: 7, week: 3, dows: [5], can: [1.05, 1.10, 1.05], hoods: ['downtown'], elsewhere: [.97, .97, .97] },
+    { id: 'summer-concerts', label: 'the summer free concerts', tag: 'festival', month: 7, week: 2, dows: [3, 4], can: [.92, .90, .90], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [.88, .95, .95], hoods: ['campus-edge'], elsewhere: [1, 1, 1] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [.88, .95, .95], hoods: ['campus-edge'], elsewhere: [1, 1, 1] },
+    { id: 'christmas-parade', label: 'the Christmas parade', tag: 'parade', month: 12, week: 1, dows: [5], can: [.88, .90, .90], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1380, weekend: 1380, inForce: true } },
 
   points: [
     { name: 'Nashville', state: 'TN', lat: 36.16, lon: -86.78, pop: 690000 },
@@ -64,5 +93,55 @@ SB.Cities.register('clarksville-tn', {
     hood: ['Ringgold', 'Rossview', 'Sango', 'St. Bethlehem', 'New Providence', 'Hilldale', 'Cumberland Heights', 'Oak Grove'],
     thing: ['pawn shop', 'strip mall', 'dark-fired tobacco', 'cinder-block bathroom', 'storm cellar', 'pickup', 'brewery patio', 'bar stage', 'move order', 'warehouse room'],
     weather: ['tornado warning', 'river flood']
-  }
+  },
+
+  events: [
+    { id: 'CLARKSVILLE_TN_TORNADO_WARNING', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [3, 4, 5], weather: 'RAIN' },
+      telegraph: 'The weather service has the whole county under a tornado watch.',
+      title: 'The tornado warning',
+      body: 'A tornado warning sweeps through while the bands are loading in at the barn-side backyard in St. Bethlehem. Everyone is sheltering in the barn.',
+      options: [
+        { id: 'SHELTER', label: 'Wait it out in the barn and play after', likely: 'A late start. The crowd who stayed are loud.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'The warning passed at nine. You played late to a barn full of people who had nowhere to go.' },
+        { id: 'HOUSE', label: 'Move the bill to a basement room', likely: 'Smaller and safer.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'A cellar took the bill. It was packed and nobody minded.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] },
+
+    { id: 'CLARKSVILLE_TN_TWO_STAGES', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'festival' },
+      telegraph: 'The river festival and the local-music day land on the same weekend.',
+      title: 'Two free stages downtown',
+      body: 'There are two free stages downtown and your booked show is up against both of them. Nobody pays to get in when the music outside is free.',
+      options: [
+        { id: 'LATE', label: 'Push doors back until the stages go quiet', likely: 'A late start. The leftovers show up.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Doors late. The crowd drifted in from the free stages, loud and happy.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd stays on the lawn.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The lawn kept the casual crowd. The regulars came.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'CLARKSVILLE_TN_MOVE_ORDERS', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
+      if: { daysOut: [0, 4], months: [4, 5, 6, 7, 8, 9, 10] },
+      telegraph: "One of the bands has a drummer waiting on his unit's next orders.",
+      title: 'Move orders',
+      body: 'The drummer got orders the week before the downtown bar show. The only fill-in is a 16-year-old who has to be out by the curfew.',
+      options: [
+        { id: 'FILL', label: 'Let the kid play and send him home on time', likely: 'The set is short and rough.',
+          effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'The kid played half a set and left before the curfew. The band played the rest as a trio.' },
+        { id: 'DROP', label: 'Drop the band from the bill', likely: 'A thinner bill.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'The bill ran short without them. The room was half full.' }
+      ] }
+  ]
 });

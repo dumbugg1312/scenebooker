@@ -50,7 +50,34 @@ SB.Cities.register('houston', {
     "whataburger",
     "buc-ee's",
     "kroger",
-    "texas southern"
+    "texas southern",
+    "chevron houston marathon",
+    "aramco houston half marathon",
+    "bayou city art festival",
+    "azalea trail",
+    "tour de houston",
+    "h-e-b thanksgiving day parade",
+    "go texan day",
+    "downtown rodeo parade",
+    "nrg park",
+    "discovery green",
+    "house of blues",
+    "houston free thinkers",
+    "noisey",
+    "culturemap",
+    "paper city",
+    "kprc",
+    "click2houston",
+    "abc13",
+    "fox 26",
+    "community impact",
+    "coog radio",
+    "texas hardcore fest",
+    "bayou doom fest",
+    "punx mas fest",
+    "tabc",
+    "texas alcoholic beverage commission",
+    "harris county constables"
   ],
   "blocklist": [
     "houston chronicle*",
@@ -59,7 +86,10 @@ SB.Cities.register('houston', {
     "art car parade*",
     "kpft*",
     "astros*",
-    "johnson space*"
+    "johnson space*",
+    "house of blues*",
+    "discovery green*",
+    "bayou city art festival*"
   ],
   "blurb": [
     "A spread-out bayou sprawl where house shows hide in old Montrose bungalows and warehouse blocks east of downtown.",
@@ -100,7 +130,29 @@ SB.Cities.register('houston', {
       "name": "Pasadena",
       "minutes": 25,
       "bearing": 130,
-      "note": "A refinery-side town of garages and carports; kids ride in."
+      "note": "A refinery-side town of garages and carports; kids ride in.",
+      "scene": 100,
+      "rooms": [
+        {
+          "id": "pasadena-carport",
+          "kind": "HOUSE",
+          "hood": "pasadena-hood",
+          "zone": "pasadena",
+          "cap": 50,
+          "ages": [
+            "ALL"
+          ],
+          "curfew": 1380,
+          "ac": false,
+          "outdoor": true,
+          "standing": [
+            65,
+            60,
+            45
+          ],
+          "note": "A garage and carport near the refineries. Kids get driven in from the suburbs."
+        }
+      ]
     },
     {
       "id": "pearland",
@@ -221,7 +273,7 @@ SB.Cities.register('houston', {
       "id": "pasadena-hood",
       "name": "Pasadena",
       "note": "Refinery-side working class on the ship channel. Garages and carports.",
-      "route": "work-side"
+      "route": "town:pasadena"
     },
     {
       "id": "sharpstown",
@@ -240,6 +292,12 @@ SB.Cities.register('houston', {
       "name": "Southwest and Alief",
       "note": "Sprawling immigrant suburbs and apartment complexes. Kids with cars but no rooms.",
       "route": "campus"
+    },
+    {
+      "id": "downtown",
+      "name": "downtown",
+      "note": "The towers and the big rooms. Only touring names and parade days.",
+      "route": "downtown"
     }
   ],
   "points": [
@@ -383,6 +441,543 @@ SB.Cities.register('houston', {
           ],
           "result": "The freeways stayed backed up. The yard was a pond and the room was half empty."
         }
+      ]
+    },
+    {
+      "id": "HOUSTON_LIVESTOCK_JAM",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 2,
+      "cooldown": 40,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          3
+        ],
+        "calendar": "festival",
+        "months": [
+          2,
+          3
+        ]
+      },
+      "telegraph": "The rodeo is in town and the freeways south are already a parking lot.",
+      "title": "The van is stuck in rodeo traffic",
+      "body": "The suburb band is forty-five minutes out and the freeway is jammed solid with rodeo traffic. The load-in is going late.",
+      "options": [
+        {
+          "id": "WAIT",
+          "label": "Hold the doors and start late",
+          "likely": "The crowd waits, a little cranky.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": 75
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            }
+          ],
+          "result": "The van got in at nine. You started late and most of them stayed."
+        },
+        {
+          "id": "SHORT",
+          "label": "Run a short bill with whoever is here",
+          "likely": "Thin but loose.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.85
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "qAdd",
+              "v": -1
+            }
+          ],
+          "result": "Two bands made it. The room was half full and it was fine."
+        },
+        {
+          "id": "MOVE",
+          "label": "Move it a day",
+          "likely": "Breaks the date. Costs trust with the bands.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 1,
+              "respect": false
+            }
+          ],
+          "result": "You moved it a day. Not everyone could make the new one."
+        }
+      ]
+    },
+    {
+      "id": "HOUSTON_NOISE_CALL",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 2,
+      "cooldown": 40,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          2
+        ]
+      },
+      "telegraph": "The house on the corner has a new neighbor, and the night limit drops at ten.",
+      "title": "A call at ten o'clock",
+      "body": "A neighbor on the house street has the decibel limit memorized and the clock says ten. The set is not close to done.",
+      "options": [
+        {
+          "id": "QUIET",
+          "label": "Cut the set and turn it down",
+          "likely": "The night ends early, nobody gets hurt.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "qAdd",
+              "v": -1
+            }
+          ],
+          "result": "You turned it down and finished unplugged. Nobody minded much."
+        },
+        {
+          "id": "MOVE",
+          "label": "Move the last bands to another house",
+          "likely": "Breaks the flow. The ones who follow are the ones who care.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 0,
+              "toKind": "HOUSE",
+              "respect": false
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "capMul",
+              "v": 0.7
+            }
+          ],
+          "result": "Three cars of people followed the amps across town."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Play on and hope",
+          "likely": "The squad car is the risk.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.8
+            }
+          ],
+          "result": "You got through two more songs before the lights came."
+        }
+      ]
+    }
+  ],
+  "rooms": [
+    {
+      "id": "ward-house",
+      "kind": "HOUSE",
+      "hood": "third-ward",
+      "cap": 60,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1350,
+      "ac": false,
+      "outdoor": false,
+      "standing": [
+        70,
+        60,
+        45
+      ],
+      "pressure": 55,
+      "start": true,
+      "note": "A rented house that hosts shows most nights. The police once came with weapons drawn, so one complaint can end it."
+    },
+    {
+      "id": "montrose-porch",
+      "kind": "HOUSE",
+      "hood": "montrose",
+      "cap": 50,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1320,
+      "ac": false,
+      "outdoor": false,
+      "standing": [
+        65,
+        60,
+        45
+      ],
+      "pressure": 55,
+      "note": "A porch and a living-room set in a bungalow. The neighbors are mixed with short-term rentals and quick to call."
+    },
+    {
+      "id": "heights-house",
+      "kind": "HOUSE",
+      "hood": "heights",
+      "cap": 40,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1320,
+      "ac": false,
+      "outdoor": false,
+      "standing": [
+        60,
+        60,
+        45
+      ],
+      "pressure": 60,
+      "note": "An old frame house, one of fewer each year. The neighbors have new money."
+    },
+    {
+      "id": "eado-warehouse",
+      "kind": "DIY",
+      "hood": "east-end",
+      "cap": 120,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1410,
+      "ac": false,
+      "standing": [
+        55,
+        60,
+        45
+      ],
+      "pressure": 60,
+      "needs": [
+        "VOUCH"
+      ],
+      "note": "A gutted warehouse with a side-door entrance, sometimes BYOB. Rent and break-ins are what end these."
+    },
+    {
+      "id": "fifth-ward-bay",
+      "kind": "DIY",
+      "hood": "fifth-ward",
+      "cap": 100,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1380,
+      "ac": false,
+      "standing": [
+        55,
+        60,
+        45
+      ],
+      "pressure": 55,
+      "note": "A warehouse practice space by the rail yard with a show on weekends."
+    },
+    {
+      "id": "strip-hall",
+      "kind": "HALL",
+      "hood": "sharpstown",
+      "cap": 200,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1350,
+      "ac": true,
+      "standing": [
+        55,
+        60,
+        60
+      ],
+      "owner": "HALL_MANAGER",
+      "note": "A rented hall in a strip mall, good for one big all-ages bill."
+    },
+    {
+      "id": "east-storefront",
+      "kind": "SHOP",
+      "hood": "east-end",
+      "cap": 40,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1200,
+      "ac": true,
+      "standing": [
+        65,
+        65,
+        70
+      ],
+      "note": "A storefront in-store set on the east side, over by suppertime."
+    },
+    {
+      "id": "east-bar",
+      "kind": "BAR",
+      "hood": "east-end",
+      "cap": 150,
+      "ages": [
+        "A21"
+      ],
+      "curfew": 1500,
+      "ac": true,
+      "standing": [
+        50,
+        65,
+        70
+      ],
+      "pressure": 50,
+      "note": "A dive with a stage that does punk and metal bills. The age door depends on the promoter."
+    },
+    {
+      "id": "heights-club",
+      "kind": "CLUB",
+      "hood": "heights",
+      "cap": 300,
+      "ages": [
+        "A18"
+      ],
+      "curfew": 1470,
+      "ac": true,
+      "standing": [
+        45,
+        70,
+        70
+      ],
+      "notice": 42,
+      "needs": [
+        "FULL_BILL"
+      ],
+      "note": "A club in the old live-music district. Rooms here shut when the rent rose."
+    },
+    {
+      "id": "downtown-hall",
+      "kind": "BIG",
+      "hood": "downtown",
+      "cap": 1200,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1380,
+      "ac": true,
+      "standing": [
+        40,
+        70,
+        70
+      ],
+      "note": "A big room where only touring names play."
+    },
+    {
+      "id": "lot-pavilion",
+      "kind": "OUTDOOR",
+      "hood": "spring-branch",
+      "cap": 80,
+      "ages": [
+        "ALL"
+      ],
+      "rent": 10,
+      "curfew": 1290,
+      "ac": false,
+      "outdoor": true,
+      "standing": [
+        60,
+        55,
+        40
+      ],
+      "note": "A parking lot or pavilion afternoon show. Heat and storms rule it."
+    }
+  ],
+  "contacts": [
+    "beaumont-tx",
+    "austin",
+    "college-station-tx",
+    "lafayette-la"
+  ],
+  "rules": {
+    "quiet": 1320,
+    "curfewMinors": {
+      "weeknight": 1380,
+      "weekend": 1500,
+      "inForce": false
+    }
+  },
+  "calendar": [
+    {
+      "id": "rodeo",
+      "label": "rodeo season",
+      "tag": "festival",
+      "month": 3,
+      "weeks": [
+        1,
+        3
+      ],
+      "dows": [
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.88,
+        0.9,
+        0.9
+      ]
+    },
+    {
+      "id": "marathon",
+      "label": "marathon weekend",
+      "tag": "race",
+      "month": 1,
+      "weeks": [
+        2,
+        3
+      ],
+      "dows": [
+        5,
+        6
+      ],
+      "can": [
+        0.92,
+        0.9,
+        0.9
+      ],
+      "hoods": [
+        "montrose",
+        "downtown"
+      ],
+      "elsewhere": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "arts-fest",
+      "label": "the downtown arts festival",
+      "tag": "festival",
+      "month": 10,
+      "week": 2,
+      "dows": [
+        5,
+        6
+      ],
+      "can": [
+        0.9,
+        0.88,
+        0.88
+      ],
+      "hoods": [
+        "downtown"
+      ],
+      "elsewhere": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "art-parade",
+      "label": "the big art parade",
+      "tag": "parade",
+      "month": 4,
+      "week": 2,
+      "dows": [
+        5
+      ],
+      "can": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "hoods": [
+        "east-end",
+        "downtown"
+      ],
+      "elsewhere": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "football-oct",
+      "label": "home football",
+      "tag": "game",
+      "month": 9,
+      "weeks": [
+        1,
+        5
+      ],
+      "dows": [
+        5
+      ],
+      "can": [
+        0.85,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "football-nov",
+      "label": "home football",
+      "tag": "game",
+      "month": 10,
+      "weeks": [
+        1,
+        5
+      ],
+      "dows": [
+        5
+      ],
+      "can": [
+        0.85,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "halloween",
+      "label": "Halloween weekend",
+      "tag": "holiday",
+      "month": 10,
+      "weeks": [
+        4,
+        5
+      ],
+      "dows": [
+        4,
+        5
+      ],
+      "can": [
+        1.08,
+        1.05,
+        1
+      ]
+    },
+    {
+      "id": "thanksgiving-eve",
+      "label": "the night before Thanksgiving",
+      "tag": "holiday",
+      "month": 11,
+      "week": 4,
+      "dows": [
+        2
+      ],
+      "can": [
+        1.05,
+        1.15,
+        1.1
       ]
     }
   ]

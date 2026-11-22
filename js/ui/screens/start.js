@@ -5,9 +5,9 @@
  *   city   a photocopied road map (every researched town a dot, Pensacola marked), a rack of typed index cards you
  *          type to filter, and the town's postcard, which lands when a town is circled three times in marker.
  *   tune   "your town": typed questions with drawn boxes.
- *   name   the booking name typed onto the page while a real flyer reading "<name> presents" is drawn beside it,
- *          re-rolling its art every few letters; the marks are rubber stamps.
- *   setup  three typed lines with drawn boxes, then the last hit: staple the first flyer up (SB.Game.newGame, SB.UI.start).
+ *   then   the going-away show (js/ui/story.js openingAsk): the setup is asked in the scene, the replies make the game
+ *          (SB.Game.newGame, SB.UI.start). The booking name is typed in it (nameWidget) while a real flyer reading
+ *          "<name> presents" is drawn beside it, re-rolling its art every few letters; the marks are rubber stamps.
  * Holds no game rule. The new career being put together lives in `draft` (interface memory) until newGame.
  * Motion (slaps, stamps, the copier's light bar, the marker circle) is CSS on classes set here; every timer belongs to
  * the mounted screen and stops when it unmounts; under reduced motion the wall is put up at once and nothing moves.
@@ -21,8 +21,12 @@
     cont: 'Continue',
     contWeek: 'week {n}',
     tapeWeek: 'WK {n}',
+    agoNow: 'saved just now',
+    agoMin1: 'saved 1 minute ago', agoMin: 'saved {n} minutes ago',
+    agoHour1: 'saved 1 hour ago', agoHour: 'saved {n} hours ago',
+    agoDay1: 'saved yesterday', agoDay: 'saved {n} days ago',
     newScene: 'New scene',
-    newLabel: 'New scene: pick a town and book your first show',
+    newLabel: 'Book a show',
     wayTop: 'your name presents',
     wayA: 'YOUR',
     wayB: 'SHOW',
@@ -48,7 +52,7 @@
     search: 'Find a town',
     featured: 'featured',
     first: 'start here',
-    thin: 'Researched lightly. The map is right; the scene is a guess.',
+    thin: 'Researched lightly. The map is right; the scene is a guess.', thinTag: 'rough',
     hard: 'What is hard here',
     rooms: 'Rooms',
     feeders: 'Towns nearby',
@@ -82,32 +86,13 @@
     markHelp: 'A little stamp printed on your flyers. It is only for looks, so pick any.',
     reroll: 'Roll new marks',
     markBlank: 'Your Name',
-    next: 'Next',
-    back: 'Back',
+    done: 'That\'s the name',
     empty: 'Give it a name first.',
     blocked: 'That name is somebody else\'s. Pick another.',
     preview: 'Your first flyer'
   };
   SB.Content.ui.setup = {
-    title: 'Before you start',
-    bills: 'Personal bills',
-    billsOn: 'On: besides the show money in the cash box, you pay your own rent, work a day job and keep a bank account. Harder, more like life.',
-    billsOff: 'Off: you only handle the show money in the cash box. No rent, no day job. Easier.',
-    billsLater: 'You can still change this in Settings until your first week starts.',
-    fog: 'How much you can see',
-    fogWhat: 'The game guesses things like how many people will come to a show, and shows them as ranges (say, 20 to 40). This sets how fast those ranges get narrow.',
-    fogHelp: { OPEN: 'Open book: you start out knowing more and learn twice as fast. Easiest.', NORMAL: 'Normal: ranges start wide and get narrow as you book shows here.',
-               HARD: 'Hard: like normal, but a band\'s draw never gets better than a rough guess.' },
-    windows: 'Deadlines',
-    windowsWhat: 'Jobs like putting up flyers have a window of days when they do the most good. This sets how strict those windows are.',
-    windowsHelp: { FORGIVING: 'Forgiving: jobs stay open a little longer. Easier while you learn.', NORMAL: 'Normal: jobs close when they would in real life.' },
-    later: 'You can change these two any time in Settings.',
-    picked: 'picked',
-    stapleHelp: 'This starts the game.',
-    start: 'Start booking',
-    staple: 'Staple it up',
-    stapleLabel: 'Staple the first flyer up and start booking',
-    back: 'Back',
+    back: 'Back to the map',
     bad: 'The game could not start.'
   };
 
@@ -118,23 +103,16 @@
     step: 'Step {n} of {of}',
     label: 'How to start, step {n} of {of}',
     start: ['New here? Press YOUR SHOW GOES HERE to start.',
-            'You will pick a town, give yourself a booking name and check three settings. Then your first show walks you through everything, one step at a time.'],
+            'You will pick a town. Then you are at the last show of the person handing you the scene, and what you answer them sets up your game: your booking name, and how hard you want it.'],
     startTapes: 'The cassette tapes are saved games. Press one to pick up where you left off.',
     city: ['Pick the town you will book shows in.',
            'Click a dot on the map or a card in the list. The postcard tells you about that town: how big it is, what is hard about booking there, and what kinds of rooms it has.',
            'First time? Pensacola, marked START HERE, is the best place to learn. When you have picked, press BOOK HERE.'],
     tune: ['Tell the game about this town, if you know it.',
-           'The map is real but the scene is a guess. If you know the town, tick what is true and press USE THESE. If you do not, press SKIP THIS. Anything left blank keeps the game\'s own guess.'],
-    name: ['Give yourself a booking name.',
-           'It is the name you book shows under, and it goes on top of every flyer you make: "your name presents". Type one in or tap one of the ideas. The flyer shows how it will look.',
-           'Your mark is the little stamp on your flyers. It is only for looks. Then press NEXT.'],
-    setup: ['Last step: how hard you want it.',
-            'These three settings change how hard the game is. Each one is explained under it. Not sure? Leave them as they are.',
-            'Then press STAPLE IT UP to start. Your first show is a walkthrough: the person handing you the scene texts you each step, and a strip of tape like this one points at what to press.',
-            'Played before? I\'VE DONE THIS BEFORE starts the same game without the walkthrough.']
+           'The map is real but the scene is a guess. If you know the town, tick what is true and press USE THESE. If you do not, press SKIP THIS. Anything left blank keeps the game\'s own guess.']
   };
 
-  var draft = { slug: null, tune: null, bookingName: '', mark: null, markSeeds: null, flyerBase: null, settings: { bills: true, fog: 'NORMAL', windows: 'NORMAL' } };
+  var draft = { slug: null, tune: null, bookingName: '', mark: null, markSeeds: null, flyerBase: null };
   var TONER = '#141413', PAPER = '#f4f2ea', BONE = '#e7ddc4';
 
   function h(t, a, k) { return SB.UI.h(t, a, k); }
@@ -170,7 +148,7 @@
   function hasTune(slug) { try { return !!(slug && SB.Cities.isLoaded(slug) && SB.Cities.questions(slug).length); } catch (e) { return false; } }
   /* which step of the way in this screen is, and how many there are (the town questions only come for some towns) */
   function stepOf(route, slug) {
-    var list = ['city'].concat(hasTune(slug) ? ['tune'] : []).concat(['name', 'setup']), n = list.indexOf(route) + 1;
+    var list = ['city'].concat(hasTune(slug) ? ['tune'] : []).concat(['show']), n = list.indexOf(route) + 1;   // the last step is the going-away show
     return { n: n, of: list.length };
   }
   /* the note: typed on a strip of bone paper, the same as the walkthrough's texts on the desk */
@@ -330,6 +308,18 @@
   }
 
   var TAPE_STOCK = ['bone', 'blue', 'pink', 'mint', 'goldenrod', 'white'];
+  /* "saved 2 minutes ago" from a slot's savedAt (slot metadata only; '' when the save has none) */
+  function agoText(ms) {
+    var m, h2, d;
+    if (typeof ms !== 'number' || !isFinite(ms)) return '';
+    m = Math.floor((Date.now() - ms) / 60000);
+    if (m < 1) return L('start', 'agoNow');
+    if (m < 60) return L('start', m === 1 ? 'agoMin1' : 'agoMin', { n: m });
+    h2 = Math.floor(m / 60);
+    if (h2 < 24) return L('start', h2 === 1 ? 'agoHour1' : 'agoHour', { n: h2 });
+    d = Math.floor(h2 / 24);
+    return L('start', d === 1 ? 'agoDay1' : 'agoDay', { n: d });
+  }
   function tapeArt(s, i) {
     var k = K(), W = 300, H = 178, out = '', name = String(s.bookingName || '').toUpperCase() || '?', town = String(s.cityName || s.city || '').toUpperCase(),
         stk = TAPE_STOCK[(SB.rng.make('tp:' + s.slot).int(0, TAPE_STOCK.length - 1) + i) % TAPE_STOCK.length], inner = '';
@@ -358,10 +348,11 @@
       openState(r.state, s.slot, fail);
     }
     function tape(s, i, wide) {
-      var a = drawn() ? tapeArt(s, i) : null, label = L('start', 'cont') + ': ' + (s.bookingName || '') + ', ' + (s.cityName || s.city || '') + ', ' + L('start', 'contWeek', { n: (s.week || 0) + 1 });
-      return h('li', { class: 'st-tape', style: { '--rot': f(SB.rng.make('tr:' + s.slot).range(-5, 5)) + 'deg' } },
+      var a = drawn() ? tapeArt(s, i) : null, label = L('start', 'cont') + ': ' + (s.bookingName || '') + ', ' + (s.cityName || s.city || '') + ', ' + L('start', 'contWeek', { n: (s.week || 0) + 1 }) + (agoText(s.savedAt) ? ', ' + agoText(s.savedAt) : '');
+      return h('li', { class: 'st-tape', style: { '--rot': f(SB.rng.make('tr:' + s.slot).range(-5, 5)) + 'deg' } }, [
         h('button', { type: 'button', class: 'cb-thing st-tape-btn', aria: { label: label }, data: { fk: 'tape-' + s.slot }, on: { click: function () { cont(s); } } },
-          a ? fit(art(a.svg, a.w, a.h), wide ? 150 : 200) : h('span', { text: label })));
+          a ? fit(art(a.svg, a.w, a.h), wide ? 150 : 200) : h('span', { text: label })),
+        agoText(s.savedAt) ? h('span', { class: 'st-tape-ago', text: agoText(s.savedAt), aria: { hidden: 'true' } }) : null]);
     }
     function tapes() {
       var few = list.slice(0, 3), rest = list.slice(3);
@@ -493,6 +484,7 @@
     edge = k.polyD(land);
     inner += '<path d="' + edge + '" transform="translate(5 6)" fill="#000" fill-opacity=".18"/>';
     inner += k.poly(land, { seed: 'us48', fill: '#ddd2b6', sw: 3.2, wob: 1.6, over: 1.5 }) + '<path d="' + edge + '" fill="url(#dk-ht1)"/>';
+    inner += '<clipPath id="st-us-clip"><path d="' + edge + '"/></clipPath><path d="' + SB.stateLinesD(MAP.x, MAP.y) + '" clip-path="url(#st-us-clip)" fill="none" stroke="' + TONER + '" stroke-opacity=".8" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="12 4 2.5 4"/>';
     pts.forEach(function (p) {
       if (p.e.slug !== 'anchorage-ak' && !/HI$/.test(p.e.state)) return;
       inner += k.rect(p.x - 34, p.y - 30, 68, 52, { seed: 'inset' + p.e.slug, sw: 2, fill: '#ddd2b6' }) + k.type(p.e.state, p.x - 28, p.y + 16, 11, { bold: true });
@@ -564,14 +556,14 @@
       /* `aka` in the index holds the other names people type for a town (NYC, San Francisco, St. Paul) */
       var fold = function (s) { return String(s || '').toLowerCase().replace(/[.,']/g, '').replace(/\s+/g, ' ').trim(); };
       var n = fold(q), items = cities().filter(function (e) {
-        return !n || fold(e.name + ' ' + e.state + ' ' + (e.aka || '')).indexOf(n) >= 0;
+        return !n || fold(e.name + ' ' + e.state + ' ' + SB.Cities.stateName(e.state) + ' ' + (e.aka || '')).indexOf(n) >= 0;
       });
       if (!items.length) return h('p', { class: 'st-typed st-none', text: L('city', 'none') });
       return h('ul', { class: 'st-rack', role: 'listbox', aria: { label: L('city', 'title') } }, items.map(function (e, i) {
         var on = e.slug === sel, ps = packState(e.slug);
         return h('li', { role: 'presentation' }, Kt().slip({ role: 'option', on: on, label: e.name + ', ' + e.state, fk: 'city-' + e.slug, seed: 'city-' + e.slug,
           cls: 'st-rackcard' + (ps === 'no' ? ' is-no' : ''), struck: ps === 'no', paper: i % 2 ? 'white' : 'bone',
-          tag: e.slug === 'pensacola' ? L('city', 'first') : (e.featured ? L('city', 'featured') : null), note: e.thin ? '~' : null,
+          tag: e.slug === 'pensacola' ? L('city', 'first') : (e.featured ? L('city', 'featured') : null), note: e.thin ? L('city', 'thinTag') : null,
           click: function () { choose(e.slug); }, keydown: rackKey }));
       }));
     }
@@ -641,7 +633,7 @@
           if (draft.slug !== slug) { draft.tune = null; }
           draft.slug = slug; status = null;
           try { qs = SB.Cities.questions(slug); } catch (e) { qs = []; }
-          if (qs.length) SB.UI.go('tune', { slug: slug }); else SB.UI.go('name');
+          if (qs.length) SB.UI.go('tune', { slug: slug }); else goShow(function (t) { status = t; drawCard(false); });
         });
       } catch (e) { status = L('start', 'packBad'); drawCard(false); }
     }
@@ -710,6 +702,7 @@
     var slug = (params && params.slug) || draft.slug, qs = [], ans = {}, form, body, stage, e = entry(slug);
     try { qs = SB.Cities.questions(slug); } catch (err) { qs = []; }
     if (draft.tune && draft.slug === slug) ans = SB.util.copy(draft.tune);
+    function fail(t) { if (body) body.appendChild(errLine(t)); }
     function optLabel(q, o) {
       if (q.kind === 'YES_NO') return word('tune.' + q.key + '.' + (o ? 'yes' : 'no'), o ? 'yes' : 'no');
       if (q.key === 'lean') return word('genre.' + o + '.name', o);
@@ -762,9 +755,9 @@
               var t = {}, k;
               for (k in ans) if (ans[k] !== undefined && !(Array.isArray(ans[k]) && !ans[k].length)) t[k] = ans[k];
               draft.tune = Object.keys(t).length ? t : null; draft.slug = slug;
-              SB.UI.go('name');
+              goShow(fail);
             } }),
-            Kt().button({ label: word('tune.skip', 'Skip'), fk: 'tune-skip', on: function () { draft.tune = null; SB.UI.go('name'); } }),
+            Kt().button({ label: word('tune.skip', 'Skip'), fk: 'tune-skip', on: function () { draft.tune = null; draft.slug = slug; goShow(fail); } }),
             Kt().button({ label: L('tune', 'back'), fk: 'tune-back', on: function () { SB.UI.go('city'); } })
           ])
         ]),
@@ -790,7 +783,6 @@
   /* the player's first flyer: a real one, "<name> presents"          */
   /* ---------------------------------------------------------------- */
 
-  var FLY_W = 420, FLY_H = Math.round(FLY_W * 1100 / 850);
   function myFlyer(name, width) {
     var s, spec, rec, k, i, cv, e = entry(draft.slug);
     if (!draft.flyerBase) draft.flyerBase = Date.now().toString(36);
@@ -811,14 +803,6 @@
       return { canvas: cv, k: k };
     } catch (err) { return null; }
   }
-  /* the tape that holds the first flyer up. Every template already prints "<name> presents" itself (SB.Flyer
-   * B.presenter), so nothing is pasted over the top: a pasted bar doubled it and could hide the headliner. */
-  function flyerFx(name) {
-    if (!drawn()) return null;
-    var k = K(), out = '';
-    out += k.tape(30, 14, 90, 26, { seed: 'mf1', rot: -30 }) + k.tape(FLY_W, 14, 90, 26, { seed: 'mf2', rot: 26 });
-    return h('span', { class: 'st-fly-fx', html: svgOf(out, FLY_W + 30, FLY_H + 30), style: { width: pu(FLY_W + 30) } });
-  }
 
   /* ---------------------------------------------------------------- */
   /* name                                                             */
@@ -834,19 +818,21 @@
     return r.shuffle ? r.shuffle(whole).slice(0, 3) : whole.slice(0, 3);
   }
 
-  function mountName(root) {
-    var tm = clock(), input, msg, marksBox, ideasBox, flyBox, body, stage, sugg = ideas(), lastK = -1, redraw = null, thumped = null;
+  /* The booking name, asked in the going-away scene ("You'll need a name for the flyers. Don't use mine.") and typed
+   * onto a strip of tape there, with the ideas, the mark stamps and the first flyer reading "<name> presents" beside
+   * it, re-rolling its art every few letters. ctx.answer(name) turns the scene (js/ui/cutscene.js, opts.widgets.name). */
+  function nameWidget(box, ctx) {
+    var input, msg, marksBox, flyBox, sugg = ideas(), lastK = -1, redraw = null, thumped = null, FW = 250;
     if (!draft.markSeeds) draft.markSeeds = rollMarks();
     if (!draft.mark) draft.mark = { v: 1, seed: draft.markSeeds[0] };
     function shown() { var n = String((input && input.value) || '').trim(); return n || L('name', 'markBlank'); }
     function flyer() {
-      var r = myFlyer(shown(), FLY_W), el;
+      var r = myFlyer(shown(), FW), el;
       SB.UI.clear(flyBox);
       if (!r) return;
-      el = h('div', { class: 'st-myfly' }, [r.canvas, flyerFx(shown())]);
+      el = h('div', { class: 'st-myfly cs-namefly' }, [r.canvas]);
       flyBox.appendChild(el);
-      /* the hero: stamped on when the screen opens, slapped again when the letters have re-rolled its art */
-      if (lastK === -1) hit(el, 'stamp', { delay: 260, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: el } });
+      if (lastK === -1) hit(el, 'stamp', { delay: 260 });
       else if (r.k !== lastK) hit(el, 'slap');
       lastK = r.k;
     }
@@ -857,7 +843,7 @@
           var on = draft.mark && draft.mark.seed === s, b = h('button', { type: 'button', role: 'radio', class: 'cb-thing st-stamp pz-hl' + (on ? ' is-on' : ''), aria: { checked: on ? 'true' : 'false' },
                                style: { '--rot': f(SB.rng.make('sr' + s).range(-6, 6)) + 'deg' },
                                data: { fk: 'mark-' + i }, on: { click: function () { draft.mark = { v: 1, seed: s }; thumped = s; marks(); flyer(); } } },
-            C().BookerMark({ name: shown(), mark: { v: 1, seed: s }, size: 84 }));
+            C().BookerMark({ name: shown(), mark: { v: 1, seed: s }, size: 60 }));
           if (thumped === s) hit(b, 'stamp');
           return b;
         })));
@@ -866,178 +852,93 @@
     }
     function soon() {
       if (redraw) clearTimeout(redraw);
-      redraw = tm.later(function () { redraw = null; draft.bookingName = input.value; marks(); flyer(); }, 140);
+      redraw = setTimeout(function () { redraw = null; draft.bookingName = input.value; marks(); flyer(); }, 160);
     }
-    function next() {
+    function done() {
       var n = String(input.value || '').trim();
       SB.UI.clear(msg);
       if (!n) { msg.appendChild(errLine(L('name', 'empty'))); try { input.focus(); } catch (e) { /* fine */ } return; }
       if (SB.text.blocked(n)) { msg.appendChild(errLine(L('name', 'blocked'))); return; }
+      if (redraw) { clearTimeout(redraw); redraw = null; }
       draft.bookingName = n;
-      SB.UI.go('setup');
+      ctx.answer(n);
     }
-    var nameField = Kt().input({ label: L('name', 'field'), big: true, value: draft.bookingName || '', max: 48, fk: 'name-in', cls: 'st-namefield',
-                                 placeholder: L('name', 'markBlank').toUpperCase(),
-                                 onKey: function (e) { if (e.key === 'Enter') { e.preventDefault(); next(); } },
-                                 onInput: function () { soon(); },
-                                 on: function () { draft.bookingName = input.value; } });
-    input = nameField.field;
+    var field = Kt().input({ label: L('name', 'field'), big: true, value: draft.bookingName || '', max: 48, fk: 'name-in', cls: 'st-namefield',
+                             placeholder: L('name', 'markBlank').toUpperCase(),
+                             onKey: function (e) { if (e.key === 'Enter') { e.preventDefault(); done(); } },
+                             onInput: function () { soon(); },
+                             on: function () { draft.bookingName = input.value; } });
+    input = field.field;
     msg = h('div', { aria: { live: 'polite' } });
     marksBox = h('div', { class: 'st-markbox' });
-    flyBox = h('div', { class: 'st-flybox', aria: { label: L('name', 'preview') }, role: 'group' });
-    ideasBox = h('div', { class: 'st-ideas', role: 'group', aria: { label: L('name', 'ideas') } }, [
-      h('p', { class: 'kt-small st-k', text: L('name', 'ideas') }),
-      h('div', { class: 'st-ideas-row' }, sugg.map(function (s, i) {
-        return Kt().button({ label: s, fk: 'idea-' + i, paper: 'white', cls: 'st-idea', on: function () { input.value = s; draft.bookingName = s; marks(); flyer(); } });
-      }))
-    ]);
-    body = h('div', { class: 'st-scrollbody' }, [
-      guide('name', draft.slug),
-      nameField,
-      h('p', { class: 'kt-pencil st-help', text: L('name', 'help') }),
-      ideasBox,
-      h('p', { class: 'kt-small st-k', text: L('name', 'marks') }),
-      h('p', { class: 'kt-pencil st-help', text: L('name', 'markHelp') }), marksBox,
-      Kt().button({ label: L('name', 'reroll'), fk: 'reroll', on: function () { draft.markSeeds = rollMarks(); draft.mark = { v: 1, seed: draft.markSeeds[0] }; thumped = draft.markSeeds[0]; marks(); flyer(); } }),
-      msg
-    ]);
-    stage = h('div', { class: 'sb-stage st st-name' }, [
-      h('div', { class: 'st-namegrid' }, [
-        Kt().card({ tag: 'section', paper: 'white', tape: ['tl'], rot: -0.6, cls: 'st-form st-namesheet' }, [
-          Kt().headline(L('name', 'title'), { size: 34, max: 560, tag: 'h1', cls: 'st-head' }),
-          body,
-          h('div', { class: 'st-acts' }, [
-            Kt().button({ label: L('name', 'next'), kind: 'primary', big: 24, fk: 'name-next', on: next }),
-            Kt().button({ label: L('name', 'back'), fk: 'name-back', on: function () { SB.UI.go('city'); } })
-          ])
+    flyBox = h('div', { class: 'st-flybox cs-nameflybox', aria: { label: L('name', 'preview') }, role: 'group' });
+    box.appendChild(h('div', { class: 'cs-namecard' }, [
+      h('div', { class: 'cs-namecol' }, [
+        field,
+        h('p', { class: 'kt-pencil st-help', text: L('name', 'help') }),
+        h('div', { class: 'st-ideas', role: 'group', aria: { label: L('name', 'ideas') } }, [
+          h('p', { class: 'kt-small st-k', text: L('name', 'ideas') }),
+          h('div', { class: 'st-ideas-row' }, sugg.map(function (s, i) {
+            return Kt().button({ label: s, fk: 'idea-' + i, paper: 'white', cls: 'st-idea', on: function () { input.value = s; draft.bookingName = s; marks(); flyer(); } });
+          }))
         ]),
-        flyBox
-      ])
-    ]);
-    root.appendChild(stage);
-    if (SB.Finish && SB.Finish.scrollbar) SB.Finish.scrollbar(body);
-    slapIn([stage.querySelector('.st-namesheet')], 0);
+        h('p', { class: 'kt-small st-k', text: L('name', 'marks') }),
+        h('p', { class: 'kt-pencil st-help', text: L('name', 'markHelp') }),
+        marksBox,
+        h('div', { class: 'st-acts' }, [
+          Kt().button({ label: L('name', 'done'), kind: 'primary', big: 22, fk: 'name-done', on: done }),
+          Kt().button({ label: L('name', 'reroll'), fk: 'reroll', on: function () { draft.markSeeds = rollMarks(); draft.mark = { v: 1, seed: draft.markSeeds[0] }; thumped = draft.markSeeds[0]; marks(); flyer(); } })
+        ]),
+        msg
+      ]),
+      flyBox
+    ]));
     marks(); flyer();
-    try { input.focus(); } catch (e) { /* fine */ }
-    /* no name yet: the box to type it in; a name: next */
-    point(function () { return String(input.value || '').trim() ? byFk(root, 'name-next') : input; });
-    return { unmount: function () { tm.stop(); point(null); } };
+    setTimeout(function () { try { input.focus(); } catch (e) { /* fine */ } }, 400);
   }
 
   /* ---------------------------------------------------------------- */
-  /* setup                                                            */
+  /* the way in: the going-away show                                  */
   /* ---------------------------------------------------------------- */
 
-  /* the last hit: one black bar of marker capitals with a staple through it */
-  function stapleArt() {
-    var k = K(), t = L('setup', 'staple').toUpperCase();
-    return k.paper(8, 10, 404, 80, { seed: 'st-stp0', stock: 'bone', rot: -1.5, cut: 2, burn: 0.3 }) +
-      k.paper(14, 16, 392, 68, { seed: 'st-stp', stock: TONER, rot: -1.5, burn: 0, shadow: false,
-        inner: k.marker(t, 34, 70, 42, { seed: 'st-stpm', fill: PAPER, maxWidth: 290 }) + k.arrow(334, 50, 388, 48, { seed: 'st-stpa', stroke: PAPER, sw: 5, head: 16 }) }) +
-      k.staple(22, 20, { rot: -30 }) + D().swipe(30, 94, 240, 10);
-  }
-
-  function skipWords() {
-    var t = SB.Content.story && SB.Content.story.tutorial && SB.Content.story.tutorial.skip;
-    return t && t.label ? String(t.label) : '';
-  }
-
-  function mountSetup(root) {
-    var tm = clock(), S = draft.settings, msg = h('div', { aria: { live: 'polite' } }), body = h('div', { class: 'st-setlines' }), flyBox, sbody, stage, hitBtn, going = false, guided = true;
-    function line(key, values, helpKey) {
-      return h('div', { class: 'st-setline' }, [
-        Kt().pick({ label: L('setup', key), name: 'st-set-' + key, value: S[key], fk: 'set-' + key,
-                    options: values.map(function (v) { return [v, word(key + '.' + v, v.toLowerCase())]; }),
-                    on: function (v) { S[key] = v; keepFocus(draw); } }),
-        h('p', { class: 'kt-pencil st-help', text: L('setup', key + 'What') }),
-        optHelp(values.map(function (v) { return [v, L('setup', helpKey + '.' + v)]; }), S[key])
-      ]);
-    }
-    /* what every choice means, not only the one picked; the picked one is marked */
-    function optHelp(rows, cur) {
-      return h('ul', { class: 'st-opthelp' }, rows.map(function (r) {
-        var on = r[0] === cur;
-        return h('li', { class: on ? 'is-on' : null, aria: on ? { current: 'true' } : null }, [
-          h('span', { text: r[1] }),
-          on ? h('span', { class: 'st-opthelp-on', text: ' ← ' + L('setup', 'picked') }) : null
-        ]);
-      }));
-    }
-    function draw() {
-      SB.UI.clear(body);
-      body.appendChild(h('div', { class: 'st-setline' }, [
-        Kt().check({ label: L('setup', 'bills'), checked: !!S.bills, fk: 'set-bills',
-                     on: function (v) { S.bills = !!v; keepFocus(draw); } }),
-        optHelp([[true, L('setup', 'billsOn')], [false, L('setup', 'billsOff')]], !!S.bills),
-        h('p', { class: 'kt-pencil st-help', text: L('setup', 'billsLater') })
-      ]));
-      body.appendChild(line('fog', Object.keys(SB.Enums.FOG), 'fogHelp'));
-      body.appendChild(line('windows', Object.keys(SB.Enums.WINDOWS), 'windowsHelp'));
-      body.appendChild(h('p', { class: 'kt-pencil st-help', text: L('setup', 'later') }));
-    }
-    function begin() {
-      var st, seed;
-      SB.UI.clear(msg);
-      if (!draft.slug || !SB.Cities.isLoaded(draft.slug)) { SB.UI.go('city'); return; }
-      if (!draft.bookingName) { SB.UI.go('name'); return; }
-      seed = draft.slug + '-' + Date.now().toString(36);
-      try {
-        st = SB.Game.newGame({ seed: seed, citySlug: draft.slug, bookingName: draft.bookingName, mark: draft.mark,
-                               settings: { bills: !!S.bills, fog: S.fog, windows: S.windows }, tune: draft.tune || null,
-                               tutorial: guided });        // the guided first show, unless "I've done this before"
-      } catch (e) { SB.log('error', 'SB.UI.setup', String(e && e.message)); msg.appendChild(errLine(L('setup', 'bad'))); going = false; return; }
-      draft = { slug: null, tune: null, bookingName: '', mark: null, markSeeds: null, flyerBase: null, settings: { bills: true, fog: 'NORMAL', windows: 'NORMAL' } };
-      point(null);
-      try { SB.UI.prefs.set('setupDone', true); } catch (e) { /* the guide shows again next time */ }
-      /* the going-away show plays before the desk appears (js/ui/story.js); then sit down */
-      if (SB.UI.story && SB.UI.story.opening) SB.UI.story.opening(st, function () { SB.UI.start(st); });
-      else SB.UI.start(st);
-    }
-    /* the last hit: two staples go through the flyer, it slaps flat, then the desk */
-    function staple() {
-      var el = flyBox.querySelector ? flyBox.querySelector('.st-myfly') : null, k = K();
-      if (going) return;
-      going = true;
-      if (reduced() || !el || !drawn()) { begin(); return; }
-      el.appendChild(h('span', { class: 'st-staples', html: svgOf(k.staple(70, 26, { rot: -8 }) + k.staple(FLY_W - 70, 24, { rot: 6 }) + k.staple(70, FLY_H - 22, { rot: 4 }) + k.staple(FLY_W - 70, FLY_H - 20, { rot: -5 }), FLY_W, FLY_H), style: { width: pu(FLY_W) } }));
-      hit(el, 'stamp');
-      tm.later(begin, 420);
-    }
-    var r = myFlyer(draft.bookingName || L('name', 'markBlank'), FLY_W);
-    flyBox = h('div', { class: 'st-flybox' }, r ? h('div', { class: 'st-myfly' }, [r.canvas, flyerFx(draft.bookingName || L('name', 'markBlank'))]) : null);
-    sbody = h('div', { class: 'st-scrollbody' }, [guide('setup', draft.slug), body, msg]);
-    hitBtn = h('button', { type: 'button', class: 'cb-thing is-strip st-staple pz-hl', aria: { label: L('setup', 'stapleLabel') }, data: { fk: 'staple' }, on: { click: staple } },
-      drawn() ? fit(art(stapleArt(), 430, 104), 400) : h('span', { text: L('setup', 'start') }));
-    stage = h('div', { class: 'sb-stage st st-setup' }, [
-      h('div', { class: 'st-namegrid' }, [
-        Kt().card({ tag: 'section', paper: 'white', tape: ['tl'], rot: -0.6, cls: 'st-form st-setsheet' }, [
-          Kt().headline(L('setup', 'title'), { size: 38, max: 560, tag: 'h1', cls: 'st-head' }),
-          sbody,
-          h('div', { class: 'st-acts' }, [
-            Kt().button({ label: L('setup', 'back'), fk: 'setup-back', on: function () { SB.UI.go('name'); } }),
-            /* skip the walkthrough: the same start, with the first show left to you */
-            skipWords() ? Kt().button({ label: skipWords(), fk: 'skip-tutorial', paper: 'white', on: function () { guided = false; staple(); } }) : null
-          ])
-        ]),
-        h('div', { class: 'st-hitcol' }, [
-          flyBox,
-          hitBtn,
-          h('p', { class: 'kt-pencil st-help st-staplehelp', text: L('setup', 'stapleHelp') })
-        ])
-      ])
-    ]);
-    root.appendChild(stage);
-    if (SB.Finish && SB.Finish.scrollbar) SB.Finish.scrollbar(sbody);
-    slapIn([stage.querySelector('.st-setsheet')], 0);
-    if (SB.Finish && flyBox.firstChild) hit(flyBox.firstChild, 'stamp', { delay: 260, cue: 'stamp', cueAt: 83, cueOpts: { gain: -5, el: flyBox.firstChild } });
-    draw();
-    point(function () { return going ? null : byFk(root, 'staple'); });
-    return { unmount: function () { tm.stop(); point(null); } };
+  /* After the map (and the town's questions) the going-away show plays on a first draft of the game, and the setup is
+   * asked in it (js/ui/story.js openingAsk, user 2026-11-21): bills, how much you can see, deadlines, the booking name
+   * (nameWidget) and the walkthrough. The real game is made from the replies with the same seed, so the scene's town,
+   * room and bands are the game's. fail(text) puts a line on the screen underneath. */
+  var showing = false;
+  function blankDraft() { return { slug: null, tune: null, bookingName: '', mark: null, markSeeds: null, flyerBase: null }; }
+  function goShow(fail) {
+    var seed, first;
+    if (showing) return;
+    if (!draft.slug || !SB.Cities.isLoaded(draft.slug)) { SB.UI.go('city'); return; }
+    seed = draft.slug + '-' + Date.now().toString(36);
+    if (!draft.markSeeds) draft.markSeeds = rollMarks();
+    if (!draft.mark) draft.mark = { v: 1, seed: draft.markSeeds[0] };
+    try {
+      if (!SB.UI.story || !SB.UI.story.openingAsk) throw new Error('no opening');
+      first = SB.Game.newGame({ seed: seed, citySlug: draft.slug, bookingName: '', mark: draft.mark,
+                                settings: { bills: true, fog: 'NORMAL', windows: 'NORMAL' }, tune: draft.tune || null, tutorial: true });
+    } catch (e) { SB.log('error', 'SB.UI.start', String(e && e.message)); if (fail) fail(L('setup', 'bad')); return; }
+    showing = true;
+    point(null);
+    SB.UI.story.openingAsk(first, { widgets: { name: nameWidget }, back: { label: L('setup', 'back'), on: function () { showing = false; } } },
+      function (a, bill) {
+        var name = String(a.name || '').trim();
+        if (!name) return null;
+        return SB.Game.newGame({ seed: seed, citySlug: draft.slug, bookingName: name, mark: draft.mark,
+                                 settings: { bills: a.bills !== false, fog: a.fog || 'NORMAL', windows: a.windows || 'NORMAL' },
+                                 tune: draft.tune || null, tutorial: a.walk !== false, goingAway: bill });
+      },
+      function (st) {
+        showing = false;
+        if (!st) { if (fail) fail(L('setup', 'bad')); return; }
+        draft = blankDraft();
+        try { SB.UI.prefs.set('setupDone', true); } catch (e) { /* the guide shows again next time */ }
+        SB.UI.start(st);
+      });
   }
 
   SB.UI.screen('start', { rail: null, title: 'ui.start.title', full: true, mount: mountStart });
   SB.UI.screen('city', { rail: null, title: 'ui.city.title', full: true, mount: mountCity });
   SB.UI.screen('tune', { rail: null, title: 'ui.tune.title', full: true, mount: mountTune });
-  SB.UI.screen('name', { rail: null, title: 'ui.name.title', full: true, mount: mountName });
-  SB.UI.screen('setup', { rail: null, title: 'ui.setup.title', full: true, mount: mountSetup });
 })(SB);

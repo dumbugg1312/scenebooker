@@ -269,8 +269,8 @@ SB.Content.strings = {
     LATE_RENT:   { name: 'pay rent late', says: 'The landlord gets it a week late and remembers.' },
     COUCH:       { name: 'sleep on a couch', says: 'Give up your place for a while. It costs less and it costs more.' }
   },
-  settle: { ROOM: 'the room', SOUND: 'sound', SECURITY: 'security', HOST: 'the host', GUARANTEE: 'the touring band',
-            LOCAL: 'the locals', SHARE: 'the touring band\'s share', INSURANCE: 'event insurance, paid when you confirmed',
+  settle: { ROOM: 'the room', ROOM_DEP: 'the room: rent {rent:money} ({dep:money} of it paid already, comes back after)', DEPOSIT: 'room deposit back', SOUND: 'sound', SECURITY: 'security', HOST: 'the host', GUARANTEE: 'the touring band',
+            LOCAL: 'the locals', SHARE: 'the touring band\'s share', SHARE_OF: '{band}\'s cut of what was left', INSURANCE: 'event insurance, paid when you confirmed',
             DAMAGES: 'damages, out of your pocket', DAMAGES_COVERED: 'damages, paid by the insurance', COSTS: 'costs', YOU: 'you, from the box',
             SOUND_EXPECTED: 'sound (nobody hired yet: about what it costs)',
             COSTS_BEFORE: '{what}, paid before the night',
@@ -382,6 +382,31 @@ SB.Content.strings = {
     handshake: { term: 'handshake', short: 'A deal you agreed out loud and didn\'t write down.',
                  long: 'Most of the time it\'s fine. When it isn\'t, it\'s your word against theirs at the end of the night.', example: '' },
     stale: { term: 'stale', short: 'Posters get covered and announcements get forgotten.',
-             long: 'Too early is a cost too. A poster from five weeks ago is under three newer ones.', example: '' }
+             long: 'Too early is a cost too. A poster from five weeks ago is under three newer ones.', example: '' },
+    /* the words a first-time player (a twelve-year-old, say) trips on, added 2026-11-21 for tap-to-define (js/ui/words.js) */
+    bill: { term: 'the bill', short: 'The list of bands playing the show, in the order they play.',
+            long: 'Usually three: an opener, a middle band, a headliner.', example: '' },
+    opener: { term: 'opener', short: 'The band that plays first.',
+              long: 'Often a newer local band. Their friends get there early, so the room isn\'t empty.', example: '' },
+    headliner: { term: 'headliner', short: 'The band that plays last, the one most people came to see.',
+                 long: 'Put the biggest draw last so people stay for the whole night.', example: '' },
+    touring: { term: 'touring band', short: 'A band from out of town, driving from show to show.',
+               long: 'They need gas money and a floor to sleep on. Nobody here knows them yet, so locals help bring people.', example: '' },
+    draw: { term: 'draw', short: 'How many people a band brings to a show.',
+            long: '"They draw 11" means about eleven people come because of them.', example: '' },
+    theDoor: { term: 'the door', short: 'The money people pay to get in, collected at the door.',
+               long: 'Everyone gets paid out of it at the end of the night.', example: '' },
+    flatFee: { term: 'flat fee', short: 'A set amount you pay a band, however many people come.',
+               long: 'Same as a guarantee. If nobody comes, you still owe it.', example: '' },
+    counter: { term: 'counter', short: 'When someone answers your offer with a different deal.',
+               long: 'You can take their deal, offer again, or pass.', example: '' },
+    tba: { term: 'TBA', short: 'To be announced: a spot on the flyer whose band isn\'t set yet.',
+           long: 'Fine on an early flyer. Fill it in before the show.', example: '' },
+    pa: { term: 'PA', short: 'The speakers and mixer that make the singer loud enough to hear.',
+          long: 'Bands bring guitars and drums, not a PA. Your sound person brings it and runs it.', example: '' },
+    promo: { term: 'promo', short: 'Getting the word out: flyers, posters, listings, texts, posts.',
+             long: 'A great show nobody heard about is an empty room.', example: '' },
+    callItANight: { term: 'call it a night', short: 'End tonight and go to sleep. This is how time moves.',
+                    long: 'Answers to your texts come in overnight. Nothing changes until you call it a night.', example: '' }
   }
 };

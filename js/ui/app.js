@@ -7,8 +7,9 @@
  * boots on DOMContentLoaded. Touches no DOM while loading except to listen for that event.
  *
  * The play loop belongs to the week screen (05-interface 4.2); the desk route keeps a hidden one mounted. The turn is
- * one evening (design/spec/10-night-clock.md): the tape deck (the old lamp) calls it a night (Week.endNight) and the
- * loop plays the night out to the next stop. They talk through one DOM event on document: 'sb-play' with detail
+ * one evening (design/spec/10-night-clock.md): the pinned clock's CALL IT A NIGHT (js/ui/nightclock.js, the one place
+ * a night is called) pulls the lamp (Week.endNight) and the loop plays the night out to the next stop; the tape deck
+ * (the old lamp) pauses and plays that out and closes the week. They talk through one DOM event on document: 'sb-play' with detail
  * { cmd: 'pause' | 'resume' | 'next', by }: 'next' plays the night out in one go, by: 'player' is the player pausing.
  * The week screen fires 'resume' and 'pause' itself when the loop starts and stops on its own, so the deck follows.
  * SB.UI.playing() says whether the loop is running.
@@ -235,14 +236,21 @@
     return ('g-' + base).slice(0, 40);   // SPEC?: 05-interface names no slot rule; one slot per career, named by its seed
   }
 
+  var saveWarned = false;
+  function saveFailed() {
+    if (saveWarned) return;
+    saveWarned = true;
+    toast("Couldn't save. Export your game from Settings.", 'no');
+  }
+
   function doSave() {
     saveTimer = null;
     if (!state || !SB.Save) return;
     saveAt = now();
     try {
       var r = SB.Save.save(state, slot || slotFor(state), saveAt);
-      if (r && r.ok === false) SB.log('warn', 'SB.UI.autosave', r.why || 'not saved');
-    } catch (e) { SB.log('warn', 'SB.UI.autosave', String(e && e.message)); }
+      if (r && r.ok === false) { SB.log('warn', 'SB.UI.autosave', r.why || 'not saved'); saveFailed(); }
+    } catch (e) { SB.log('warn', 'SB.UI.autosave', String(e && e.message)); saveFailed(); }
   }
   /** At most once a second. */
   function autosave() {
@@ -391,6 +399,7 @@
   function start(s, slotName) {
     if (!s || typeof s !== 'object' || !s.clock) SB.fail('SB.UI.start', 'not a game state');
     state = s;
+    SB.text.off = !!(s.settings && s.settings.noText);
     slot = slotName || slotFor(s);
     playing = false;
     trail = [];
@@ -418,7 +427,7 @@
   }
 
   /* ---------------------------------------------------------------- */
-  /* the lamp (the tape deck): call it a night, pause, close the week */
+  /* the lamp: call it a night (pulled by the pinned clock, js/ui/nightclock.js), pause, close the week (the tape deck) */
   /* ---------------------------------------------------------------- */
 
   function setPlaying(v) { playing = !!v; renderShell(); }
@@ -479,6 +488,10 @@
     var full = !!(current && current.def && current.def.full), closeup = !!(current && isCloseup(current.name, current.def));
     if (SB.Desk && typeof SB.Desk.render === 'function') {
       try { SB.Desk.render(state, { full: full, closeup: closeup }); } catch (e) { SB.log('warn', 'SB.UI.desk', String(e && e.message)); }
+    }
+    /* tonight's clock, pinned to the same corner of the desk and every close-up, with the one CALL IT A NIGHT */
+    if (SB.NightClock) {
+      try { SB.NightClock.render(state, { full: full }); } catch (e) { SB.log('warn', 'SB.UI.clock', String(e && e.message)); }
     }
     if (typeof document !== 'undefined' && document.body) {
       document.body.classList.toggle('is-full', full || !state);

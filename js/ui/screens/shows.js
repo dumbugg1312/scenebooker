@@ -5,13 +5,13 @@
  * BILL, CREW, ANNOUNCE, SHOW NIGHT. Each has one stamp (DONE / TO DO / WAITING ON a name / LOCKED / !!); the step in
  * hand is unfolded to its rows, the rest fold to one line. Right: the picker for the row that is picked: the hold
  * form, the offer slip, the sticker sheet of local bands, the crew, the flyer, the jobs with DO IT TONIGHT, the door,
- * the deal; HOW IT LOOKS (the forecast) sits behind a strip. Foot: tonight's clock (js/ui/clock.js, design/spec/
- * 10-night-clock.md) and CALL IT A NIGHT, which is the tape deck's own pull; the card comes back at the next evening.
+ * the deal; HOW IT LOOKS (the forecast) sits behind a strip. Tonight's clock and CALL IT A NIGHT are the pinned clock's
+ * (js/ui/nightclock.js, the one place a night is called): a button here that takes time hatches its hours on it, and
+ * a night called while the card is up brings the card back at the next evening.
  * Everything that takes time says what it takes, and is crossed out with the reason when tonight cannot take it.
  * A played or cancelled show is the night's record instead. bill: the old route; it opens the same card on the bill.
  * Also defines SB.UI.cuDraw, the small drawing helpers the clipboard, sticker sheet and key hooks share.
  * Reads Shows, Jobs, Forecast, Bands, Harm, People, Money, Rooms and Week views; changes state only through SB.UI.act
- * (and SB.UI.lamp.pull for the night).
  */
 (function (SB) {
   'use strict';
@@ -28,6 +28,7 @@
     pastBox: 'PLAYED',
     hidePast: 'Put the box away',
     noRoom: 'no room yet',
+    gone: 'That show is not on the list any more.',
     asks: '{yes} yes, {wait} waiting, {no} no',
     reach: 'Who has heard',
     open: 'Open the show on {d}',
@@ -90,7 +91,7 @@
     floor: 'FLOOR',
     nobody: 'nobody yet',
     you: 'You',
-    youWork: 'You work the floor',
+    youWork: 'You work the door',
     ask: 'Ask {name} ({rate} a night)',
     put: 'Put {name} on',
     on: '{name} is on it',
@@ -135,6 +136,8 @@
     toOffer: 'THE OFFER', toOfferL: 'Open the offer to the touring band',
     page: 'PAGE', bandPage: 'Open {name}\'s page',
     order: 'RUNNING ORDER', earlier: 'EARLIER', later: 'LATER', earlierL: 'Move {name} earlier in the night', laterL: 'Move {name} later in the night',
+    booked: 'BOOKED',
+    billPlaying: 'PLAYING, IN THIS ORDER: DRAG ONE OR USE THE ARROWS', billPlaying1: 'PLAYING', billAsked: 'ASKED, WAITING TO HEAR BACK', billOpen: 'STILL OPEN',
     bigger: 'BIGGER', smaller: 'SMALLER',
     another: '+ ANOTHER BAND', anotherL: 'Ask another band for the {slot} slot',
     peel: 'TAKE THEM OFF',
@@ -147,8 +150,8 @@
     opens: { ROOM: 'opens when the room is confirmed', BILL: 'opens when the bands have said yes' },
     stepL: 'Step {n}, {step}, {stamp}: {line}',
     lock: 'LOCK IT', lockV: 'locked', lockNo: 'NOT LOCKED',
-    sum: { date: '{d} · {when}', bill0: 'nobody yet', crew: 'sound {sound} · door {door}', flyer: 'flyer made', flyerNo: 'no flyer yet',
-           ready: 'ready for the night', wants: 'they want: {need}', yours: 'yours in the morning' },
+    sum: { date: '{d} · {when}', bill0: 'nobody yet', asked: '{n} asked', booked0: 'nobody booked', crew: 'sound {sound} · door {door}', flyer: 'flyer made', flyerNo: 'no flyer yet',
+           ready: 'ready for the night', soon: 'nothing to do till the night', wants: 'they want: {need}', yours: 'yours in the morning' },
     offerRow: 'OFFER', soon: 'IN {n} DAYS', soon1: 'TOMORROW', soon0: 'TONIGHT',
     asked: 'ASKED {day}', tonightWord: 'TONIGHT',
     askedSince: 'Asked {name} on {day}. You hear back overnight.',
@@ -168,7 +171,7 @@
       bandNo: '{band} said no: ask another band for the {slot} slot.',
       bandOrLock: 'Ask a band for the {slot} slot, or lock the bill as it stands.',
       pickBand: 'PICK A BAND',
-      order: 'Set the running order: pick a band, then EARLIER or LATER.',
+      order: 'Set the running order: drag a band up or down the bill, or use its arrows.',
       pickOrder: 'RUNNING ORDER',
       crew: 'Ask someone to run {role}.',
       crewNamed: 'Ask {name} to run {role}.',
@@ -190,14 +193,15 @@
       waiting: 'Waiting on {names}: you hear back overnight.',
       heldYours: '{room} has what it asked for, so the night is yours in the morning.',
       held2: '{room} has you #{n} in line: you hear if it opens up.',
-      nothing: 'Nothing more to do on this show tonight.',
+      nothing: 'Nothing more to do on this show tonight. Call it a night.',
+      nothingPhone: 'Nothing more to do on this show tonight. {n} on your phone need an answer, or call it a night.',
       keepOn: 'Everything is in hand: call it a night till the show.',
       notOpen: 'This evening is over.'
     },
     look: 'HOW IT LOOKS', lookL: 'How the night looks: the crowd you can expect', lookBack: 'BACK TO {row}', lookBackL: 'Back to {row}',
-    callNight: 'CALL IT A NIGHT', callNightL: 'Call it a night: answers come overnight, and tomorrow evening you are back here',
+    toClock: 'then call it a night, on the clock ↘', toClockShort: 'on the clock ↘',
     callOff: 'cancel the show',
-    doNow: 'DO IT TONIGHT', doNowL: 'Do it tonight: {job}',
+    doNow: 'DO IT TONIGHT', doNowL: 'Do it tonight: {job}', stillYours: 'Still yours on this show:',
     effort: 'HOW SHARP', effortWord: { ROUGH: 'ROUGH', STANDARD: 'STANDARD', SHARP: 'SHARP' },
     hasIt: '{name} has it',
     stayUp: 'means staying up {n}',
@@ -253,7 +257,22 @@
     lockedWarn: 'The bill is locked. This costs trust with the band. Go ahead?',
     yesGo: 'Go ahead',
     noGo: 'Leave it',
-    noWord: 'NO'
+    noWord: 'NO',
+    /* what a band's sticker says about them (SB.UI.bandRead): their pull, then what helps and what holds them back */
+    pull: 'PULLS {n}', pullGuess: 'PULLS {n}?', pullL: 'they pull {n} people', pullGuessL: 'word is they pull {n} people (not seen yet)',
+    showWith: 'show with them: {lo}-{hi}', answers: 'answers in {lo}-{hi} days', crowd: 'their crowd: {who}', crowdL: 'Their crowd: {who}',
+    plusL: 'Good: {list}', minusL: 'Holds them back: {list}',
+    read: {
+      fit: 'fits this bill', wrong: 'wrong bill', stretch: 'a stretch for this bill', slot: 'wants this slot', headline: 'wants to headline',
+      busy: 'busy that night', no21: 'won\'t play a 21+ room', weekend: 'Fri/Sat only', justPlayed: 'just played',
+      out: 'lineup change', playedOut: 'played out', listed: 'someone\'s on your list', trusts: 'trusts you', sour: 'sour on you',
+      liveGood: 'great live', liveBad: 'shaky live', relGood: 'always shows up', relBad: 'flaky', promoGood: 'shares the flyer', promoBad: 'won\'t promote',
+      crossGood: 'pulls other scenes', crossBad: 'only their own crowd', fun: 'in it for fun', grow: 'wants to grow', money: 'in it for the money',
+      buzz: 'people are talking', fading: 'fading', hot: 'their sound is hot', cooling: 'their sound is cooling', brandNew: 'brand new band',
+      fast: 'answers fast', slow: 'slow to answer', comingUp: 'coming up', playOften: 'can play often', wearsFast: 'plays out fast', worn: 'people have seen them a lot',
+      needPAID: 'must get paid', needCROWD: 'wants a real crowd', needSLOT: 'picky about slots', needSOUND: 'picky about sound', needFLOOR: 'needs a floor',
+      needMEAL: 'needs a meal', needON_TIME: 'hates a late night', needALL_AGES: 'all-ages rooms only', needBILL: 'picky about the bill', needNAME_RIGHT: 'spell their name right'
+    }
   };
 
   /* ================================================================ */
@@ -833,6 +852,62 @@
   function lower(k) { return String(k || '').toLowerCase().replace(/_/g, ' '); }
   function money(n) { return SB.text.money ? SB.text.money(n || 0) : '$' + Math.round(n || 0); }
   function md(day) { var d = SB.time.date(day); return d.m + '/' + d.d; }
+
+  /* ---- SB.UI.bandRead: what a band brings and what holds them back, read off what the player could know ---- */
+  /** bandRead(state, card, o): { pull: { text, sure }, plus: [words], minus: [words], crowd: words }. Only public facts and
+   *  what the notebook has learned: the draw range (word of mouth until seen), trust, the band's known needs and why they
+   *  play, their buzz, how their sound is doing, and (with o.showId / o.slot / o.fit) how they sit with this show: the
+   *  fit, the slot they would want, the night, the room's door. Each list leads with what matters for this show. */
+  SB.UI.bandRead = function (s, c, o) {
+    var E = SB.Enums, Cf = SB.Config, plus = [], minus = [], show, b, d, tp, want, rank = { OPEN: 0, MIDDLE: 1, CLOSE: 2 }, dow, crowd = [], gk = ['KIDS', 'MIDDLE', 'OLD'], seen = {};
+    o = o || {};
+    if (!s || !c) return { pull: null, plus: plus, minus: minus, crowd: '' };
+    function R(k) { return SB.text.label('ui.bill.read.' + k); }
+    function add(list, k) { if (!seen[k]) { seen[k] = true; list.push(R(k)); } }
+    function mid(v) { return v && num(v.conf) && v.conf >= E.CONF.HEARD ? (v.lo50 + v.hi50) / 2 : null; }
+    show = o.showId && s.shows ? s.shows[o.showId] : null;
+    b = s.bands ? s.bands[c.id] : null;
+    d = c.draw && c.draw.text && c.draw.text !== '—' ? { text: c.draw.text, sure: c.draw.conf >= E.CONF.SEEN } : null;
+    /* this show first: how their sound sits with the bill, the slot they would want, the night and the room */
+    if (o.fit === 'FIT') add(plus, 'fit'); else if (o.fit === 'WRONG') add(minus, 'wrong'); else if (o.fit === 'STRETCH') add(minus, 'stretch');
+    tp = num(c.tierPublic) ? c.tierPublic : 0; want = tp >= 2 ? 'CLOSE' : (tp === 1 ? 'MIDDLE' : 'OPEN');
+    if (o.slot && o.slot === want) add(plus, 'slot');
+    else if (o.slot && tp >= 2 && rank[o.slot] < rank[want]) add(minus, 'headline');
+    if (show && o.free === false) add(minus, 'busy');
+    if (show && (c.needs || []).indexOf('ALL_AGES') >= 0 && show.door && show.door.ages === 'A21') add(minus, 'no21');
+    dow = show ? SB.time.dow(show.day) : null;
+    if (show && (c.needs || []).indexOf('WEEKEND') >= 0 && dow !== 4 && dow !== 5) add(minus, 'weekend');
+    if (b && (b.plays || []).some(function (p) { return p <= s.clock.day && s.clock.day - p <= ((Cf.YES && Cf.YES.wornDays) || 14); })) add(minus, 'justPlayed');
+    /* the band itself */
+    if (c.out) add(minus, 'out');
+    if (c.playedOut) add(minus, 'playedOut');
+    if (c.listedMembers) add(minus, 'listed');
+    if (c.trust && (c.trust.stage === 'TRUSTED' || c.trust.stage === 'ALLY')) add(plus, 'trusts');
+    else if (c.trust && c.trust.stage === 'SOUR') add(minus, 'sour');
+    if (num(mid(c.live))) { if (mid(c.live) >= 70) add(plus, 'liveGood'); else if (mid(c.live) <= 48) add(minus, 'liveBad'); }
+    if (num(mid(c.rel))) { if (mid(c.rel) >= 0.8) add(plus, 'relGood'); else if (mid(c.rel) <= 0.55) add(minus, 'relBad'); }
+    if (num(mid(c.promo))) { if (mid(c.promo) >= 0.7) add(plus, 'promoGood'); else if (mid(c.promo) <= 0.4) add(minus, 'promoBad'); }
+    if (num(mid(c.cross))) { if (mid(c.cross) >= 0.5) add(plus, 'crossGood'); else if (mid(c.cross) <= 0.15) add(minus, 'crossBad'); }
+    (c.needs || []).forEach(function (n) {
+      if (show && (n === 'WEEKEND' || n === 'ALL_AGES')) return;                // said above when this show breaks it
+      if (n === 'WEEKEND') add(minus, 'weekend');
+      else if (SB.text.has('ui.bill.read.need' + n)) add(minus, 'need' + n);
+    });
+    if (c.motive === 'FUN') add(plus, 'fun'); else if (c.motive === 'GROW') add(plus, 'grow'); else if (c.motive === 'MONEY') add(minus, 'money');
+    if (c.buzzWord === 'rising') add(plus, 'buzz'); else if (c.buzzWord === 'fading' || c.stage === 'FADING') add(minus, 'fading');
+    if (c.trend === 'UP') add(plus, 'hot'); else if (c.trend === 'DOWN') add(minus, 'cooling');
+    if (c.stage === 'COMING_UP') add(plus, 'comingUp');
+    /* how fast the town tires of them (Bands.fresh, C.WEAR): new bands can play often, old heads play out fast */
+    if (c.gens && num(c.gens[2]) && c.gens[2] >= 0.99) add(minus, 'wearsFast');                         // an old-head band (the engine checks this first)
+    else if (c.stage === 'FORMING' || c.stage === 'NEW') add(plus, 'playOften');
+    if (c.stage === 'FORMING' || c.stage === 'NEW') add(minus, 'brandNew');
+    if (b && !c.playedOut && !seen.justPlayed && safe(function () { return SB.Bands.fresh(s, b, show ? show.day : s.clock.day); }, 1) < 0.8) add(minus, 'worn');
+    if (o.rw && o.rw.hi <= 3) add(plus, 'fast'); else if (o.rw && o.rw.lo >= 4) add(minus, 'slow');
+    /* who comes to see them (the band's crowd, public: it is on their sticker) */
+    (c.gens || []).forEach(function (g, i) { if (num(g) && g >= 0.6) crowd.push(word('gen.' + gk[i] + '.short', lower(gk[i]))); });
+    return { pull: d, plus: plus, minus: minus, crowd: crowd.join(', ') };
+  };
+
   /** piece(cls, stock, kids, o): one self-contained piece of paper on the board (CSS cuts it and casts its paste-up shadow) */
   function piece(cls, stock, kids, o) {
     o = o || {};
@@ -874,7 +949,13 @@
   }
   function bandAsks(s, showId) {
     var by = {};
-    asksFor(s, showId).forEach(function (a) { if (a.kind === 'BAND_PLAY') by[a.toId] = a; });
+    var on = {}, sh = s.shows && s.shows[showId];
+    ((sh && sh.bill && sh.bill.slots) || []).forEach(function (x) { if (x && x.bandId) on[x.bandId] = true; });
+    /* a taken-back ask, or a yes whose band was peeled off the bill, is not an open ask: the band can be asked again */
+    asksFor(s, showId).forEach(function (a) {
+      if (a.kind !== 'BAND_PLAY' || a.status === 'WITHDRAWN' || (a.status === 'YES' && !on[a.toId])) return;
+      by[a.toId] = a;
+    });
     return by;
   }
   function roomName(s, id) { return id && s.rooms && s.rooms[id] ? s.rooms[id].name : ''; }
@@ -1028,7 +1109,7 @@
           var out = K().paper(4, 4, 92, 74, { seed: 'pf' + x.id, stock: x.status === 'CANCELLED' ? 'newsprint' : 'white', rot: i % 2 ? 3 : -3, sx: 3, sy: 4,
             inner: D.marker(md(x.day), 50, 40, 20, { anchor: 'middle', seed: 'pfd' + x.id }) + (x.status === 'CANCELLED' ? K().xout(14, 14, 72, 56, { seed: 'pfx' + x.id, sw: 3 })
               : D.type((x.result && x.result.vsPar ? String(x.result.vsPar) : '').slice(0, 9).toUpperCase(), 50, 64, 11, { anchor: 'middle', bold: true, maxWidth: 84 })) });
-          return D.thing({ cls: 'cb-pastflyer', label: SB.time.fmt(x.day, 'short') + ', ' + roomName(s, x.roomId) + ', ' + (x.result && x.result.verdictLine ? x.result.verdictLine : T('shows', 'status.' + x.status)),
+          return D.thing({ cls: 'cb-pastflyer', label: SB.time.fmt(x.day, 'short') + ', ' + (x.roomId && roomName(s, x.roomId) ? roomName(s, x.roomId) + ', ' : '') + (x.result && x.result.verdictLine ? x.result.verdictLine : T('shows', 'status.' + x.status)),
             svg: out, w: 100, h: 84, onClick: function () { SB.UI.go('show', { showId: x.id }); } });
         }))]) : null
       ]));
@@ -1079,7 +1160,10 @@
             { text: '<', label: T('shows', 'earlier'), fk: 'own-prev', onClick: function () { move(-1); } },
             { text: '>', label: T('shows', 'later'), fk: 'own-next', onClick: function () { move(1); } }] }),
           D.act(T('shows', 'create'), T('shows', 'newOwn') + ': ' + SB.time.fmt(ownDay, 'short'), 'own-go', function () {
-            var day = ownDay, r = act(function (x) { return SB.Shows.create(x, { own: true, day: day, tags: [], benefitFor: null }); });
+            var day = ownDay, dup = null, k, o, r;
+            for (k in (st().shows || {})) { o = st().shows[k]; if (!o.requestId && !o.roomId && o.day === day && (o.status === 'DRAFT' || o.status === 'CONFIRMED')) { dup = o; break; } }
+            if (dup) { SB.UI.go('show', { showId: dup.id }); return; }
+            r = act(function (x) { return SB.Shows.create(x, { own: true, day: day, tags: [], benefitFor: null }); });
             if (r && r.ok !== false && r.showId) SB.UI.go('show', { showId: r.showId });
           }, { size: 14 })
         ])
@@ -1114,7 +1198,7 @@
     return { label: next.label, frac: Math.max(0.05, Math.min(1, 1 - (w.lateFrom - s.clock.day) / span)), late: s.clock.day >= w.lateFrom };
   }
 
-  /* CALL IT A NIGHT on the card is the tape deck's own pull (SB.UI.lamp.pull: Week.endNight, then the desk plays the
+  /* CALL IT A NIGHT while the card is up (the pinned clock's, js/ui/nightclock.js: SB.UI.lamp.pull: Week.endNight, then the desk plays the
    * night out, with its stage cards, decisions and show nights). The card only asks to be picked up again at the next
    * evening: when the play-out stops at an evening one day on and nothing else took the screen. */
   var backTo = null, backHooked = false, backWatch = null;
@@ -1214,12 +1298,16 @@
       var tc = safe(function () { return SB.Tutorial && SB.Tutorial.current ? SB.Tutorial.current(s) : null; }, null);
       return tc && tc.showId === showId ? tc : null;
     }
+    function gone() {
+      return h('div', { class: 'cb-gone' }, [C().Empty({ text: T('shows', 'gone') }),
+        D.act(T('show', 'back'), T('show', 'back'), 'gone-back', function () { SB.UI.go('shows'); }, { size: 14 })]);
+    }
     function draw() {
       var s = st(), v, show, rows, steps, nx, n, tc, tgt, pk, r, i, ink;
       SB.UI.clear(root);
-      if (!s || !showId || !s.shows || !s.shows[showId]) { root.appendChild(C().Empty({})); return; }
+      if (!s || !showId || !s.shows || !s.shows[showId]) { root.appendChild(gone()); return; }
       v = safe(function () { return SB.Shows.view(s, showId); }, null);
-      if (!v) { root.appendChild(C().Empty({})); return; }
+      if (!v) { root.appendChild(gone()); return; }
       show = v.show;
       if (!LIVE[show.status]) { root.appendChild(after(s, v)); return; }
       whatCache = {};
@@ -1254,10 +1342,10 @@
           showHead(s, show, null, T('show', 'back'), function () { SB.UI.go('shows'); }, SB.time.fmt(show.day, 'dow3') + ' ' + md(show.day), 13),   // the room has its own step; the stamp sits beside the date
           nextLine(s, nx),
           h('ol', { class: 'cb-steps', aria: { label: T('card', 'steps') } }, steps.map(function (sp, k) {
-            var open = sp.key === curStep, m = sp.rows.length, ht = Math.max(24, Math.min(34, Math.floor(196 / Math.max(1, m))));
+            var open = sp.key === curStep, m = sp.rows.length + (sp.key === 'BILL' ? 1.5 : 0), ht = Math.max(24, Math.min(34, Math.floor(196 / Math.max(1, m))));
             return h('li', { class: 'cb-step is-' + sp.state.toLowerCase() + (open ? ' is-open' : '') }, [
               stepThing(sp, k, open),
-              open ? h('ol', { class: 'cb-cardrows', aria: { label: T('card', 'rows') } }, sp.rows.map(function (x, j) { return h('li', null, rowThing(x, j, ht)); })) : null
+              open ? h('ol', { class: 'cb-cardrows', aria: { label: T('card', 'rows') } }, sp.key === 'BILL' ? billRows(v, sp.rows, ht) : sp.rows.map(function (x, j) { return h('li', null, rowThing(x, j, ht)); })) : null
             ]);
           })),
           foot(s, v, n)
@@ -1283,10 +1371,9 @@
     }
     /* the top sheet is yellow copy paper: a city whose hot ink is the yellow gets the red here, so it can be read */
     function hotInk(s) { var c = CK() ? CK().hot(s) : null; return c && c === safe(function () { return K().ink('fluorYellow'); }, '') ? safe(function () { return K().ink('fireRed'); }, c) : c; }
-    function clockEl(extra) { var s = st(); return CK() ? CK().slip(s, { crunch: 0, cls: 'cb-clock', tonight: tonightV || undefined, extra: extra || 0, hot: hotInk(s) || undefined }) : null; }
-    /* while a button that takes time is pointed at, its hours are hatched on the clock's boxes */
+    /* while a button that takes time is pointed at, its hours are hatched on the pinned clock's ruler */
     function preview(el, hours) {
-      function show(x) { var slot = root.querySelector ? root.querySelector('.cb-clockslot') : null, c; if (!slot) return; c = clockEl(x); if (!c) return; SB.UI.clear(slot); slot.appendChild(c); }
+      function show(x) { if (SB.NightClock) SB.NightClock.preview(x, el); }
       if (!el || !el.addEventListener || !(hours > 0)) return el;
       el.addEventListener('mouseenter', function () { show(hours); });
       el.addEventListener('focus', function () { show(hours); });
@@ -1303,37 +1390,22 @@
       if (ok) return preview(el, o.hours);
       return h('span', { class: 'cb-nofitwrap' }, [el, why ? h('span', { class: 'cb-typed cb-small cb-whynot', text: why }) : null]);
     }
-    function callNight() {
-      var s = st(), l = safe(function () { return SB.UI.lamp.label(); }, null);
-      if (!s || !l) return;
-      if (l.key === 'night' || l.key === 'resume') comeBack(showId, s.clock.day);
-      SB.UI.lamp.pull();
-      if (safe(function () { return SB.UI.route(); }, null) === 'show') backDrop();           // refused: the card is still up
-    }
-    function nightBtn(fk, tut, hotOn) {
-      var l = safe(function () { return SB.UI.lamp.label(); }, null), isNight = !l || l.key === 'night';
-      return D.act(isNight ? T('card', 'callNight') : String(l.text || '').toUpperCase(), isNight ? T('card', 'callNightL') : String(l.text || ''), fk, callNight,
-        { size: fk === 'next' ? 12 : 14, tut: tut, tutRef: showId, cls: 'cb-nightbtn' + (hotOn ? ' is-hot' : '') });
-    }
     function dayWordOf(s, day) { return !num(day) || day >= s.clock.day ? T('card', 'tonightWord') : SB.time.fmt(day, 'dow3').toUpperCase(); }
     function sinceOf(s, a) { return dayWordOf(s, a && num(a.queuedDay) ? a.queuedDay : (a ? a.sentDay : null)); }
 
-    /* the foot: what will not fit before it is due (this show's), tonight's clock, CALL IT A NIGHT; calling the show off is a small link */
+    /* the foot: what will not fit before it is due (this show's), the asks going out tonight; calling the show off is a small link.
+       Tonight's clock and CALL IT A NIGHT are the pinned clock's (js/ui/nightclock.js). */
     function foot(s, v, n) {
       var ours = {}, cr, today = s.clock.day, ink = hotInk(s);
       (v.jobs || []).forEach(function (j) { ours[j.id] = true; });
       /* only warn about work the player can start: a crunch made of jobs still waiting on the room or the bill is noise */
       function startable(id) { var r = safe(function () { return SB.Week.canDoNow(s, id); }, null); return !!r && (r.ok !== false || r.code === 'NO_TIME'); }
       cr = CK() ? (safe(function () { return SB.Week.crunch(s); }, []) || []).filter(function (c) { return (c.jobs || []).some(function (id) { return ours[id] && startable(id); }); }) : [];
-      return h('footer', { class: 'cb-cardfoot cb-nightfoot', style: ink ? { '--ck-hot': ink } : null }, [
+      return h('footer', { class: 'cb-cardfoot cb-nightfoot', data: { tut: 'card-foot', 'tut-ref': showId }, style: ink ? { '--ck-hot': ink } : null }, [
         ui.noTime ? h('p', { class: 'cb-typed cb-small cb-notime', role: 'alert' }, [h('span', { class: 'ck-bang', aria: { hidden: 'true' }, text: '!!' }), ' ' + ui.noTime]) : null,
         cr.length ? h('ul', { class: 'ck-crunch cb-crunch', role: 'note' }, cr.slice(0, 1).map(function (c) {
           return h('li', null, [h('span', { class: 'ck-bang', aria: { hidden: 'true' }, text: '!!' }), CK().crunchLine(c, { today: today })]);
         })) : null,
-        h('div', { class: 'cb-clockrow' }, [
-          h('div', { class: 'cb-clockslot' }, clockEl(0)),
-          nightBtn('card-night', 'card-night', !!tonightV && tonightV.open && tonightV.left <= 0)
-        ]),
         h('div', { class: 'cb-footrow' }, [
           h('span', { class: 'cb-asksout cb-typed cb-small', role: 'status', data: { n: String(n) }, text: T('card', n === 1 ? 'out1' : (n ? 'outN' : 'out0'), { n: n }) }),
           h('button', { type: 'button', class: 'cb-link pz-hl', data: { fk: 'cancel' }, aria: { label: T('show', 'cancelL') }, text: T('card', 'callOff'), on: { click: function () {
@@ -1412,7 +1484,7 @@
         var raw = show.bill.slots[i] || {}, k = n >= 3 ? (i === 0 ? 'OPEN' : (i === n - 1 ? 'CLOSE' : 'MIDDLE')) : (raw.want === 'OPEN' && i === 0 ? 'OPEN' : (raw.want === 'CLOSE' && i === n - 1 ? 'CLOSE' : 'MIDDLE')),
             ba = b.confirmed ? null : askOf(asks, function (a) { return a.kind === 'BAND_PLAY' && a.toId === b.band.id; });
         onBill[b.band.id] = true;
-        slots[k].push({ key: 'band-' + b.band.id, kind: 'band', slot: k, band: b.band, b: b, idx: i, value: b.band.name, st: b.confirmed ? 'YES' : 'WAITING', stText: !b.confirmed && ba && OPEN_ASK[ba.status] ? asked(ba) : null, hot: !!b.listed,
+        slots[k].push({ key: 'band-' + b.band.id, kind: 'band', slot: k, band: b.band, b: b, idx: i, value: b.band.name, st: b.confirmed ? 'YES' : 'WAITING', stText: b.confirmed ? T('card', 'booked') : (ba && OPEN_ASK[ba.status] ? asked(ba) : null), hot: !!b.listed,
                         state: b.confirmed ? 'DONE' : 'WAIT', who: b.confirmed ? null : b.band.name });
       });
       asks.forEach(function (a) {
@@ -1499,7 +1571,7 @@
       function stateOf(k) { return some(k, 'BAD') ? 'BANG' : (some(k, 'TODO') ? 'TODO' : (some(k, 'WAIT') ? 'WAITING' : (some(k, 'HOLD') ? 'TODO' : 'DONE'))); }
       billDone = !!show.bill.locked || (v.bands.length > 0 && !some('BILL', 'BAD') && !some('BILL', 'TODO') && !some('BILL', 'WAIT') && !offer);
       out = STEPS.map(function (k) {
-        var stt = stateOf(k), need = k === 'ANNOUNCE' ? 'BILL' : (k === 'DATE' || k === 'ROOM' ? null : 'ROOM'), locked, w, line = '', f;
+        var stt = stateOf(k), need = (k === 'DATE' || k === 'ROOM' ? null : 'ROOM'), locked, w, line = '', f;
         if (k === 'BILL') stt = billDone ? 'DONE' : (stt === 'DONE' ? 'WAITING' : stt);              // every band said yes, but the touring band has not taken the offer
         locked = !!need && !(need === 'ROOM' ? roomOk : billDone) && !some(k, 'WAIT') && k !== tutStep && !(pr && stepOfRow(pr) === k) &&
                  !(k === 'BILL' && (billDone || v.bands.length || some(k, 'BAD'))) && !(k === 'DEAL' && ((offer && offer.state !== 'TODO') || (v.deal && v.deal.agreedDay != null))) &&
@@ -1512,10 +1584,14 @@
         else if (k === 'DATE') line = T('card', 'sum.date', { d: SB.time.fmt(show.day, 'short'), when: days > 0 ? T('card', days === 1 ? 'inDay' : 'inDays', { n: days }) : T('card', 'tonight') });
         else if (k === 'ROOM') line = room && room.value ? room.value + (room.state === 'HOLD' && room.unmet[0] ? ' · ' + T('card', 'sum.wants', { need: room.unmet[0].text }) : (room.st === 'HELD' && room.state === 'WAIT' && room.rank === 1 ? ' · ' + T('card', 'sum.yours') : '')) : T('show', 'noRoom');
         else if (k === 'DEAL') line = by[k].map(function (r) { return r.key === 'offer' ? r.value + ': ' + (r.stText || T('card', 'st.' + r.st)) : r.value; }).join(' · ');
-        else if (k === 'BILL') line = v.bands.length || by[k].some(function (r) { return r.kind === 'ask'; }) ? by[k].filter(function (r) { return r.kind === 'band' || r.kind === 'ask'; }).map(function (r) { return short(r.value, 16) + (r.state === 'DONE' ? '' : '?'); }).join(', ') : T('card', 'sum.bill0');
+        else if (k === 'BILL') {                                                          // who is booked, in running order; then how many are asked
+          f = by[k].filter(function (r) { return r.kind === 'ask'; }).length;
+          line = by[k].filter(function (r) { return r.kind === 'band'; }).sort(function (a, b) { return a.idx - b.idx; }).map(function (r) { return short(r.value, 16) + (r.state === 'DONE' ? '' : '?'); }).join(', ');
+          line = line || f ? (line || T('card', 'sum.booked0')) + (f ? ' · ' + T('card', 'sum.asked', { n: f }) : '') : T('card', 'sum.bill0');
+        }
         else if (k === 'CREW') line = T('card', 'sum.crew', { sound: (by[k][0] && by[k][0].value) || '?', door: (by[k][1] && by[k][1].value) || '?' });
         else if (k === 'ANNOUNCE') { f = by[k][0]; line = T('card', f && f.state === 'DONE' ? 'sum.flyer' : 'sum.flyerNo') + (by[k][1] && by[k][1].value ? ' · ' + by[k][1].value : ''); }
-        else line = stt === 'SOON' ? T('card', 'sum.ready') : (by[k][0] && by[k][0].value ? by[k][0].value : T('card', 'sum.ready'));
+        else line = stt === 'SOON' ? T('card', 'sum.soon') : (by[k][0] && by[k][0].value ? by[k][0].value : T('card', 'sum.ready'));
         return { key: k, rows: by[k], state: stt, who: w, line: line, need: need, days: days };
       });
       return out;
@@ -1671,11 +1747,13 @@
       if (names.length) return nightNext(N('waiting', { names: names.slice(0, 3).join(', ') }));
       if (room && room.state === 'HOLD') return nightNext(N('roomWants', { room: room.value, need: room.unmet.map(function (x) { return x.text; }).join('; ') }), 'room');
       if (stop) return nightNext(stopText());
-      return nightNext(N('nothing'));
+      i = safe(function () { return SB.Mail.needsYou(s).length; }, 0);
+      return nightNext(i ? N('nothingPhone', { n: i }) : N('nothing'));
     }
     function nextLine(s, nx) {
       var b = nx.btn, btn = null, w = D.mw(T('card', 'next'), 20);
-      if (nx.night) btn = nightBtn('next', 'card-next', false);
+      /* waiting is calling it a night, and that is the pinned clock's button: the line points at it */
+      if (nx.night) btn = tonightV && tonightV.open ? h('span', { class: 'cb-typed cb-small cb-nexthint', text: T('card', /call it a night/i.test(nx.text || '') ? 'toClockShort' : 'toClock') }) : null;
       else if (b && b.hours > 0) btn = costAct({ text: b.text, label: b.label, fk: 'next', hours: b.hours, fn: b.fn, refusal: b.refusal, size: 12, tut: 'card-next', tutRef: showId });
       else if (b) btn = D.act(b.text, b.label || b.text, 'next', b.fn, { size: 12, tut: 'card-next', tutRef: showId });
       return h('div', { class: 'cb-next' + (nx.night ? ' is-night' : ''), role: 'group', aria: { label: T('card', 'nextL') } }, [
@@ -1733,27 +1811,66 @@
     }
 
     /* one row: its name on a label-maker strip (it opens), what is written in by hand, how it stands as a stamp */
-    function rowThing(r, i, ht) {
-      var W = 420, on = sel === r.key, out = '', lx = 98, stT = r.st ? (r.stText || T('card', 'st.' + r.st)) : '', sw = 0, vx = lx + 6, maxV, val = String(r.value || '').toUpperCase(), vw, sb;
+    function rowThing(r, i, ht, o) {
+      o = o || {};
+      var W = o.W || 420, on = sel === r.key, out = '', lx = 98, stT = r.st ? (r.stText || T('card', 'st.' + r.st)) : '', sw = 0, vx = lx + 6, maxV, val = String(r.value || '').toUpperCase(), vw, sb;
       if (on) out += '<path d="M2 2H' + (W - 3) + 'L' + (W - 2) + ' ' + (ht - 3) + 'H3Z" fill="' + D.PAPER + '" stroke="' + D.TONER + '" stroke-width="2.4"/>';
       else out += '<path d="M' + lx + ' ' + (ht - 2.5) + 'H' + (W - 6) + '" stroke="' + D.TONER + '" stroke-opacity=".4" stroke-width="1.2"/>';
-      out += D.strip(r.label, 5, (ht - 25) / 2 - 1, 12, { rot: ((i % 3) - 1) * 0.7 });
-      if (r.st) { sb = stampBox(stT, W - 8, ht / 2, { dashed: r.st === 'EMPTY' || r.st === 'OPT', ink: r.st === 'EMPTY' ? D.TONER : null, rot: i % 2 ? 1.5 : -1.5 }); out += sb.svg; sw = sb.w; }
+      out += D.strip(r.label, 5, (ht - 25) / 2 - 1, 12, o.pencil ? { rot: ((i % 3) - 1) * 0.7, ground: D.GRAY } : { rot: ((i % 3) - 1) * 0.7 });
+      if (o.tick) { out += '<g transform="translate(' + f(W - 26) + ' ' + f(ht / 2 - 8) + ')">' + D.mark('DONE', 16) + '</g>'; sw = 22; }   // booked: the PLAYING heading says it, a tick is enough
+      else if (r.st) { sb = stampBox(stT, W - 8, ht / 2, { dashed: r.st === 'EMPTY' || r.st === 'OPT', ink: r.st === 'EMPTY' ? D.TONER : null, rot: i % 2 ? 1.5 : -1.5 }); out += sb.svg; sw = sb.w; }
       else if (r.note) { sw = D.tw(r.note, 12) + 4; out += D.type(r.note, W - 8 - sw, ht / 2 + 4.5, 12, { bold: true }); }
       if (r.hot) { out += D.bang(W - 8 - sw - 22, ht / 2 + 8, 17); sw += 26; }
+      if (o.time) { out += D.type(o.time, W - 8 - sw - 6, ht / 2 + 4.5, 12, { anchor: 'end', bold: true }); sw += D.tw(o.time, 12) + 10; }   // when they go on
       maxV = Math.max(40, W - 8 - sw - 6 - vx);
       var vs = ht >= 30 ? 17 : (ht >= 27 ? 15 : 13);                // a long step packs its rows tighter: the hand shrinks with them
-      function vW(t) { return D.mw(t, vs, { seed: 'rv' + r.key }); }
+      if (o.pencil) vs -= 3;                                         // asked, not booked: typed small in pencil, not written in marker
+      function vW(t) { return o.pencil ? D.tw(t, vs) : D.mw(t, vs, { seed: 'rv' + r.key }); }
       if (val) {
         /* what is written in keeps its size: a long name is cut short, never squeezed under the stamp */
         if (vW(val) > maxV) val = val.replace(/^THE\s+/, '');
         if (vW(val) > maxV) { while (val.length > 1 && vW(val.replace(/\s+$/, '') + '..') > maxV) val = val.slice(0, -1); val = val.replace(/\s+$/, '') + '..'; }
         vw = vW(val);
-        out += D.marker(val, vx, ht / 2 + vs * 0.38, vs, { seed: 'rv' + r.key }) + (r.struck ? K().line(vx - 2, ht / 2 + 1, vx + vw + 2, ht / 2 - 1, { seed: 'rs' + r.key, sw: 2.6 }) : '');
+        out += (o.pencil ? D.type(val, vx, ht / 2 + vs * 0.36, vs, { bold: true, fill: '#5a5953' }) : D.marker(val, vx, ht / 2 + vs * 0.38, vs, { seed: 'rv' + r.key })) +
+               (r.struck ? K().line(vx - 2, ht / 2 + 1, vx + vw + 2, ht / 2 - 1, { seed: 'rs' + r.key, sw: 2.6 }) : '');
       } else out += '<path d="M' + vx + ' ' + (ht - 8) + 'h' + f(maxV * 0.7) + '" stroke="' + D.TONER + '" stroke-width="1.4" stroke-dasharray="2 4"/>';
-      return D.thing({ cls: 'cb-cardrow' + (on ? ' is-on' : ''), pressed: on, fk: 'row-' + r.key, tut: 'card-row', tutRef: r.kind || r.key, svg: out, w: W, h: ht,
-        label: r.label + ': ' + (r.value || T('card', 'blank')) + (stT ? ', ' + stT.toLowerCase() : '') + (r.note ? ', ' + r.note.toLowerCase() : '') + (r.hot ? ' (!!)' : ''),
+      return D.thing({ cls: 'cb-cardrow' + (on ? ' is-on' : ''), pressed: on, fk: 'row-' + r.key, tut: 'card-row', tutRef: r.kind || r.key, svg: out, w: W, h: ht, drop: o.drop || null,
+        label: r.label + ': ' + (r.value || T('card', 'blank')) + (stT ? ', ' + stT.toLowerCase() : '') + (o.time ? ', ' + T('bill', 'starts', { t: o.time }).toLowerCase() : '') + (r.note ? ', ' + r.note.toLowerCase() : '') + (r.hot ? ' (!!)' : ''),
         onClick: function () { pick(r.key); } });
+    }
+    /* the bill step unfolded: who is playing, in running order, each with its set time and arrows (and drag one onto another
+     * to swap places); then who has been asked and not answered, in pencil; then the slots nobody is in; then the lock */
+    function billRows(v, rows, ht) {
+      var locked = !!v.show.bill.locked, order = v.show.bill.slots.map(function (x) { return x.bandId; }), many = order.length > 1, out = [], j = 0,
+          booked = rows.filter(function (r) { return r.kind === 'band'; }).sort(function (a, b) { return a.idx - b.idx; }),
+          asked = rows.filter(function (r) { return r.kind === 'ask'; }), gaps = rows.filter(function (r) { return r.kind === 'slot'; }),
+          rest = rows.filter(function (r) { return r.kind !== 'band' && r.kind !== 'ask' && r.kind !== 'slot'; });
+      function head(t) { return h('li', { class: 'cb-billhead', aria: { hidden: 'true' } }, h('span', { class: 'cb-typed', text: t })); }
+      function moveTo(id, to) {
+        var o2 = order.slice(), from = o2.indexOf(id);
+        if (from < 0 || to < 0 || to >= o2.length || from === to) return;
+        o2.splice(from, 1); o2.splice(to, 0, id);
+        guard(locked, function () { act(function (x) { return SB.Shows.setBill(x, showId, { order: o2 }); }); });
+      }
+      function arrow(up) {
+        var y0 = ht / 2 - 6, y1 = ht / 2 + 6;
+        return '<path d="' + (up ? 'M13 ' + f(y0) + 'L21 ' + f(y1) + 'L5 ' + f(y1) : 'M13 ' + f(y1) + 'L21 ' + f(y0) + 'L5 ' + f(y0)) + 'Z" fill="' + D.TONER + '" stroke="' + D.TONER + '" stroke-width="1.6" stroke-linejoin="round"/>';
+      }
+      if (booked.length) out.push(head(T('card', many ? 'billPlaying' : 'billPlaying1')));
+      booked.forEach(function (r) {
+        var id = r.band.id, i = order.indexOf(id), name = r.band.name,
+            el = rowThing(r, j++, ht, { W: many ? 366 : 420, drop: many ? 'bill:' + id : null, time: num(r.b.start) ? SB.time.clock(r.b.start) : '', tick: !!r.b.confirmed });
+        if (many) D.draggable(el, { id: id }, function (t, p) { if (t && t.indexOf('bill:') === 0) moveTo(p.id, order.indexOf(t.slice(5))); });
+        out.push(h('li', { class: 'cb-billrow' + (many ? ' is-movable' : '') }, [el, many ? h('span', { class: 'cb-billmv', role: 'group', aria: { label: T('card', 'order') + ': ' + name } }, [
+          D.thing({ cls: 'cb-mvbtn', label: T('card', 'earlierL', { name: name }), fk: 'up-' + id, tut: 'bill-move', tutRef: showId, svg: arrow(true), w: 26, h: ht, disabled: i <= 0, onClick: function () { moveTo(id, i - 1); } }),
+          D.thing({ cls: 'cb-mvbtn', label: T('card', 'laterL', { name: name }), fk: 'dn-' + id, svg: arrow(false), w: 26, h: ht, disabled: i >= order.length - 1, onClick: function () { moveTo(id, i + 1); } })
+        ]) : null]));
+      });
+      if (asked.length) out.push(head(T('card', 'billAsked')));
+      asked.forEach(function (r) { out.push(h('li', null, rowThing(r, j++, ht, { pencil: true }))); });
+      if (gaps.length && (booked.length || asked.length)) out.push(head(T('card', 'billOpen')));
+      gaps.concat(rest).forEach(function (r) { out.push(h('li', null, rowThing(r, j++, ht))); });
+      return out;
     }
     function pickHead(t) { return h('h2', { class: 'cb-pickhead', aria: { label: t } }, D.word(String(t).slice(0, 34), 22)); }
 
@@ -1917,11 +2034,27 @@
       ], { label: T('card', 'door') });
     }
 
+    /* what is still yours on a played show (the debrief, the thanks): the record only lists what is done, and the night's
+       own page with these buttons is gone once you leave it, so they are here too */
+    function afterTodo(s, v) {
+      var open = (v.jobs || []).filter(function (j) { return mine(j) && j.mode !== 'PROMISE' && !(j.window && (j.window.state === 'EARLY' || j.window.state === 'MISSED')); });
+      if (!open.length) return null;
+      return h('div', { class: 'cb-aftertodo', role: 'group', aria: { label: T('card', 'stillYours') } }, [
+        h('p', { class: 'cb-typed cb-aftertodo-h', text: T('card', 'stillYours') })
+      ].concat(open.map(function (j) {
+        var can = canNow(s, j.id, jobOpts(j));
+        return h('div', { class: 'cb-aftertodo-row' }, [
+          h('span', { class: 'cb-typed', text: j.label }),
+          costAct({ text: T('card', 'doNow'), label: T('card', 'doNowL', { job: j.label }), fk: 'after-' + j.id, hours: can.hours || j.hours || 0, refusal: can, size: 12, fn: function () { doJob(j); } })
+        ]);
+      })));
+    }
     function after(s, v) {
       var show = v.show, onNote = function (key) { SB.UI.go('notebook', { key: key }); };
       /* the night's record, pasted up (js/ui/screens/showrecord.js); the ruled ledger below if that file is missing */
       if (show.result && typeof SB.UI.showRecord === 'function') return h('div', { class: 'cb-show is-after' }, [
         showHead(s, show, v.room, T('show', 'back'), function () { SB.UI.go('shows'); }),
+        afterTodo(s, v),
         SB.UI.showRecord(s, v, { onNote: onNote, jobs: v.jobs || [] })
       ]);
       return h('div', { class: 'cb-show is-after' }, [
@@ -1997,14 +2130,14 @@
 
     function doorSection(s, v) {
       var show = v.show, door = show.door, room = v.room, ages = room && room.ages && room.ages.length ? room.ages : Object.keys(SB.Enums.AGES), kids = [], price = door.price || 0, pt;
-      function setPrice(p) { p = Math.max(0, Math.round(Number(p) || 0)); act(function (x) { return SB.Shows.setDoor(x, showId, { price: p }); }); }
-      pt = '$' + price;
+      function setPrice(p) { p = Math.max(0, Math.min(100, Math.round(Number(p) || 0))); act(function (x) { return SB.Shows.setDoor(x, showId, { price: p }); }); }
+      pt = money(price);
       var tagSvg = K().paper(0, 0, 0, 0, { pts: [[16, 30], [40, 6], [150, 8], [148, 74], [40, 76]], stock: 'manila', burn: 0.6, sx: 4, sy: 6,
           inner: '<circle cx="36" cy="40" r="5" fill="#141413"/>' + D.marker(pt, 98, 62, 40, { anchor: 'middle', seed: 'price' + price, maxWidth: 96 }) }) +
         K().path([[0, 4], [18, 26], [34, 40]], { seed: 'ps', sw: 1.6, stroke: '#141413' });
       kids.push(D.word(T('show', 'price'), 14));
       kids.push(h('div', { class: 'cb-pricerow' }, [
-        ui.editPrice ? h('input', { type: 'number', class: 'cb-priceedit', min: '0', step: '1', value: String(price), aria: { label: T('show', 'price') }, data: { fk: 'price' },
+        ui.editPrice ? h('input', { type: 'number', class: 'cb-priceedit', min: '0', max: '100', step: '1', value: String(price), aria: { label: T('show', 'price') }, data: { fk: 'price' },
           on: { change: function (e) { ui.editPrice = false; setPrice(e.target.value); }, blur: function () { if (ui.editPrice) { ui.editPrice = false; render(); } },
                 keydown: function (e) { if (e.key === 'Escape') { ui.editPrice = false; render(); } } } })
           : D.thing({ cls: 'cb-pricetag', label: T('show', 'priceL', { p: money(price) }), fk: 'price', svg: tagSvg, w: 156, h: 84, strip: '$', stripSize: 11,
@@ -2249,14 +2382,6 @@
       ((p && p.tilt) || []).forEach(function (t) { if (t.fan === bandGenre && t.band === top && (t.gen === undefined || t.gen === null)) a += t.d; });
       return a >= 0.7 ? 'FIT' : (a >= 0.45 ? 'STRETCH' : 'WRONG');
     }
-    /* a marker tick for fits, a question mark for a stretch, a cross-hatch for the wrong bill, with the word typed beside it */
-    function fitArt(fit, x, y) {
-      var k = K(), ink = D.blue(), out = '', i;
-      if (fit === 'FIT') out += k.path([[x + 1, y + 9], [x + 6, y + 15], [x + 16, y + 1]], { seed: 'fit', sw: 3.2, stroke: ink, wob: 0.5, cap: 'square' });
-      else if (fit === 'STRETCH') out += D.marker('?', x + 3, y + 15, 18, { fill: ink, seed: 'fitq' });
-      else for (i = 0; i < 4; i++) out += k.line(x + i * 4, y + 16, x + i * 4 + 6, y, { seed: 'fh' + i, sw: 1.8, stroke: ink }) + (i < 2 ? k.line(x + i * 8, y, x + i * 8 + 8, y + 16, { seed: 'fv' + i, sw: 1.8, stroke: ink }) : '');
-      return out + D.type(T('bill', 'fit.' + fit), x + 22, y + 13, 12, { bold: true, fill: ink });
-    }
 
     var billTop = null;
     function sheet(s, v, slot) {
@@ -2279,22 +2404,40 @@
         if (fl.genre && fl.genre !== g) return;
         out.push(D.typed(word('genre.' + g + '.name', g).toUpperCase(), 12, { bold: true, cls: 'cb-pilename' }));
         out.push(h('div', { class: 'cb-pile' }, piles[g].map(function (c, i) {
-          var el = candidate(s, c, onBill[c.id], asks[c.id], i, slot),
+          var el = candidate(s, c, onBill[c.id], asks[c.id], i, slot, show),
               ear = D.listen({ band: c, text: T('bill', 'listen'), stopText: T('bill', 'listenStop'), label: T('bill', 'listenL', { name: c.name }), fk: 'hear-' + c.id });
-          return ear ? h('div', { class: 'cb-candbox' }, [el, ear]) : el;
+          return h('div', { class: 'cb-candbox' }, [el.thing, el.read, ear]);
         })));
       });
       return piece('cb-sheet', 'blue', out, { label: T('bill', 'cands') });
     }
 
-    /* a band's sticker on the sheet: the lifted corner says peel me; under it, what they cost, how soon they answer, what they would add */
-    function candidate(s, c, on, ask, i, slot) {
-      var rw = safe(function () { return SB.Bands.replyWindow(s, c.id); }, null), fee = safe(function () { return SB.Bands.fee(s, c.id, showId); }, null), w = 200, ht = 112, out = '', peeled = on || (ask && ask.status !== 'NO' && ask.status !== 'SILENT'),
+    /* the read under a sticker: what helps them (ballpoint), what holds them back (the hot ink), then the small print */
+    function readEl(rd, small) {
+      return h('div', { class: 'cb-read', aria: { hidden: 'true' } }, [
+        rd.plus.length ? h('ul', { class: 'cb-read-plus' }, rd.plus.slice(0, 3).map(function (t) { return h('li', { text: t }); })) : null,
+        rd.minus.length ? h('ul', { class: 'cb-read-minus' }, rd.minus.slice(0, 3).map(function (t) { return h('li', { text: t }); })) : null,
+        small ? h('p', { class: 'cb-read-small', text: small }) : null
+      ]);
+    }
+    function readLabel(rd) {
+      return (rd.pull ? '. ' + T('bill', rd.pull.sure ? 'pullL' : 'pullGuessL', { n: rd.pull.text }) : '') +
+             (rd.plus.length ? '. ' + T('bill', 'plusL', { list: rd.plus.slice(0, 3).join(', ') }) : '') +
+             (rd.minus.length ? '. ' + T('bill', 'minusL', { list: rd.minus.slice(0, 3).join(', ') }) : '') + (rd.crowd ? '. ' + T('bill', 'crowdL', { who: rd.crowd }) : '');
+    }
+
+    /* a band's sticker on the sheet: the lifted corner says peel me; under it, what they cost and how many they pull, then
+     * what helps them and what holds them back (SB.UI.bandRead), and the small print: the show with them, how soon they answer */
+    function candidate(s, c, on, ask, i, slot, show) {
+      var rw = safe(function () { return SB.Bands.replyWindow(s, c.id); }, null), fee = safe(function () { return SB.Bands.fee(s, c.id, showId); }, null), w = 200, ht = 118, out = '', peeled = on || (ask && ask.status !== 'NO' && ask.status !== 'SILENT'),
           wv = peeled ? null : what(s, c.id), feeT = fee ? (fee.amount ? money(fee.amount) : word('localPay.' + fee.pay + '.name', lower(fee.pay))) : '?', stg = c.trust && c.trust.stage, el, lab, sh = Math.round(w * 0.42),
-          fit = fitOf(s, c.genre, billTop), withOk = !!(wv && wv.call && num(wv.call.hi) && wv.call.hi > 0), noMsg = false;
+          fit = fitOf(s, c.genre, billTop), withOk = !!(wv && wv.call && num(wv.call.hi) && wv.call.hi > 0), noMsg = false, rd, small, pt;
       var sty = c.style && c.style !== c.genre ? word('style.' + c.style + '.name', c.style) : '';
-      if (fit) ht += 20;
-      if (sty && !peeled) ht += 14;
+      rd = peeled ? { pull: null, plus: [], minus: [], crowd: '' } : safe(function () {
+        return SB.UI.bandRead(s, c, { showId: showId, slot: slot, fit: fit, rw: rw, free: fl.freeOnly || !show ? true : SB.Bands.isFree(s, c.id, show.day) });
+      }, { pull: null, plus: [], minus: [], crowd: '' });
+      small = peeled ? '' : [rd.crowd ? T('bill', 'crowd', { who: rd.crowd }) : '', rw ? T('bill', 'answers', { lo: rw.lo, hi: rw.hi }) : ''].filter(Boolean).join(' · ');
+      if (sty && !peeled) ht += 16;
       if (peeled) {
         /* a blank sticker space outlined in pencil, the unknown typed in pencil (not a web drop zone) */
         out += '<path d="M10 10L' + (w - 11) + ' 9L' + (w - 9) + ' ' + (sh - 8) + 'L9 ' + (sh - 9) + 'Z" fill="none" stroke="#6b6a64" stroke-opacity=".8" stroke-width="1.3" stroke-linejoin="round"/>';
@@ -2306,20 +2449,24 @@
         if (stg === 'ALLY') out += '<g transform="translate(' + (w - 56) + ' 6)">' + D.mark('DONE', 16) + '</g>';
         else if (stg === 'SOUR') out += K().heart(w - 30, 16, 16, { seed: 'th' + c.id, fill: 'none' }) + K().line(w - 38, 8, w - 22, 24, { seed: 'thx', sw: 2 });
         if (c.listedMembers) out += D.bang(8, 26, 18);
-        out += K().paper(4, sh + 4, 94, 26, { seed: 'fe' + c.id, stock: 'manila', sx: 2, sy: 3, burn: 0.3, rot: -3, inner: D.type(feeT.toUpperCase(), 51, sh + 22, 12, { anchor: 'middle', bold: true, maxWidth: 86 }) });
-        if (rw) out += D.type(rw.lo + '-' + rw.hi + 'D', 106, sh + 22, 12, { bold: true });
-        if (withOk) out += D.head(146, sh + 30, 18, { mode: 'ink', ink: D.blue() }) + D.marker(Math.round(wv.call.lo) + '-' + Math.round(wv.call.hi), 158, sh + 26, 13, { fill: D.blue(), seed: 'wv' + c.id, maxWidth: 40 });
-        if (fit) out += fitArt(fit, 8, sh + 36);
+        /* what they cost on a manila tag; what they pull in marker beside it (a question mark until you have seen them) */
+        out += K().paper(4, sh + 4, 86, 26, { seed: 'fe' + c.id, stock: 'manila', sx: 2, sy: 3, burn: 0.3, rot: -3, inner: D.type(feeT.toUpperCase(), 47, sh + 22, 12, { anchor: 'middle', bold: true, maxWidth: 78 }) });
+        if (rd.pull) {
+          pt = T('bill', rd.pull.sure ? 'pull' : 'pullGuess', { n: rd.pull.text });
+          out += D.head(104, sh + 31, 20, rd.pull.sure ? { mode: 'solid' } : { mode: 'open', dash: true });
+          out += D.marker(pt.replace(/^\S+\s+/, ''), 116, sh + 25, 17, { seed: 'pl' + c.id, maxWidth: w - 120 });
+          out += D.type(pt.split(' ')[0], 116, sh + 33, 8, { bold: true, fill: '#5a5953' });
+        }
         if (sty) out += D.type(sty.toUpperCase(), 8, ht - 5, 12, { bold: true, maxWidth: w - 16 });
         lab = (sty ? sty + '. ' : '') + T('bill', 'pick', { name: c.name, fee: feeT, lo: rw ? rw.lo : '?', hi: rw ? rw.hi : '?', with: withOk ? T('bill', 'withThem', { lo: Math.round(wv.call.lo), hi: Math.round(wv.call.hi) }) : '' }) +
-          (fit ? '. ' + T('bill', 'fitL.' + fit) : '') + (c.listedMembers ? '. ' + T('bill', 'listed') : '') + (stg ? '. ' + word('stage.' + stg, lower(stg)) : '');
+          readLabel(rd) + (stg ? '. ' + word('stage.' + stg, lower(stg)) : '');
       }
       /* peeling a sticker writes a message: when tonight has no half hour left the sticker is crossed out and stays put */
       if (!peeled && canMsg && canMsg.ok === false) { noMsg = true; out += K().line(8, sh - 4, w - 10, 12, { seed: 'cn' + c.id, sw: 3 }); lab += '. ' + whyT(canMsg); }
       else if (!peeled && costT(mailH())) lab += ', ' + costT(mailH()).toLowerCase();
       el = D.thing({ cls: 'cb-cand' + (peeled ? ' is-peeled' : '') + (noMsg ? ' cb-nofit' : ''), label: lab, tut: 'bill-cand', tutRef: showId, fk: 'cand-' + c.id, svg: out, w: w, h: peeled ? sh + 4 : ht, disabled: noMsg,
         onClick: peeled ? function () { SB.UI.go('band', { bandId: c.id }); } : (noMsg ? function () {} : function () { askBand(st(), c.id, slot, false); }) });
-      return noMsg ? el : preview(el, peeled ? 0 : mailH());
+      return { thing: noMsg ? el : preview(el, peeled ? 0 : mailH()), read: peeled ? null : readEl(rd, small) };
     }
 
     /* Escape puts HOW IT LOOKS away (back to the picked row); otherwise it is the close-up's own */
@@ -2327,8 +2474,16 @@
     if (root && typeof root.addEventListener === 'function') root.addEventListener('keydown', keyHandler);
     mode = safe(function () { var x = st().shows[showId]; return x && LIVE[x.status] ? 'card' : 'show'; }, 'show');
     var undress = dress(root, mode, st());
+    /* a night called on the pinned clock while this card is up: the card asks to be picked up again next evening
+       (and lets that go when the night was not called after all: the card is still up) */
+    var offNight = typeof document === 'undefined' ? null : SB.UI.on(document, 'sb-callnight', function (e) {
+      var at = e && e.detail && e.detail.at, s = st();
+      if (!s || mode !== 'card') return;
+      if (at === 'before') comeBack(showId, s.clock.day);
+      else if (at === 'after' && safe(function () { return SB.UI.route(); }, null) === 'show') backDrop();
+    });
     render();
-    return { update: function () { keepFocus(root, render); }, unmount: function () { undress(); if (SB.Audio) SB.Audio.stop(); if (root && root.removeEventListener) root.removeEventListener('keydown', keyHandler); } };
+    return { update: function () { keepFocus(root, render); }, unmount: function () { undress(); if (offNight) offNight(); if (SB.NightClock) SB.NightClock.preview(0); if (SB.Audio) SB.Audio.stop(); if (root && root.removeEventListener) root.removeEventListener('keydown', keyHandler); } };
   }
   /* the old bill route: the same card, opened on the bill (the first open slot, else the first band) */
   function mountBill(root, params) { return mountShow(root, { showId: params && params.showId, row: (params && params.row) || 'bill' }); }

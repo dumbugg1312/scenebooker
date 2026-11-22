@@ -1,13 +1,16 @@
 SB.Cities.register('new-haven-ct', {
   v: 1,
   slug: 'new-haven-ct',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['yale', 'yale university', 'yale new haven hospital', 'yale bowl', 'yale daily news', 'yale-harvard', 'harvard', 'knights of columbus',
            'southern connecticut state', 'gateway community college', 'albertus magnus', 'university of new haven', 'quinnipiac university',
            'new haven register', 'new haven independent', 'grand news', 'metro-north', 'shore line east', 'hartford line', 'ct transit', 'mixmaster',
            'international festival of arts and ideas', 'powder house day', 'cherry blossom festival', 'italian feast', 'st. patrick\'s day parade', 'open studios',
            'hartford whalers', 'whalers', 'mohegan sun', 'foxwoods', 'submarine base', 'coast guard academy', 'hurricane irene', 'hurricane sandy',
            'vfw', 'american legion', 'elks',
+           'shoreline summer festival', 'freddy fixer parade', 'st. andrew society', 'st. andrew society festa', 'caribbean heritage festival', 'new haven pride center',
+           'new haven jazz festival', 'chalk art festival', 'dragon boat festival', 'wooster square association', 'fenway park', 'yale bulldogs', 'yale football',
+           'yale commencement', 'new haven coliseum', 'ct public', 'ct examiner', 'new journal', 'daily nutmeg', 'visit new haven', 'ct dcp',
            'dwight street annex', 'the grand avenue social', 'grand avenue social', 'oyster shell hall', 'wooster basement', 'sixth floor, ferry street',
            'the winchester loft', 'council 41 hall', 'edgewood carriage house', 'sound side lanes', 'the long wharf boathouse', 'third floor triple', 'quinnipiac boiler room'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Storms are written only as 'the storm' in game text. */
@@ -32,7 +35,11 @@ SB.Cities.register('new-haven-ct', {
     { id: 'city', kind: 'CITY', name: 'New Haven' },
     { id: 'west-haven', kind: 'FEEDER', name: 'West Haven', minutes: 10, bearing: 250, pop: 55000, note: 'A beach and working-class town of halls and clubs, with some scene of its own.' },
     { id: 'east-haven', kind: 'FEEDER', name: 'East Haven', minutes: 10, bearing: 100, pop: 30000, note: 'Italian-American shoreline town. Little scene: the kids come to the city.' },
-    { id: 'hamden', kind: 'FEEDER', name: 'Hamden', minutes: 15, bearing: 350, pop: 60000, note: 'A big suburb of garages and strip malls that supplies the city\'s bands.' },
+    { id: 'hamden', kind: 'FEEDER', name: 'Hamden', minutes: 15, bearing: 350, pop: 60000, scene: 80, note: 'A big suburb of garages and strip malls that supplies the city\'s bands.',
+      rooms: [
+    { id: 'hamden-garage', kind: 'DIY', hood: 'hamden-industrial', cap: 60, rent: 50, deposit: 0, pa: .5, curfew: 1350, ac: false, sketch: 45, standing: [60, 60, 40],
+      pressure: 60, needs: ['VOUCH'], note: 'A vacant garage beside the practice rooms. The address goes out by message only, and the owner is talking about a wall.' }
+      ] },
     { id: 'branford', kind: 'FEEDER', name: 'Branford', minutes: 20, bearing: 90, pop: 28000, note: 'A harbor town with some basement bands.' },
     { id: 'wallingford-meriden', kind: 'FEEDER', name: 'Wallingford and Meriden', minutes: 20, bearing: 10, note: 'Meriden is an old silver and mill city with a real scene; Wallingford is the quieter suburb.' },
     { id: 'milford', kind: 'FEEDER', name: 'Milford', minutes: 25, bearing: 245, pop: 52000, note: 'A beach suburb with its own small scene.' },
@@ -54,10 +61,47 @@ SB.Cities.register('new-haven-ct', {
     { id: 'edgewood', name: 'Edgewood and West River', route: 'old-side', note: 'Cut-up Victorians, triple-deckers and old industrial stock, mixed and working-class. Students and artists found cheap rent, and it is heating up.' },
     { id: 'the-hill', name: 'the Hill and Dwight', route: 'work-side', note: 'Dense triple-deckers around the hospital, which keeps expanding. Better for practice than for hosting a public show.' },
     { id: 'newhallville', name: 'Newhallville and Dixwell', route: 'old-side', note: 'Long-standing Black neighborhoods with old community centers and church halls. A place to rent a hall, not to treat as a cheap punk district.' },
-    { id: 'city-point', name: 'City Point, the Annex and the harbor', route: 'work-side', note: 'Sparse waterfront of warehouses, boat storage and practice rooms. The loudest-tolerant spots, and the farthest from where the kids live.' }
+    { id: 'city-point', name: 'City Point, the Annex and the harbor', route: 'work-side', note: 'Sparse waterfront of warehouses, boat storage and practice rooms. The loudest-tolerant spots, and the farthest from where the kids live.' },
+    { id: 'hamden-industrial', name: 'Hamden, off State Street', route: 'town:hamden', note: 'Industrial buildings just over the line, with garages beside practice rooms. Cheap and out of sight until a landlord notices.' }
   ],
 
-  contacts: ['springfield-ma', 'worcester-ma', 'waterbury-ct', 'norwich-ct'],
+  rooms: [
+    { id: 'east-rock-basement', kind: 'HOUSE', hood: 'east-rock', cap: 40, hostCut: 0, pa: .4, curfew: 1320, ac: false, outdoor: false, sketch: 25, standing: [65, 60, 45],
+      pressure: 55, start: true, note: 'A basement under a Victorian flat. Two neighbor calls end the night, and the sound ordinance ends it at ten anyway.' },
+    { id: 'campus-studio', kind: 'HOUSE', hood: 'east-rock', cap: 15, hostCut: 0, pa: .3, curfew: 1320, ac: false, outdoor: false, sketch: 15, standing: [70, 55, 40],
+      pressure: 55, note: 'A studio apartment near campus. A dozen people on a Saturday evening, a folk bill, and the lease has a short fuse.' },
+    { id: 'triple-decker', kind: 'HOUSE', hood: 'fair-haven', cap: 35, hostCut: 0, pa: .4, curfew: 1320, ac: false, outdoor: false, sketch: 25, standing: [65, 60, 45],
+      pressure: 45, note: 'A triple-decker basement with a low ceiling and a damp floor. The landlord lives upstairs and can hear every chord.' },
+    { id: 'harbor-bay', kind: 'DIY', hood: 'city-point', cap: 80, rent: 70, deposit: 0, pa: .5, curfew: 1350, ac: false, sketch: 45, standing: [55, 60, 45],
+      pressure: 60, needs: ['VOUCH'], note: 'A bay in a boat-storage warehouse by the harbor. Loud is fine here, but it is far from the kids and the fire marshal is watching.' },
+    { id: 'community-hall', kind: 'HALL', hood: 'newhallville', cap: 150, rent: 150, deposit: 50, pa: .5, curfew: 1320, ac: true, sketch: 10, standing: [60, 60, 60],
+      owner: 'CHURCH_CONTACT', pressure: 45, note: 'A church or community hall on a Sunday afternoon. A rental fee, and a hall member who wants to know what the music is.' },
+    { id: 'book-shop', kind: 'SHOP', hood: 'westville', cap: 50, pa: .4, curfew: 1260, ac: true, sketch: 5, standing: [70, 65, 70], following: .2,
+      note: 'A bookshop that clears its floor for bands. Over by nine, and the owner is tired of the rent going up.' },
+    { id: 'green-bar', kind: 'BAR', hood: 'downtown', cap: 120, soundFee: 60, pa: .7, ages: ['A21'], curfew: 1500, ac: true, following: .3, sketch: 20, standing: [50, 65, 70],
+      note: 'A bar near the Green with small-bill nights and a canned-food benefit in December. Twenty-one and over unless it runs a juice-bar night.' },
+    { id: 'harbor-yard', kind: 'OUTDOOR', hood: 'city-point', cap: 400, rent: 25, pa: .5, curfew: 1200, ac: false, outdoor: true, sketch: 35, standing: [55, 55, 45],
+      note: 'A brewery yard on the harbor side. All ages for one summer day, and the weather decides everything.' },
+    { id: 'rock-club', kind: 'CLUB', hood: 'downtown', cap: 600, houseCosts: 200, split: .8, pa: .9, ages: ['ALL', 'A18'], curfew: 1380, ac: true, following: .6, sketch: 15,
+      standing: [45, 70, 70], owner: 'TALENT_BUYER', notice: 56, needs: ['FULL_BILL'], note: 'The long-running rock club downtown, with wristbands and death metal tours. Wants a name on the bill and weeks of lead time.' },
+    { id: 'old-theater', kind: 'BIG', hood: 'downtown', cap: 2500, rent: 2200, deposit: 500, pa: 1, ages: ['ALL'], curfew: 1380, ac: true, following: .8, sketch: 5,
+      standing: [40, 70, 70], notice: 112, needs: ['FULL_BILL'], note: 'A restored theater for punk-adjacent tours. All ages, ticketed, and far out of reach for now.' }
+  ],
+
+  contacts: ['hartford', 'bridgeport-ct', 'providence', 'springfield-ma', 'worcester-ma'],
+
+  calendar: [
+    { id: 'street-festa', label: 'the Italian street festival', tag: 'festival', month: 6, week: 4, dows: [3, 4, 5, 6], can: [.92, .88, .85], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'arts-fest', label: 'the summer arts festival', tag: 'festival', month: 6, weeks: [2, 4], dows: [4, 5, 6], can: [.92, .90, .88], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'old-side-parade', label: 'the old-side community parade', tag: 'parade', month: 6, week: 2, dows: [5], can: [.90, .88, .88], hoods: ['newhallville'], elsewhere: [1, 1, 1] },
+    { id: 'diy-fest', label: 'the summer all-ages festival', tag: 'festival', month: 7, week: 2, dows: [5], can: [.90, .90, .90] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 3], dows: [5], can: [.85, .95, .95] },
+    { id: 'football-nov', label: 'home football', tag: 'game', month: 11, weeks: [1, 3], dows: [5], can: [.85, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1200, weekend: 1200, inForce: false } },
 
   points: [
     { name: 'Hartford', state: 'CT', lat: 41.76, lon: -72.67, pop: 121000 },
@@ -91,6 +135,54 @@ SB.Cities.register('new-haven-ct', {
         { id: 'HALL', label: 'Ask a social hall to take it for the night', likely: 'Dry and bigger, but with a hall member watching.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'A hall member asked what the night was called, then stayed for a set.' }
+      ] },
+
+    { id: 'NEW_HAVEN_CT_GAME_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'game' },
+      telegraph: 'A home game is on Saturday, and the roads around the bowl will be jammed all afternoon.',
+      title: 'The highway is a parking lot',
+      body: 'The streets and the highway around the bowl are jammed. The first band is stuck in the line, and the load-in door is blocked for an hour.',
+      options: [
+        { id: 'LATE', label: 'Push the doors back an hour', likely: 'The bands get there. The crowd comes late.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'The van got through at nine. Doors an hour late, and the night ran tight against the ordinance.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is stuck in traffic.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'Half the list sat in the jam and gave up. The regulars were already in the basement.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] },
+
+    { id: 'NEW_HAVEN_CT_FORECLOSURE', when: 'WEEK', tier: 'HARD', weight: 1, cooldown: 60, bind: ['show'],
+      if: { daysOut: [0, 5] },
+      telegraph: 'A notice went up on the front door of the house you booked.',
+      title: 'The sign on the porch',
+      body: 'The house is in foreclosure and the sign went up the same week as your show. The housemates say it can happen once, if it is over by the end of the month.',
+      options: [
+        { id: 'ONCE', label: 'Run it as the last one there', likely: 'A tight, sad, loud night. Quiet by ten.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
+          result: 'Everyone knew it was the last one. The floor was packed and the singer signed the wall.' },
+        { id: 'HOUSE', label: 'Move it to another house', likely: 'Smaller, and a stranger upstairs.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
+          result: 'A friend of a friend took the bill with a day to spare. It was smaller and quieter.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] },
+
+    { id: 'NEW_HAVEN_CT_LAST_BEFORE_WALL', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 60, bind: ['show'],
+      if: { daysOut: [0, 4] },
+      telegraph: 'The owner of the garage building has been seen with a tape measure.',
+      title: 'The last show before the drywall',
+      body: 'The owner of the industrial building is putting up a wall across the garage next week. Your show is the last one before it goes up.',
+      options: [
+        { id: 'PACK', label: 'Tell everyone and pack it', likely: 'A big, loud farewell. The word gets around.',
+          effects: [{ op: 'MONEY', amount: -20 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.2 }, { op: 'REGULARS', pct: .02 }],
+          result: 'Word spread and the garage was shoulder to shoulder. Somebody wrote on the new wall in marker.' },
+        { id: 'QUIET', label: 'Keep it quiet and keep the address private', likely: 'A small night. No trouble.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'Thirty people who knew. No owner, no police, and a long goodbye.' }
       ] }
   ]
 });

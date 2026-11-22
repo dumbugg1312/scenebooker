@@ -20,7 +20,7 @@ SB.Content.people = {
                'You\'re the one doing the shows now? We\'d play one. We don\'t need much.']
     },
     ASK_YES: {
-      KIDS:   ['YES. we\'ll [open | play | close]. (%30: we\'ll bring the kit.)', 'YES!!! {dow}!!! we\'re there'],
+      KIDS:   ['YES. we\'re in. (%30: we\'ll bring the kit.)', 'YES!!! {dow}!!! we\'re there'],
       MIDDLE: ['Yeah, we\'re in. What time\'s load-in?', 'In. {dow} the {date:ord} works for all of us.'],
       OLD:    ['We can do that. Tell me when and where.', 'Yes. Send me the time.']
     },

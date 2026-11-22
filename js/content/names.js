@@ -120,7 +120,7 @@ SB.Content.names = {
                        'Lost', 'Named'],
                  what: ['The Minivan', 'My Bike', 'The Good Cooler', 'Our Drum Throne', 'The Porch Swing', 'The Family Dog',
                         'The Spare Key', 'The Group Photo', 'My Prom Tux', 'The Lawn Mower', 'Our Van', 'The Trampoline'],
-                 till: ['Homecoming', 'Graduation', 'Spring Break', 'Labor Day', 'My Birthday', 'The Fourth', 'Christmas Break',
+                 till: ['Prom', 'Graduation', 'Spring Break', 'Labor Day', 'My Birthday', 'The Fourth', 'Christmas Break',
                         'Payday', 'Next Summer', 'Further Notice', 'Thanksgiving', 'The Weekend'],
                  num: ['Two', 'Three', 'Four', 'Six', 'Nine', 'Eleven', 'Forty'],
                  unit: ['Hours', 'Exits', 'Miles', 'Days', 'Stoplights', 'Payments', 'Missed Calls', 'Gas Stations'],
@@ -452,8 +452,8 @@ SB.Content.names = {
                       'Brass Lamp', 'Velvet Curtain', 'Dead Air', 'Tall Ceiling', 'Green Lamp', 'Tin Ceiling'] }
     },
     BIG: {
-      patterns: ['the {hood} Auditorium', 'the {family} Civic Center', 'the {family} Memorial Auditorium', 'the {family} Memorial Theater',
-                 'the Old {family} Opera House', 'the {hood} Civic Center', 'the {family} Event Center',
+      patterns: ['the {hood} Auditorium', 'the {family} Municipal Hall', 'the {family} Memorial Hall', 'the {family} Memorial Theater',
+                 'the Old {family} Opera House', 'the {hood} Assembly Hall', 'the {family} Event Center',
                  'the Old {family} Theater on {street}', 'the {street} Armory Hall', 'the {family} Exposition Hall',
                  'the {family} Performing Arts Hall', 'the {tree} Pavilion Hall'],
       banks: { family: ['Abernathy', 'Whitaker', 'Lockhart', 'Kincaid', 'Tolliver', 'Brennan', 'Mercado', 'Whitfield', 'Dunleavy',

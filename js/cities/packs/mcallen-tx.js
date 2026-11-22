@@ -3,7 +3,7 @@ SB.Cities.register('mcallen-tx', {
   "slug": "mcallen-tx",
   "confidence": {
     "geography": "PARTLY",
-    "scene": "UNVERIFIED",
+    "scene": "PARTLY",
     "names": "UNCHECKED"
   },
   "banned": [
@@ -45,7 +45,29 @@ SB.Cities.register('mcallen-tx', {
     "hidalgo county",
     "mcallen police",
     "whataburger",
-    "reynosa cartel"
+    "reynosa cartel",
+    "texas monthly",
+    "galax z fair",
+    "galax-z fair",
+    "fiesta de palmas",
+    "palmfest",
+    "mcallen holiday parade",
+    "concert in the sky",
+    "mcallen international carfest",
+    "carfest",
+    "parade of oranges",
+    "mcallen performing arts center",
+    "valleycentral",
+    "myrgv",
+    "trucha rgv",
+    "experience mcallen",
+    "bentsen palm community park",
+    "mission events center",
+    "bandsintown",
+    "jambase",
+    "texas border business",
+    "town square publications",
+    "grupo frontera"
   ],
   "blocklist": [
     "mcallen monitor*",
@@ -53,7 +75,9 @@ SB.Cities.register('mcallen-tx', {
     "la plaza mall*",
     "quinta mazatlan*",
     "border fest*",
-    "rgv vipers*"
+    "rgv vipers*",
+    "mcallen performing arts center*",
+    "galax-z fair*"
   ],
   "blurb": [
     "A hot border metro where hardcore and metal bookers fight gas money and distance.",
@@ -105,7 +129,23 @@ SB.Cities.register('mcallen-tx', {
       "name": "Edinburg",
       "minutes": 15,
       "bearing": 355,
-      "note": "The university town. Students and kids come in and out, and bands live there too."
+      "note": "The university town. Students and kids come in and out, and bands live there too.",
+      "scene": 400,
+      "rooms": [
+        {
+          "id": "edinburg-hall",
+          "kind": "HALL",
+          "hood": "edinburg-town",
+          "zone": "edinburg",
+          "cap": 200,
+          "ages": [
+            "ALL"
+          ],
+          "curfew": 1350,
+          "ac": true,
+          "note": "A rented student or church hall north of town. Easy to book, with an early curfew from whoever holds the lease."
+        }
+      ]
     },
     {
       "id": "mission",
@@ -113,7 +153,23 @@ SB.Cities.register('mcallen-tx', {
       "name": "Mission",
       "minutes": 15,
       "bearing": 290,
-      "note": "Families and a younger crowd that drives in."
+      "note": "Families and a younger crowd that drives in.",
+      "scene": 150,
+      "rooms": [
+        {
+          "id": "mission-grove",
+          "kind": "OUTDOOR",
+          "hood": "mission-town",
+          "zone": "mission",
+          "cap": 100,
+          "ages": [
+            "ALL"
+          ],
+          "curfew": 1320,
+          "outdoor": true,
+          "note": "A park pavilion or a grove yard. Free, hot in summer, and over when the neighbors call."
+        }
+      ]
     },
     {
       "id": "weslaco",
@@ -223,6 +279,18 @@ SB.Cities.register('mcallen-tx', {
       "name": "Edinburg",
       "note": "The university town north of the city. Student apartments and rented houses.",
       "route": "campus"
+    },
+    {
+      "id": "edinburg-town",
+      "name": "Edinburg",
+      "route": "town:edinburg",
+      "note": "The university town north of McAllen. Student halls, church halls and rented rooms, easy to book and early to close."
+    },
+    {
+      "id": "mission-town",
+      "name": "Mission",
+      "route": "town:mission",
+      "note": "Citrus groves, parks and family yards west of McAllen. Free and hot, and over when the neighbors call."
     }
   ],
   "points": [
@@ -363,6 +431,510 @@ SB.Cities.register('mcallen-tx', {
           "result": "They made it halfway and called it. The bill got shorter."
         }
       ]
+    },
+    {
+      "id": "MCALLEN_TX_PARADE_CLOSURE",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 2,
+      "cooldown": 40,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          4
+        ],
+        "calendar": "parade",
+        "months": [
+          12
+        ]
+      },
+      "telegraph": "The lit parade is Saturday and the main streets downtown close at five.",
+      "title": "The parade shuts the street",
+      "body": "The holiday parade has closed the main streets, and the van cannot reach the load-in door of the movie house. The crowd is on the sidewalk and not in your room.",
+      "options": [
+        {
+          "id": "EARLY",
+          "label": "Load in before the barricades go up",
+          "likely": "A long afternoon, and a short night.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": -90
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            }
+          ],
+          "result": "You loaded in at three and sat in the room while the parade went by."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Run it as planned and take what you get",
+          "likely": "The crowd is at the parade.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.75
+            }
+          ],
+          "result": "The parade took everyone. The ones who found a way around the barricades stayed late."
+        },
+        {
+          "id": "MOVE",
+          "label": "Move it a day",
+          "likely": "Breaks the date. Costs trust with everyone.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 1,
+              "respect": false
+            }
+          ],
+          "result": "You moved it a day. The ones who could come, came."
+        }
+      ]
+    },
+    {
+      "id": "MCALLEN_TX_FIESTA_WEEKEND",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 2,
+      "cooldown": 40,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          4
+        ],
+        "calendar": "festival",
+        "months": [
+          10
+        ]
+      },
+      "telegraph": "The convention-center music weekend takes the downtown, and the all-ages storefront has a stage booked against it.",
+      "title": "The big weekend eats the crowd",
+      "body": "A free music weekend across town has the whole downtown crowd, the parking and the sound. Your stage is ready and there is nobody in front of it.",
+      "options": [
+        {
+          "id": "LATE",
+          "label": "Push doors back until the big stage ends",
+          "likely": "The crowd that wants more comes after eleven.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": 75
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            }
+          ],
+          "result": "Doors at midnight. The ones with ringing ears came in for the loud part."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Run it as planned",
+          "likely": "A small, loyal room.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.7
+            }
+          ],
+          "result": "A stage and a few dozen people. The ones who stayed knew every word."
+        },
+        {
+          "id": "MOVE",
+          "label": "Move it a day",
+          "likely": "Breaks the date. Costs trust with everyone.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 1,
+              "respect": false
+            }
+          ],
+          "result": "You moved it a day. The ones who could come, came."
+        }
+      ]
+    },
+    {
+      "id": "MCALLEN_TX_BACKYARD_CALL",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 2,
+      "cooldown": 45,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          3
+        ]
+      },
+      "telegraph": "The extension cord runs out of a carport and a neighbor is on the porch with a phone.",
+      "title": "The neighbor calls at ten",
+      "body": "A backyard show in old McAllen. At ten a neighbor calls, the extension cord runs from the carport and the drummer is in a lawn chair.",
+      "options": [
+        {
+          "id": "UNPLUG",
+          "label": "Unplug and play acoustic until the last song",
+          "likely": "Smaller and warmer. Nobody gets a ticket.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "qAdd",
+              "v": -1
+            }
+          ],
+          "result": "The amps went quiet. The drummer played a cardboard box."
+        },
+        {
+          "id": "MOVE_IT",
+          "label": "Move the whole bill to the storefront",
+          "likely": "Packed in and loud. Costs a little in the door.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 0,
+              "respect": false
+            },
+            {
+              "op": "MONEY",
+              "amount": -25
+            }
+          ],
+          "result": "A storefront took the bill. The tile floor made it louder than the yard."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Play through and see what happens",
+          "likely": "Quick end to the night.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.75
+            }
+          ],
+          "result": "A car pulled up at ten past. That was the show."
+        }
+      ]
     }
-  ]
+  ],
+  "rooms": [
+    {
+      "id": "old-mcallen-carport",
+      "kind": "HOUSE",
+      "hood": "old-mcallen",
+      "cap": 50,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1380,
+      "ac": false,
+      "outdoor": true,
+      "pressure": 50,
+      "start": true,
+      "note": "A carport and a backyard in an old single-story block. No basements here: a slab, a driveway and an extension cord."
+    },
+    {
+      "id": "arts-storefront",
+      "kind": "DIY",
+      "hood": "downtown",
+      "cap": 150,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1470,
+      "ac": true,
+      "sketch": 35,
+      "pressure": 50,
+      "note": "A cultural-arts storefront with a tiled floor and a back patio, home of the alternative and punk nights. It lives on bar sales and a few bookers."
+    },
+    {
+      "id": "strip-bar",
+      "kind": "BAR",
+      "hood": "downtown",
+      "cap": 120,
+      "ages": [
+        "A21"
+      ],
+      "curfew": 1500,
+      "ac": true,
+      "note": "A small bar with a stage on the strip, booking post-punk and alternative nights. The weeknights are thin."
+    },
+    {
+      "id": "movie-house",
+      "kind": "CLUB",
+      "hood": "downtown",
+      "cap": 300,
+      "ages": [
+        "ALL",
+        "A18"
+      ],
+      "curfew": 1440,
+      "ac": true,
+      "note": "A restored old movie house that takes touring packages and local-booker nights. The rent is the pressure."
+    },
+    {
+      "id": "expressway-club",
+      "kind": "CLUB",
+      "hood": "southside",
+      "cap": 250,
+      "ages": [
+        "A18"
+      ],
+      "curfew": 1500,
+      "ac": true,
+      "note": "A club that runs thrash, doom and hardcore nights, eighteen and up, with bands from both sides of the river. It runs late."
+    },
+    {
+      "id": "shed-unit",
+      "kind": "DIY",
+      "hood": "southside",
+      "cap": 80,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1410,
+      "ac": false,
+      "sketch": 45,
+      "pressure": 55,
+      "note": "A rehearsal unit in a produce-shed strip. Cheap and loud, with air conditioning that is mostly a rumor."
+    },
+    {
+      "id": "movie-house-big",
+      "kind": "BIG",
+      "hood": "downtown",
+      "cap": 700,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1380,
+      "ac": true,
+      "note": "The movie house in its big configuration, for the one or two nationals a year."
+    }
+  ],
+  "contacts": [
+    "brownsville-tx",
+    "laredo-tx",
+    "corpus-christi-tx",
+    "san-antonio"
+  ],
+  "calendar": [
+    {
+      "id": "citrus-festival",
+      "label": "the citrus festival",
+      "tag": "festival",
+      "month": 1,
+      "weeks": [
+        4,
+        5
+      ],
+      "dows": [
+        3,
+        4,
+        5
+      ],
+      "can": [
+        0.85,
+        0.88,
+        0.9
+      ],
+      "hoods": [
+        "mission-town"
+      ],
+      "elsewhere": [
+        0.97,
+        0.97,
+        0.97
+      ]
+    },
+    {
+      "id": "fourth-fireworks",
+      "label": "the Fourth of July fireworks",
+      "tag": "holiday",
+      "month": 7,
+      "week": 1,
+      "dows": [
+        4,
+        5
+      ],
+      "can": [
+        0.88,
+        0.9,
+        0.9
+      ],
+      "hoods": [
+        "downtown"
+      ],
+      "elsewhere": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "palm-fiesta",
+      "label": "the palm fiesta weekend",
+      "tag": "festival",
+      "month": 10,
+      "week": 3,
+      "dows": [
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.85,
+        0.88,
+        0.9
+      ],
+      "hoods": [
+        "downtown"
+      ],
+      "elsewhere": [
+        0.97,
+        0.97,
+        0.97
+      ]
+    },
+    {
+      "id": "holiday-parade",
+      "label": "the holiday parade",
+      "tag": "parade",
+      "month": 12,
+      "week": 1,
+      "dows": [
+        5
+      ],
+      "can": [
+        0.85,
+        0.88,
+        0.9
+      ],
+      "hoods": [
+        "downtown"
+      ],
+      "elsewhere": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "football-sep",
+      "label": "home football",
+      "tag": "game",
+      "month": 9,
+      "weeks": [
+        1,
+        4
+      ],
+      "dows": [
+        4
+      ],
+      "can": [
+        0.88,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "football-oct",
+      "label": "home football",
+      "tag": "game",
+      "month": 10,
+      "weeks": [
+        1,
+        4
+      ],
+      "dows": [
+        4
+      ],
+      "can": [
+        0.88,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "football-nov",
+      "label": "home football",
+      "tag": "game",
+      "month": 11,
+      "weeks": [
+        1,
+        4
+      ],
+      "dows": [
+        4
+      ],
+      "can": [
+        0.88,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "halloween",
+      "label": "Halloween weekend",
+      "tag": "holiday",
+      "month": 10,
+      "weeks": [
+        4,
+        5
+      ],
+      "dows": [
+        4,
+        5
+      ],
+      "can": [
+        1.08,
+        1.05,
+        1
+      ]
+    },
+    {
+      "id": "thanksgiving-eve",
+      "label": "the night before Thanksgiving",
+      "tag": "holiday",
+      "month": 11,
+      "week": 4,
+      "dows": [
+        2
+      ],
+      "can": [
+        1.05,
+        1.15,
+        1.1
+      ]
+    }
+  ],
+  "rules": {
+    "curfewMinors": {
+      "weeknight": 1350,
+      "weekend": 1440,
+      "inForce": false
+    }
+  }
 });

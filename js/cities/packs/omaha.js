@@ -7,9 +7,13 @@ SB.Cities.register('omaha', {
            'offutt air force base', 'offutt', 'union pacific', 'mutual of omaha', 'tenaska', 'warren buffett', 'buffett', 'first national bank of omaha',
            'tyson', 'omaha storm chasers', 'storm chasers', 'omaha mavericks', 'kfab', 'kgor', 'henry doorly zoo', 'old market', 'bob kerrey bridge',
            'conagra', 'kiewit', 'werner enterprises', 'ameritas', 'omaha steaks', 'charles schwab stadium', 'cha cha cha', 'conor oberst', 'saddle creek',
-           'slowdown', 'the waiting room', 'the brothers lounge', 'reverb lounge', 'the sydney', 'the barley street tavern'],
+           'slowdown', 'the waiting room', 'the brothers lounge', 'reverb lounge', 'the sydney', 'the barley street tavern',
+           'flatwater free press', 'omaha daily record', 'omaha magazine', 'ohmyomaha', 'visit omaha', 'uno gateway', 'charles schwab field',
+           'college world series', 'mcws', 'maha music festival', 'maha festival', 'heartland pride', 'star city pride', 'artsarben', 'aksarben village',
+           'stinson park', 'omaha zombie walk', 'junkstock', 'taste of omaha', 'jazz on the green', 'omaha fringe festival', 'omaha restaurant week',
+           'zootacular', 'lauritzen gardens', 'union station', 'little bohemia', 'nebraska liquor control commission', 'omaha police department'],
   /* The ban list is the dossier's, plus the obvious local institutions. Game text says "the university", "the air base", "the rail company". */
-  blocklist: ['creighton*', 'offutt*', 'berkshire hathaway*', 'world-herald*', 'union pacific*', 'mutual of omaha*', 'omaha storm chasers*', 'cornhuskers*'],
+  blocklist: ['creighton*', 'offutt*', 'berkshire hathaway*', 'world-herald*', 'union pacific*', 'mutual of omaha*', 'omaha storm chasers*', 'cornhuskers*', 'flatwater free press*', 'omaha daily record*'],
 
   blurb: ['A Missouri River city with a tight hardcore core and a scene that rebuilt after the pandemic. Benson and Midtown carry the bars, North Omaha carries the barns and yards.',
           'All-ages rooms keep closing, so houses and one mid-size room hold the teenagers. People leave for Chicago or Denver at twenty-five, and some come back for the reunion shows.'],
@@ -54,7 +58,45 @@ SB.Cities.register('omaha', {
     { id: 'west-omaha', name: 'West Omaha and Millard', route: 'campus', note: 'Suburban sprawl. Many teenage bands start in garages and basements here.' }
   ],
 
-  contacts: ['lincoln-ne', 'des-moines-ia', 'kansas-city'],
+  rooms: [
+    { id: 'dundee-house', kind: 'HOUSE', hood: 'dundee', cap: 60, curfew: 1350, ac: false, pressure: 50, start: true,
+      note: 'A living room or basement in the old frame houses, with no stage. Parking and the neighbors are the worry.' },
+    { id: 'north-barn', kind: 'HOUSE', hood: 'north-omaha', cap: 100, curfew: 1320, outdoor: true, ac: false, pressure: 55,
+      note: 'A barn behind a band member\'s house. A Tuesday crowd of a hundred is a lot of cars for one street.' },
+    { id: 'bohemia-space', kind: 'DIY', hood: 'south-omaha', cap: 200, curfew: 1350, ac: true,
+      note: 'A nonprofit rehearsal and show space south of downtown. It cannot fully replace the room that closed, and the calendar is thin.' },
+    { id: 'south-storefront', kind: 'DIY', hood: 'south-omaha', cap: 80, curfew: 1380, ac: false, pressure: 55,
+      note: 'A storefront and warehouse room in the cheap blocks. A sale of the building would end it.' },
+    { id: 'benson-bar', kind: 'BAR', hood: 'benson', cap: 120, ages: ['A21'], curfew: 1500, ac: true,
+      note: 'A bar with a back-room stage on the walkable strip. It backs the local bills and turns the kids away at the door.' },
+    { id: 'benson-lounge', kind: 'CLUB', hood: 'benson', cap: 300, ages: ['ALL'], curfew: 1380, ac: true,
+      note: 'A mid-size lounge that allows all ages when the booker pushes. Liquor-licensed, so the kids need a form.' },
+    { id: 'maple-lounge', kind: 'CLUB', hood: 'downtown', cap: 250, ages: ['ALL'], curfew: 1380, ac: true,
+      note: 'A lounge with a stage and an all-ages hardcore night. The bigger draws get the slots first.' },
+    { id: 'blackstone-bar', kind: 'BAR', hood: 'downtown', cap: 150, ages: ['A21'], curfew: 1500, ac: true,
+      note: 'A basement-feeling bar for the heavier bills. The age policy leaves the teens out.' },
+    { id: 'warehouse-club', kind: 'CLUB', hood: 'market', cap: 350, ages: ['ALL'], curfew: 1380, ac: true,
+      note: 'A club in the tourist district that takes touring packages. Kids on a budget do not drive in.' },
+    { id: 'big-room', kind: 'BIG', hood: 'benson', cap: 900, ages: ['ALL'], curfew: 1380,
+      note: 'The big indie-leaning room. Only a touring headliner gets in, not a local bill.' },
+    { id: 'park-lawn', kind: 'OUTDOOR', hood: 'campus', cap: 300, ages: ['ALL'], curfew: 1260, outdoor: true,
+      note: 'A park pavilion and lawn with a generator. Permits and the weather decide it.' },
+    { id: 'millard-garage', kind: 'HOUSE', hood: 'west-omaha', cap: 40, curfew: 1320, ac: false,
+      note: 'A garage or finished basement where teenage bands start. The parents set the end time.' }
+  ],
+
+  contacts: ['lincoln-ne', 'des-moines-ia', 'kansas-city', 'sioux-falls-sd'],
+
+  calendar: [
+    { id: 'baseball-series', label: 'the national college baseball tournament', tag: 'festival', month: 6, weeks: [2, 4], dows: [4, 5, 6], can: [.85, .85, .85], hoods: ['downtown', 'market'], elsewhere: [.95, .95, .95] },
+    { id: 'pride', label: 'the Pride parade', tag: 'parade', month: 7, week: 3, dows: [5], can: [.88, .88, .88], hoods: ['downtown', 'market'], elsewhere: [.97, .97, .97] },
+    { id: 'cinco', label: 'the Cinco de Mayo celebrations', tag: 'holiday', month: 5, week: 1, dows: [5, 6], can: [.95, .95, .95], hoods: ['south-omaha'], elsewhere: [1, 1, 1] },
+    { id: 'summer-fest', label: 'the summer music festival', tag: 'festival', month: 8, weeks: [2, 3], dows: [5], can: [.90, .90, .90], hoods: ['campus'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 4], dows: [5], can: [.88, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 4], dows: [5], can: [.88, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
 
   points: [
     { name: 'Sioux City', state: 'IA', lat: 42.50, lon: -96.40, pop: 85000 },
@@ -105,6 +147,40 @@ SB.Cities.register('omaha', {
         { id: 'RIDES', label: 'Organize rides over the walking bridge', likely: 'Two hours of your day. Most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
           result: 'A carload walked the footbridge together with their amps. They will remember that.' }
+      ] },
+
+    { id: 'OMAHA_BARN_QUIET_HOUR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
+      telegraph: 'The barn crowd keeps growing and the neighbors on the street have started to count the cars.',
+      title: 'A call at ten',
+      body: 'A Tuesday crowd of about a hundred has filled the street. At ten a neighbor calls in the quiet-hour complaint, and an officer is on the way.',
+      options: [
+        { id: 'WRAP', label: 'Wrap the set up and clear the street', likely: 'Short. The host keeps the trust.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'REGULARS', pct: .01 }],
+          result: 'You cut the last band down and had the street empty before the car pulled up.' },
+        { id: 'PLAY', label: 'Keep playing and hope', likely: 'If the officer comes, the whole thing ends.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'The officer stood at the gate for two songs. The host was not happy.' },
+        { id: 'INDOOR', label: 'Pull the amps inside the barn and shut the doors', likely: 'Hot and loud, but quieter outside.',
+          effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
+          result: 'Doors shut and the crowd packed in. The last set shook the loft.' }
+      ] },
+
+    { id: 'OMAHA_TOURNEY_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'festival' },
+      telegraph: 'The big college baseball weekend is coming and every downtown parking space is spoken for.',
+      title: 'The bar cancels the bill',
+      body: 'The bar with the back-room stage lost its parking to the tournament and has dropped your bill for the final weekend.',
+      options: [
+        { id: 'HOUSE', label: 'Move the bill to a house', likely: 'Smaller and louder. Nobody has to park downtown.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'A house took the bill with a day to spare and the floor was packed.' },
+        { id: 'LATER', label: 'Push the show to the next weekend', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 7, respect: false }],
+          result: 'You moved it a week. Most of the bands could make it.' },
+        { id: 'ACCEPT', label: 'Look for a smaller slot at another room', likely: 'Cheaper and thinner.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
+          result: 'A smaller room took it for a thinner night.' }
       ] }
   ]
 });

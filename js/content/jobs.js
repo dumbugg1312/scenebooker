@@ -944,5 +944,13 @@ SB.Content.jobs = {
     INSURANCE: 'event insurance, {insurance:money}, bought when it confirms'
   },
 
+  /* a room changes your night: phone messages (slots: room, date) */
+  notice: {
+    needBands: 'A band has to say yes first.',
+    moved: 'Your show moved to {date} at {room}. Check the bands can still play.',
+    roomGone: '{room} can\'t do your show anymore. Find another room or call it off.',
+    roomClosed: '{room} closed. Your show on {date} is off.'
+  },
+
   windowLoss: 'late · {kids}% of kids, {middle}% of the middle, {old}% of old heads won\'t hear in time'
 };

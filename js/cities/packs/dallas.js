@@ -47,7 +47,27 @@ SB.Cities.register('dallas', {
     "tarrant county",
     "denton county",
     "bomb factory",
-    "dallas county"
+    "dallas county",
+    "fox 4",
+    "nbc dfw",
+    "dallas news",
+    "central track",
+    "do214",
+    "cotton bowl",
+    "red river showdown",
+    "red river rivalry",
+    "deep ellum community arts fair",
+    "deep ellum arts festival",
+    "dallas international film festival",
+    "dallas police department",
+    "dpd beat",
+    "dallas college",
+    "richland college",
+    "american airlines center",
+    "dallas pride",
+    "house bill 1819",
+    "hb 1819",
+    "texas womans university"
   ],
   "blocklist": [
     "dallas observer*",
@@ -55,7 +75,11 @@ SB.Cities.register('dallas', {
     "state fair of texas*",
     "big tex*",
     "dfw airport*",
-    "fort worth weekly*"
+    "fort worth weekly*",
+    "cotton bowl*",
+    "red river showdown*",
+    "deep ellum community arts fair*",
+    "dallas international film festival*"
   ],
   "blurb": [
     "Three hubs thirty miles apart, tied together by tollways, house shows and a long memory for crust.",
@@ -104,7 +128,28 @@ SB.Cities.register('dallas', {
       "name": "Garland",
       "minutes": 20,
       "bearing": 60,
-      "note": "Kids drive in. Garage bands."
+      "note": "Kids drive in. Garage bands.",
+      "scene": 100,
+      "rooms": [
+        {
+          "id": "east-club",
+          "kind": "CLUB",
+          "hood": "garland-mesquite",
+          "zone": "garland",
+          "cap": 250,
+          "ages": [
+            "ALL"
+          ],
+          "curfew": 1380,
+          "ac": true,
+          "standing": [
+            50,
+            65,
+            65
+          ],
+          "note": "A strip-mall room where kids with cars come in from the east suburbs."
+        }
+      ]
     },
     {
       "id": "irving",
@@ -128,7 +173,29 @@ SB.Cities.register('dallas', {
       "name": "Plano",
       "minutes": 30,
       "bearing": 5,
-      "note": "Affluent suburban teens."
+      "note": "Affluent suburban teens.",
+      "scene": 100,
+      "rooms": [
+        {
+          "id": "suburb-hall",
+          "kind": "HALL",
+          "hood": "richardson-plano",
+          "zone": "plano",
+          "cap": 200,
+          "ages": [
+            "ALL"
+          ],
+          "curfew": 1320,
+          "ac": true,
+          "standing": [
+            60,
+            60,
+            60
+          ],
+          "owner": "HALL_MANAGER",
+          "note": "A rented rec building out north. Cheap, but the staff can pull the plug if a show gets rough."
+        }
+      ]
     },
     {
       "id": "arlington",
@@ -229,13 +296,13 @@ SB.Cities.register('dallas', {
       "id": "garland-mesquite",
       "name": "Garland and Mesquite",
       "note": "Eastern suburbs. Kids with cars and strip-mall rooms.",
-      "route": "campus"
+      "route": "town:garland"
     },
     {
       "id": "richardson-plano",
       "name": "Richardson and Plano",
       "note": "North suburbs. Teens come in on the tollways.",
-      "route": "campus"
+      "route": "town:plano"
     }
   ],
   "points": [
@@ -374,6 +441,535 @@ SB.Cities.register('dallas', {
           ],
           "result": "The hail came through at load-in. Half the list waited it out at home."
         }
+      ]
+    },
+    {
+      "id": "DALLAS_FAIR_TRAFFIC",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 2,
+      "cooldown": 40,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          3
+        ],
+        "calendar": "fair"
+      },
+      "telegraph": "The fairgrounds are jammed all month and the roads into South Dallas are one long line of brake lights.",
+      "title": "The van is stuck behind the fair",
+      "body": "A show in South Dallas on a fair weekend. The roads in are packed and the first band is still on the freeway.",
+      "options": [
+        {
+          "id": "WAIT",
+          "label": "Hold the doors and start late",
+          "likely": "The crowd waits, a little cranky.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": 75
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            }
+          ],
+          "result": "The van got in at nine. You started late and most of them stayed."
+        },
+        {
+          "id": "SHORT",
+          "label": "Run a short bill with whoever is here",
+          "likely": "Thin but loose.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.85
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "qAdd",
+              "v": -1
+            }
+          ],
+          "result": "Two bands made it. The room was half full and it was fine."
+        },
+        {
+          "id": "MOVE",
+          "label": "Move it a day",
+          "likely": "Breaks the date. Costs trust with the bands.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 1,
+              "respect": false
+            }
+          ],
+          "result": "You moved it a day. Not everyone could make the new one."
+        }
+      ]
+    },
+    {
+      "id": "DALLAS_HALLOWEEN_PATROL",
+      "when": "WEEK",
+      "tier": "REAL",
+      "weight": 2,
+      "cooldown": 40,
+      "bind": [
+        "show"
+      ],
+      "if": {
+        "daysOut": [
+          0,
+          4
+        ],
+        "calendar": "holiday",
+        "months": [
+          10
+        ]
+      },
+      "telegraph": "Police are talking about extra patrols on the strip after the last shooting.",
+      "title": "New patrols on the strip",
+      "body": "The lots near the Deep Ellum rooms are closed to cars and the patrols are thick. Your Halloween show is in the middle of it.",
+      "options": [
+        {
+          "id": "INSIDE",
+          "label": "Move the whole bill to a house",
+          "likely": "Smaller and quieter. Nobody can close a lot at a house.",
+          "effects": [
+            {
+              "op": "MOVE_SHOW",
+              "dayShift": 0,
+              "toKind": "HOUSE",
+              "respect": false
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "capMul",
+              "v": 0.6
+            }
+          ],
+          "result": "A house took the bill with an hour to spare, and the floor was packed."
+        },
+        {
+          "id": "EARLY",
+          "label": "Start early and be out before the crowds",
+          "likely": "Most get in. A short night.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "lateMin",
+              "v": -90
+            },
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.9
+            }
+          ],
+          "result": "Doors early, done before the patrols tightened."
+        },
+        {
+          "id": "ACCEPT",
+          "label": "Run it and take what you get",
+          "likely": "People are nervous about the lots.",
+          "effects": [
+            {
+              "op": "SHOW_MOD",
+              "key": "headsMul",
+              "v": 0.75
+            }
+          ],
+          "result": "Half the list stayed home rather than risk the car."
+        }
+      ]
+    }
+  ],
+  "rooms": [
+    {
+      "id": "south-house",
+      "kind": "HOUSE",
+      "hood": "south-dallas",
+      "cap": 60,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1380,
+      "ac": false,
+      "outdoor": false,
+      "standing": [
+        65,
+        60,
+        45
+      ],
+      "pressure": 55,
+      "start": true,
+      "note": "A lived-in house run by a small crew who want it all ages. One neighbor call or one tired landlord ends it."
+    },
+    {
+      "id": "east-house",
+      "kind": "HOUSE",
+      "hood": "east-dallas",
+      "cap": 50,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1350,
+      "ac": false,
+      "outdoor": false,
+      "standing": [
+        65,
+        60,
+        45
+      ],
+      "pressure": 55,
+      "note": "A back room in an old duplex on a tight block. Every neighbor hears the drums."
+    },
+    {
+      "id": "cliff-house",
+      "kind": "HOUSE",
+      "hood": "oak-cliff",
+      "cap": 50,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1350,
+      "ac": false,
+      "outdoor": true,
+      "standing": [
+        65,
+        60,
+        45
+      ],
+      "note": "A cheap old rental across the river, a van and a cooler in the yard."
+    },
+    {
+      "id": "cedars-warehouse",
+      "kind": "DIY",
+      "hood": "cedars",
+      "cap": 150,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1410,
+      "ac": false,
+      "standing": [
+        55,
+        60,
+        45
+      ],
+      "pressure": 60,
+      "needs": [
+        "VOUCH"
+      ],
+      "note": "A warehouse room by the rail with no paper on it. The first fire marshal visit ends it."
+    },
+    {
+      "id": "practice-units",
+      "kind": "DIY",
+      "hood": "south-dallas",
+      "cap": 120,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1380,
+      "ac": false,
+      "standing": [
+        55,
+        60,
+        45
+      ],
+      "pressure": 50,
+      "note": "A storefront practice unit that doubles as a stage, cheap rent and thin walls."
+    },
+    {
+      "id": "strip-bar",
+      "kind": "BAR",
+      "hood": "lower-greenville",
+      "cap": 150,
+      "ages": [
+        "A21"
+      ],
+      "curfew": 1530,
+      "ac": true,
+      "standing": [
+        50,
+        65,
+        70
+      ],
+      "pressure": 50,
+      "note": "A heavy-rock and punk bar with a stage on the strip. Twenty-one and up, and the neighbors are close."
+    },
+    {
+      "id": "ellum-bar",
+      "kind": "BAR",
+      "hood": "deep-ellum",
+      "cap": 120,
+      "ages": [
+        "ALL",
+        "A18"
+      ],
+      "matinee": true,
+      "curfew": 1500,
+      "ac": true,
+      "standing": [
+        50,
+        65,
+        70
+      ],
+      "note": "A bar with a back-room stage on the strip. Eighteen-plus and all-ages nights, until the lease runs out."
+    },
+    {
+      "id": "ellum-club",
+      "kind": "CLUB",
+      "hood": "deep-ellum",
+      "cap": 300,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1380,
+      "ac": true,
+      "standing": [
+        45,
+        70,
+        70
+      ],
+      "note": "A real club with a booker and a paid door, all ages unless the bill says otherwise."
+    },
+    {
+      "id": "factory-hall",
+      "kind": "BIG",
+      "hood": "deep-ellum",
+      "cap": 1500,
+      "ages": [
+        "ALL"
+      ],
+      "curfew": 1380,
+      "ac": true,
+      "standing": [
+        40,
+        70,
+        70
+      ],
+      "note": "A converted factory the scene watches from the sidewalk. Only touring names play it."
+    },
+    {
+      "id": "grove-yard",
+      "kind": "OUTDOOR",
+      "hood": "pleasant-grove",
+      "cap": 80,
+      "ages": [
+        "ALL"
+      ],
+      "rent": 10,
+      "curfew": 1260,
+      "ac": false,
+      "outdoor": true,
+      "standing": [
+        60,
+        55,
+        40
+      ],
+      "note": "A backyard and a garage in the southeast. Bring water, because the heat is the other headliner."
+    }
+  ],
+  "contacts": [
+    "waco-tx",
+    "tyler-tx",
+    "oklahoma-city",
+    "longview-tx"
+  ],
+  "calendar": [
+    {
+      "id": "fair-sep",
+      "label": "the state fair",
+      "tag": "fair",
+      "month": 9,
+      "weeks": [
+        4,
+        5
+      ],
+      "dows": [
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.8,
+        0.85,
+        0.85
+      ],
+      "hoods": [
+        "south-dallas",
+        "cedars"
+      ],
+      "elsewhere": [
+        0.95,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "fair-oct",
+      "label": "the state fair",
+      "tag": "fair",
+      "month": 10,
+      "weeks": [
+        1,
+        3
+      ],
+      "dows": [
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.8,
+        0.85,
+        0.85
+      ],
+      "hoods": [
+        "south-dallas",
+        "cedars"
+      ],
+      "elsewhere": [
+        0.95,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "rivalry",
+      "label": "the big rivalry game",
+      "tag": "game",
+      "month": 10,
+      "weeks": [
+        2,
+        3
+      ],
+      "dows": [
+        5
+      ],
+      "can": [
+        0.88,
+        0.9,
+        0.9
+      ],
+      "hoods": [
+        "deep-ellum"
+      ],
+      "elsewhere": [
+        0.95,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "arts-fair",
+      "label": "the Deep Ellum arts fair",
+      "tag": "festival",
+      "month": 4,
+      "week": 1,
+      "dows": [
+        4,
+        5,
+        6
+      ],
+      "can": [
+        0.88,
+        0.85,
+        0.85
+      ],
+      "hoods": [
+        "deep-ellum"
+      ],
+      "elsewhere": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "football-oct",
+      "label": "home football",
+      "tag": "game",
+      "month": 9,
+      "weeks": [
+        1,
+        5
+      ],
+      "dows": [
+        5
+      ],
+      "can": [
+        0.85,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "football-nov",
+      "label": "home football",
+      "tag": "game",
+      "month": 10,
+      "weeks": [
+        1,
+        5
+      ],
+      "dows": [
+        5
+      ],
+      "can": [
+        0.85,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "id": "halloween",
+      "label": "Halloween weekend",
+      "tag": "holiday",
+      "month": 10,
+      "weeks": [
+        4,
+        5
+      ],
+      "dows": [
+        4,
+        5
+      ],
+      "can": [
+        1.08,
+        1.05,
+        1
+      ],
+      "hoods": [
+        "deep-ellum"
+      ],
+      "elsewhere": [
+        1.08,
+        1.05,
+        1
+      ]
+    },
+    {
+      "id": "thanksgiving-eve",
+      "label": "the night before Thanksgiving",
+      "tag": "holiday",
+      "month": 11,
+      "week": 4,
+      "dows": [
+        2
+      ],
+      "can": [
+        1.05,
+        1.15,
+        1.1
       ]
     }
   ]

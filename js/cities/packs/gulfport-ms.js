@@ -7,7 +7,11 @@ SB.Cities.register('gulfport-ms', {
            'cruisin the coast', 'smokin\' the sound', 'smokin the sound', 'black spring break', 'new orleans saints', 'barq\'s', 'barqs', 'waffle house',
            'sonic drive-in', 'taco bell', 'amtrak', 'katrina', 'hurricane katrina', 'vfw', 'american legion', 'elks',
            'the slab', 'tidewater hall', 'seabee row annex', 'dock nineteen', 'the pump house', 'fellowship hall no. 3', 'bayou carport', 'seawall social club',
-           'the drydock', 'harbor lot pavilion', 'pine hill shed'],
+           'the drydock', 'harbor lot pavilion', 'pine hill shed',
+           'mississippi gulf coast community college', 'gulf coast community college', 'mississippi coast coliseum', 'coast coliseum',
+           'mississippi deep sea fishing rodeo', 'deep sea fishing rodeo', 'view the cruise', 'boo bash', 'gulfport arts festival', 'sky lantern festival',
+           'memorial day blowout', 'gulfport dragway', 'gulfport little theatre', 'lynn meadows discovery center', 'wlox', 'coast observer',
+           'mississippi today', 'mississippi folklife', 'hattiesburg american', 'jackson free press', 'mississippi abc'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The storm is written only as 'the storm' in game text. */
   blocklist: ['sun herald*', 'keesler*', 'cruisin the coast*', 'seabee*', 'waffle house*', 'barq*'],
 
@@ -53,7 +57,19 @@ SB.Cities.register('gulfport-ms', {
     { id: 'long-beach', name: 'Long Beach', route: 'campus', note: 'The beach suburb to the west with a branch campus. In effect Gulfport\'s west side.' }
   ],
 
-  contacts: ['mobile-al', 'pensacola', 'slidell-la', 'daphne-al'],
+  contacts: ['mobile-al', 'pensacola', 'slidell-la', 'daphne-al', 'new-orleans-la'],
+
+  calendar: [
+    { id: 'car-week', label: 'the classic-car week', tag: 'festival', month: 10, week: 1, dows: [4, 5, 6], can: [.88, .85, .85], hoods: ['downtown', 'mississippi-city'], elsewhere: [.97, .95, .95] },
+    { id: 'fishing-weekend', label: 'the big fishing weekend', tag: 'festival', month: 7, week: 1, dows: [4, 5, 6], can: [.92, .90, .88], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'mardi-gras', label: 'Mardi Gras parade weekend', tag: 'parade', month: 2, weeks: [2, 4], dows: [4, 5, 6], can: [.85, .80, .80], hoods: ['downtown'], elsewhere: [.97, .95, .95] },
+    { id: 'arts-festival', label: 'the arts festival', tag: 'festival', month: 9, week: 3, dows: [5], can: [.90, .88, .88], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'dragway-weekend', label: 'Memorial Day race weekend', tag: 'race', month: 5, week: 4, dows: [4, 5, 6], can: [.92, .90, .90], hoods: ['north-side'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [4], can: [.85, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [2, 4], dows: [4], can: [.85, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
 
   points: [
     { name: 'New Orleans', state: 'LA', lat: 29.95, lon: -90.07, pop: 1000000 },

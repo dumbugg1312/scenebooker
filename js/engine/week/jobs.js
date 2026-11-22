@@ -270,6 +270,12 @@ SB.module('Jobs', function (SB) {
     return { o: o === undefined ? null : o, i: i === undefined ? null : i, m: m === undefined ? null : m };
   }
 
+  /* the first show the walkthrough guides makes its flyer while the bands answer (bands go on it as TBA) */
+  function guidedShow(state, show) {
+    var t = state.story && state.story.tutorial;
+    return !!(t && t.on && !((state.player && state.player.showsPlayed) || 0) && (!t.showId || t.showId === show.id));
+  }
+
   /* -> { met, day, missing: [type] }. A need on a repeated job is met when every instance is DONE or MOOT. */
   function needsOf(state, job) {
     var c = cfg(job.type), show = showOf(state, job), out = { met: true, day: null, missing: [], list: [] };
@@ -284,6 +290,8 @@ SB.module('Jobs', function (SB) {
       if (!done) { out.met = false; out.missing.push(type); }
     });
     if (job.type === 'LOCK_BILL' && confirmedSlots(show).length < 2) { out.met = false; out.missing.push('BANDS'); }
+    /* the flyer is for a bill with a yes on it (spec 11) */
+    if ((job.type === 'MAKE_FLYER' || job.type === 'ANNOUNCE' || job.type === 'LISTINGS' || job.type === 'LOCAL_AD') && !confirmedSlots(show).length && !(show.bill && show.bill.locked) && !guidedShow(state, show)) { out.met = false; out.missing.push('BANDS'); }
     return out;
   }
 
@@ -301,6 +309,7 @@ SB.module('Jobs', function (SB) {
              missedAt: missedAt, label: lab, loss: null };
   }
 
+  var JOB_GRACE = 2;
   function computeWindow(state, job, onDay) {
     var c = cfg(job.type), show = showOf(state, job), mode = modeOf(state, job), carrier, w, req, nd, ov, T,
         opensDay, idealUntil, missedAt, st, fp, len, k, exp;
@@ -326,9 +335,13 @@ SB.module('Jobs', function (SB) {
         idealUntil = ov.i == null ? null : show.day - ov.i;
         missedAt = ov.m == null ? null : show.day - ov.m;
         opensDay = ov.o == null ? nd.day : (nd.day == null ? show.day - ov.o : Math.max(show.day - ov.o, nd.day));
+        /* a job is never late before it could be done: a show booked short gets JOB_GRACE days from the day the job
+         * became possible (its needs met, else the confirm), never past the night before the show */
+        exp = nd.day != null ? nd.day : (show.confirmedDay != null ? show.confirmedDay : null);
+        if (idealUntil != null && exp != null && idealUntil < exp + JOB_GRACE) idealUntil = Math.max(idealUntil, Math.min(exp + JOB_GRACE, show.day - 1));
         if (ov.m != null && T <= ov.m) st = 'MISSED';
         else if (!nd.met || (ov.o != null && T > ov.o)) st = 'EARLY';
-        else if (ov.i == null || T >= ov.i) {
+        else if (idealUntil == null || onDay <= idealUntil) {
           fp = opensDay != null ? opensDay : (idealUntil != null ? idealUntil - 6 : onDay);
           len = idealUntil != null ? idealUntil - fp + 1 : 0;
           k = Math.max(1, Math.ceil(len / 3));
@@ -844,7 +857,7 @@ SB.module('Jobs', function (SB) {
     if (!nd.met) {
       /* names the missing job: `missing` is its type ('BANDS' when LOCK_BILL lacks two confirmed bands), `missingLabel` its name */
       missing = nd.missing[0];
-      var no = U.no('NEEDS', SB.text.label('refuse.NEEDS'));
+      var no = U.no('NEEDS', missing === 'BANDS' && job.type !== 'LOCK_BILL' ? label('jobs.notice.needBands', {}, SB.text.label('refuse.NEEDS')) : SB.text.label('refuse.NEEDS'));
       no.missing = missing;
       no.missingLabel = missing === 'BANDS' ? null : label('jobs.' + missing + '.label', {}, missing);
       return no;
@@ -881,6 +894,12 @@ SB.module('Jobs', function (SB) {
     carrier = carrierOf(state, job);
     if (carrier && !LIVE[carrier.status]) return U.no('LOCKED', SB.text.label('refuse.LOCKED'));
     if (!LIVE[job.status]) return U.no('ALREADY', SB.text.label('refuse.ALREADY'));
+    /* a rider with hours on tonight's own show takes tonight's clock */
+    if (on && job.status !== 'PROMISED' && carrier && SB.Week && SB.Week.eveningOpen && state.shows && state.shows[job.showId] &&
+        state.shows[job.showId].day === today(state) && SB.Week.eveningOpen(state)) {
+      var h = hoursOf(state, job), fit;
+      if (h > 0 && SB.Week.fits) { fit = SB.Week.fits(state, h); if (!fit.ok) return U.no('NO_TIME', fit.text || SB.text.label('refuse.NO_TIME')); }
+    }
     job.status = on ? 'PROMISED' : 'TODO';
     return U.yes({ status: job.status });
   }

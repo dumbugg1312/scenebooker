@@ -1,7 +1,7 @@
 SB.Cities.register('columbus-ga', {
   v: 1,
   slug: 'columbus-ga',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   /* The dossier's real institutions and its invented venue names are in banned: research, not content. */
   banned: ['fort benning', 'benning', 'fort moore', 'aflac', 'global payments', 'tsys', 'columbus state university', 'columbus state', 'csu',
            'columbus technical college', 'auburn university', 'springer opera house', 'rivercenter', 'riverwalk', 'uptown columbus', 'synovus park',
@@ -10,8 +10,10 @@ SB.Cities.register('columbus-ga', {
            'wjsp', 'wtgz', 'wvrk', 'wrcg', 'wrbl', 'wtvm', 'riverfest', 'myspace', 'fort rucker', 'fort novosel', 'maxwell air force base',
            'lowell of the south', 'scrambled dog', 'peach belt', 'the lintworks', 'mill pond hall', 'the fountain lot', 'whitewater room',
            'victory drive skate and roll', 'the tenth street carport', 'weracoba shed', 'post 411 hall', 'the bibb annex',
-           'back room at the laundromat', 'chehaw street storage unit 14', 'the wynnton hill garage'],
-  blocklist: ['waffle house*', 'ledger-enquirer*', 'riverfest*', 'lintworks*', 'springer*', 'aflac*'],
+           'back room at the laundromat', 'chehaw street storage unit 14', 'the wynnton hill garage',
+           'fountain city classic', 'pig jig', 'always uptown', 'aj mcclung', 'mcclung stadium', 'the columbite', 'columbus navigator', 'wltz', 'artsfest',
+           'friday night concert series', 'woodruff park', 'georgia hockey', 'ledger enquirer', 'columbus civic center'],
+  blocklist: ['waffle house*', 'ledger-enquirer*', 'riverfest*', 'lintworks*', 'springer*', 'aflac*', 'fountain city classic*', 'columbus navigator*'],
 
   blurb: ['A Georgia army city on the Chattahoochee, across the bridges from Alabama, where soldiers, students and suburban kids share one strip-mall map.',
           'The scene is small and leans on a few rooms, so every closing resets it.'],
@@ -51,7 +53,45 @@ SB.Cities.register('columbus-ga', {
     { id: 'phenix-side', name: 'Phenix City', route: 'town:phenix-city', note: 'The Alabama side, with different laws and less infrastructure.' }
   ],
 
-  contacts: ['montgomery-al', 'tallahassee-fl', 'augusta-ga'],
+  rooms: [
+    { id: 'lakebottom-yard', kind: 'HOUSE', hood: 'lakebottom', cap: 40, curfew: 1320, ac: false, outdoor: true, start: true,
+      note: 'A rented bungalow with a back yard and a carport. Slab floor, no basement, and one neighbor with a phone.' },
+    { id: 'mill-porch', kind: 'HOUSE', hood: 'bibb-city', cap: 50, curfew: 1380, ac: false, outdoor: true, pressure: 55,
+      note: 'A small mill house with a loud porch. Cheap and forgotten, but the lots are tight and the neighbors are close.' },
+    { id: 'donor-room', kind: 'DIY', hood: 'north-east', cap: 120, ages: ['ALL'], curfew: 1380, ac: true, pressure: 55,
+      note: 'A donation-run room in a big old building: couches, pool tables, a small stage at the far end and a weekly open mic. It lives on one organizer and one landlord.' },
+    { id: 'record-store', kind: 'SHOP', hood: 'uptown', cap: 100, curfew: 1350, ac: true,
+      note: 'An independent record store with a back room that closes the shop for shows. Five to fifteen at the door, doors early, done by ten-thirty.' },
+    { id: 'stage-bar', kind: 'BAR', hood: 'uptown', cap: 150, curfew: 1500, ac: true,
+      note: 'A restaurant bar with a second-floor listening room. Free nights in the week, covers on weekends, and new apartments next door.' },
+    { id: 'club', kind: 'CLUB', hood: 'uptown', cap: 300, ages: ['A18'], curfew: 1470, ac: true, pressure: 50,
+      note: 'The standing room for touring bands. Soldiers and students pack it, and the base keeps a list of rooms that are off limits.' },
+    { id: 'fellowship-hall', kind: 'HALL', hood: 'north-east', cap: 150, curfew: 1320, ac: true,
+      note: 'A church fellowship hall or a veterans\' post. The rent is cheap and the older members can veto a loud night.' },
+    { id: 'street-stage', kind: 'OUTDOOR', hood: 'uptown', cap: 500, curfew: 1320, ac: false, outdoor: true, pressure: 50,
+      note: 'A closed-off block with a stage on fall Fridays. Free, all ages and family-friendly, and punk gets in only as a one-off.' },
+    { id: 'victory-storefront', kind: 'DIY', hood: 'victory-drive', cap: 80, curfew: 1380, ac: false, pressure: 55,
+      note: 'A storefront behind the pawn shops and motels. Cheap and loud, and the fire marshal is the threat.' },
+    { id: 'harris-land', kind: 'OUTDOOR', hood: 'north-east', cap: 60, curfew: 1560, ac: false, outdoor: true,
+      note: 'A generator show on somebody\'s cousin\'s land. All night if the weather holds, and a long drive home.' },
+    { id: 'arena', kind: 'BIG', hood: 'uptown', cap: 3000, curfew: 1380, ac: true,
+      note: 'The city arena books package tours. Far from DIY, and a local band gets on the bill only through a miracle.' }
+  ],
+
+  contacts: ['montgomery-al', 'tallahassee-fl', 'atlanta', 'birmingham', 'augusta-ga'],
+
+  calendar: [
+    { id: 'rivalry', label: 'the big rivalry football weekend', tag: 'game', month: 11, week: 2, dows: [4, 5], can: [.85, .80, .80], hoods: ['uptown'], elsewhere: [.92, .90, .90] },
+    { id: 'river-fest', label: 'the spring river music festival', tag: 'festival', month: 5, week: 1, dows: [4, 5], can: [.90, .85, .85], hoods: ['uptown'], elsewhere: [1, .97, .97] },
+    { id: 'july-fourth', label: 'the Fourth of July fireworks', tag: 'holiday', month: 7, week: 1, dows: [4, 5], can: [.90, .88, .88], hoods: ['uptown'], elsewhere: [1, .97, .97] },
+    { id: 'fall-uptown', label: 'the fall Uptown festival', tag: 'festival', month: 9, weeks: [3, 4], dows: [5], can: [.92, .88, .88], hoods: ['uptown'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [5], can: [.88, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [5], can: [.88, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1260, weekend: 1260, inForce: false } },
 
   points: [
     { name: 'Macon', state: 'GA', lat: 32.84, lon: -83.63, pop: 157000 },
@@ -67,5 +107,57 @@ SB.Cities.register('columbus-ga', {
     hood: ['Uptown', 'Wynnton', 'Dinglewood', 'Midtown', 'Lakebottom', 'Rose Hill', 'Bibb City', 'Phenix City', 'Cusseta'],
     thing: ['red clay', 'mill house', 'boiled peanuts', 'sweet tea', 'carport', 'bridge traffic', 'open mic', 'record store', 'paint cans', 'pool table'],
     weather: ['heat index', 'tornado watch']
-  }
+  },
+  events: [
+    { id: 'COLUMBUS_GA_NEIGHBOR_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3] },
+      telegraph: 'A neighbor on the block has been standing at the fence with a phone.',
+      title: 'Audible from the property line',
+      body: 'The city code makes anything you can hear from the property line a violation after ten. A neighbor knows it, and it is Saturday.',
+      options: [
+        { id: 'EARLY', label: 'Start early and be done by ten', likely: 'Most of them make it. A short, tight night.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Doors early and the last chord at ten sharp. Nobody called.' },
+        { id: 'QUIET', label: 'Turn it down and play it acoustic', likely: 'A strange, quiet night. The ones who came are glad.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'Quiet sets on the porch. The neighbor stayed inside.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The call comes. Maybe the cops, maybe not.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'The call came at ten-fifteen, and half the room left before the second knock.' }
+      ] },
+
+    { id: 'COLUMBUS_GA_RIVALRY_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'game' },
+      telegraph: 'The hotels are full and the big game is on Saturday.',
+      title: 'The whole town is at the game',
+      body: 'Hotels are full, Uptown is closed to traffic, and half the all-ages crowd has a ticket to the stadium. Your show is on the same night.',
+      options: [
+        { id: 'LATE', label: 'Push doors back until the game lets out', likely: 'The crowd that wants a night out shows up. Later than planned.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Doors an hour late. They came in loud from the game.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the stadium.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The casual crowd stayed at the game. The regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'COLUMBUS_GA_UPTOWN_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3], months: [6, 7, 8, 9] },
+      telegraph: 'The council is talking about extending the Uptown curfew for kids.',
+      title: 'The curfew catches a carload',
+      body: 'A curfew for unsupervised minors covers the blocks around the record store. A carload of sixteen-year-olds is headed for the back room at nine-thirty.',
+      options: [
+        { id: 'EARLY', label: 'Move the start up so they are inside by nine', likely: 'Most make it. A thin start.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
+          result: 'Doors an hour early. The kids were inside before the patrol came by.' },
+        { id: 'HOLD', label: 'Hold them inside until a parent comes', likely: 'Two hours of your night. Nobody gets cited.',
+          effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
+          result: 'You kept them in the back room and called every parent. They will remember that.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The young ones stay home.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The curfew scared off the youngest, and the room ran old.' }
+      ] }
+  ]
 });

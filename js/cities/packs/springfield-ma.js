@@ -9,7 +9,11 @@ SB.Cities.register('springfield-ma', {
            'dunkin', 'dunkin donuts', 'friendly\'s', 'white castle',
            'the mill river pump house', 'mill river pump house', 'tapley street annex', 'sixteen acres lanes', 'st. casimir\'s lower hall', 'st. casimirs lower hall',
            'the orchard loading dock', 'orchard loading dock', 'dwight street social club', 'chapman yard', 'brightwood boxing gym',
-           'armory hill bocce club', 'forest park rec annex', 'the pioneer pallet co.', 'pioneer pallet', 'boston road skate and sub'],
+           'armory hill bocce club', 'forest park rec annex', 'the pioneer pallet co.', 'pioneer pallet', 'boston road skate and sub',
+           'springfield museums', 'springfield technical community college', 'stcc', 'american international college', 'western new england university',
+           'westover air reserve base', 'barnes air national guard base', 'springfield business improvement district', 'springfield pride parade',
+           'caribbean parade', 'new england metal & hardcore fest', 'new england metal and hardcore festival', 'western massachusetts news', 'wwlp',
+           'nepm', 'new england public media', 'western mass news', 'stearns square', 'enshrinement weekend', 'bright nights at forest park', 'big e parade'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Real institutions appear only as generic phrases in game text. */
   blocklist: ['baystate*', 'massmutual*', 'smith & wesson*', 'mgm*', 'thunderbirds*', 'valley advocate*', 'dunkin*', 'hall of fame*'],
 
@@ -52,7 +56,21 @@ SB.Cities.register('springfield-ma', {
     { id: 'boston-road', name: 'Boston Road and East Springfield', route: 'work-side', note: 'Chain stores, motels and industrial park units: dead-end commercial and cheap.' }
   ],
 
-  contacts: ['worcester-ma', 'new-haven-ct'],
+  contacts: ['worcester-ma', 'new-haven-ct', 'hartford', 'albany-ny', 'providence'],
+
+  calendar: [
+    { id: 'pride', label: 'Pride weekend', tag: 'parade', month: 6, week: 1, dows: [4, 5], can: [.88, .90, .90], hoods: ['metro-center'], elsewhere: [1, .98, .98] },
+    { id: 'italian-feast', label: 'the Italian feast', tag: 'festival', month: 7, weeks: [2, 3], dows: [4, 5, 6], can: [.92, .88, .88], hoods: ['south-end'], elsewhere: [1, .98, .98] },
+    { id: 'summer-parade', label: 'the big summer neighborhood parade', tag: 'parade', month: 8, weeks: [3, 4], dows: [5], can: [.90, .85, .85], hoods: ['brightwood', 'mason-square'], elsewhere: [1, .97, .97] },
+    { id: 'regional-fair', label: 'the big regional fair', tag: 'fair', month: 9, weeks: [3, 5], dows: [4, 5, 6], can: [.90, .85, .85] },
+    { id: 'lights-drive', label: 'the lights drive at the big park', tag: 'festival', month: 12, weeks: [1, 4], dows: [0, 1, 2, 3, 4, 5, 6], can: [.95, .92, .92], hoods: ['forest-park'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [4], can: [.85, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [4], can: [.85, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1320, curfewMinors: { weeknight: 1380, weekend: 1440, inForce: false } },
 
   points: [
     { name: 'Hartford', state: 'CT', lat: 41.76, lon: -72.67, pop: 121000 },
@@ -67,5 +85,58 @@ SB.Cities.register('springfield-ma', {
     hood: ['Brightwood', 'Indian Orchard', 'Sixteen Acres', 'Pine Point', 'McKnight', 'Six Corners', 'Liberty Heights', 'Old Hill', 'Memorial Square'],
     thing: ['three-decker', 'packie', 'grinder', 'rotary', 'mill room', 'nor\'easter', 'bocce court', 'social club', 'practice room'],
     weather: ['nor\'easter', 'ice storm']
-  }
+  },
+
+  events: [
+    { id: 'SPRINGFIELD_MA_FAIR_JAM', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'The big regional fair opens across the river, and the bridges will be a parking lot.',
+      title: 'The bridges are a parking lot',
+      body: 'The fair has I-91 and the river bridges. A show downtown or on the west bank has bands stuck for hours and a half-empty room.',
+      options: [
+        { id: 'EARLIER', label: 'Move the start up so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+          effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: 0.8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
+          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
+          effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: 0.3, beyond: true }],
+          result: 'The backup never cleared. The ones across the river stayed home.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'SPRINGFIELD_MA_YARD_NOISE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
+      telegraph: 'A neighbor has been talking about calling the police about the amps.',
+      title: 'A patrol car at the second band',
+      body: 'The amplification rule lets a patrol car shut down a yard show even at eight on a Saturday. It is the second band, and the amps are audible down the block.',
+      options: [
+        { id: 'DOWN', label: 'Turn the amps down', likely: 'A quieter, looser set. The room still has a night.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'The amps came down and the set got tighter. The officer drove off.' },
+        { id: 'INSIDE', label: 'Move the rest of the bill inside', likely: 'Smaller and louder. Nobody can hear it from the street.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 0.6 }],
+          result: 'The bill moved indoors and the floor was packed.' },
+        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'They may shut it down for good.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.7 }],
+          result: 'The patrol car came back at nine. The night ended on a flat note.' }
+      ] },
+
+    { id: 'SPRINGFIELD_MA_PARK_LIGHTS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'festival', months: [11, 12, 1] },
+      telegraph: 'The lights drive at the big park opens, and traffic is already backing into the neighborhood.',
+      title: 'Traffic is in the basement streets',
+      body: 'The lights drive backs traffic into the streets where the finished basements are for five weeks. A basement show there needs a back-road route and an early start.',
+      options: [
+        { id: 'EARLY', label: 'Open early and send everyone the back way', likely: 'Most get in before the cars. Thinner than usual.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.92 }],
+          result: 'Doors early, and the back road worked. The ones who came parked a mile away.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up on the traffic.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
+          result: 'The cars crawled past the house all night. Half the list gave up.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] }
+  ]
 });

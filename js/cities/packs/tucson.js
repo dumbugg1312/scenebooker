@@ -1,14 +1,18 @@
 SB.Cities.register('tucson', {
   v: 1,
   slug: 'tucson',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['university of arizona', 'u of a', 'arizona wildcats', 'wildcats', 'arizona daily star', 'tucson weekly', 'daily wildcat', 'tucson sentinel', 'kxci',
            'kvoa', 'kold', 'kgun', 'tucson electric power', 'raytheon', 'davis-monthan', 'davis monthan air force base', 'fort huachuca', 'pima community college',
            'pima county', 'tucson medical center', 'banner health', 'tucson gem and mineral show', 'gem and mineral show', 'el tour de tucson',
            'all souls procession', 'fourth avenue street fair', 'tucson rodeo', 'la fiesta de los vaqueros', 'sky island', 'kitt peak', 'tohono o\'odham nation',
            'pascua yaqui tribe', 'diamond casino', 'golf links', 'cat mountain', 'arizona-sonora desert museum', 'tucson roadrunners', 'tucson saguaros',
            'hotel congress', 'club congress', 'tucson convention center', 'loft cinema', 'rialto theatre', 'the flycatcher', 'club crawl', 'sentinel peak',
-           'saguaro national park', 'mount lemmon', 'border patrol'],
+           'saguaro national park', 'mount lemmon', 'border patrol',
+           'tucson.com', 'thisistucson', 'this is tucson', 'kgun 9', 'azpm', 'arizona public media', 'visit tucson', 'downtown tucson partnership',
+           'tucson gem mineral and fossil showcase', 'gem and jam', 'fourth avenue winter street fair', 'fourth avenue spring street fair',
+           'fourth avenue merchants association', 'tucson rodeo parade', 'tucson meet yourself', 'tucson presidio birthday', 'tucson veterans day parade',
+           'dusk music festival', 'tucson film festival', 'phoenix new times', 'state press'],
   /* "The university", "the air base", "the gem show", "the procession". Nogales is a place and is used as a place. */
   blocklist: ['hotel congress*', 'club congress*', 'arizona daily star*', 'tucson weekly*', 'rialto theatre*', 'raytheon*', 'davis-monthan*', 'pima community*'],
 
@@ -51,7 +55,52 @@ SB.Cities.register('tucson', {
     { id: 'east-side', name: 'the east side', route: 'campus', note: 'Cul-de-sacs, driveways and garages. Where a lot of teen bands start.' }
   ],
 
+  rooms: [
+    { id: 'midtown-garage', kind: 'HOUSE', hood: 'midtown', cap: 60, hostCut: 0, pa: .4, curfew: 1320, ac: false, outdoor: false, sketch: 25, standing: [70, 60, 45],
+      pressure: 50, start: true, note: 'A garage off Speedway with a swamp cooler on the amp. Kids and old heads on one floor, and out by ten before the neighbors call.' },
+    { id: 'barrio-yard', kind: 'HOUSE', hood: 'barrio', cap: 50, hostCut: 0, pa: .4, curfew: 1320, ac: false, outdoor: true, sketch: 25, standing: [65, 60, 45],
+      pressure: 55, note: 'A backyard behind an adobe rowhouse. It goes quiet fast when new neighbors move in.' },
+    { id: 'east-garage', kind: 'HOUSE', hood: 'east-side', cap: 40, hostCut: 0, pa: .4, curfew: 1290, ac: false, outdoor: false, sketch: 20, standing: [65, 60, 50],
+      pressure: 50, note: 'A tract garage where the teen bands start. The parents set the hour.' },
+    { id: 'menlo-yard', kind: 'HOUSE', hood: 'menlo', cap: 50, hostCut: 0, pa: .4, curfew: 1320, ac: false, outdoor: true, sketch: 30, standing: [65, 60, 45],
+      pressure: 40, note: 'A hillside yard on the west side. Cheap and far from campus, so the crowd is all local.' },
+    { id: 'youth-space', kind: 'DIY', hood: 'midtown', cap: 250, rent: 70, deposit: 0, pa: .7, ages: ['ALL'], curfew: 1350, ac: true, sketch: 15, standing: [60, 65, 60],
+      pressure: 40, note: 'A youth-run arts and music space on Grant. Doors at seven, all ages, and it runs on grants and volunteers.' },
+    { id: 'south-bay', kind: 'DIY', hood: 'south-tucson', cap: 120, rent: 60, deposit: 0, pa: .6, curfew: 1380, ac: false, sketch: 45, standing: [55, 60, 45],
+      pressure: 60, needs: ['VOUCH'], note: 'A narrow unit between body shops and taquerias. The one place hardcore has fit, and the landlord is watching.' },
+    { id: 'avenue-shop', kind: 'SHOP', hood: 'fourth-ave', cap: 60, pa: .4, curfew: 1320, ac: true, sketch: 5, standing: [70, 70, 80], following: .2,
+      note: 'A record and thrift storefront on Fourth Avenue. In-store sets before the bars fill.' },
+    { id: 'avenue-bar', kind: 'BAR', hood: 'fourth-ave', cap: 150, soundFee: 50, pa: .7, ages: ['A21'], curfew: 1500, ac: true, following: .3, sketch: 20,
+      standing: [50, 65, 70], note: 'A bar by the underpass with a music shop next door. Nearly the only punk host for years.' },
+    { id: 'prince-bar', kind: 'BAR', hood: 'prince', cap: 150, soundFee: 40, pa: .6, ages: ['A21'], curfew: 1500, ac: true, following: .2, sketch: 15,
+      standing: [45, 65, 70], note: 'A plain stage in a strip-mall bar. Metal and hardcore on weeknights, a long drive from campus.' },
+    { id: 'union-hall', kind: 'HALL', hood: 'prince', cap: 200, rent: 160, deposit: 75, pa: .6, curfew: 1320, ac: true, sketch: 10, standing: [55, 60, 70],
+      owner: 'HALL_MANAGER', note: 'A rented hall for the afternoon. A cleaning deposit and someone watching the door.' },
+    { id: 'hotel-club', kind: 'CLUB', hood: 'downtown', cap: 350, houseCosts: 200, split: .8, pa: .9, ages: ['ALL', 'A21'], curfew: 1380, ac: true, following: .6, sketch: 10,
+      standing: [45, 70, 70], owner: 'TALENT_BUYER', notice: 56, needs: ['FULL_BILL'], note: 'The old club inside the hotel, with a patio stage. A touring room that wants a name.' },
+    { id: 'old-theatre', kind: 'BIG', hood: 'downtown', cap: 1200, rent: 1800, deposit: 500, pa: .95, ages: ['ALL'], curfew: 1380, ac: true, sketch: 5, standing: [40, 70, 70],
+      notice: 90, note: 'An old theatre for the biggest metal and hardcore nights. A local band gets it once a year at most.' },
+    { id: 'campus-lot', kind: 'OUTDOOR', hood: 'university', cap: 150, rent: 15, pa: .4, curfew: 1290, sketch: 30, standing: [60, 55, 40],
+      note: 'A park or a lot near the university. Fine in January, out of the question in July.' }
+  ],
+
   contacts: ['phoenix', 'flagstaff-az', 'el-paso-tx'],
+
+  calendar: [
+    { id: 'winter-fair', label: 'the winter street fair', tag: 'fair', month: 12, week: 2, dows: [4, 5, 6], can: [.90, .88, .85], hoods: ['fourth-ave', 'downtown'], elsewhere: [1, .98, .98] },
+    { id: 'spring-fair', label: 'the spring street fair', tag: 'fair', month: 3, week: 4, dows: [4, 5, 6], can: [.90, .88, .85], hoods: ['fourth-ave', 'downtown'], elsewhere: [1, .98, .98] },
+    { id: 'gem-show', label: 'the gem show', tag: 'festival', month: 2, weeks: [1, 3], dows: [3, 4, 5, 6], can: [.92, .90, .90], hoods: ['downtown'], elsewhere: [.98, .96, .96] },
+    { id: 'rodeo', label: 'the rodeo weekend and parade', tag: 'parade', month: 2, week: 3, dows: [4, 5, 6], can: [.95, .92, .90] },
+    { id: 'procession', label: 'the Day of the Dead procession', tag: 'parade', month: 11, week: 1, dows: [5, 6], can: [.90, .88, .85], hoods: ['downtown', 'menlo'], elsewhere: [1, .97, .97] },
+    { id: 'cycling-race', label: 'the cycling race', tag: 'race', month: 11, week: 3, dows: [5], can: [.95, .92, .92] },
+    { id: 'football-9', label: 'home football', tag: 'game', month: 9, weeks: [1, 4], dows: [5], can: [.88, .95, .95], hoods: ['university'], elsewhere: [1, 1, 1] },
+    { id: 'football-10', label: 'home football', tag: 'game', month: 10, weeks: [1, 4], dows: [5], can: [.88, .95, .95], hoods: ['university'], elsewhere: [1, 1, 1] },
+    { id: 'football-11', label: 'home football', tag: 'game', month: 11, weeks: [1, 4], dows: [5], can: [.88, .95, .95], hoods: ['university'], elsewhere: [1, 1, 1] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { curfewMinors: { weeknight: 1320, weekend: 1320, inForce: false } },
 
   points: [
     { name: 'Phoenix', state: 'AZ', lat: 33.45, lon: -112.07, pop: 5200000 },
@@ -102,6 +151,54 @@ SB.Cities.register('tucson', {
         { id: 'ACCEPT', label: 'Run it as it is', likely: 'Half the crowd goes home early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'The ones who stayed were soaked and the room emptied by ten.' }
+      ] },
+
+    { id: 'TUCSON_STREET_FAIR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'fair' },
+      telegraph: 'The street fair sets up on the avenue this weekend, and the parking runs out two blocks away.',
+      title: 'Fair weekend on the avenue',
+      body: 'The in-store set will fill the avenue with strangers. The bar next door wants the sidewalk, and your crowd has to park a long way off.',
+      options: [
+        { id: 'EARLY', label: 'Play early, before the fair crowd thickens', likely: 'The regulars get in. A short, quick set.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Doors an hour early. The regulars were in and out before the lot filled.' },
+        { id: 'ACCEPT', label: 'Run it and let the strangers wander in', likely: 'Some come in, some never find a space to park.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'REGULARS', pct: .02 }],
+          result: 'A few fair-goers stayed for the second band. The regulars circled the block twice.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'TUCSON_GEM_SHOW_VAN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'festival', months: [1, 2] },
+      telegraph: 'Every motel lot in town is full for the gem show, and the touring van has no place to sleep.',
+      title: 'No beds in town',
+      body: 'The gem show has taken every motel and half the parking. The out-of-town band is circling with a van, and a Midtown house offers a living room floor if the show ends by ten.',
+      options: [
+        { id: 'FLOOR', label: 'Take the floor and end the show by ten', likely: 'A short night. The band is grateful.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'REGULARS', pct: .02 }],
+          result: 'Done by ten, and the band slept in a living room. They said so on the way out of town.' },
+        { id: 'PAY', label: 'Pay for a motel room an hour out', likely: 'Costs forty dollars. They make doors late.',
+          effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
+          result: 'The band drove in from the next town and loaded in late, but they loaded in.' },
+        { id: 'ACCEPT', label: 'Let them sort it out themselves', likely: 'They play tired and leave early.',
+          effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'They played hard and short, and the van was gone before the last song died.' }
+      ] },
+
+    { id: 'TUCSON_CURFEW_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3] },
+      telegraph: 'The all-ages crowd has parents who want the kids home by ten-thirty.',
+      title: 'Home by midnight',
+      body: 'A sixteen-year-old with a parent\'s SUV from the foothills has to be home by midnight, and the neighbors across the street are watching the all-ages door. The last band will play to half a room.',
+      options: [
+        { id: 'EARLY', label: 'Move the start up so the kids hear every band', likely: 'Everyone sees the whole bill. An early night.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'Doors early. The kids heard every band and made the curfew with minutes to spare.' },
+        { id: 'ACCEPT', label: 'Run the bill as planned', likely: 'The last band loses the young half of the room.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
+          result: 'The parents came at ten-thirty and the room emptied. The headliner played to the older heads.' }
       ] }
   ]
 });

@@ -1,13 +1,17 @@
 SB.Cities.register('spokane-wa', {
   v: 1,
   slug: 'spokane-wa',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['gonzaga university', 'gonzaga', 'whitworth', 'eastern washington university', 'washington state university', 'wsu', 'fairchild air force base',
            'fairchild', 'bloomsday', 'lilac festival', 'torchlight parade', 'hoopfest', 'pig out in the park', 'hillyard festival',
            'interstate fair', 'spokane county interstate fair', 'amtrak', 'great northern railway', 'creative by nature', 'lilac city', 'hooptown usa',
            'spokesman-review', 'spokesman review', 'inlander', 'kyrs', 'spokane indians', 'spokane chiefs', 'vfw', 'american legion',
            'the rail spur hall', 'rail spur hall', 'havana street annex', 'fourth floor fellowship hall', 'the grain elevator room', 'grain elevator room',
            'latah creek grange', 'the falls basement', 'marshall street rec', 'the interstate room', 'lilac lane lodge', 'the viaduct shop',
+           'lilac bloomsday run', 'armed forces torchlight parade', 'spokane hoopfest association', 'spokane arena', 'spokane transit authority', 'spokane tribe resort',
+           'spokane live', 'spokane entertainment district', 'spokane county fair and expo center', 'spokane city council', 'crucial times fest', 'sonic solstice',
+           'punk rock flea market', 'punk palouse fest', 'geekfest', 'decolonise fest', 'kxly', 'krem', 'khq', 'spokane rising', 'spokane historical society',
+           'wslcb', 'spokane county juvenile court', 'spokane police', 'nevada heights',
            'market street back room', 'the basalt hall'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Colleges, events and the weekly paper appear in game text only as generic words. */
   blocklist: ['gonzaga*', 'spokesman*', 'inlander*', 'hoopfest*', 'bloomsday*', 'lilac festival*', 'latah creek grange*', 'viaduct shop*'],
@@ -50,7 +54,49 @@ SB.Cities.register('spokane-wa', {
     { id: 'the-valley', name: 'the Valley', route: 'campus', note: 'Strip malls, light industry and chain restaurants east of Havana Street; shop rooms, halls and carports for shows.' }
   ],
 
-  contacts: ['missoula-mt', 'boise-id', 'bozeman-mt', 'yakima-wa'],
+  rooms: [
+    { id: 'north-garage', kind: 'HOUSE', hood: 'north-bank', cap: 50, curfew: 1320, ac: false, outdoor: false, pressure: 55, start: true,
+      note: 'A garage turned into a practice room and a show room, run by a couple from their own lot. One neighbor call or a landlord ends it.' },
+    { id: 'sprague-basement', kind: 'HOUSE', hood: 'east-central', cap: 40, curfew: 1320, ac: false, outdoor: false, pressure: 55,
+      note: 'A basement in an old frame house. The fire count and the neighbors are the risk.' },
+    { id: 'mansion-flat', kind: 'HOUSE', hood: 'brownes-addition', cap: 60, curfew: 1320, ac: false, outdoor: false, pressure: 55,
+      note: 'A big-roomed apartment in a cut-up mansion. Loud, with close neighbors and a lot of tenant turnover.' },
+    { id: 'shop-lot', kind: 'DIY', hood: 'south-hill', cap: 150, curfew: 1320, ac: false, outdoor: true, pressure: 50,
+      note: 'A storefront and its lot, used for daytime outdoor sets. The weather and the shop lease decide it.' },
+    { id: 'reception-hall', kind: 'HALL', hood: 'north-bank', cap: 300, rent: 15, deposit: 0, curfew: 1380, ac: true, owner: 'HALL_MANAGER',
+      note: 'A former church turned reception hall, rented by the night. It runs on the owner saying yes.' },
+    { id: 'east-end-room', kind: 'DIY', hood: 'downtown', cap: 200, curfew: 1380, ac: true, standing: [60, 65, 65],
+      note: 'A new all-ages room with a cafe bar and good sound. A fair size for visiting bands.' },
+    { id: 'old-all-ages', kind: 'CLUB', hood: 'downtown', cap: 300, ages: ['ALL'], curfew: 1380, ac: true, notice: 56, needs: ['FULL_BILL'], pressure: 60,
+      note: 'A long-closed all-ages room being brought back on crowdfunding. The sprinkler bill has blocked it so far.' },
+    { id: 'concert-hall', kind: 'CLUB', hood: 'downtown', cap: 400, ages: ['ALL'], curfew: 1380, ac: true, notice: 56, pressure: 60,
+      note: 'A ticketed hall that books all-ages hardcore and metal. It shut once over violence, so it is a fragile step up.' },
+    { id: 'sprague-bar', kind: 'BAR', hood: 'east-central', cap: 150, ages: ['A21'], curfew: 1530, ac: true,
+      note: 'A bar with a stage that has to keep minors out. It books the twenty-one-plus metal and punk bills.' },
+    { id: 'parkade', kind: 'OUTDOOR', hood: 'downtown', cap: 500, curfew: 1260, rent: 0, pressure: 55,
+      note: 'A parking garage that turns into a market with bands for a weekend. The weather and the park hours decide it.' },
+    { id: 'arena-big', kind: 'BIG', hood: 'downtown', cap: 1000, curfew: 1380,
+      note: 'The arena and a resort hall out on the reservation, where package tours play. A big step above DIY.' },
+    { id: 'rail-hall', kind: 'HALL', hood: 'hillyard', cap: 120, curfew: 1320, ac: false, pressure: 50,
+      note: 'A union hall in the old rail neighborhood, rented by the night. The kitchen bar has to stay locked.' }
+  ],
+
+  contacts: ['kennewick-wa', 'missoula-mt', 'yakima-wa', 'seattle'],
+
+  calendar: [
+    { id: 'road-race', label: 'the road race', tag: 'race', month: 5, week: 1, dows: [6], can: [.95, .92, .92] },
+    { id: 'spring-parade', label: 'the spring festival parade', tag: 'parade', month: 5, week: 3, dows: [5], can: [.85, .80, .80], hoods: ['downtown'], elsewhere: [.97, .95, .95] },
+    { id: 'street-hoops', label: 'the street basketball weekend', tag: 'festival', month: 6, week: 4, dows: [5, 6], can: [.88, .85, .85], hoods: ['downtown'], elsewhere: [.97, .95, .95] },
+    { id: 'flea-market', label: 'the flea market weekend', tag: 'festival', month: 8, week: 1, dows: [4, 5, 6], can: [.95, .92, .92], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'county-fair', label: 'the county fair', tag: 'fair', month: 9, weeks: [2, 3], dows: [3, 4, 5, 6], can: [.90, .88, .88], hoods: ['the-valley'], elsewhere: [.97, .95, .95] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [4], can: [.88, .97, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [4], can: [.88, .97, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1320 },
+
 
   points: [
     { name: 'Missoula', state: 'MT', lat: 46.87, lon: -113.99, pop: 75000 },
@@ -66,5 +112,58 @@ SB.Cities.register('spokane-wa', {
     hood: ['Browne\'s Addition', 'Hillyard', 'East Central', 'West Central', 'Peaceful Valley', 'the South Hill', 'Logan', 'the Valley', 'the Y'],
     thing: ['basement', 'espresso stand', 'wildfire smoke', 'pickup truck', 'huckleberry', 'woodstove', 'chains', 'fellowship hall', 'practice space'],
     weather: ['smoke season', 'hard freeze', 'pass closure']
-  }
+  },
+
+  events: [
+    { id: 'SPOKANE_WA_PARADE_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], calendar: 'parade' },
+      telegraph: 'The parade is Saturday, and the city shuts the downtown streets at a quarter to eight.',
+      title: 'No van within six blocks',
+      body: 'The parade has every downtown street closed by a quarter to eight. A band cannot get a van within six blocks of the room, and the load-in is a long walk.',
+      options: [
+        { id: 'EARLY', label: 'Load in before the streets close', likely: 'A scramble. The night starts thin.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Everything was in by seven. The crowd came in on foot, a little late.' },
+        { id: 'CARRY', label: 'Carry the gear in by hand', likely: 'Slow. The bands will remember it.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'Six blocks of amps on foot. The set started late and loose.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'SPOKANE_WA_PASS_SNOW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3], months: [11, 12, 1, 2, 3] },
+      telegraph: 'The pass is closing for snow, and a band from over the mountain is on it.',
+      title: 'The pass is closed',
+      body: 'A band booked from Missoula is stuck behind a pass closure, and the bill has to be rebuilt from locals before doors.',
+      options: [
+        { id: 'LOCALS', label: 'Rebuild the bill from local bands', likely: 'A thinner night with a hometown feel.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'Three local bands filled in. The room was half full and loud.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start. The crowd gets restless.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The van made it at ten. You started late and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] },
+
+    { id: 'SPOKANE_WA_NEIGHBOR_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 3] },
+      telegraph: 'A neighbor on the block has already said the music carries across the fence.',
+      title: 'The fifty-foot call',
+      body: 'A neighbor calls the sound rule on a north-side garage show. You can cut the set to unplugged or move the whole night into the practice room.',
+      options: [
+        { id: 'QUIET', label: 'Cut to unplugged', likely: 'Quiet, and not what they came for.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'A soft, strange night under the porch light. The ones who stayed liked it.' },
+        { id: 'INSIDE', label: 'Move it into the practice room', likely: 'Smaller and louder, and out of earshot.',
+          effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'You packed the practice room. Nobody outside could hear it.' },
+        { id: 'ACCEPT', label: 'Run it and take the warning', likely: 'A second call ends it for good.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'The officer came at ten. You finished the set with the amps turned down.' }
+      ] }
+  ]
 });

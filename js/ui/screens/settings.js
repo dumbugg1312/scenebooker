@@ -65,11 +65,15 @@
     list: 'saves on this machine',
     none: 'no saves on this machine.',
     weekN: 'wk {n}',
+    agoNow: 'saved just now',
+    agoMin1: 'saved 1 minute ago', agoMin: 'saved {n} minutes ago',
+    agoHour1: 'saved 1 hour ago', agoHour: 'saved {n} hours ago',
+    agoDay1: 'saved yesterday', agoDay: 'saved {n} days ago',
     del: 'tear it up',
     delSay: 'Tear up the save {name}, {city}, week {n}',
-    delSure: 'Delete "{name}" ({city}, week {n})? It is gone for good.',
-    delYes: 'tear it up',
-    keep: 'keep it',
+    delSure: 'Delete this save? This can\'t be undone.',
+    delYes: 'Delete',
+    keep: 'Keep',
     end: 'end the career',
     endSure: 'End this career? The town will remember what you did.',
     endYes: 'end it',
@@ -106,6 +110,18 @@
         Kt().button({ label: no, fk: 'no', on: function () { close(); } })
       ])
     ]), { label: text });
+  }
+  /* "saved 2 minutes ago" from a slot's savedAt (slot metadata only; '' when the save has none) */
+  function agoText(ms) {
+    var m, h2, d;
+    if (typeof ms !== 'number' || !isFinite(ms)) return '';
+    m = Math.floor((Date.now() - ms) / 60000);
+    if (m < 1) return L('agoNow');
+    if (m < 60) return L(m === 1 ? 'agoMin1' : 'agoMin', { n: m });
+    h2 = Math.floor(m / 60);
+    if (h2 < 24) return L(h2 === 1 ? 'agoHour1' : 'agoHour', { n: h2 });
+    d = Math.floor(h2 / 24);
+    return L(d === 1 ? 'agoDay1' : 'agoDay', { n: d });
   }
   function dateOf(ms) {
     var d = new Date(ms);
@@ -254,7 +270,7 @@
       return h('li', { class: 'sf-save' }, Kt().card({ paper: STUB_PAPER[k % STUB_PAPER.length], torn: true, seed: 'stub' + x.slot, cls: 'sf-stub' + (mine ? ' is-mine' : '') }, [
         Kt().photo({ id: STUB_PHOTO[k % STUB_PHOTO.length], w: 64, h: 78, paper: 'white', seed: 'stub', rot: -1, cls: 'sf-stubphoto' }),
         h('div', { class: 'sf-stubtext' }, [
-          h('p', { class: 'kt-small', text: dateOf(x.savedAt) }),
+          h('p', { class: 'kt-small', text: [dateOf(x.savedAt), agoText(x.savedAt)].filter(Boolean).join(' · ') }),
           Kt().headline(name, { size: 20, max: 170, tag: 'h3', cls: 'sf-stubname' }),
           h('p', { class: 'kt-type sf-stubcity', text: [city, L('weekN', { n: wk })].filter(Boolean).join(' · ') }),
           mine ? h('p', { class: 'kt-pencil', text: L('thisOne') }) : null,

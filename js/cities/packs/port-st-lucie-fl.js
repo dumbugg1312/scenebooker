@@ -6,9 +6,10 @@ SB.Cities.register('port-st-lucie-fl', {
            'wptv', 'publix', 'pub sub', 'waffle house', 'brightline', 'greyhound', 'vfw', 'american legion', 'elks', 'hurricane frances', 'hurricane jeanne',
            'hurricane milton', 'frances', 'jeanne', 'milton', 'pineapple festival', 'indian river state college', 'seminole brighton', 'brighton reservation',
            'gators', 'seminoles', 'dolphins', 'the swale', 'section 21 annex', 'lanai room', 'canal street carport', 'palmetto plaza unit 9', 'the snowbird lounge',
-           'lot 40 hall', 'cashmere garage', 'mangrove back room', 'the retention pond', 'sandhill rec', 'bayshore annex'],
+           'lot 40 hall', 'cashmere garage', 'mangrove back room', 'the retention pond', 'sandhill rec', 'bayshore annex',
+           'st. lucie county fair', 'st lucie county fair', 'midflorida event center', 'clover park', 'river nights', 'friday fest', 'marina square', 'psl irish festival', 'freedom fest', 'festival of lights', 'treasure coast caribbean food and music festival', 'fort pierce punk rock flea market', 'treasure coast tattoo art expo', 'emo night treasure coast', 'macaroni kid', 'bandsintown', 'eventbrite', 'humanitix', 'gigsalad', 'thebash', 'visit st. lucie', 'cityofpsl', 'treasurecoast.com', 'wlrn', 'miami new times', 'creative loafing', 'st. lucie county fairgrounds', 'treasure coast theatre'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The storms are written only as 'the storm' in game text. */
-  blocklist: ['tcpalm*', 'publix*', 'waffle house*', 'pineapple festival*', 'general development*', 'wptv*'],
+  blocklist: ['tcpalm*', 'publix*', 'waffle house*', 'pineapple festival*', 'general development*', 'wptv*', 'st. lucie county fair*', 'midflorida event center*', 'macaroni kid*'],
 
   blurb: ['A fast-growing Treasure Coast city of platted ranch-house lots, canals and six-lane boulevards, with no center and nothing walkable.',
           'Nobody here has a basement, so shows are in carports and garages. Storms and neighbors run the calendar, and every kid needs a ride.'],
@@ -48,7 +49,19 @@ SB.Cities.register('port-st-lucie-fl', {
     { id: 'fort-pierce-hood', name: 'downtown Fort Pierce', route: 'downtown', note: 'The nearest walkable core, with bars and old storefronts, where the local night life actually happens.' }
   ],
 
-  contacts: [{ name: 'West Palm Beach', state: 'FL', lat: 26.72, lon: -80.05 }, 'lakeland-fl'],
+  contacts: [{ name: 'West Palm Beach', state: 'FL', lat: 26.72, lon: -80.05 }, 'palm-bay-fl', 'miami', 'orlando', 'lakeland-fl'],
+
+  calendar: [
+    { id: 'fair-feb', label: 'the county fair', tag: 'fair', month: 2, week: 4, dows: [4, 5, 6], can: [.85, .88, .90], hoods: ['fort-pierce-hood', 'north-county'], elsewhere: [.95, .95, .95] },
+    { id: 'fair-mar', label: 'the county fair', tag: 'fair', month: 3, weeks: [1, 2], dows: [4, 5, 6], can: [.85, .88, .90], hoods: ['fort-pierce-hood', 'north-county'], elsewhere: [.95, .95, .95] },
+    { id: 'spring-street', label: 'the spring street festival', tag: 'festival', month: 3, week: 2, dows: [5], can: [.90, .92, .95], hoods: ['st-lucie-west'], elsewhere: [1, 1, 1] },
+    { id: 'fourth', label: 'the Fourth of July party', tag: 'holiday', month: 7, week: 1, dows: [4, 5, 6], can: [.70, .75, .80] },
+    { id: 'light-parade', label: 'the holiday parade and lights', tag: 'parade', month: 12, weeks: [1, 2], dows: [5, 6], can: [.88, .90, .93], hoods: ['st-lucie-west', 'fort-pierce-hood'], elsewhere: [1, .97, .97] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 5], dows: [4], can: [.85, .95, .95] },
+    { id: 'football-oct', label: 'home football', tag: 'game', month: 10, weeks: [1, 5], dows: [4], can: [.85, .95, .95] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
 
   points: [
     { name: 'West Palm Beach', state: 'FL', lat: 26.72, lon: -80.05, pop: 120000 },

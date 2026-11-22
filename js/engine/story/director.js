@@ -282,9 +282,29 @@ SB.module('Director', function (SB) {
     return p && typeof p.rate === 'number' && p.rate === p.rate ? p.rate : dflt;
   }
 
+  /* the people the opening names (the outgoing booker, sound, security, the host) go by first names in every text and
+   * cutscene, so no two of them share one: a later one that would is given another first name of their generation.
+   * Its own random stream, so nothing else in the game draws differently. */
+  function distinctFirsts(state, ids) {
+    var seen = {}, r = SB.rng.make('cast-first:' + String(state.seed || '')), N = SB.Content.names && SB.Content.names.first;
+    ids.forEach(function (id) {
+      var p = id && state.people ? state.people[id] : null, pool, i, f;
+      if (!p || !p.first) return;
+      if (seen[p.first.toLowerCase()]) {
+        pool = (N && (N[E.GEN_KEY[p.gen]] || N[Object.keys(N)[0]])) || [];
+        for (i = 0; i < 60 && pool.length; i++) {
+          f = r.pick(pool);
+          if (!seen[String(f).toLowerCase()] && !SB.text.blocked(f + ' ' + (p.last || ''))) { p.first = f; break; }
+        }
+      }
+      seen[p.first.toLowerCase()] = true;
+    });
+  }
+
   function opening(state) {
     var d = dir(state), p = pack(state), room = startRoom(state), out = withRole(state, 'OUTGOING');
     var sound = withRole(state, 'SOUND'), security = withRole(state, 'SECURITY'), host = room ? room.ownerId : null;
+    distinctFirsts(state, [out, host, sound, security]);
     var cast = (p && p.cast) || {}, sl = {
       outgoing: firstName(state, out), outgoingInitial: firstName(state, out).charAt(0),
       bigCity: p && p.whereGo && p.whereGo[0] ? p.whereGo[0].name : '',

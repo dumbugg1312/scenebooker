@@ -2,7 +2,9 @@ SB.Cities.register('tyler-tx', {
   v: 1,
   slug: 'tyler-tx',
   confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
-  banned: ['tyler morning telegraph', 'texas rose festival', 'rose festival', 'rose capital of america', 'azalea trail', 'east texas state fair',
+  banned: ['tyler morning telegraph', 'rose queen', 'rose parade', 'rose garden', 'tyler municipal rose garden', 'state fair of east texas', 'red dirt bbq festival',
+           'brick street revival', 'tyler paper', 'cbs19', 'ketk', 'knue', 'visit tyler', 'bandsintown', 'jambase', 'tjc', 'cascades of texas', 'texas standard',
+           'texas public radio', 'dallas observer', 'fort worth weekly', 'tyler area chamber of commerce', 'texas rose festival', 'rose festival', 'rose capital of america', 'azalea trail', 'east texas state fair',
            'whataburger', 'waffle house', 'sonic drive-in', 'dairy queen', 'shiner', 'dr pepper', 'topo chico', 'warped tour', 'tabc', 'vfw',
            'american legion', 'canton trade days', 'first monday trade days', 'dallas cowboys', 'texas longhorns', 'texas a&m',
            'tyler junior college', 'ut tyler', 'university of texas at tyler', 'texas college', 'stephen f. austin', 'lamar university',
@@ -52,7 +54,18 @@ SB.Cities.register('tyler-tx', {
     { id: 'south-side', name: 'the south side and the college edge', route: 'campus', note: 'Student apartments and rentals near the colleges, a source of audience and bands.' }
   ],
 
-  contacts: ['longview-tx', 'shreveport-la'],
+  contacts: ['longview-tx', 'shreveport-la', 'dallas', 'waco-tx'],
+
+  calendar: [
+    { id: 'flower-fest', label: 'the autumn flower festival', tag: 'festival', month: 10, week: 3, dows: [3, 4, 5, 6], can: [.88, .85, .85], hoods: ['downtown', 'midtown'], elsewhere: [.97, .95, .95] },
+    { id: 'state-fair', label: 'the state fair and rodeo', tag: 'fair', month: 9, week: 4, dows: [4, 5], can: [.90, .88, .88], hoods: ['loop-belt'], elsewhere: [.95, .93, .93] },
+    { id: 'bbq-fest', label: 'the barbecue festival', tag: 'festival', month: 5, week: 2, dows: [4, 5, 6], can: [.92, .90, .90], hoods: ['downtown'], elsewhere: [1, .97, .97] },
+    { id: 'football-sep', label: 'high school football', tag: 'game', month: 9, weeks: [1, 5], dows: [4], can: [.85, 1, .97] },
+    { id: 'football-oct', label: 'high school football', tag: 'game', month: 10, weeks: [1, 5], dows: [4], can: [.85, 1, .97] },
+    { id: 'football-nov', label: 'high school football', tag: 'game', month: 11, weeks: [1, 2], dows: [4], can: [.85, 1, .97] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
 
   points: [
     { name: 'Dallas', state: 'TX', lat: 32.78, lon: -96.8, pop: 1300000 },
@@ -70,5 +83,41 @@ SB.Cities.register('tyler-tx', {
     hood: ['Charnwood', 'Azalea District', 'Bullard', 'Whitehouse', 'Lindale', 'South Broadway', 'Front Street', 'Beckham Avenue'],
     thing: ['pole barn', 'carport', 'generator', 'breakfast taco', 'barbecue pit', 'drive-in', 'tornado siren', 'rose bush', 'shed', 'church lot', 'strip-mall unit'],
     weather: ['spring thunderstorm', 'tornado watch', 'ice storm']
-  }
+  },
+
+  events: [
+    { id: 'TYLER_TX_FESTIVAL_VAN', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'festival' },
+      telegraph: 'The festival weekend has every motel full and every lot near downtown roped off.',
+      title: 'The van with nowhere to park',
+      body: 'The touring van is due Friday and the festival has taken every motel bed and parking space near downtown. They cannot cancel and they cannot park.',
+      options: [
+        { id: 'LOT', label: 'Park them in a church lot out on the Loop', likely: 'A long walk and a late load-in.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'The van sat in a lot on the Loop and the gear came in on a borrowed truck. Doors went late.' },
+        { id: 'FLOOR', label: 'Put them up on a floor on the north side', likely: 'Free, and a better crowd for it.',
+          effects: [{ op: 'REGULARS', pct: .02 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
+          result: 'They slept on a living-room floor and played like they owed somebody.' },
+        { id: 'ACCEPT', label: 'Let them sort it out and run the night', likely: 'They get there. Tired.',
+          effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'They found a spot six blocks off and played a flat set.' }
+      ] },
+
+    { id: 'TYLER_TX_GENERATOR_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3], weather: 'RAIN', months: [3, 4, 5, 6] },
+      telegraph: 'A tornado watch covers the whole county and the power company is warning about outages.',
+      title: 'The power goes out mid-set',
+      body: 'A spring storm took the lines down halfway through the second band. The crowd is in the carport and somebody has a generator in the truck.',
+      options: [
+        { id: 'GEN', label: 'Run the rest of the set off the generator', likely: 'Loud, and the neighbor will call.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'MONEY', amount: -25 }],
+          result: 'The generator coughed on and the set went on in the dark. The neighbor called at ten.' },
+        { id: 'SHORT', label: 'Cut it short and send everyone home', likely: 'Safe. A thin night.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
+          result: 'You called it with the sirens going. Half the bill never played.' },
+        { id: 'MOVE', label: 'Move the rest of the bill a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. The ones who could come, came.' }
+      ] }
+  ]
 });

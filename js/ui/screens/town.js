@@ -494,6 +494,7 @@
         function P(lat, lon) { return SB.geo.project(lat, lon); }
         inner += k.poly(outlinePts(), { seed: 'us', fill: '#e7ddc4', sw: 2.6, wob: 0.6 });
         inner += k.dots(k.polyD(outlinePts()), 1, { op: 0.6 });
+        inner += '<clipPath id="tn-us-clip"><path d="' + k.polyD(outlinePts()) + '"/></clipPath><path d="' + SB.stateLinesD(0, 0) + '" clip-path="url(#tn-us-clip)" fill="none" stroke="' + TONER + '" stroke-opacity=".75" stroke-width="1.8" stroke-linejoin="round" stroke-dasharray="9 3 2 3"/>';
         idx.forEach(function (e) {
           var p;
           if (!num(e.lat) || !num(e.lon)) return;

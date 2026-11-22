@@ -1,13 +1,18 @@
 SB.Cities.register('wilmington-nc', {
   v: 1,
   slug: 'wilmington-nc',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['unc wilmington', 'uncw', 'unc pembroke', 'cape fear community college', 'east carolina university', 'camp lejeune', 'fort bragg',
            'azalea festival', 'holiday flotilla', 'cucalorus', 'riverfest', 'seahawks', 'starnews', 'star-news', 'port city daily', 'whqr', 'wave transit',
            'cape fear public transportation authority', 'cook out', 'waffle house', 'bojangles', 'biscuitville', 'cheerwine', 'sun drop',
            'hurricane florence', 'wilmywood', 'battleship north carolina', 'uss north carolina', 'vfw', 'american legion',
            'the carport at shipyard', 'marl pit hall', 'pogie row annex', 'spanish moss room', 'number nine fellowship hall', 'brickyard loft',
-           'monkey junction roller rink', 'the fisher street garage', 'cape lot 14', 'vinegar slab pizza', 'the dry dock back porch', 'salt marsh social hall'],
+           'monkey junction roller rink', 'the fisher street garage', 'cape lot 14', 'vinegar slab pizza', 'the dry dock back porch', 'salt marsh social hall',
+           'wilmington biz', 'wilmingtonbiz', 'wect', 'wway', 'port city jams', 'avenue wilmington', 'salt magazine', 'wilmington and beaches', 'wilmington downtown inc',
+           'downtown alive', 'nc azalea festival', 'north carolina azalea festival', 'wrightsville beach holiday flotilla', 'wilmington beer week',
+           'lighthouse beer and wine festival', 'nc 4th of july festival', 'greenfield lake amphitheater', 'live oak bank pavilion', 'riverfront park', 'wilson center',
+           'hopscotch', 'hurricane helene', 'wilmington strong', 'music over flo', 'unc school of government', 'nc abc commission', 'ncrla', 'wfae',
+           'spectrum news', 'pollstar', 'eventbrite', 'bandsintown'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The storm is written only as 'the storm' in game text. */
   blocklist: ['uncw*', 'starnews*', 'port city daily*', 'cucalorus*', 'azalea festival*', 'cook out*', 'marl pit*', 'pogie row*'],
 
@@ -47,10 +52,39 @@ SB.Cities.register('wilmington-nc', {
     { id: 'college-road', name: 'College Road and the campus side', route: 'campus', note: 'Student apartment complexes and rentals around the university. Complexes shut parties down fast.' },
     { id: 'inner-ring', name: 'Greenfield Lake and Forest Hills', route: 'old-side', note: 'Quiet tree-lined bungalow streets where neighbors call in noise quickly. Porch and small backyard shows.' },
     { id: 'castle-hayne', name: 'Castle Hayne and the north county', route: 'work-side', note: 'Industrial lots, acreage and big yards up toward the airport. Cheap, with generator and field shows.' },
-    { id: 'over-the-bridge', name: 'across the river', route: 'campus', note: 'New subdivisions in the next county where many workers now live. Strict HOAs.' }
+    { id: 'over-the-bridge', name: 'across the river', route: 'campus', note: 'New subdivisions in the next county where many workers now live. Strict HOAs.' },
+    { id: 'wrightsville-beach', name: 'Wrightsville Beach', route: 'old-side', note: 'The beach town east of Midtown: bar patios, summer crowds and a bridge that backs up. Dead in the off-season.' }
   ],
 
-  contacts: ['myrtle-beach-sc', 'fayetteville-nc', 'durham-nc'],
+  rooms: [
+    { id: 'southside-carport', kind: 'HOUSE', hood: 'southside', cap: 40, ages: ['ALL'], curfew: 1320,outdoor: true, ac: false, pressure: 55, start: true,  note: 'A carport and a sandy back yard on a slab ranch house, with an extension cord out the kitchen window. One call to the non-emergency line ends it.' },
+    { id: 'forest-porch', kind: 'HOUSE', hood: 'inner-ring', cap: 30, ages: ['ALL'], curfew: 1290,outdoor: true, ac: false,  note: 'A screened porch on a bungalow street. Short sets, early, and the neighbors are quick.' },
+    { id: 'north-field', kind: 'HOUSE', hood: 'castle-hayne', cap: 80, ages: ['ALL'], curfew: 1410,outdoor: true, ac: false,  note: 'A big yard and a generator out on the north county acreage. Nobody to complain, and a long way from anything.' },
+    { id: 'back-room', kind: 'DIY', hood: 'downtown', cap: 100, ages: ['A18'], curfew: 1380,ac: true, pressure: 55,  note: 'A back room behind a wine-and-beer shop on the core blocks. The hub for the local mixed bills, and it lives on a landlord and a permit.' },
+    { id: 'rec-bar', kind: 'BAR', hood: 'downtown', cap: 120, ages: ['A18'], curfew: 1500,ac: true,  note: 'A bar with a rec room, darts and pinball, that books late sets and touring bands. Eighteen and up, and the drinks are the money.' },
+    { id: 'main-road-tavern', kind: 'BAR', hood: 'midtown', cap: 150, ages: ['A21'], curfew: 1470,ac: true,  note: 'A tavern on the main road out to the beach that lists punk and hardcore bills. Treat it as twenty-one and up.' },
+    { id: 'church-hall', kind: 'HALL', hood: 'downtown', cap: 300, ages: ['ALL'], curfew: 1320,ac: true, rent: 400,  note: 'A converted old church used for the big release shows. Rare, costly, and the old building is what bites.' },
+    { id: 'old-club', kind: 'CLUB', hood: 'downtown', cap: 300, ages: ['A18'], curfew: 1440,ac: true, pressure: 60,  note: 'A mid-size room in an old downtown building. The last big one was shut on structural findings, so everyone checks the floor.' },
+    { id: 'patio', kind: 'OUTDOOR', hood: 'downtown', cap: 150, ages: ['ALL'], curfew: 1260,ac: false, outdoor: true, pressure: 60,  note: 'A taproom patio on the riverfront blocks. Zoning writes citations for amplified sound without a stage permit, and the police take the noise calls.' },
+    { id: 'beach-patio', kind: 'OUTDOOR', hood: 'wrightsville-beach', cap: 200, ages: ['A21'], curfew: 1380,ac: false, outdoor: true,  note: 'A beach bar patio that has hosted hardcore and straight-edge sets. Summer only.' },
+    { id: 'arts-shop', kind: 'SHOP', hood: 'brooklyn', cap: 60, ages: ['ALL'], curfew: 1200,ac: true,  note: 'A storefront in the arts district. Afternoon sets for the film and art crowd, over by eight.' },
+    { id: 'waterfront-pavilion', kind: 'BIG', hood: 'downtown', cap: 1200, ages: ['ALL'], curfew: 1380,ac: true,  note: 'The big waterfront pavilion. Touring packages only, almost never the scene.' },
+  ],
+
+  contacts: ['myrtle-beach-sc', 'fayetteville-nc', 'raleigh', 'charleston-sc', 'durham-nc'],
+
+  calendar: [
+    { id: 'spring-festival', label: 'the spring garden festival', tag: 'festival', month: 4, week: 2, dows: [2, 3, 4, 5, 6], can: [0.85, 0.88, 0.9], hoods: ['downtown'], elsewhere: [1, 0.97, 0.97] },
+    { id: 'move-in', label: 'move-in week', tag: 'graduation', month: 8, week: 2, dows: [2, 3, 4, 5, 6], can: [0.85, 0.9, 0.92], hoods: ['college-road'], elsewhere: [1, 1, 1] },
+    { id: 'river-festival', label: 'the river festival', tag: 'festival', month: 10, week: 1, dows: [4, 5, 6], can: [0.85, 0.88, 0.9], hoods: ['downtown'], elsewhere: [1, 0.97, 0.97] },
+    { id: 'beer-week', label: 'taproom beer week', tag: 'festival', month: 10, weeks: [2, 4], dows: [4, 5], can: [0.93, 0.95, 0.97], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'boat-parade', label: 'the holiday boat parade', tag: 'parade', month: 11, week: 4, dows: [5], can: [0.92, 0.9, 0.9], hoods: ['wrightsville-beach'], elsewhere: [1, 0.97, 0.97] },
+    { id: 'fourth', label: 'the Fourth of July on the river', tag: 'holiday', month: 7, week: 1, dows: [4, 5, 6], can: [0.9, 0.88, 0.88], hoods: ['downtown'], elsewhere: [1, 0.97, 0.97] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.10] }
+  ],
+
+  rules: { quiet: 1440 },
 
   points: [
     { name: 'Raleigh', state: 'NC', lat: 35.78, lon: -78.64, pop: 470000 },
@@ -67,5 +101,69 @@ SB.Cities.register('wilmington-nc', {
     hood: ['Brooklyn', 'Southside', 'Midtown', 'Castle Hayne', 'Forest Hills', 'Sunset Park', 'Monkey Junction', 'Wrightsville Beach', 'Carolina Beach'],
     thing: ['carport', 'live oak', 'shrimp boat', 'hush puppy', 'boiled peanuts', 'sweet tea', 'screened porch', 'extension cord', 'sandy yard', 'taproom', 'storage unit'],
     weather: ['tropical storm watch', 'pollen', 'humidity', 'afternoon thunderstorm']
-  }
+  },
+
+  events: [
+    { id: 'WILMINGTON_NC_FESTIVAL_BLOCK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'festival' },
+      telegraph: 'A festival is closing the downtown streets and the load-in block is on the list.',
+      title: 'The streets are closed and the tourists are wandering in',
+      body: 'Downtown is shut to cars for the festival. Your load-in is on a blocked street and half the room is tourists who thought it was a bar.',
+      options: [
+        { id: 'EARLY', label: 'Load in early, before the barricades', likely: 'A tight scramble. The room fills with strangers anyway.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
+          result: 'Gear in by four, doors early. The strangers stayed for two songs and clapped.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The locals avoid downtown on festival nights.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
+          result: 'The regulars fought the parking and made it. The rest of the street never found the door.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'WILMINGTON_NC_PATIO_CITATION', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
+      telegraph: 'A taproom down the block got a citation for amplified sound on its patio, and the word is out.',
+      title: 'The patio set draws a zoning ticket',
+      body: 'The patio has no stage permit for amplified sound, and zoning and the police both enforce it. The band can go inside or play without the amps.',
+      options: [
+        { id: 'INSIDE', label: 'Move the bill into a house', likely: 'Smaller and louder. Nobody can cite a carport.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'A carport took the bill with an hour to spare, and the extension cord held.' },
+        { id: 'UNPLUGGED', label: 'Play it unplugged on the patio', likely: 'Quiet and strange. Some people love it.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'Acoustic guitars and a cardboard kick drum. Quiet, odd and kind of great.' },
+        { id: 'RISK', label: 'Run it loud and pay if it comes', likely: 'A fine if someone calls.',
+          effects: [{ op: 'MONEY', amount: -40 }, { op: 'REGULARS', pct: .02 }],
+          result: 'The ticket came during the last song. The crowd thought it was worth it.' }
+      ] },
+
+    { id: 'WILMINGTON_NC_STORM_WEEK', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 4], months: [8, 9, 10] },
+      telegraph: 'The storm is out in the Atlantic and the whole coast is watching the forecast.',
+      title: 'The storm turns toward the coast',
+      body: 'An evacuation order is coming and the touring van has already turned around. The bill is down to the locals who are staying put.',
+      options: [
+        { id: 'SHORT', label: 'Run the short bill in a carport', likely: 'A thin, loud, close night.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'A few locals and a generator. The wind picked up and nobody wanted to leave.' },
+        { id: 'MOVE', label: 'Move it a week', likely: 'Breaks the date. Costs trust with everyone.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it. The ones who stayed in town came to the next one.' }
+      ] },
+
+    { id: 'WILMINGTON_NC_MOVE_IN', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'graduation' },
+      telegraph: 'Move-in week is here and the road to campus is a parking lot.',
+      title: 'Every student is stuck on College Road',
+      body: 'The back room is empty because every student is in move-in traffic. The new freshmen will come next Friday, and they will not know the rules.',
+      options: [
+        { id: 'LATE', label: 'Hold doors until the traffic clears', likely: 'A late start. The ones who made it are glad.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
+          result: 'Doors an hour late. The freshmen drifted in sunburned and asked who was playing.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A thin night, and a few new faces.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
+          result: 'Half the room, and three freshmen who asked how to get on the list.' }
+      ] }
+  ]
 });

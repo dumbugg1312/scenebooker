@@ -2,43 +2,50 @@
  * The boxes are sized in em, so the clock is as big as the type around it: on the desk, the calendar and the card.
  * Only the stay-up hour and a crunch warning wear the city's hot ink (--ck-hot, set by SB.Clock). */
 
-.ck-boxes { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .14em .3em; line-height: 0; vertical-align: middle; }
-.ck-hr { display: inline-block; line-height: 0; }
-.ck-hr svg { height: 1.25em; display: block; overflow: visible; }
-.ck-hr--stay { margin-left: .25em; }
-.ck-hr--tired { opacity: .75; }
+/* the ruler (SB.Clock.ruler): the evening in clock time; its words are typed */
+.ck-ruler { display: block; width: 100%; line-height: 0; }
+.ck-ruler svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ck-ruler text { font-family: var(--f-mono); letter-spacing: .02em; }
+.ck-ruler--mini svg { height: calc(var(--p) * 9); }
 
-.ck-slip { --ck-hot: var(--hot, #d8392b); position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 5);
+.ck-slip { --ck-hot: var(--hot, #d8392b); position: relative; display: flex; flex-direction: column; align-items: stretch; gap: calc(var(--p) * 5);
   padding: calc(var(--p) * 8) calc(var(--p) * 10) calc(var(--p) * 9); background: var(--pp-white); color: var(--toner);
   font: 400 calc(var(--fs) * 13)/1.2 var(--f-type); box-shadow: var(--sh-s) 0 rgba(0, 0, 0, .55); transform: rotate(-.8deg); }
-.ck-line { display: inline-block; padding: calc(var(--p) * 3) calc(var(--p) * 7) calc(var(--p) * 2); background: var(--toner); color: var(--pp-bond);
-  font: 400 calc(var(--fs) * 13)/1.1 var(--f-mono); letter-spacing: .06em; white-space: normal; }
-.ck-slip .ck-boxes { font-size: calc(var(--fs) * 15); }
-.ck-crunch { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: calc(var(--p) * 3); max-width: calc(var(--p) * 330);
-  font: 400 calc(var(--fs) * 12)/1.25 var(--f-type); text-transform: uppercase; }
+.ck-top { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 calc(var(--p) * 8); }
+.ck-line { display: inline-block; align-self: center; padding: calc(var(--p) * 3) calc(var(--p) * 7) calc(var(--p) * 2); background: var(--toner); color: var(--pp-bond);
+  font: 400 calc(var(--fs) * 12)/1.1 var(--f-mono); letter-spacing: .06em; }
+.ck-now { font: 400 calc(var(--fs) * 26)/.95 var(--f-gothic); letter-spacing: .01em; }
+.ck-rest { font: 400 calc(var(--fs) * 11)/1.15 var(--f-mono); letter-spacing: .04em; }
+.ck-foot { display: flex; align-items: center; gap: calc(var(--p) * 10); }
+.ck-crunch { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: calc(var(--p) * 3); min-width: 0;
+  font: 400 calc(var(--fs) * 11)/1.2 var(--f-type); text-transform: uppercase; }
 .ck-crunch li { display: flex; gap: calc(var(--p) * 5); align-items: baseline; }
 .ck-bang { font: 400 calc(var(--fs) * 16)/1 var(--f-gothic); color: var(--ck-hot); transform: rotate(8deg); flex: 0 0 auto; }
 
-/* on the desk: a slip of paper taped under the tape deck (js/desk/scene.js puts it in the deck's button). Big (user,
-   2026-11-21: "make the desk clock bigger"): the night's hours are the game, so the slip reads across the table. */
-.dk-clock { position: absolute; z-index: 3; pointer-events: none; display: flex; justify-content: center; }
-.dk-clock .ck-slip { padding: calc(var(--u) * 12) calc(var(--u) * 16) calc(var(--u) * 14); gap: calc(var(--u) * 9); font-size: calc(var(--u) * 22 * var(--scale, 1));
-  box-shadow: calc(var(--u) * 5) calc(var(--u) * 6) 0 var(--pitch); transform: rotate(-1.6deg); }
-.dk-clock .ck-line { font-size: calc(var(--u) * 22 * var(--scale, 1)); padding: calc(var(--u) * 5) calc(var(--u) * 10) calc(var(--u) * 4); }
-.dk-clock .ck-line--split { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 calc(var(--u) * 12); padding: calc(var(--u) * 7) calc(var(--u) * 12) calc(var(--u) * 5); }
-.dk-clock .ck-head { font: 400 calc(var(--u) * 46)/.95 var(--f-gothic); letter-spacing: .01em; }
-.dk-clock .ck-rest { font: 400 calc(var(--u) * 21)/1.1 var(--f-mono); letter-spacing: .06em; }
-.dk-clock .ck-boxes { font-size: calc(var(--u) * 34); gap: calc(var(--u) * 6) calc(var(--u) * 9); }
-.dk-clock .ck-slip.is-long .ck-boxes { font-size: calc(var(--u) * 24); gap: calc(var(--u) * 5) calc(var(--u) * 7); }   /* a day off: two rows, not three */
-.dk-clock .ck-crunch { font-size: calc(var(--u) * 18 * var(--scale, 1)); max-width: none; }
-.dk-clock .ck-bang { font-size: calc(var(--u) * 26); }
-.dk-clock .ck-slip::before { content: ""; position: absolute; left: 40%; top: calc(var(--u) * -12); width: calc(var(--u) * 96); height: calc(var(--u) * 24);
+/* the pinned clock (js/ui/nightclock.js): one place on every screen, at the stage's foot left of the pocket player,
+   with the one CALL IT A NIGHT. Close-ups shrink to leave it the foot of the stage (as they do for the guide's strip). */
+.nc { position: fixed; z-index: 35; width: calc(var(--u) * 420);
+  right: calc((100vw - var(--u) * 1600) / 2 + var(--u) * 182); bottom: calc((100vh - var(--u) * 1000) / 2 + var(--u) * 14); }
+.nc[hidden] { display: none; }
+.nc .ck-slip { transform: rotate(-1deg); box-shadow: calc(var(--u) * 5) calc(var(--u) * 6) 0 var(--pitch); }
+.nc .ck-slip::before { content: ""; position: absolute; left: 38%; top: calc(var(--u) * -10); width: calc(var(--u) * 80); height: calc(var(--u) * 20);
   background: var(--tape, rgba(236, 228, 200, .78)); transform: rotate(-3deg); }
+.ck-call { all: unset; box-sizing: border-box; position: relative; flex: none; cursor: pointer; padding: calc(var(--p) * 6) calc(var(--p) * 12) calc(var(--p) * 5);
+  background: var(--toner); color: var(--pp-bond); font: 400 calc(var(--fs) * 17)/1 var(--f-gothic); letter-spacing: .04em;
+  clip-path: var(--edge-cut-3); transform: rotate(-1.2deg); }
+.ck-call:hover, .ck-call:focus-visible { background: var(--hl-solid); color: var(--toner); }
+.ck-call.is-hot { background: var(--ck-hot); color: var(--pp-white); }
+.nc.is-nudged .ck-slip { animation: nc-jump 600ms steps(6, end); }
+@keyframes nc-jump { 0%, 100% { transform: rotate(-1deg); } 20% { transform: translateY(-8%) rotate(-3deg); } 50% { transform: translateY(-3%) rotate(1.5deg); } 75% { transform: rotate(-2deg); } }
+body.nc-on .cu-back--staged:not(.cu-back--column) .cu-stage { align-items: flex-start; padding-top: calc(var(--u) * 22); }
+body.nc-on .cu-back--staged:not(.cu-back--column) .cu-stage > .cu-obj { zoom: .84; }
+body.nc-on .cu-back--staged .cu-stage > .cu--mat, body.nc-on .cu-back--staged .cu-stage > .cu--wall { zoom: .82; }
+body.nc-on .sy-strip { max-width: calc(var(--u) * 930); }
 
-/* on the calendar: tonight's slip beside the week's title, and the CALL IT A NIGHT tab under it */
+/* on the calendar: the week's close tab in the head; each day's evening as a small ruler under its words */
 .cc-tonight { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 8); margin-left: auto; }
 .cc-dayhrs { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 3); padding: calc(var(--p) * 5) calc(var(--p) * 5) calc(var(--p) * 4); border-top: calc(var(--p) * 2) solid var(--toner); }
-.cc-dayhrs .ck-boxes { font-size: calc(var(--fs) * 10); }
+.cc-dayhrs .ck-ruler { align-self: stretch; }
 .cc-dayword { font: 400 calc(var(--fs) * 12)/1 var(--f-mono); text-transform: uppercase; letter-spacing: .04em; }
 .cc-dayword.is-show { padding: calc(var(--p) * 1) calc(var(--p) * 4); background: var(--toner); color: var(--paper, #f4f2ea); }
 .cc-day.is-today { box-shadow: inset 0 0 0 calc(var(--p) * 4) var(--toner); }
@@ -62,5 +69,49 @@
 .cc-tab--now:disabled { text-decoration: none; }
 .cc-tab--now:disabled .cc-tab-l { text-decoration: line-through; }
 .cc-has { font: 400 calc(var(--fs) * 12)/1.2 var(--f-type); text-transform: uppercase; color: var(--pp-gray); margin: calc(var(--p) * 2) 0 0 calc(var(--p) * 12); }
-.cc-slap .ck-slip { align-self: stretch; transform: none; box-shadow: none; padding-left: 0; background: transparent; }
+.cc-held-ruler { align-self: stretch; margin: calc(var(--p) * 2) 0; }
+.cb-nexthint { font-family: var(--f-mono); text-transform: uppercase; white-space: nowrap; }
 .cc-outbox li { display: flex; align-items: center; gap: calc(var(--p) * 8); flex-wrap: wrap; }
+
+/* the overnight slip (js/ui/nightclock.js): what came back while you slept, stuck above tonight's clock */
+.on-slip { --paper: var(--pp-white); position: fixed; z-index: 36; width: calc(var(--u) * 420); padding: calc(var(--u) * 14) calc(var(--u) * 18) calc(var(--u) * 12);
+  right: calc((100vw - var(--u) * 1600) / 2 + var(--u) * 182); bottom: calc((100vh - var(--u) * 1000) / 2 + var(--u) * 190);
+  color: var(--toner); transform: rotate(.8deg); box-shadow: calc(var(--u) * 5) calc(var(--u) * 6) 0 var(--pitch); }
+.on-head { margin: 0 0 calc(var(--u) * 6); font: 400 calc(var(--u) * 22)/1 var(--f-gothic); text-transform: uppercase; letter-spacing: .04em; }
+.on-list { margin: 0 0 calc(var(--u) * 8); padding: 0 0 0 calc(var(--u) * 18); font: 400 calc(var(--u) * 15)/1.3 var(--f-type); }
+.on-list li { margin-bottom: calc(var(--u) * 4); }
+.on-list li.is-hot { color: var(--late); }
+.on-list li.is-more { list-style: none; margin-left: calc(var(--u) * -18); opacity: .75; }
+.on-ok { all: unset; cursor: pointer; float: right; padding: calc(var(--u) * 4) calc(var(--u) * 10); background: var(--toner); color: var(--pp-bond);
+  font: 400 calc(var(--u) * 14)/1 var(--f-type); letter-spacing: .06em; }
+.on-ok:hover, .on-ok:focus-visible { background: var(--hl-solid); color: var(--toner); }
+
+/* the deck pressed at an evening: one line over the clock for a few seconds (SB.NightClock.nudge) */
+.nc-say { position: absolute; left: calc(var(--u) * 8); bottom: 100%; margin: 0 0 calc(var(--u) * 12); padding: calc(var(--u) * 5) calc(var(--u) * 10) calc(var(--u) * 4);
+  background: var(--toner); color: var(--pp-bond); font: 400 calc(var(--u) * 16 * var(--scale, 1))/1.2 var(--f-type); white-space: nowrap;
+  transform: rotate(-1.5deg); box-shadow: var(--sh-s) 0 var(--pitch); animation: mv-slap 250ms steps(1, end) backwards; }
+
+/* ---------- small windows: the floating cards keep off the phone ----------
+   The 1280 x 800 desk is untouched. In any landscape window smaller than 1280 x 800 the phone close-up fills the stage's
+   middle, so while it is open the clock moves up into the free column right of the phone, the overnight slip under it,
+   the new-patch card into the free column on the left, and the need-you card clear of the phone's edge.
+   In a tall narrow window (a phone, about 390 wide) the stage is a band across the middle with empty paper above and
+   below: the clock goes below it and the slip and the patch card above, each at a size you can read. */
+@media (max-width: 1279px) and (min-aspect-ratio: 3/4), (max-height: 799px) and (min-aspect-ratio: 3/4) {
+  body:has(.cu--phone) .nc { width: calc(var(--u) * 390); bottom: auto;
+    right: calc((100vw - var(--u) * 1600) / 2 + var(--u) * 28); top: calc((100vh - var(--u) * 1000) / 2 + var(--u) * 46); }
+  body:has(.cu--phone) .nc-say { bottom: auto; top: 100%; margin: calc(var(--u) * 14) 0 0; white-space: normal; }
+  body:has(.cu--phone) .on-slip { width: calc(var(--u) * 390); bottom: auto;
+    right: calc((100vw - var(--u) * 1600) / 2 + var(--u) * 28); top: calc((100vh - var(--u) * 1000) / 2 + var(--u) * 330); }
+  body:has(.cu--phone) .sy-card.pz-paper, body:has(.cu--phone) .sy-card-leaving.pz-paper { width: calc(var(--u) * 500); transform: rotate(var(--tilt, 0deg));
+    left: calc((100vw - var(--u) * 1600) / 2 + var(--u) * 24); top: calc((100vh - var(--u) * 1000) / 2 + var(--u) * 530); }
+  .ph-hero-need { left: calc(var(--p) * -236); }
+}
+@media (max-aspect-ratio: 3/4) {
+  body .nc { --u: min(calc((100vw - 32px) / 420), 1px); --p: calc(var(--u) * 1.25); --fs: calc(var(--p) * var(--scale, 1));
+    width: calc(var(--u) * 420); left: calc((100vw - var(--u) * 420) / 2); right: auto; bottom: 16px; }
+  body .on-slip { --u: min(calc((100vw - 32px) / 420), 1px); --p: calc(var(--u) * 1.25); --fs: calc(var(--p) * var(--scale, 1));
+    width: calc(var(--u) * 420); left: calc((100vw - var(--u) * 420) / 2); right: auto; bottom: auto; top: 16px; }
+  body .sy-card.pz-paper, body .sy-card-leaving.pz-paper { transform: translate(-50%, 0) rotate(var(--tilt, 0deg)); --u: min(calc((100vw - 32px) / 550), 1px); --p: calc(var(--u) * 1.25); --fs: calc(var(--p) * var(--scale, 1));
+    top: calc((100vh - 100vw * .625) / 4); }
+}

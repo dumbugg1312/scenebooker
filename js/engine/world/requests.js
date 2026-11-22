@@ -214,6 +214,12 @@ SB.module('Requests', function (SB) {
     return keyPick(req.id + ':how', ['an old friend', 'we toured with them once', 'a friend from back home', 'we met on the road']);
   }
 
+  /* ' of February' when a named day is outside the current game month, else '' */
+  function ofMonth(day, t) {
+    var a = SB.time.date(day), b = SB.time.date(t);
+    return a.m === b.m && a.y === b.y ? '' : ' of ' + SB.time.fmt(day, 'month');
+  }
+
   function slotsFor(state, req) {
     var b = band(state, req.bandId), p = pack(state), here = cityPoint(state), d = req.dates || [], t = today(state);
     var peers = (p.zones || []).filter(function (z) { return z.kind === 'PEER'; });
@@ -237,7 +243,7 @@ SB.module('Requests', function (SB) {
       referrer: (req.referrerId ? personName(state, req.referrerId) : '') || 'a friend',
       referrerHow: referrerHowFor(state, req),
       you: '',
-      dateLong: SB.time.fmt(first, 'dow') + ' the ' + SB.text.ordinal(SB.time.date(first).d),
+      dateLong: SB.time.fmt(first, 'dow') + ' the ' + SB.text.ordinal(SB.time.date(first).d) + ofMonth(first, t),
       daysOut: first - t,
       /* who signs is who writes: a swap is written by the contact who books in the band's town (req.fromId), and the
        * message's sender is that same person; otherwise the band's own contact */
@@ -251,8 +257,8 @@ SB.module('Requests', function (SB) {
       newMember: '', era: eraFor(b ? b.id : req.id, t), host: '',
       amount: req.ask && req.ask.guarantee > 0 ? req.ask.guarantee : round10(200 + 10 * keyPick(req.id + ':amt', [0, 3, 5, 8, 11, 14, 17, 20, 25])), bookingName: state.player ? state.player.bookingName || '' : ''
     }, k;
-    if (d.length) { s.day1 = SB.time.fmt(d[0], 'dow'); s.date1 = SB.time.date(d[0]).d; s.date = s.date1; }
-    if (d.length > 1) { s.day2 = SB.time.fmt(d[1], 'dow'); s.date2 = SB.time.date(d[1]).d; }
+    if (d.length) { s.day1 = SB.time.fmt(d[0], 'dow'); s.date1 = SB.time.date(d[0]).d; s.date = s.date1; s.of1 = ofMonth(d[0], t); }
+    if (d.length > 1) { s.day2 = SB.time.fmt(d[1], 'dow'); s.date2 = SB.time.date(d[1]).d; s.of2 = ofMonth(d[1], t); }
     if (req.route && req.route.prev && typeof req.route.prev.day === 'number') s.date0 = SB.time.date(req.route.prev.day).d;
     /* a flag never overwrites a slot that holds a value: date2 and guarantee are both a flag and a number */
     for (k in flags) if (s[k] === undefined || s[k] === null || s[k] === '') s[k] = flags[k];

@@ -1,16 +1,17 @@
 SB.Cities.register('durham-nc', {
   v: 1,
   slug: 'durham-nc',
-  confidence: { geography: 'PARTLY', scene: 'UNVERIFIED', names: 'UNCHECKED' },
+  confidence: { geography: 'PARTLY', scene: 'PARTLY', names: 'UNCHECKED' },
   banned: ['duke', 'duke university', 'duke health', 'duke basketball', 'unc', 'unc chapel hill', 'university of north carolina', 'nc state', 'nccu',
            'north carolina central university', 'research triangle park', 'rtp', 'american tobacco', 'brightleaf', 'streets at southpoint', 'southpoint',
            'durham bulls', 'herald-sun', 'news & observer', 'news and observer', 'indy week', 'moogfest', 'full frame', 'godurham', 'cheerwine', 'sun drop',
            'cook out', 'bojangles', 'biscuitville', 'waffle house', 'fort bragg', 'fort liberty', 'acc tournament', 'dukies', 'tar heels', 'bull city',
            'bull durham', 'american legion', 'vfw',
            'the pollen room', 'carport nineteen', 'orchard street annex', 'st. delphine\'s fellowship hall', 'the slaw cellar', 'mill house number six',
-           'bright leaf back lot', 'the yellow dust', 'cold biscuit hall', 'post 4410 hall', 'the spare warehouse', 'holloway street garage'],
+           'bright leaf back lot', 'the yellow dust', 'cold biscuit hall', 'post 4410 hall', 'the spare warehouse', 'holloway street garage',
+           'discover durham', 'abc11', 'wral', 'durham performing arts center', 'dpac', 'centerfest', 'bull city boom and bash', 'bull city boom & bash', 'durham central park', 'durham pride', 'pride durham', 'lgbtq center of durham', 'black august', 'phoenix fest', 'durham book festival', 'good moon festival', 'nccu homecoming', 'nc a&t', 'durham holiday parade', 'durham parks and recreation'],
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Real institutions are written only in generic form. */
-  blocklist: ['unc*', 'nccu*', 'cook out*', 'waffle house*', 'bull city*', 'indy week*', 'the pollen room*'],
+  blocklist: ['unc*', 'nccu*', 'cook out*', 'waffle house*', 'bull city*', 'indy week*', 'the pollen room*', 'wral*', 'dpac*', 'centerfest*'],
 
   blurb: ['Small, political and queer-friendly. Screamo, grind and hardcore share bills, and a benefit night is the normal kind of show.',
           'Old-timers tell squat stories. The kids fill the downtown club, and a promoter, a band member and the door person are the same three people.'],
@@ -56,7 +57,49 @@ SB.Cities.register('durham-nc', {
     { id: 'north-durham', name: 'North Durham and Bragtown', route: 'campus', note: 'Older suburban strips and cheap apartments along Roxboro Road; ignored.' }
   ],
 
-  contacts: ['greensboro-nc', 'richmond', 'fayetteville-nc', 'wilmington-nc'],
+  rooms: [
+    { id: 'mill-porch', kind: 'HOUSE', hood: 'west-durham', cap: 50, pa: .4, curfew: 1350, ac: false, outdoor: false, sketch: 25, standing: [65, 60, 45],
+      pressure: 55, start: true, note: 'A rowhouse in an old mill village, with a porch and a cellar. Houses were cheap here once, and the neighbors have started to call.' },
+    { id: 'walltown-yard', kind: 'HOUSE', hood: 'walltown', cap: 60, pa: .4, curfew: 1320, ac: false, outdoor: true, sketch: 20, standing: [65, 60, 45],
+      pressure: 50, note: 'A yard and a front room beside a street that is changing fast. Rent is the pressure, not the neighbors.' },
+    { id: 'east-garage', kind: 'HOUSE', hood: 'east-durham', cap: 80, pa: .5, curfew: 1380, ac: false, outdoor: false, sketch: 30, standing: [65, 60, 45],
+      pressure: 50, note: 'A big garage with no basement, in a neighborhood that gets pricier every month. Loud, and the one place it might survive.' },
+    { id: 'lot-room', kind: 'DIY', hood: 'lakewood', cap: 100, rent: 60, pa: .5, curfew: 1380, ac: false, sketch: 40, standing: [60, 60, 45],
+      pressure: 55, note: 'A rehearsal room off the Hillsborough Road lots. Run by volunteers, short on years, and one sale away from the end.' },
+    { id: 'hosiery-floor', kind: 'DIY', hood: 'east-durham', cap: 120, rent: 80, pa: .6, curfew: 1410, ac: false, sketch: 50, standing: [55, 60, 45],
+      pressure: 60, needs: ['VOUCH'], note: 'A floor in a converted hosiery building, in the old squat and warehouse tradition. Eviction letters and inspectors are the weather.' },
+    { id: 'south-hall', kind: 'HALL', hood: 'hayti', cap: 150, rent: 120, deposit: 50, pa: .5, curfew: 1320, ac: true, sketch: 10, standing: [60, 60, 65],
+      owner: 'HALL_MANAGER', note: 'A rented community hall for benefit nights. Mutual aid and queer youth shows are routine here, and it is out by ten.' },
+    { id: 'zine-shop', kind: 'SHOP', hood: 'downtown', cap: 60, pa: .4, curfew: 1290, ac: true, sketch: 5, standing: [70, 70, 75], following: .2,
+      note: 'A record and zine shop downtown. An afternoon in-store set, and a table of fliers by the door.' },
+    { id: 'stage-bar', kind: 'BAR', hood: 'downtown', cap: 250, soundFee: 70, pa: .8, ages: ['A21', 'ALL'], curfew: 1440, ac: true, following: .5, sketch: 15, standing: [50, 65, 70],
+      note: 'A queer-founded bar with a stage that anchors punk and hardcore bills. Most nights are 21 and over, and the age is decided show by show.' },
+    { id: 'main-street-club', kind: 'CLUB', hood: 'downtown', cap: 300, houseCosts: 150, split: .8, pa: .8, ages: ['A18'], curfew: 1440, ac: true, following: .5, sketch: 15, standing: [45, 70, 70],
+      note: 'A music bar on the main street with hardcore, screamo and metal on the calendar. Eighteen and over, and it fills.' },
+    { id: 'garage-club', kind: 'CLUB', hood: 'east-durham', cap: 450, houseCosts: 200, split: .8, pa: .9, ages: ['ALL'], curfew: 1410, ac: true, following: .6, sketch: 15, standing: [45, 70, 65],
+      owner: 'TALENT_BUYER', notice: 56, needs: ['FULL_BILL'], note: 'A big club in an old garage-and-bar complex on the east side. All ages unless the show says otherwise, and it wants a bill that sells.' },
+    { id: 'park-pavilion', kind: 'OUTDOOR', hood: 'downtown', cap: 200, rent: 20, pa: .4, curfew: 1260, ac: false, outdoor: true, sketch: 30, standing: [60, 55, 50],
+      note: 'The pavilion in the park downtown. A daytime benefit fest, and over by nine.' },
+    { id: 'arts-hall', kind: 'BIG', hood: 'downtown', cap: 2000, pa: 1, ages: ['ALL'], curfew: 1380, ac: true, following: .8, sketch: 5, standing: [40, 70, 60],
+      note: 'The performing arts center, a long way from the scene. Touring acts only, and the place a local band is never asked.' }
+  ],
+
+  contacts: ['raleigh', 'greensboro-nc', 'fayetteville-nc', 'winston-salem-nc', 'richmond'],
+
+  calendar: [
+    { id: 'homecoming', label: 'the homecoming parade weekend', tag: 'parade', month: 10, week: 2, dows: [5], can: [0.85, 0.85, 0.85], hoods: ['east-durham', 'hayti'], elsewhere: [0.97, 0.97, 0.97] },
+    { id: 'pride-weekend', label: 'the Pride weekend', tag: 'festival', month: 9, week: 4, dows: [4, 5], can: [0.9, 0.88, 0.88], hoods: ['downtown', 'old-north'], elsewhere: [0.97, 0.95, 0.95] },
+    { id: 'arts-festival', label: 'the downtown arts festival', tag: 'festival', month: 9, week: 3, dows: [5, 6], can: [0.9, 0.88, 0.88], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'fourth', label: 'the Fourth of July fireworks', tag: 'holiday', month: 7, week: 1, dows: [0, 1, 5, 6], can: [0.88, 0.85, 0.85], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'community-weekend', label: 'the August community weekend', tag: 'festival', month: 8, week: 4, dows: [4, 5, 6], can: [0.92, 0.9, 0.9], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'doc-festival', label: 'the spring documentary festival', tag: 'festival', month: 4, weeks: [1, 2], dows: [3, 4, 5, 6], can: [0.92, 0.9, 0.9], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'football-sep', label: 'home football', tag: 'game', month: 9, weeks: [1, 2], dows: [5], can: [0.88, 0.95, 0.95] },
+    { id: 'holiday-parade', label: 'the holiday parade', tag: 'parade', month: 12, week: 1, dows: [5], can: [0.92, 0.9, 0.9], hoods: ['downtown'], elsewhere: [1, 1, 1] },
+    { id: 'halloween', label: 'Halloween weekend', tag: 'holiday', month: 10, weeks: [4, 5], dows: [4, 5], can: [1.08, 1.05, 1] },
+    { id: 'thanksgiving-eve', label: 'the night before Thanksgiving', tag: 'holiday', month: 11, week: 4, dows: [2], can: [1.05, 1.15, 1.1] }
+  ],
+
+  rules: { curfewMinors: { weeknight: 1380, weekend: 1440, inForce: false }, quiet: 1380 },
 
   points: [
     { name: 'Raleigh', state: 'NC', lat: 35.78, lon: -78.64, pop: 470000 },
@@ -72,5 +115,58 @@ SB.Cities.register('durham-nc', {
     hood: ['Old North Durham', 'Trinity Park', 'Walltown', 'Northgate Park', 'Watts-Hillandale', 'Old West Durham', 'East Durham', 'Hayti', 'Lakewood', 'Bragtown'],
     thing: ['mill house', 'tobacco barn', 'pimento cheese', 'biscuit', 'sweet tea', 'pollen', 'porch', 'benefit show', 'zine table', 'donation jar', 'group chat'],
     weather: ['pollen', 'humidity', 'ice storm']
-  }
+  },
+
+  events: [
+    { id: 'DURHAM_NC_HOMECOMING', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
+      if: { daysOut: [0, 4], calendar: 'parade' },
+      telegraph: 'The homecoming parade closes the east-side streets at six in the morning.',
+      title: 'The parade has the east side',
+      body: 'The streets near the show are closed from dawn and the crowd is alumni and kids with nowhere to park. The all-ages bill is still on.',
+      options: [
+        { id: 'EARLY', label: 'Open early and tell them where to park', likely: 'Most get in. A tired, loud night.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
+          result: 'Doors an hour early. The ones who came parked a mile away.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up on the closures.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
+          result: 'The streets stayed shut. Half the list never found a place to park.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
+          result: 'You moved it a day. Not everyone could make the new one.' }
+      ] },
+
+    { id: 'DURHAM_NC_PRIDE_DOOR', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
+      if: { daysOut: [0, 5], calendar: 'festival' },
+      telegraph: 'The pride week benefit is booked for the same weekend as the arts festival.',
+      title: 'The door fight',
+      body: 'The bar with the stage wants a 21-and-over door, and the kids want all ages. Pride week and the downtown arts festival have the same stage booked.',
+      options: [
+        { id: 'ALL', label: 'Make it all ages and move it to the hall', likely: 'Smaller, and the kids can come.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
+          result: 'The hall took the bill and the kids filled the floor.' },
+        { id: 'BAR', label: 'Keep it at the bar, 21 and over', likely: 'The kids are shut out.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
+          result: 'The bar was packed, and the kids stood on the sidewalk.' },
+        { id: 'SPLIT', label: 'Run an early all-ages set and a late bar set', likely: 'Two nights in one.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }, { op: 'SHOW_MOD', key: 'lateMin', v: 30 }],
+          result: 'Early set for the kids, a late one for the bar. Everyone got a night.' }
+      ] },
+
+    { id: 'DURHAM_NC_NOISE_CALL', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
+      if: { daysOut: [0, 3], months: [3, 4, 5, 6, 7, 8, 9, 10] },
+      telegraph: 'A neighbor on the porch street has called in the last two shows.',
+      title: 'The third noise call',
+      body: 'The house has had two noise calls and the sound ordinance bars amplified music after eleven. Tonight the set must stop mid-song or move to a cellar.',
+      options: [
+        { id: 'CELLAR', label: 'Move the bill to a cellar in the mill', likely: 'Smaller and sweatier. Nobody can hear it.',
+          effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
+          result: 'A cellar took the whole bill, and the floor was packed.' },
+        { id: 'EARLY', label: 'Start at six and end by ten', likely: 'Most of them get there. A short night.',
+          effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
+          result: 'Done by ten-thirty, and the street stayed quiet.' },
+        { id: 'ACCEPT', label: 'Run it and take the knock', likely: 'A visit from the officers.',
+          effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
+          result: 'The knock came at eleven. The last band played one song unplugged.' }
+      ] }
+  ]
 });
