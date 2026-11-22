@@ -46,6 +46,108 @@ SB.module('Requests', function (SB) {
 
   function refuse(state, code) { return U.no(code, line(state, 'strings.refuse.' + code)); }
 
+  /* ------------------------------------------------------------------ */
+  /* where the tells sit in a written request (13-real-booking, part 1)  */
+  /* ------------------------------------------------------------------ */
+
+  /* A template with the text of every tell guard, (?TELL: ...) and [?TELL: ... | ...], wrapped in marks. The marks are
+   * control characters no template holds; the copy walks the template the way SB.text's parser does, so the marked
+   * template has the same shape and draws the same numbers as the plain one. */
+  var MARK_OPEN = '\u0001', MARK_NAME = '\u0002', MARK_CLOSE = '\u0003', markCache = {};
+  function markTells(src) {
+    var pos = 0, out = '', T = E.TELL || {};
+    function seq(stops) {
+      var c, depth = 0, inCond = stops.indexOf(')') >= 0, m, end;
+      while (pos < src.length) {
+        c = src.charAt(pos);
+        if (c === '\\' && pos + 1 < src.length) { out += src.substr(pos, 2); pos += 2; continue; }
+        if (c === ')' && inCond && depth > 0) { depth--; out += c; pos++; continue; }
+        if (stops.indexOf(c) >= 0) break;
+        if (c === '{') { end = src.indexOf('}', pos); if (end < 0) end = src.length - 1; out += src.slice(pos, end + 1); pos = end + 1; continue; }
+        if (c === '[') { pick(); continue; }
+        if (c === '(' && (src.charAt(pos + 1) === '?' || src.charAt(pos + 1) === '%')) {
+          m = /^\((\?(!?)([A-Za-z0-9_.]+)|%(\d+(?:\.\d+)?)):/.exec(src.slice(pos));
+          if (m) { cond(m); continue; }
+        }
+        if (c === '(' && inCond) depth++;
+        out += c; pos++;
+      }
+    }
+    function open(name) { if (src.charAt(pos) === ' ') { out += ' '; pos++; } out += MARK_OPEN + name + MARK_NAME; }
+    function cond(m) {
+      var tell = m[3] && m[2] !== '!' && T[m[3]] ? m[3] : null;
+      out += m[0]; pos += m[0].length;
+      if (tell) open(tell);
+      seq(')');
+      if (tell) out += MARK_CLOSE;
+      if (src.charAt(pos) === ')') { out += ')'; pos++; }
+    }
+    function pick() {
+      var m, tell, start, w;
+      out += '['; pos++;
+      while (pos < src.length) {
+        m = /^\s*\?(!?)([A-Za-z0-9_.]+):/.exec(src.slice(pos));
+        tell = m && m[1] !== '!' && T[m[2]] ? m[2] : null;
+        if (m) { out += m[0]; pos += m[0].length; }
+        if (tell) open(tell);
+        start = out.length;
+        seq('|]');
+        if (tell) {                                                    // the close mark goes before an option's ^weight
+          w = /\^\d+(?:\.\d+)?\s*$/.exec(out.slice(start));
+          out = w ? out.slice(0, start + w.index) + MARK_CLOSE + out.slice(start + w.index) : out + MARK_CLOSE;
+        }
+        if (pos >= src.length) break;
+        out += src.charAt(pos); pos++;
+        if (src.charAt(pos - 1) === ']') break;
+      }
+    }
+    seq('');
+    return out + src.slice(pos);
+  }
+  function markNode(node) {
+    if (typeof node === 'string') return markCache[node] || (markCache[node] = markTells(node));
+    if (Array.isArray(node)) return node.map(markNode);
+    if (node && typeof node === 'object' && typeof node.t === 'string') { var c = {}, k; for (k in node) c[k] = node[k]; c.t = markNode(node.t); return c; }
+    return node;
+  }
+  /* The spans of the marks in `marked`, as offsets in `body`: the two differ only by the marks and by white space the
+   * renderer's tidy dropped. Null when they cannot be lined up. */
+  function spansOf(marked, body) {
+    var i = 0, j = 0, c, end, stack = [], out = [], s;
+    while (i < marked.length) {
+      c = marked.charAt(i);
+      if (c === MARK_OPEN) { end = marked.indexOf(MARK_NAME, i); if (end < 0) return null; stack.push({ tell: marked.slice(i + 1, end), from: j }); i = end + 1; continue; }
+      if (c === MARK_CLOSE) { s = stack.pop(); if (!s) return null; s.to = j; out.push(s); i++; continue; }
+      if (j < body.length && c === body.charAt(j)) { i++; j++; continue; }
+      if (/\s/.test(c)) { i++; continue; }
+      return null;
+    }
+    if (j !== body.length || stack.length) return null;
+    out.forEach(function (x) {
+      while (x.from < x.to && /\s/.test(body.charAt(x.from))) x.from++;
+      while (x.to > x.from && /\s/.test(body.charAt(x.to - 1))) x.to--;
+    });
+    return out.filter(function (x) { return x.to > x.from; }).sort(function (a, b) { return (a.from - b.from) || (b.to - a.to); });
+  }
+  /* The request's body, and where the lines that carry one of the band's own tells sit in it:
+   * { body, spans: [{ tell, from, to }] }, offsets into body. The marked copy is rendered first and the TEXT stream is
+   * then put back where it was, so the body is drawn exactly as it always was and the stream ends where it always did. */
+  function bodyWithTells(state, template, slots, b) {
+    var path = 'requests.templates.' + template + '.body', own = (b && hidOf(b).tells) || [], node, streams, saved, had, marked = null, body, spans;
+    if (SB.text.off || !SB.text.has(path)) return { body: '', spans: [] };
+    node = SB.Content.requests.templates[template].body;
+    streams = state.rng.streams; had = !!streams[E.STREAM.TEXT]; saved = had ? streams[E.STREAM.TEXT].slice() : null;
+    if (own.length) {
+      SB.Content.__tellMarks = markNode(node);
+      try { marked = SB.text.line('__tellMarks', slots || {}, rngT(state)); } catch (e) { marked = null; }
+      delete SB.Content.__tellMarks;
+      if (had) streams[E.STREAM.TEXT] = saved; else delete streams[E.STREAM.TEXT];
+    }
+    body = line(state, path, slots);
+    spans = marked === null ? null : spansOf(marked, body);
+    return { body: body, spans: (spans || []).filter(function (x) { return own.indexOf(x.tell) >= 0; }) };
+  }
+
   function getReq(state, id, where) {
     var q = state.requests && state.requests[id];
     if (!q) SB.fail(where || 'Requests', 'unknown request "' + id + '"');
@@ -91,6 +193,7 @@ SB.module('Requests', function (SB) {
   }
 
   function drive(a, b) { return SB.geo.drive(a, b); }
+  var NEARBY_MINUTES = 120;                                          // within two hours: they've played here
 
   function placeOnly(p) { return { slug: p.slug || null, name: p.name, state: p.state, lat: p.lat, lon: p.lon }; }
 
@@ -534,7 +637,10 @@ SB.module('Requests', function (SB) {
     flags.guarantee = shape !== 'DOOR' && shape !== 'HAT';
     flags.lodging = ask.lodging;
     flags.meal = ask.meal;
-    flags.firstVisit = !(b && b.visits && b.visits.length);
+    /* a band from up the road has played here before, whatever the save says: their friends drive over */
+    flags.nearby = kind !== 'LOCAL_ASK' && !!(b && b.place && typeof b.place.lat === 'number' && typeof here.lat === 'number' &&
+                   drive(here, b.place) <= NEARBY_MINUTES);
+    flags.firstVisit = !(b && b.visits && b.visits.length) && !flags.nearby;
     if (b && b.visits && b.visits.length) {
       var lv = b.visits[b.visits.length - 1];
       flags.lastGood = typeof lv.q === 'number' && lv.q >= C.RETURN_Q;
@@ -566,7 +672,8 @@ SB.module('Requests', function (SB) {
     /* the message, written once */
     var slots = slotsFor(state, req), base = 'requests.templates.' + template;
     if (owner) slots.room = owner.name;
-    var subject = line(state, base + '.subject', slots), body = line(state, base + '.body', slots);
+    var subject = line(state, base + '.subject', slots), written = bodyWithTells(state, template, slots, b), body = written.body;
+    req.tellSpans = written.spans;
     var fromName = b && kind !== 'LOCAL_ASK' ? b.name : (owner ? personName(state, owner.ownerId) : (b ? b.name : personName(state, fromId)));
     if (kind === 'SWAP' && spec.fromId) fromName = personName(state, spec.fromId) || fromName;
     var mid = SB.Mail.post(state, { kind: 'REQUEST', fromId: req.fromId, fromName: fromName, subject: subject, body: body, needs: true,
@@ -694,8 +801,18 @@ SB.module('Requests', function (SB) {
       flags: flags,
       says: typeof q.statedDraw === 'number' ? q.statedDraw : null,
       here: b ? (SB.Notebook.range(state, 'draw:' + q.bandId + ':city') || null) : null,
-      shortNotice: q.shortNotice ? line(state, 'requests.shortNotice', { daysOut: (q.dates[0] || today(state)) - today(state) }) : ''
+      shortNotice: q.shortNotice ? line(state, 'requests.shortNotice', { daysOut: (q.dates[0] || today(state)) - today(state) }) : '',
+      guessWhy: guessWhy(state, q, b)
     };
+  }
+
+  /* why your guess sits so far under what they say: one plain line, only when it does */
+  function guessWhy(state, q, b) {
+    var r = b ? SB.Notebook.range(state, 'draw:' + q.bandId + ':city') : null, says = q.statedDraw;
+    if (!r || typeof says !== 'number' || typeof r.hi90 !== 'number' || r.hi90 >= says * 0.6) return '';
+    var fl = (q.hid && q.hid.flags) || {}, slots = { says: says, daysOut: (q.dates[0] || today(state)) - today(state) };
+    var key = fl.nearby ? 'NEARBY' : (fl.firstVisit ? 'FIRST' : 'RETURN');
+    return line(state, 'requests.guessWhy.' + key, slots) + (q.shortNotice ? line(state, 'requests.guessWhy.SHORT', slots) : '') + '.';
   }
 
   /* ------------------------------------------------------------------ */

@@ -111,7 +111,7 @@ SB.Content.strings = {
   },
 
   room: {
-    HOUSE:   { name: 'a house', pays: 'no rent · hat to the host' },
+    HOUSE:   { name: 'a house', pays: 'no rent · donations for the host' },
     DIY:     { name: 'a DIY space', pays: 'a flat fee or a cut of the door' },
     HALL:    { name: 'a hall', pays: 'rent and a deposit' },
     BAR:     { name: 'a bar', pays: 'the bar keeps the drinks · sometimes a cut of the door' },
@@ -149,7 +149,7 @@ SB.Content.strings = {
     GUARANTEE:      { name: 'guarantee', words: '{amount:money} no matter what' },
     GUARANTEE_PLUS: { name: 'guarantee plus', words: '{amount:money}, plus half of what\'s left after costs' },
     VERSUS:         { name: 'versus', words: '{amount:money} or {pct}% of the door, whichever is more' },
-    HAT:            { name: 'the hat', words: 'whatever goes in the hat' }
+    HAT:            { name: 'donation door', words: 'whatever people give at the door' }
   },
   localPay: {
     FREE:  { name: 'for nothing', words: 'They play for free.' },
@@ -256,7 +256,7 @@ SB.Content.strings = {
                  NOT_DONE_SILENT: 'not done, and nobody said' },
 
   /* Money */
-  money: { DOOR: 'the door', HAT: 'the hat', ROOM: 'room rent', DEPOSIT: 'deposit', SOUND: 'sound', SECURITY: 'security',
+  money: { DOOR: 'the door', HAT: 'gas money', ROOM: 'room rent', DEPOSIT: 'deposit', SOUND: 'sound', SECURITY: 'security',
            INSURANCE: 'event insurance', DAMAGES: 'damages',
            HOST: 'the host', TOURING: 'touring band', LOCAL: 'local bands', PRINT: 'printing', PROMO: 'paid push and ads',
            FOOD: 'food', HELPER: 'helpers', FLYER: 'flyer art', MOTEL: 'motel', THEFT: 'stolen', WAGES: 'day job',
@@ -296,7 +296,7 @@ SB.Content.strings = {
     POCKET:       { name: 'pay it yourself', says: 'The band gets what you promised. You\'re out the difference.' },
     ASK_LESS:     { name: 'ask the band to take less', says: 'Some bands understand. All of them remember.' },
     LOCALS_GIVE:  { name: 'the locals give theirs up', says: 'The local bands put their cut toward the touring band.' },
-    HAT:          { name: 'pass the hat', says: 'Works when the room liked the band and there\'s still a room.' },
+    HAT:          { name: 'ask at the door for gas money', says: 'Whoever\'s on the door asks people for a few extra for the band from out of town. People give when they liked them.' },
     SHORT_SILENT: { name: 'pay them short and say nothing', says: 'They\'ll count it in the van. Then everybody will hear.' },
     OFF_RENT:     { name: 'take it off the room\'s rent', says: 'The room gets less than you agreed. They keep the deposit.' }
   },
@@ -330,8 +330,8 @@ SB.Content.strings = {
     versus: { term: 'versus', short: 'A guarantee or a share of the door, whichever is more.',
               long: 'The band is safe on a slow night and paid fairly on a good one. You carry the slow night.',
               example: '(?show: {band}: {amount:money} or {pct}% of the door.)' },
-    hat: { term: 'the hat', short: 'Whatever people put in a hat, a jar or a bucket for the band.',
-           long: 'It works when the room liked them. It doesn\'t when the room was empty.', example: '(?show: The hat at {room} goes to {band}.)' },
+    hat: { term: 'gas money', short: 'A few extra dollars people give at the door for the touring band, when the door asks.',
+           long: 'Nobody passes a hat. The door asks, and people give when they liked the band. At a house the whole door is often whatever people give.', example: '(?show: Gas money at {room} goes to {band}.)' },
     hold: { term: 'hold', short: 'A room saying it\'ll keep a date for you. Not a promise.',
             long: 'Two people can ask for the same Saturday; you\'re next in line if they let it go.', example: '(?show: You have {room} held for the {date:ord}.)' },
     challenge: { term: 'challenge', short: 'Another booker asking for a date you hold.',

@@ -17,7 +17,7 @@
     guarantee: ['guarantee', 'guaranteed', 'guarantees'],
     doorDeal: ['door deal', 'cut of the door', 'share of the door', 'door split'],
     versus: ['versus'],
-    hat: ['the hat'],
+    hat: ['gas money', 'donation door'],
     hold: ['hold', 'on hold', 'held'],
     challenge: ['challenge'],
     confirm: ['confirm', 'confirmed'],

@@ -1107,9 +1107,9 @@ SB.Content.events = [
       { id: 'YOUR_CUT', label: 'Give them your cut', likely: 'You go home with nothing. They don\'t forget it.',
         effects: [{ op: 'MONEY', amount: -40, cat: 'TOURING' }, { op: 'TRUST', who: '$touring', k: 'GAVE_ALL' }],
         result: 'You gave them your forty. They hugged you, all four of them.' },
-      { id: 'HAT', label: 'Pass the hat for gas', likely: 'The crowd usually comes through.',
+      { id: 'HAT', label: 'Ask at the door for gas money', likely: 'People usually come through.',
         effects: [{ op: 'SHOW_MOD', key: 'hatBonus', v: 40 }, { op: 'TRUST', who: '$touring', d: 2 }],
-        result: 'You passed a hat. People were generous.' },
+        result: 'The door asked everybody for a few extra for their gas. People were generous.' },
       { id: 'MATH', label: 'Show them the math', likely: 'They see where every dollar went. Some bands like that; some don\'t.',
         effects: [{ op: 'TRUST', who: '$touring', d: -1 }],
         result: 'You walked them through the sheet. They nodded. It was a long nod.' }

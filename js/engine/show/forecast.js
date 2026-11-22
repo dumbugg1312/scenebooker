@@ -525,6 +525,60 @@ SB.module('Forecast', function (SB) {
     return out;
   }
 
+  /* ---------------- the break-even line (13-real-booking, part 3) ---------------- */
+
+  /* breakEven(state, showId, over) -> { even, price, owed, lo, hi, shape, hat, split }. Reads only; stores nothing.
+   * `over` previews choices not saved yet: { price, guarantee, shape, share } (share is the band's part of the door, 0 to 1,
+   * or 0 to 100). The money is Night's own settle (Night.figureAt), so there is one copy of the rules.
+   *   even   the fewest paying people at which everyone promised is paid and the player's own costs are back
+   *          (owed / price, rounded up, when nothing owed moves with the door); null at a price of 0, for a hat, or if no door gets there
+   *   owed   the guarantee, everything off the top, the locals' agreed money and the player's own costs so far, at that door
+   *   lo, hi the Call's range for the night as it would be with these choices
+   *   hat    true when the door is a hat passed round: nobody is promised a number
+   *   split  on a door deal, at the middle of the guess: { at, offTop, band, you } (at = paying people), else null */
+  function breakEven(state, showId, over) {
+    var show = assumeBill(state, showOf(state, showId, 'Forecast.breakEven')), s = {}, k, door, deal, c, hat, price, shape, f, lo, hi, mid, even = null, owed = 0, split = null, at, changed = false;
+    over = over || {};
+    for (k in show) if (Object.prototype.hasOwnProperty.call(show, k)) s[k] = show[k];
+    door = s.door = copy(show.door || {}); deal = s.deal = copy(show.deal || {});
+    if (typeof over.price === 'number' && over.price >= 0) {
+      if (door.donation) { if (num(door.suggested, 0) !== over.price) changed = true; door.suggested = over.price; }
+      else { if (num(door.price, 0) !== over.price) changed = true; door.price = over.price; }
+    }
+    if (over.shape && E.DEAL[over.shape]) deal.shape = over.shape;
+    if (typeof over.guarantee === 'number') deal.guarantee = Math.max(0, Math.round(over.guarantee));
+    if (typeof over.share === 'number') deal.pct = clamp(over.share > 1 ? over.share / 100 : over.share, 0, 1);
+    shape = deal.shape || 'DOOR';
+    hat = !!door.donation || shape === 'HAT';
+    price = door.donation ? num(door.suggested, 0) : num(door.price, 0);
+    /* the guess moves with the price, so a previewed price is forecast afresh; anything else reads the show's Call */
+    c = changed && show.status !== 'PLAYED' && show.status !== 'CANCELLED' ? callOf(state, s) : call(state, showId);
+    if (!ready(state, s) || !SB.Night || typeof SB.Night.figureAt !== 'function') {
+      return { even: null, price: price, owed: 0, lo: c.lo, hi: c.hi, shape: shape, hat: hat, split: null };
+    }
+    function ok(n) { var x = SB.Night.figureAt(state, s, n); return x.gap === 0 && x.net >= 0; }
+    if (price > 0 && !hat) {
+      /* more people at the door never leaves the player worse off, so the first door that covers it is found by halving */
+      hi = 1;
+      while (hi < 65536 && !ok(hi)) hi *= 2;
+      if (ok(0)) even = 0;
+      else if (ok(hi)) {
+        lo = hi === 1 ? 0 : hi / 2;
+        while (hi - lo > 1) { mid = Math.floor((lo + hi) / 2); if (ok(mid)) hi = mid; else lo = mid; }
+        even = hi;
+      }
+    }
+    at = Math.max(0, Math.round((c.lo + c.hi) / 2) - Math.max(0, Math.round(num(door.comps, 0))));
+    f = SB.Night.figureAt(state, s, even === null ? at : even);
+    /* on a door deal the band's part is a share of whatever comes in, not a promise: it is not in what is owed */
+    owed = f.offTop + f.locals + f.costs + (shape === 'DOOR' || shape === 'HAT' ? 0 : f.touring);
+    if (shape === 'DOOR' && !hat) {
+      f = SB.Night.figureAt(state, s, at);
+      split = { at: at, offTop: f.offTop, band: f.touring + f.locals, you: f.keep };
+    }
+    return { even: even, price: price, owed: owed, lo: c.lo, hi: c.hi, shape: shape, hat: hat, split: split };
+  }
+
   return { lens: lens, usual: usual, par: par, call: call, ablate: ablate, card: card, what: what, reachStrip: reachStrip, jobLoss: jobLoss,
-           reference: reference, parOf: parOf, callOf: callOf };
+           reference: reference, parOf: parOf, callOf: callOf, breakEven: breakEven };
 });

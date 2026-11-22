@@ -57,6 +57,8 @@
     sign: 'Signs',
     noSigns: 'no signs yet.',
     jobsDone: 'jobs you have done, and why they matter',
+    learned: "WHAT YOU'VE LEARNED",
+    learnedNone: 'Lessons show up here after your first show.',
     callTally: 'your calls this year',
     tallyLine: '{inside} of {shows} shows came inside your call.',
     tallyWidth: 'your calls were {now} wide this year and {then} wide last year.',
@@ -367,6 +369,27 @@
         }));
       }
 
+      /* every lesson shown at least once, by the step of booking it belongs to */
+      function learnedView() {
+        var s = game(), I = SB.Content && SB.Content.irl, list = SB.IRL && SB.IRL.learned ? safe(function () { return SB.IRL.learned(s) || []; }, []) : [],
+            order = (I && I.steps) || ['DATE', 'ROOM', 'DEAL', 'BILL', 'CREW', 'ANNOUNCE', 'NIGHT', 'SETTLE'], by = {}, kids = [h('h3', { class: 'nb-sub', text: L('learned') })];
+        function lineOf(key) {
+          var i = key.indexOf(':'), kind = key.slice(0, i), id = key.slice(i + 1), c = SB.Content;
+          if (kind === 'cause') return I && I.cause && I.cause[id] ? I.cause[id].line : '';
+          if (kind === 'settle') return I && I.settle && I.settle[id] ? I.settle[id].line : '';
+          if (kind === 'job') return c && c.jobs && c.jobs[id] ? c.jobs[id].why : '';
+          return '';
+        }
+        list.forEach(function (x) { var t = lineOf(x.key); if (t) (by[x.step] = by[x.step] || []).push(t); });
+        if (!Object.keys(by).length) { kids.push(h('p', { class: 'nb-pencil', text: L('learnedNone') })); return h('div', { class: 'nb-learned' }, kids); }
+        order.forEach(function (st) {
+          if (!by[st]) return;
+          kids.push(h('h4', { class: 'nb-step', text: (I && I.stepLabel && I.stepLabel[st]) || st }));
+          kids.push(h('ul', { class: 'nb-jobs nb-learned-list' }, by[st].map(function (t) { return h('li', { text: t }); })));
+        });
+        return h('div', { class: 'nb-learned' }, kids);
+      }
+
       function howView() {
         var s = game(), out = [], done = {}, types = [], tally = null, pg = pageOf('HOW') || { rows: [] }, t;
         if (pg.rows.length) out.push(rowsView(pg.rows));
@@ -377,6 +400,7 @@
             return h('li', null, [h('b', { text: SB.text.label('jobs.' + ty + '.label') }), ' ', SB.text.label('jobs.' + ty + '.why')]);
           })));
         }
+        out.push(learnedView(s));
         tally = safe(function () { return SB.Notebook.tally(s); }, null);
         if (tally && tally.shows > 0) {
           t = tallyArt(tally.inside, tally.shows);

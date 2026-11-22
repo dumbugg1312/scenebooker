@@ -35,7 +35,7 @@
     turnedAway: '{n} turned away',
     cashBox: 'Cash box',
     cashPending: 'not counted yet',
-    hat: 'and the hat',
+    hat: 'and gas money',
     heat: 'Heat',
     posts: 'Posts',
     postHeld: 'a post went up',
@@ -83,7 +83,7 @@
     doorLine: '{paid} paid × {price}',
     owedPaid: 'owed {owed}, paid {paid}',
     youPay: 'you pay {n}', bandGets: 'the band gets {n}', localsGet: 'the locals get {n}', roomGets: 'the room gets {n}',
-    hatBrings: 'the hat brings {n}', leftUnpaid: '{n} left unpaid',
+    hatBrings: 'gas money at the door brings {n}', leftUnpaid: '{n} left unpaid',
     tear: 'tear one off',
     lineN: 'the line: {n}',
     lineGone: 'the line: gone home',
@@ -655,6 +655,12 @@
           SB.UI.clear(host); SB.UI.clear(region.result); SB.UI.clear(region.leave);
           host.className = 'nt-at nt-at--stop is-env'; quiet(false);
           host.appendChild(envelope(savedView, model.lines, true));
+          try {
+            var iq = sh && ((sh.result && sh.result.irl && sh.result.irl.settle) || (sh.night && sh.night.settled && sh.night.settled.irl)),
+                it = iq && SB.Content && SB.Content.irl && SB.Content.irl.settle && SB.Content.irl.settle[String(iq).split(':')[1]],
+                inode = it && it.line && SB.UI.parts && SB.UI.parts.irl ? SB.UI.parts.irl(it.line) : null;
+            if (inode) host.appendChild(inode);
+          } catch (e) { SB.log('warn', 'night', 'irl: ' + String(e && e.message)); }
           if (!queue.length && sh && sh.result) {
             region.result.appendChild(result(sh));
             afterJobs(region.result);

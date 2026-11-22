@@ -51,6 +51,7 @@ SB.module('Notebook', function (SB) {
     if (!n.terms) n.terms = {};
     if (!n.calls) n.calls = [];
     if (!n.tells) n.tells = {};
+    if (!n.irl) n.irl = {};                                // 13-real-booking: how often each IN REAL LIFE lesson has been shown
     return n;
   }
   function week(state) { return (state.clock && typeof state.clock.week === 'number') ? state.clock.week : 0; }

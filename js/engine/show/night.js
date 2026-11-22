@@ -361,10 +361,11 @@ SB.module('Night', function (SB) {
        ['SHORT_SILENT', gap, true, [{ k: 'TRUST', v: S.SHORT_SILENT.trust, who: ts ? bandName(state, ts.bandId) : null }, { k: 'WORD', v: S.SHORT_SILENT.word, who: null }]],
        ['OFF_RENT', Math.min(gap, room.kind === 'CLUB' ? 0 : rentDue), rentDue > 0 && room.kind !== 'CLUB', [{ k: 'REL', v: S.OFF_RENT.ownerRel, who: personName(state, room.ownerId) }]]
       ].forEach(function (o) {
+        if (o[0] === 'ASK_LESS') return;   // not offered at all: asking a band to take less than promised is a disrespect no booker does (the user, 2026-11-22)
         shortfall.push({ k: o[0], label: SB.text.label('shortfall.' + o[0] + '.name'), covers: Math.max(0, o[1]), costs: o[3], enabled: !!o[2] && o[1] > 0, why: o[2] && o[1] > 0 ? null : why });
       });
       if (!sf || !E.SHORTFALL[sf]) sf = shortfall[0].enabled ? 'POCKET' : 'SHORT_SILENT';
-      if (!shortfall.filter(function (o) { return o.k === sf; })[0].enabled) sf = shortfall[0].enabled ? 'POCKET' : 'SHORT_SILENT';
+      if (!(shortfall.filter(function (o) { return o.k === sf; })[0] || {}).enabled) sf = shortfall[0].enabled ? 'POCKET' : 'SHORT_SILENT';
       cover = shortfall.filter(function (o) { return o.k === sf; })[0].covers;
       if (sf === 'ASK_LESS') { lines.forEach(function (l) { if (ts && l.toId === ts.bandId && l.amount >= cover) { l.amount -= cover; l.agreed = false; } }); tNow -= cover; }
       else if (sf === 'LOCALS_GIVE') { x = cover; locals.forEach(function (l) { var t = Math.min(l.amount, x); l.amount -= t; x -= t; l.agreed = false; }); localSum -= cover; }
@@ -473,6 +474,29 @@ SB.module('Night', function (SB) {
              dispute: night.dispute && !night.dispute.answered ? night.dispute.decision : null };
   }
 
+  /* The settle as it would come out with `paid` people paying at the door, for a show that has not been played (13-real-booking,
+   * part 3: the break-even line). `show` may be a changed copy of a stored show (another price or deal); it keeps the stored show's
+   * id, so the money already spent on it is found. The same figure() as the real settle; changes nothing. Null without a room or a bill. */
+  function figureAt(state, show, paid) {
+    var door = show.door || {}, price, s = {}, k, f, ts, touring = 0, locals = 0, streams, was;
+    if (!roomOf(state, show) || !show.bill || !show.bill.slots) return null;
+    paid = Math.max(0, Math.round(num(paid, 0)));
+    price = door.donation ? num(door.suggested, 0) * C.PRICE.HAT_RATE : num(door.price, 0);
+    for (k in show) if (Object.prototype.hasOwnProperty.call(show, k)) s[k] = show[k];
+    s.night = { outcome: { heads: paid, paid: paid, comps: 0, gross: door.donation ? 0 : Math.round(paid * price), hat: door.donation ? Math.round(paid * price) : 0, q: 0, run: 1 } };
+    /* a room's terms may word a line as they are read (the TEXT stream): the stream is put back, so asking leaves no trace */
+    streams = state.rng && state.rng.streams; was = streams && streams[E.STREAM.TEXT] ? streams[E.STREAM.TEXT].slice() : null;
+    try { f = figure(state, s, null); }
+    finally { if (streams) { if (was) streams[E.STREAM.TEXT] = was; else delete streams[E.STREAM.TEXT]; } }
+    ts = touringSlot(s);
+    f.lines.forEach(function (l) {
+      if (ts && l.toId === ts.bandId && (l.k === 'GUARANTEE' || l.k === 'SHARE')) touring += l.amount;
+      else if (l.k === 'LOCAL' || (l.k === 'SHARE' && l.toId)) locals += l.amount;
+    });
+    return { paid: paid, price: price, door: f.G, offTop: f.offTop, touring: touring, locals: locals, owed: f.owed, gap: f.gap, left: f.left, keep: f.keep,
+             costs: f.costSum + f.insurance, net: f.playerNet };
+  }
+
   var LINE_CAT = { ROOM: 'ROOM', SOUND: 'SOUND', SECURITY: 'SECURITY', HOST: 'HOST', GUARANTEE: 'TOURING', LOCAL: 'LOCAL' };
   var NOT_FROM_THE_BOX = { YOU: 1, COSTS: 1, INSURANCE: 1, DAMAGES: 1, DEPOSIT: 1 };   // settle lines the cash box does not pay
 
@@ -551,6 +575,8 @@ SB.module('Night', function (SB) {
     night.accounts = acc;
     night.settled = { keep: f.keep, playerNet: f.playerNet, pocket: f.pocket, short: f.short || f.unpaid > 0, chosen: f.chosen, door: f.gross, hat: f.hat, paidTo: paidTo,
                       agreed: !f.short && !(f.unpaid > 0) && (!f.chosen || f.chosen === 'POCKET' || f.chosen === 'HAT') };
+    /* the lesson of how the gap was covered, picked and counted once, here (13-real-booking, part 1) */
+    if (has('IRL', 'settle')) SB.IRL.settle(state, showId, f.chosen);
     records.push(rec(show, 'SETTLE_DONE', '', { playerNet: f.playerNet, fund: num(state.money && state.money.fund, 0), bank: state.money ? state.money.bank : null }));
     push(records, finish(state, showId));
     log(state, records);
@@ -715,6 +741,8 @@ SB.module('Night', function (SB) {
       followers: { from: fol0, to: num(P.followers, fol0) }, memory: { score: 0, wall: false, story: null }, thanked: null, demand: night.demand,
       causes: (fb.causes || []).filter(function (x) { return Math.abs(x.d) >= 0.5; }).slice(0, 14).map(function (x) { return { cause: x.cause, d: x.d, hidden: x.hidden, ctx: x.ctx }; })
     };
+    /* the lessons and the what-ifs of this night, picked and counted once, from the causes just measured (13-real-booking) */
+    if (has('IRL', 'pick')) SB.IRL.pick(state, showId, result);
     /* 6. memory and stages */
     stage0 = num(P.stage, 1);
     if (has('Legacy', 'afterShow')) push(world, SB.Legacy.afterShow(state, show, result));
@@ -802,5 +830,5 @@ SB.module('Night', function (SB) {
     return { heads: res.night.heads, q: res.night.q, byGen: res.night.byGen.slice(), hostScore: hs };
   }
 
-  return { begin: begin, next: next, settleView: settleView, settle: settle, auto: auto, finish: finish, resolveOther: resolveOther, asShow: asShow };
+  return { begin: begin, next: next, settleView: settleView, settle: settle, auto: auto, finish: finish, resolveOther: resolveOther, asShow: asShow, figureAt: figureAt };
 });

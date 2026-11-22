@@ -1,0 +1,32 @@
+/* irl: the IN REAL LIFE scrap (js/ui/irl.js). A torn bit of copy paper, a rubber stamp, one line of toner type.
+ * Same paper, torn edge and fonts as css/kit.css; the hot tone is the city's --hot ink (falls back to --late). */
+.irl { position: relative; isolation: isolate; box-sizing: border-box; display: block; max-width: 100%; margin: calc(var(--p) * 6) 0; padding: calc(var(--p) * 22) calc(var(--p) * 16) calc(var(--p) * 12);
+  color: var(--toner, #141312); font: 400 calc(var(--fs) * 13)/1.35 var(--f-type); filter: drop-shadow(var(--sh-s, 1px) 0 rgba(0, 0, 0, .5)); transform: rotate(-.6deg); }
+.irl::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--pp-bond, #F4F1E8); clip-path: var(--edge-torn-t); }
+.irl__stamp { position: absolute; left: calc(var(--p) * 12); top: calc(var(--p) * 6); padding: calc(var(--p) * 1) calc(var(--p) * 5); transform: rotate(-3deg);
+  border: calc(var(--p) * 2) solid var(--hot, var(--late, #B42318)); color: var(--hot, var(--late, #B42318)); opacity: .88;
+  font: 400 calc(var(--fs) * 11)/1.2 var(--f-gothic); letter-spacing: .14em; white-space: nowrap; pointer-events: none; }
+.irl__line { display: block; overflow-wrap: anywhere; }
+.irl--hot .irl__line { color: var(--hot, var(--late, #B42318)); }
+.irl__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.irl--compact { display: flex; align-items: baseline; gap: calc(var(--p) * 10); padding: calc(var(--p) * 8) calc(var(--p) * 14) calc(var(--p) * 6); transform: none; margin: calc(var(--p) * 4) 0; }
+.irl--compact .irl__stamp { position: static; flex: none; }
+.irl--compact .irl__line { flex: 1 1 auto; min-width: 0; }
+
+@media (max-width: 520px) { .irl { transform: none; } .irl--compact { flex-wrap: wrap; } }
+@media (prefers-reduced-motion: reduce) { .irl { transform: none; } }
+
+/* close-up: the week's lessons under the ledger */
+.cc-irl { display: flex; flex-direction: column; gap: calc(var(--p) * 4); max-width: 100%; min-width: 0; }
+.cc-irl .irl { margin: calc(var(--p) * 4) 0; }
+.cc-irl-what { padding: calc(var(--p) * 8) calc(var(--p) * 14); background: var(--pp-bond, #F4F1E8); color: var(--toner, #141312); font: 400 calc(var(--fs) * 13)/1.35 var(--f-type); }
+.cc-irl-h { margin: 0 0 calc(var(--p) * 4); font: 400 calc(var(--fs) * 12)/1.2 var(--f-gothic); letter-spacing: .12em; }
+.cc-irl-what ul { margin: 0; padding-left: calc(var(--p) * 16); }
+.cc-irl-what li { overflow-wrap: anywhere; }
+
+/* inbox: the sentences that carried a tell, once the truth is out; notebook: WHAT YOU'VE LEARNED steps */
+.ph-tell { text-decoration: underline wavy; text-decoration-thickness: 1px; text-underline-offset: .2em; }
+.nb-step { margin: calc(var(--p) * 8) 0 calc(var(--p) * 2); font: 400 calc(var(--fs) * 12)/1.2 var(--f-gothic); letter-spacing: .12em; }
+
+.cb-even.is-late { color: var(--hot, var(--late, #B42318)); }

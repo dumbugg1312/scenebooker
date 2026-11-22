@@ -615,6 +615,7 @@ function main() {
   /* 6. every part */
   const partArgs = {
     yearPage: () => [{ year: 1, week: state.clock.week, shows: [], lines: [] }],     // SPEC?: a stub recap; no year has passed
+    irl: () => ['Send the advance ten days out.'],
     flyerThumb: () => [{ recipe: null, spec: showId ? SB.Jobs.flyerSpec(state, showId) : null }, 120]
   };
   for (const name of Object.keys(SB.UI.parts)) {

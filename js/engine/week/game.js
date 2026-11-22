@@ -70,7 +70,7 @@ SB.module('Game', function (SB) {
       regulars: { by: {}, total: 0, faces: [], lastBadWeek: null, priceyRun: 0, line: [] },
       truth: { quirks: [], nightQuirks: [], chan: {}, comfort: [0, 0, 0], zoneMul: {}, heat: {}, heatLine: {},
                waves: {}, pulses: [], parKnows: {}, weather: {} },
-      notebook: { est: {}, causes: {}, notes: [], terms: {}, calls: [], tells: {} },
+      notebook: { est: {}, causes: {}, notes: [], terms: {}, calls: [], tells: {}, irl: {} },
       bands: {}, people: {}, rooms: {}, bookers: {}, contacts: {}, requests: {}, shows: {}, otherShows: [],
       jobs: {}, asks: {}, mail: { messages: [] }, tours: {},
       week: null,

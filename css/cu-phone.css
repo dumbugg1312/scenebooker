@@ -223,6 +223,7 @@
 .ph-crowd-top { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 0 calc(var(--p) * 2); }
 .ph-crowd-top .ph-k { margin: 0 0 calc(var(--p) * 8); }
 .ph-each { grid-column: 1 / -1; display: flex; align-items: center; gap: calc(var(--p) * 4); margin: 0; padding-top: calc(var(--p) * 4); border-top: calc(var(--p) * 1.5) dashed var(--t); font-size: calc(var(--fs) * 12); letter-spacing: .08em; }
+.ph-guess-why { grid-column: 1 / -1; margin: 0; }
 
 .ph-tear { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 8); }
 .ph-tear-pg { position: relative; padding: 0; border: 0; background: none; transform: rotate(var(--r, 1.5deg)); transition: transform 120ms steps(2, end); }

@@ -57,6 +57,8 @@
     short: 'There isn\'t enough. Pick a way through:',
     payBills: 'pay the bills',
     paid: 'paid',
+    whatChanged: 'WHAT WOULD HAVE CHANGED IT',
+    irl: 'in real life',
     next: '{open} jobs open, {late} late, {replies} answers due',
     start: 'start week {n}',
     notClosed: 'The week is not closed yet.',
@@ -301,6 +303,7 @@
           r.verdictLine ? h('p', { class: 'cc-verdict-line pz-paper', text: r.verdictLine }) : null,
           h('div', { class: 'cc-crowdcard' }, [kt.sheet('white', 'crowd' + id), crowd(r)]),
           ledger(r),
+          safe(function () { return irlBlock(r); }, null),
           r.comments && r.comments.length ? h('div', { class: 'cc-quotes', role: 'group', aria: { label: L('idx.said') } }, r.comments.map(function (c) { return quote(s, c); })) : null,
           h('div', { class: 'cc-crowd-legend' }, [
             r.door && num(r.door.gross) ? h('span', { text: L('door', { paid: r.paid, price: SB.text.money(r.door.price || 0), gross: SB.text.money(r.door.gross) }) }) : null,
@@ -339,6 +342,27 @@
           r.call && num(r.call.lo) ? h('span', { text: L('guessed', { lo: r.call.lo, hi: r.call.hi }) }) : null
         ])
       ]);
+    }
+
+    /** In real life: the show's lessons as scraps, what would have changed it, and what could not have been known. Older saves carry none. */
+    function irlBlock(r) {
+      var I = r && r.irl, T = SB.Content && SB.Content.irl, P = SB.UI.parts && SB.UI.parts.irl, kids = [], list = [], c, line;
+      if (!I || !T || !P) return null;
+      function scrap(txt, o) { var n = txt ? P(txt, o) : null; if (n) kids.push(n); }
+      (I.lessons || []).forEach(function (key) {
+        var p = String(key).split(':'), t0 = p[0], k0 = p[1];
+        if (t0 === 'cause' && T.cause[k0]) scrap(T.cause[k0].line);
+        else if (t0 === 'job' && SB.Content.jobs && SB.Content.jobs[k0]) scrap(SB.Content.jobs[k0].why);
+        else if (t0 === 'settle' && T.settle && T.settle[k0]) scrap(T.settle[k0].line);
+      });
+      (I.whatIf || []).forEach(function (w) {
+        c = T.cause[w.cause];
+        line = c && c.whatIf ? SB.text.render(c.whatIf, { n: w.n, gen: w.gen || undefined, money: w.money === null ? undefined : w.money }) : '';
+        if (line) list.push(h('li', { text: line }));
+      });
+      if (list.length) kids.push(h('div', { class: 'cc-irl-what' }, [h('p', { class: 'cc-irl-h', text: L('whatChanged') }), h('ul', null, list)]));
+      if (I.unknown && T.cause[I.unknown.cause] && T.cause[I.unknown.cause].unknown) scrap(SB.text.render(T.cause[I.unknown.cause].unknown, { n: I.unknown.n }), { tone: 'hot' });
+      return kids.length ? h('div', { class: 'cc-irl', role: 'group', aria: { label: L('irl') } }, kids) : null;
     }
 
     /** The ledger as three scraps: what you did, what you couldn't have known, luck. Par, the rest and the total ride along. */

@@ -108,6 +108,9 @@
     cancelSure: 'Cancel this show? The bands and the room will remember.',
     cancelYes: 'Cancel it',
     keep: 'Keep it',
+    evenAt: "You're even at {n} paying at {p}. Your guess for this night: {lo} to {hi}.",
+    evenSplit: 'At {n} paying: room and sound {off}, the band {band}, you {you}.',
+    evenHat: 'Nobody is promised anything; everything people give at the door goes to the bands.',
     locked: 'The bill is locked. Changing it now costs trust with the bands.',
     result: 'How it went',
     unknown: '?'
@@ -201,6 +204,7 @@
     look: 'HOW IT LOOKS', lookL: 'How the night looks: the crowd you can expect', lookBack: 'BACK TO {row}', lookBackL: 'Back to {row}',
     toClock: 'then call it a night, on the clock ↘', toClockShort: 'on the clock ↘',
     callOff: 'cancel the show',
+    laterLoss: '{day} instead of tonight: about {n} fewer{gen}{money}.', laterGenKids: ', mostly kids', laterGenOld: ', mostly old heads', laterMoney: ' (about {m} at the door)',
     doNow: 'DO IT TONIGHT', doNowL: 'Do it tonight: {job}', stillYours: 'Still yours on this show:',
     effort: 'HOW SHARP', effortWord: { ROUGH: 'ROUGH', STANDARD: 'STANDARD', SHARP: 'SHARP' },
     hasIt: '{name} has it',
@@ -932,9 +936,18 @@
     els.forEach(function (el) { el.classList.add('mv-slap'); });
   }
 
-  function confirmCard(text, yes, no, onYes) {
+  /* 13-real-booking: the lesson for calling a show off, by how far out it is (more than 28 days, 14 to 28, under 14) */
+  function cancelLesson(s, id) {
+    var sh = s.shows && s.shows[id], irl = SB.Content && SB.Content.irl, days, key, e;
+    if (!sh || !irl || !irl.cancel || !SB.UI.parts || !SB.UI.parts.irl) return null;
+    days = sh.day - s.clock.day; key = days > 28 ? 'EARLY' : (days >= 14 ? 'MID' : 'LATE'); e = irl.cancel[key];
+    return e && e.line ? SB.UI.parts.irl(e.line) : null;
+  }
+
+  function confirmCard(text, yes, no, onYes, extra) {
     var close = SB.UI.card(h('div', { class: 'sb-confirm cb-confirm' }, [
       h('p', { class: 'cb-typed', text: text }),
+      extra || null,
       h('div', { class: 'cb-row' }, [
         D.act(yes, yes, 'cf-yes', function () { close(); onYes(); }),
         D.act(no, no, 'cf-no', function () { close(); })
@@ -1409,7 +1422,7 @@
         h('div', { class: 'cb-footrow' }, [
           h('span', { class: 'cb-asksout cb-typed cb-small', role: 'status', data: { n: String(n) }, text: T('card', n === 1 ? 'out1' : (n ? 'outN' : 'out0'), { n: n }) }),
           h('button', { type: 'button', class: 'cb-link pz-hl', data: { fk: 'cancel' }, aria: { label: T('show', 'cancelL') }, text: T('card', 'callOff'), on: { click: function () {
-            confirmCard(T('show', 'cancelSure'), T('show', 'cancelYes'), T('show', 'keep'), function () { act(function (x) { return SB.Shows.cancel(x, showId, 'PLAYER'); }); });
+            confirmCard(T('show', 'cancelSure'), T('show', 'cancelYes'), T('show', 'keep'), function () { act(function (x) { return SB.Shows.cancel(x, showId, 'PLAYER'); }); }, cancelLesson(s, showId));
           } } })
         ])
       ]);
@@ -2017,6 +2030,7 @@
           D.tickThing({ on: !!d.meal, text: I('meal').toUpperCase(), label: I('meal'), fk: 'meal', onClick: function () { d.meal = !d.meal; render(); } }),
           D.tickThing({ on: !!d.lodging, text: I('lodging').toUpperCase(), label: I('lodging'), fk: 'lodging', onClick: function () { d.lodging = !d.lodging; render(); } })
         ]),
+        evenLine({ shape: d.shape, guarantee: withG ? (d.guarantee || 0) : 0, share: d.pct == null ? 1 : d.pct }),
         ex ? h('p', { class: 'cb-typed cb-small', text: I('ifNobody') + ': ' + (num(ex.total) ? money(ex.total) : '?') + (num(ex.breakEven) ? '. ' + I('breakEven') + ': ' + I('paidN', { n: ex.breakEven }) : '') + '.' }) : null,
         h('div', { class: 'cb-row' }, [costAct({ text: I('sendOffer'), label: I('sendOffer') + ': ' + r.band.name, fk: 'send-offer', hours: mailH(), size: 15, tut: 'card-offer', tutRef: showId,
           fn: function () { sendOffer(q, show); } })])
@@ -2128,6 +2142,17 @@
       return piece('cb-roompiece', 'bone', kids, { label: T('show', 'room') });
     }
 
+    /* 13-real-booking part 3: what the night has to draw before you are even, at the deal and price as they stand (over: unsaved choices) */
+    function evenLine(over) {
+      var b = safe(function () { return SB.Forecast.breakEven(st(), showId, over); }, null), txt;
+      if (!b) return null;
+      if (b.hat) txt = T('show', 'evenHat');
+      else if (b.split) txt = T('show', 'evenSplit', { n: b.split.at, off: money(b.split.offTop), band: money(b.split.band), you: money(b.split.you) });
+      else if (b.even != null && b.price > 0) txt = T('show', 'evenAt', { n: b.even, p: money(b.price), lo: b.lo, hi: b.hi });
+      else return null;
+      return h('p', { class: 'cb-typed cb-small cb-even' + (!b.hat && !b.split && b.even > b.hi ? ' is-late' : ''), role: 'note', data: { fk: 'even' }, text: txt });
+    }
+
     function doorSection(s, v) {
       var show = v.show, door = show.door, room = v.room, ages = room && room.ages && room.ages.length ? room.ages : Object.keys(SB.Enums.AGES), kids = [], price = door.price || 0, pt;
       function setPrice(p) { p = Math.max(0, Math.min(100, Math.round(Number(p) || 0))); act(function (x) { return SB.Shows.setDoor(x, showId, { price: p }); }); }
@@ -2147,6 +2172,7 @@
           { text: '+$1', label: T('show', 'dearer'), fk: 'p+', onClick: function () { setPrice(price + 1); } }] }),
         D.tickThing({ on: !!door.donation, text: T('show', 'donation'), label: T('show', 'donationL'), fk: 'don', onClick: function () { var on = !door.donation; act(function (x) { return SB.Shows.setDoor(x, showId, { donation: on }); }); } })
       ]));
+      kids.push(evenLine(null));
       /* the ages as a stamp inked on the sheet; the choices torn off below it */
       kids.push(h('div', { class: 'cb-agesrow' }, [
         D.art(D.stamp(word('ages.' + door.ages, door.ages), 6, 6, 18, { rot: -6 }), D.stampW(word('ages.' + door.ages, door.ages), 18) + 20, 52),
@@ -2175,6 +2201,7 @@
           D.art(d.written ? K().path([[4, 24], [26, 4], [32, 10], [10, 30]], { seed: 'pen', sw: 2.4 }) + K().scrawl(6, 32, 36, { seed: 'sig', sw: 1.6 }) : K().heart(20, 18, 22, { seed: 'hs', fill: 'none' }), 46, 38),
           h('p', { class: 'cb-typed', text: t + ', ' + (d.written ? T('show', 'written') : T('show', 'handshake')) })
         ]),
+        evenLine(null),
         ex ? h('div', { class: 'cb-iou', role: 'img', aria: { label: T('show', 'exposure') + ': ' + (num(ex.total) ? money(ex.total) : '?') } }, [D.art(out, 220, 48),
           h('p', { class: 'cb-typed cb-small', aria: { hidden: 'true' }, text: (ex.lines || []).map(function (l) { return (l.label || lower(l.cat)) + ' ' + money(l.amount || 0); }).join(' / ') })]) : null
       ], { label: T('show', 'deal') });
@@ -2195,6 +2222,19 @@
     var PROMO_JOBS = { MAKE_FLYER: 1, FLYER_RUN: 1, ANNOUNCE: 1, BANDS_SHARE: 1, PRINT: 1, LISTINGS: 1, LOCAL_AD: 1, MAILING_LIST: 1, HAND_OUT: 1, INVITES: 1, WEEK_PUSH: 1, DAY_OF_POST: 1 };
     /* one job, as the calendar's note says it (js/ui/screens/week.js): what it costs, when it is due (late in hot ink),
        and DO IT TONIGHT; crossed out with the reason when tonight cannot take it. The flyer picks how sharp first. */
+    /* 13-real-booking part 3: what waiting until the next night costs this job, from the engine's own loss (heads, by generation) */
+    function laterLine(s, j) {
+      var sh = s.shows && s.shows[j.showId], today = s.clock.day, next = today + 1, a, b, d = [], tot = 0, g, top = 0, gen = '', m = '', price;
+      if (j.group !== 'TELLING' || !sh || next > sh.day) return null;
+      a = safe(function () { return SB.Forecast.jobLoss(s, j.id, today); }, null); b = safe(function () { return SB.Forecast.jobLoss(s, j.id, next); }, null);
+      if (!a || !b) return null;
+      for (g = 0; g < 3; g++) { d[g] = (b[g] || 0) - (a[g] || 0); tot += d[g]; if (d[g] > d[top]) top = g; }
+      if (Math.round(tot) < 1) return null;
+      if (d[top] >= tot * 0.5 && top !== 1) gen = T('card', top === 0 ? 'laterGenKids' : 'laterGenOld');
+      price = sh.door && !sh.door.donation ? sh.door.price : 0;
+      if (price > 0) m = T('card', 'laterMoney', { m: money(Math.round(tot) * price) });
+      return h('p', { class: 'cb-typed cb-small cb-later', text: T('card', 'laterLoss', { day: SB.time.fmt(next, 'dow'), n: Math.round(tot), gen: gen, money: m }) });
+    }
     function jobNote(s, j, i) {
       var status = j.waived ? 'WAIVED' : j.status, by = byOther(j), todo = j.mode === 'HOURS' && mine(j),
           o = jobOpts(j), can = todo ? canNow(s, j.id, o) : null, hours = can && can.ok ? can.hours : (j.type === 'MAKE_FLYER' && SB.Config.FLYER && SB.Config.FLYER.HOURS ? SB.Config.FLYER.HOURS[effortOf()] : j.hours),
@@ -2205,6 +2245,7 @@
           todo && costT(hours) ? h('span', { class: 'cc-note-cost', text: costT(hours) }) : null,
           due ? h('span', { class: 'cc-note-due' + (due.late ? ' is-late' : ''), text: due.text }) : null,
           h('span', { class: 'cb-sr', text: ' ' + word('jobStatus.' + j.status, lower(j.status)) + (j.window && j.window.label ? ', ' + j.window.label : '') })]),
+        todo && can && can.ok ? laterLine(s, j) : null,
         j.waived ? h('p', { class: 'cb-typed cb-small', text: j.text || word('jobs.waived', T('show', 'waived')) }) : null,
         by ? h('p', { class: 'cb-typed cb-small cb-hasit', text: T('card', 'hasIt', { name: j.planned.byName || first(s, by) || '' }) }) : null,
         j.status === 'DONE' && j.text ? h('p', { class: 'cb-typed cb-small', text: j.text }) : null,

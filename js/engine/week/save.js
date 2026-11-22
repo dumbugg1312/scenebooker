@@ -215,7 +215,14 @@ SB.module('Save', function (SB) {
       state = fn(state);
       if (!state || typeof state.v !== 'number' || state.v <= v) return null;
     }
-    return fillStyles(state);
+    return fillNotebook(fillStyles(state));
+  }
+
+  /* 13-real-booking: the count of IN REAL LIFE lessons shown. No version bump: the field is additive and starts empty. */
+  function fillNotebook(state) {
+    var n = state && state.notebook;
+    if (n && typeof n === 'object' && (!n.irl || typeof n.irl !== 'object' || Array.isArray(n.irl))) n.irl = {};
+    return state;
   }
 
   /* A band's style is stored only when it is not its genre; readers use b.style || b.genre. No version bump: the field is additive. */

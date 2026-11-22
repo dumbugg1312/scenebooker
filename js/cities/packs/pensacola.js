@@ -301,8 +301,8 @@ SB.Cities.register('pensacola', {
       options: [
         { id: 'PUSH_LAST', label: 'Push them last', likely: 'They play to whoever stays.', effects: [{ op: 'SWAP_ORDER', touringTo: 'LAST' }], result: '{touring} loaded in during the closer\'s last song and played anyway.' },
         { id: 'HOLD', label: 'Start with locals and hold the room', likely: 'The night runs late.', effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 30 }], result: 'You stretched every changeover. They made it.' },
-        { id: 'HAT', label: 'Tell the crowd and pass the hat for the wait', likely: 'People are kind about it.', effects: [{ op: 'SHOW_MOD', key: 'hatBonus', v: 1 }, { op: 'SHOW_MOD', key: 'lateMin', v: 20 }, { op: 'TRUST', who: '$touring', d: 2 }],
-          result: 'You said it from the front. The hat came back heavy.' }
+        { id: 'HAT', label: 'Tell the crowd and ask for gas money at the door', likely: 'People are kind about it.', effects: [{ op: 'SHOW_MOD', key: 'hatBonus', v: 1 }, { op: 'SHOW_MOD', key: 'lateMin', v: 20 }, { op: 'TRUST', who: '$touring', d: 2 }],
+          result: 'You said it from the front. The door did well after that.' }
       ] },
 
     { id: 'PENSACOLA_SAILORS', when: 'NIGHT', tier: 'GENTLE', weight: 1, cooldown: 20, bind: ['show'], at: 'SET:1',

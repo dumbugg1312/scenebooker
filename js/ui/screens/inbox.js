@@ -60,9 +60,11 @@
     flags: 'Worth knowing',
     reply: 'Answer',
     book: 'book it',
+    works: '{dow} works',
+    worksL: 'Tell them {dow} works and start the show',
     bookL: 'Book it: tell them you are in and start the show',
     toShowL: 'Open the show',
-    pass: 'pass',
+    pass: 'not this time',
     takeIt: 'take it',
     counter: 'They came back with something else.',
     holdRoom: 'Which room',
@@ -651,7 +653,7 @@
       c.msgs.forEach(function (m) { items.push({ who: 'them', day: num(m.day) ? m.day : 0, m: m }); });
       if (q) {
         if (s.mail && s.mail.extended && s.mail.extended[q.id]) {
-          items.push({ who: 'me', day: s.mail.replied && num(s.mail.replied[q.id]) ? s.mail.replied[q.id] : (c.msgs[0] ? c.msgs[0].day : 0), text: safe(function () { return SB.text.line('requests.compose.INTERESTED', {}, null); }, ''), mark: 'sent' });
+          items.push({ who: 'me', day: s.mail.replied && num(s.mail.replied[q.id]) ? s.mail.replied[q.id] : (c.msgs[0] ? c.msgs[0].day : 0), text: safe(function () { var sh = showFor(s, q); return SB.text.line('requests.compose.INTERESTED', { day: sh && num(sh.day) ? SB.time.fmt(sh.day, 'dow') : '' }, null); }, ''), mark: 'sent' });
         }
         (q.offers || []).forEach(function (o) {
           if (o.by !== 'player') return;
@@ -674,15 +676,51 @@
       return h('div', { class: 'ph-thread', role: 'log', aria: { label: nameOf(s, c) } }, [safe(function () { return attachment(s, c); }, null)].concat(out));
     }
 
+    /* once the band has played here (or the show fell through) the sentences that carried a tell are underlined, with the
+     * lesson under the message. Before that the message reads as it always did. */
+    function truthOut(s, q) {
+      var id, x;
+      if (!q) return false;
+      for (id in (s.shows || {})) { x = s.shows[id]; if (x && x.requestId === q.id && (x.status === 'PLAYED' || x.status === 'CANCELLED')) return true; }
+      return false;
+    }
+    function bodyText(s, m, c) {
+      var q = c && c.req, body = m.body || m.text || m.subject || '', spans, at = 0, kids = [];
+      if (!q || m.kind !== 'REQUEST' || !m.body || !truthOut(s, q)) return h('p', { class: 'ph-bub-text', text: body });
+      spans = (q.tellSpans || []).filter(function (x) { return x && num(x.from) && num(x.to) && x.from >= 0 && x.to > x.from && x.to <= m.body.length; })
+        .sort(function (a, b) { return a.from - b.from; });
+      spans.forEach(function (x) {
+        if (x.from < at) return;
+        if (x.from > at) kids.push(m.body.slice(at, x.from));
+        kids.push(h('u', { class: 'ph-tell', text: m.body.slice(x.from, x.to) }));
+        at = x.to;
+      });
+      if (at < m.body.length) kids.push(m.body.slice(at));
+      return h('p', { class: 'ph-bub-text' }, kids);
+    }
+    function teachNote(s, q) {
+      var T = SB.Content && SB.Content.requests && SB.Content.requests.templates, t = q && T ? T[q.template] : null;
+      return irlScrap(t && t.teaches, true);
+    }
+    function irlScrap(line, compact) {
+      var n = SB.UI.parts && SB.UI.parts.irl ? safe(function () { return SB.UI.parts.irl(line, compact ? { compact: true } : null); }, null) : null;
+      return n || null;
+    }
+    function passedNote() {
+      var a = SB.Content && SB.Content.irl && SB.Content.irl.answer;
+      return irlScrap(a && a.PASSED && a.PASSED.line, true);
+    }
+
     function theirBubble(s, m, rv, c) {
       var sig = rv && m.kind === 'REQUEST' && rv.signals ? rv.signals : [], hot = c && c.needs ? hotInk() : null;
       return h('div', { class: 'ph-bub ph-bub--them pz-paper' }, [
         m.subject && m.kind === 'REQUEST' ? h('p', { class: 'ph-bub-subj', text: m.subject }) : null,
-        h('p', { class: 'ph-bub-text', text: m.body || m.text || m.subject || '' }),
+        bodyText(s, m, c),
         num(m.replyBy) ? h('p', { class: 'ph-replyby' + (hot ? ' is-hot' : ''), style: hot ? { '--hot': hot, '--hot-ink': lightInk(hot) ? T : W } : null, text: up(L('replyBy', { day: SB.time.fmt(m.replyBy, 'short') })) }) : null,
         sig.length ? h('ul', { class: 'ph-sigs', aria: { label: L('signals') } }, sig.map(function (g) {
           return h('li', { class: 'ph-sig' }, [h('b', { text: g.good === true ? '+' : (g.good === false ? '−' : '?') }), ' ', g.text || '']);
-        })) : null
+        })) : null,
+        m.kind === 'REQUEST' && c && c.req && truthOut(s, c.req) ? teachNote(s, c.req) : null
       ]);
     }
     function myBubble(text, mark) {
@@ -787,7 +825,8 @@
           h('div', { class: 'ph-crowd-top' }, [kicker(L('guess')), mk(lbl, 30, { seed: 'cg', fill: ink('ballpointBlue') })]),
           b2 ? pic(b2[0], b2[1], b2[2]) : h('p', { class: 'ph-sys', text: L('noGuess') })
         ]),
-        unit > 1 ? h('p', { class: 'ph-each' }, [pic(head(10, 10, 0.8, 'each'), 20, 26), up(L('each', { n: unit }))]) : null
+        unit > 1 ? h('p', { class: 'ph-each' }, [pic(head(10, 10, 0.8, 'each'), 20, 26), up(L('each', { n: unit }))]) : null,
+        rv.guessWhy ? h('p', { class: 'ph-sys ph-guess-why', text: rv.guessWhy }) : null
       ]);
     }
 
@@ -972,7 +1011,10 @@
         queued = queuedFor(s, c).map(function (o) { return o.kind; });
         /* one yes: BOOK IT says you are interested (a message, if it has not gone yet), makes the show and opens its
          * card on the room. The hold and the offer are made there (js/ui/screens/shows.js). */
-        tabs.push(bookTab(s, q, queued.indexOf('INTERESTED') >= 0 || !!(s.mail && s.mail.extended && s.mail.extended[q.id])));
+        /* the yes is a reply: one per date they can do ("Friday works"), or "open the show" once there is one */
+        var sent = queued.indexOf('INTERESTED') >= 0 || !!(s.mail && s.mail.extended && s.mail.extended[q.id]);
+        if (showFor(s, q) || sent) tabs.push(bookTab(s, q, sent, null, true));
+        else (q.dates || []).slice(0, 3).forEach(function (d, i) { tabs.push(bookTab(s, q, sent, d, i === 0, (q.dates || []).length > 1)); });
         tabs.push(tab('PASS', L('pass'), function () { view = 'pass'; draft.mode = 'PASS'; render(); }, { done: queued.indexOf('PASS') >= 0, tut: 'req-pass', ref: q.id }));
       }
       return tabs.length ? h('div', { class: 'ph-fringe ph-dock', role: 'group', aria: { label: L('reply') } }, tabs) : null;
@@ -990,17 +1032,24 @@
      * said on the tab; when tonight has no room for it the tab says why and does nothing. */
     function mailHours() { return SB.Config.MAIL && num(SB.Config.MAIL.hours) ? SB.Config.MAIL.hours : 0.5; }
     function costTag(label, hours) { return SB.Clock && SB.Clock.tag ? SB.Clock.tag(label, hours) : label; }
-    function bookTab(s, q, sent) {
+    function bookTab(s, q, sent, day, first, many) {
       var show = showFor(s, q), need = !sent && !show, hours = need ? mailHours() : 0,
+          dow = num(day) ? SB.time.fmt(day, many && sameDow(q) ? 'short' : 'dow') : '',
           fit = need ? (safe(function () { return SB.Week.fits(s, hours); }, null) || { ok: true }) : { ok: true }, ok = fit.ok !== false,
           why = ok ? '' : ((SB.Clock && SB.Clock.why ? SB.Clock.why(fit) : fit.why) || '');
-      return tab('BOOK', show ? L('toShow') : costTag(L('book'), hours), function () {
+      return tab(first ? 'BOOK' : 'BOOK-' + day, show ? L('toShow') : costTag(dow ? L('works', { dow: dow }) : L('book'), hours), function () {
         var r;
         if (!ok) return;
+        if (num(day)) draft.day = day;
         if (need) { r = act(function (x) { return SB.Mail.reply(x, q.id, 'INTERESTED'); }); if (!r || r.ok === false) return; }
         toCard(q, 'room');
-      }, { hot: ok, disabled: !ok, sub: why || null, tut: 'req-book', ref: q.id,
-           aria: (show ? L('toShowL') : L('bookL')) + (why ? '. ' + why : '') });
+      }, { hot: ok && first, disabled: !ok, sub: why || null, tut: first ? 'req-book' : null, ref: first ? q.id : null,
+           aria: (show ? L('toShowL') : (dow ? L('worksL', { dow: dow }) : L('bookL'))) + (why ? '. ' + why : '') });
+    }
+    /* two dates on the same weekday (a week apart) are told apart by the date, not the day */
+    function sameDow(q) {
+      var seen = {};
+      return (q.dates || []).some(function (d) { var k = SB.time.fmt(d, 'dow'); if (seen[k]) return true; seen[k] = 1; return false; });
     }
 
     /* the show this request is for (made now if there is none yet), opened at a row of its card */
@@ -1022,6 +1071,7 @@
             return tab('tone-' + k, L('tones.' + k), function () { draft.tone = k; render(); }, { on: draft.tone === k, pressed: draft.tone === k ? 'true' : 'false' });
           }))]),
         myBubble(text, null),
+        passedNote(),
         tab('send-pass', L('sendPass'), function () {
           var r = act(function (x) { return SB.Mail.reply(x, q.id, 'PASS', { tone: draft.tone }); });
           if (r && r.ok !== false) { view = 'chat'; draft = {}; render(); }

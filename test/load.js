@@ -17,6 +17,9 @@ const ENGINE  = [
   'week/money', 'week/stress', 'week/mail', 'week/shows', 'week/jobs', 'week/week', 'week/save', 'week/game'
 ].map(f => 'js/engine/' + f + '.js');
 
+// Engine files outside the SB.API manifest (no stub, never swapped by opts.real): loaded after the engine whenever they exist.
+const EXTRA = ['js/engine/show/irl.js'];
+
 function exists(rel) { return fs.existsSync(path.join(ROOT, rel)); }
 
 function run(rel) {
@@ -120,6 +123,7 @@ function load(opts) {            // opts: { stubs: bool, packs: [slug], text: bo
     } else if (exists(f)) run(f);
     else if (opts.stubs) run(stub);                                    // a stub with the same module name
   });
+  EXTRA.forEach(f => { if (exists(f)) run(f); });
   // SPEC?: the spec runs every pack unconditionally, which throws while no pack exists. When the caller did not
   // name packs, the default 'pensacola' is skipped if its file is absent; a named pack that is absent still throws.
   const named = Array.isArray(opts.packs);
@@ -138,6 +142,7 @@ load.CORE = CORE;
 load.CONTENT = CONTENT;
 load.CITIES = CITIES;
 load.ENGINE = ENGINE;
+load.EXTRA = EXTRA;
 load.run = run;
 load.strip = strip;
 module.exports = load;

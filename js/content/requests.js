@@ -16,7 +16,7 @@ SB.Content.requests = {
       teaches: 'A good ask: exact dates, the route, what they carry, a small honest number.',
       subject: [
         '{city}, {day1} the {date1:ord}{of1} (?date2: or {day2} the {date2:ord}{of2}), {band} ({home})',
-        'Date request: {city}, {month} {date1} (?date2: or {date2}), {band} from {home}'
+        '{city} on the {date1:ord}{of1} (?date2: or the {date2:ord}{of2})? {band} ({home})'
       ],
       body: [
         "Hi {you|there},\n\n" +
@@ -34,7 +34,7 @@ SB.Content.requests = {
         "Thanks for reading this either way.\n{member}",
 
         "Hi {you|there},\n\n" +
-        "{band} here, from {home}. We play {genrePlain}. (?firstVisit: It's our first time down your way, so honestly, don't expect a crowd for us.)\n\n" +
+        "{band} here, from {home}. We play {genrePlain}. (?firstVisit: It's our first time down your way, so honestly, don't expect a crowd for us.)(?nearby: We're only up the road, so a few of our friends usually make the drive.)\n\n" +
         "Dates: {day1} the {date1:ord}{of1} (?date2: or {day2} the {date2:ord}{of2}). " +
         "[?hasRoute: We're in {prev} the night before and {next} the night after, so either one works for the drive. | We're still building the rest of the run around these.]\n" +
         "(?shortNotice: Sorry this is so close. We'd understand a no.)\n\n" +
@@ -510,8 +510,8 @@ SB.Content.requests = {
   /* The player's own messages, shown in the composer before sending. One group per ASK kind and REPLY. */
   compose: {
     INTERESTED: [
-      'Interested. Give me a few days to find a room.',
-      'This could work. Let me check rooms and get back to you this week.'
+      '(?day: {day} works.) Give me a few days to lock a room.',
+      '(?day: {day} could work.) Let me check rooms and get back to you this week.'
     ],
     OFFER: [
       '{dateLong}. (?doorDeal: Door deal: you get everything after {costs:money} for the room and sound.) (?guarantee: {guarantee:money} guaranteed.) ' +
@@ -648,6 +648,13 @@ SB.Content.requests = {
 
   ladder: { wide: 'could be {lo}, could be {hi}', mid: 'probably {lo} to {hi}', narrow: '{lo}–{hi}', known: 'drew {n} here on a {dow}' },
   shortNotice: 'Short notice. Nobody expects a full room on {daysOut:words} days; the town will judge it that way.',
+  /* under your guess when it sits far below what they say (Requests.view guessWhy); the engine adds SHORT and a period */
+  guessWhy: {
+    FIRST: 'They do about {says} at home. Nobody here knows them yet',
+    NEARBY: 'They do about {says} at home, up the road. Only a few will make the drive',
+    RETURN: "They do about {says} at home. Away from home it's always less",
+    SHORT: ", and {daysOut:words} days isn't long for word to get around"
+  },
   /* the warnings on a date (Crowd.near): a similar show the night before, a bigger similar show a night or three after */
   nightBefore: '{room:cap|Another room} has a show for the same crowd the night before, {night}. Some of them will still be worn out.',
   biggerAfter: '{room:cap|Another room} has a bigger show for the same crowd on {night}. Some will save their money for that one.',

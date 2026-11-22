@@ -48,7 +48,7 @@
     sendPreview: 'What goes out',
     exposureNoBreak: 'If nobody comes you owe {total:money}.',
     door: 'The door: {paid} paid at {price:money}, {gross:money}',
-    hat: 'The hat: {hat:money}',
+    hat: 'Gas money: {hat:money}',
     gap: 'Short by {gap:money}',
     keepCustom: 'Split it the usual way (you keep {n:money})',
     keepFair: 'Keep only what is fair ({n:money})',
