@@ -21,7 +21,12 @@
 /* ---------------------------------------------------------------- */
 /* start: the wall                                                   */
 /* ---------------------------------------------------------------- */
-.st-start { }
+/* the wall behind it all (user 2026-11-22: "there should be a wall texture back there ... make the wall look better
+   and hide it in the background"): dark painted cinderblock a few shades off black, its grime the riot grrrl kit's
+   toner photo blurred to blotches (assets/textures/wall.webp); the vignette keeps the title the brightest thing */
+.st-start { background-color: #0c0c0b;
+  background-image: radial-gradient(ellipse 75% 70% at 45% 40%, transparent 40%, rgba(0, 0, 0, .65) 100%), url("../assets/textures/wall.webp?v=2");
+  background-size: 100% 100%, cover; background-position: center, center; }
 .st-pile { position: absolute; inset: calc(var(--p) * -20); overflow: hidden; z-index: 0; opacity: .6; }
 .st-pile::after { content: ""; position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(ellipse 60% 40% at 30% 30%, rgba(0, 0, 0, .45), transparent 70%); }

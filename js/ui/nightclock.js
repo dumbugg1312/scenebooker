@@ -130,6 +130,7 @@
                          aria: { label: L('callNightSay') }, text: L('callNight').toUpperCase(), on: { click: call } });
   }
   /* the rest of tonight (js/ui/evening.js): beside CALL IT A NIGHT while the evening is up */
+  /* (the THINGS TO DO button came off the clock 2026-11-22: the to-do list on the desk opens them, js/desk/scene.js) */
   function things(t) {
     if (lampKey() !== 'night' || !SB.UI.evening) return null;
     return h('button', { type: 'button', class: 'ck-things pz-hl' + (t.left > 0 ? ' is-on' : ''), data: { fk: 'things' },
@@ -179,7 +180,8 @@
     if (k === key) return;
     key = k;
     SB.UI.clear(e);
-    e.appendChild(SB.Clock.slip(s, { tonight: t, list: cr, crunch: 1, short: true, hot: ink, extra: pv.hours, cls: 'nc-slip', foot: btnOn ? (playButton() || h('span', { class: 'ck-btns' }, [things(t), button(t)])) : null }));
+    void things;
+    e.appendChild(SB.Clock.slip(s, { tonight: t, list: cr, crunch: 1, short: true, hot: ink, extra: pv.hours, cls: 'nc-slip', foot: btnOn ? (playButton() || button(t)) : null }));
     if (sayEl) e.appendChild(sayEl);                             // a redraw keeps the line that is up
     retape();
   }
