@@ -31,7 +31,8 @@
     YES: '{who} said yes.', NO: '{who} said no.', COUNTER: '{who} wrote back with a change. Answer them on the phone.',
     said: '{who}: “{text}”',
     gone: 'The request from {who} is gone. They booked somewhere else.', confirmed: '{date} at {room} is confirmed. The show is real.',
-    more: '+{n} more on the phone'
+    more: '+{n} more on the phone',
+    stillNot: 'You still haven\'t {thing}. Call it a night anyway?', stillYes: 'call it a night', stillNo: 'not yet'
   };
 
   /* What a quiet night says instead of "nothing changed" (2.1): somebody you know, in their own words. Who is named in {who}:
@@ -212,6 +213,37 @@
     return list.length ? list[r.int(0, list.length - 1)].replace(/\{who\}/g, k[1]) : L('still');
   }
 
+  /* While the walkthrough is on and tonight's step has something to do tonight, CALL IT A NIGHT asks once per step: the clock
+   * swaps the button for the question, with CALL IT A NIGHT and NOT YET. Never when the step waits on someone else, or the
+   * hours are spent. */
+  var asking = null, askedFor = null, askGame = null;
+  function undone(s) {
+    var u = s && s.story && s.story.tutorial && s.story.tutorial.on && SB.Tutorial && SB.Tutorial.undone ? safe(function () { return SB.Tutorial.undone(s); }, null) : null;
+    return u && u.thing ? u : null;
+  }
+  function press() {
+    var s = safe(function () { return SB.UI.game(); }, null), t = s ? safe(function () { return SB.Week.tonight(s); }, null) : null, u, k;
+    if (s !== askGame) { askGame = s; asking = null; askedFor = null; }   // a new game asks afresh
+    if (lampKey() === 'night' && t && t.left > 0 && !showTonight()) {
+      u = undone(s); k = u ? u.step + ':' + u.stage : null;
+      if (u && askedFor !== k) { askedFor = k; asking = u.thing; render(s, info0); focusAsk(); return; }
+    }
+    asking = null;
+    call();
+  }
+  function focusAsk() {
+    var b = el && el.querySelector ? el.querySelector('[data-fk="callnight"]') : null;
+    if (b && b.focus) { try { b.focus({ preventScroll: true }); } catch (x) { b.focus(); } }
+  }
+  function notYet() { asking = null; render(safe(function () { return SB.UI.game(); }, null), info0); }
+  function askGroup() {
+    return h('div', { class: 'ck-group ck-ask', role: 'group', aria: { label: L('stillNot', { thing: asking }) }, style: { display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'stretch' } }, [
+      h('p', { class: 'ck-asktext', text: L('stillNot', { thing: asking }) }),
+      h('button', { type: 'button', class: 'ck-call pz-hl', data: { fk: 'callnight' }, text: L('stillYes').toUpperCase(), on: { click: function () { asking = null; call(); } } }),
+      h('button', { type: 'button', class: 'ck-call ck-stay pz-hl is-hot', data: { fk: 'notyet', tut: 'night' }, text: L('stillNo').toUpperCase(), on: { click: notYet } })
+    ]);
+  }
+
   function call() {
     if (lampKey() !== 'night') return;
     dropSlip();
@@ -240,7 +272,7 @@
     var show = showTonight();
     return h('button', { type: 'button', class: 'ck-call pz-hl' + (t.left <= 0 || show ? ' is-hot' : ''), data: { fk: 'callnight', tut: 'night' },
                          title: show ? L('toShowSay') : L('callNightTip'),
-                         aria: { label: L(show ? 'toShowSay' : 'callNightSay') }, text: L(show ? 'toShow' : 'callNight').toUpperCase(), on: { click: call } });
+                         aria: { label: L(show ? 'toShowSay' : 'callNightSay') }, text: L(show ? 'toShow' : 'callNight').toUpperCase(), on: { click: press } });
   }
 
   /* the extras beside the one press (0.8, 2.1, 2.6): STAY UP 1 HR, SKIP TO <day>, and on an open night the top two things to do.
@@ -253,6 +285,12 @@
     var main = button(t), extra = [], s, q, st, qk;
     if (lampKey() !== 'night' || !t) return main;
     s = safe(function () { return SB.UI.game(); }, null);
+    if (asking) {
+      /* the question goes when the thing it names has been done (or the game changed) */
+      qk = undone(s);
+      if (s === askGame && qk && qk.thing === asking) return askGroup();
+      asking = null;
+    }
     st = t.stay || {};
     if (!showTonight()) {
       if (t.left <= 0 && st.left > 0 && SB.UI.evening)
@@ -265,14 +303,8 @@
         extra.push(h('button', { type: 'button', class: 'ck-call ck-skip pz-hl', data: { fk: 'skip' }, aria: { label: L('skipSay', { day: qk }) },
                                  text: L('skip', { day: qk }).toUpperCase(), on: { click: function () { skipTo(q.day); } } }));
       }
-      if (t.left >= 3 && SB.UI.evening && SB.UI.evening.quick) {
-        SB.UI.evening.quick(2).forEach(function (v) {
-          extra.push(h('button', { type: 'button', class: 'ck-call ck-act pz-hl', data: { fk: 'act-' + v.id },
-                                   aria: { label: v.label + ', ' + SB.Clock.cost(v.hours) + '. ' + (v.benefit || '') },
-                                   text: v.label + ', ' + SB.Clock.cost(v.hours).toLowerCase(),
-                                   on: { click: function () { SB.UI.evening.press(v); } } }));
-        });
-      }
+      /* the two evening activities that used to sit under CALL IT A NIGHT were taken off 2026-11-24 (user: "call it a
+         night is enough"); they are still on the TONIGHT list on the desk */
     }
     if (!extra.length) return main;
     return h('div', { class: 'ck-group', style: { display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'stretch' } }, [main].concat(extra));
@@ -355,7 +387,7 @@
     cr = safe(function () { return SB.Week.crunch(s); }, []) || [];
     ink = SB.Clock.hot(s);
     btnOn = lampKey() === 'night' || lampKey() === 'close' || lampKey() === 'next' || lampKey() === 'resume' || lampKey() === 'pause';
-    k = JSON.stringify([t, cr.slice(0, 1), ink, btnOn && lampKey(), pv.hours, safe(function () { return SB.Week.quiet(s); }, null)]);
+    k = JSON.stringify([t, cr.slice(0, 1), ink, btnOn && lampKey(), asking, asking ? !!undone(s) : 0, pv.hours, safe(function () { return SB.Week.quiet(s); }, null)]);
     if (k === key) return;
     key = k;
     SB.UI.clear(e);
@@ -398,5 +430,5 @@
     if (b && b.focus) { try { b.focus({ preventScroll: true }); } catch (x) { b.focus(); } }
   }
 
-  SB.NightClock = { render: render, preview: preview, nudge: nudge, callNight: call };
+  SB.NightClock = { render: render, preview: preview, nudge: nudge, callNight: call, press: press };
 })(SB);

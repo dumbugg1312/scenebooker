@@ -1509,6 +1509,8 @@ SB.module('Week', function (SB) {
     c.week = n; c.day = n * 7; c.phase = E.PHASE.PLAY;      // the new week plays from Monday morning by itself (spec 10)
     c.cursor = { dayIdx: 0, half: E.HALF.DAY }; c.done = 0; c.stop = null;
     if (typeof P.burnoutUntil === 'number' && P.burnoutUntil <= c.day) P.burnoutUntil = null;
+    /* a day job switched on or off at the setup after the first show starts with this week (SB.Game.turnBills) */
+    if (SB.Game && SB.Game.turnBills) SB.Game.turnBills(state);
     state.week = blankWeek(state, n);                     // clock.pending is kept: it opens Monday morning
     SB.Jobs.refreshAll(state);
     SB.Director.planWeek(state);

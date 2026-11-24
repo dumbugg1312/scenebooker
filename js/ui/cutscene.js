@@ -290,7 +290,7 @@ SB.module('Cutscene', function (SB) {
     cutscene = cutscene || {}; slots = slots || {}; opts = opts || {};
     /* a frame with an `ask` waits for the player's reply when opts.ask is on (the setup questions on the way in);
        otherwise the reply picked before (opts.answers[ask.id]) is shown as a plain line */
-    var asking = !!opts.ask, answers = {}, prior = opts.answers || null, waiting = null, advancing = false;
+    var asking = !!opts.ask, answers = {}, prior = opts.answers || null, waiting = null, advancing = false, toggles = {};
     var frames = (cutscene.frames || []).filter(Boolean), kind = String(cutscene.kind || 'PANELS').toUpperCase();
     if (kind !== 'SCENE' && kind !== 'DROP') kind = 'PANELS';
     var counts = {}, ctxs = frames.map(function (f) { return artCtx(f, slots, counts); });
@@ -400,6 +400,24 @@ SB.module('Cutscene', function (SB) {
         if (!still) mv(b, 'slap', t + 150 + i * 160);
         b.addEventListener('click', function (e) { e.stopPropagation(); answer(a, o.v, b); });
       });
+      /* a.toggle { id, label, on, off, def }: a tick box under the answers, kept with whichever answer is picked
+         (user 2026-11-24: the day job switches on and off apart from how hard the game is) */
+      if (a.toggle) {
+        var tg = a.toggle, tb = el('button', 'cs-toggle pz-hl', wrap), tbox = el('span', 'cs-tick', tb), tcol = el('span', 'cs-togglecol', tb),
+            tlab = el('span', 'cs-togglelab', tcol, fill(tg.label, slots)), tnote = el('span', 'cs-togglenote', tcol, '');
+        void tlab;
+        if (!(tg.id in toggles)) toggles[tg.id] = !!tg.def;
+        var paint = function () {
+          var on = toggles[tg.id];
+          tb.setAttribute('aria-pressed', on ? 'true' : 'false'); tb.classList.toggle('is-on', on);
+          tbox.textContent = on ? 'X' : '';
+          tnote.textContent = fill(on ? tg.on : tg.off, slots) || '';
+        };
+        tb.type = 'button';
+        tb.addEventListener('click', function (e) { e.stopPropagation(); if (waiting === null) return; toggles[tg.id] = !toggles[tg.id]; paint(); });
+        paint();
+        if (!still) mv(tb, 'slap', t + 150 + (a.options || []).length * 160);
+      }
       if (a.foot) el('p', 'cs-foot', wrap, fill(a.foot, slots));
       var at = idx;
       setTimeout(function () { var b0 = row.querySelector('.cs-reply'); if (b0 && !done && idx === at) try { b0.focus(); } catch (e) { /* gone */ } }, still ? 0 : t + 200);
@@ -408,6 +426,7 @@ SB.module('Cutscene', function (SB) {
     function answer(a, v, btn) {
       if (done || waiting === null) return;
       answers[a.id] = v;
+      if (a.toggle) { answers[a.toggle.id] = a.toggle.id in toggles ? toggles[a.toggle.id] : !!a.toggle.def; Array.prototype.forEach.call(box.querySelectorAll('.cs-toggle'), function (c) { c.disabled = true; }); }
       if (typeof opts.onAnswer === 'function') try { opts.onAnswer(a.id, v, slots); } catch (e) { /* the answer is kept anyway */ }
       waiting = null; advancing = true; nextBtn.hidden = false; skipBtn.disabled = false; skipBtn.removeAttribute('title'); hint.textContent = 'click or space';
       if (btn && btn.parentNode) {

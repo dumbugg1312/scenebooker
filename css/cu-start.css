@@ -40,6 +40,12 @@
 
 .st-front { position: absolute; inset: 0; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr) calc(var(--p) * 440); gap: calc(var(--p) * 20) calc(var(--p) * 20); padding: calc(var(--p) * 28) calc(var(--p) * 40) calc(var(--p) * 28) calc(var(--p) * 40); align-items: start; }
 .st-left { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
+/* the left column never runs past the bottom (big text): it is as tall as the stage, and the how-to note gives up room
+   and scrolls before the tapes, Bring in a save and Settings get pushed off */
+.st-front { grid-template-rows: minmax(0, 1fr); }
+.st-start .st-left { align-self: stretch; min-height: 0; }
+.st-start .st-left > * { flex: none; }
+.st-start .st-left > .st-guide { flex: 0 1 auto; min-height: calc(var(--p) * 70); overflow-y: auto; overscroll-behavior: contain; }
 .st-title { position: relative; margin: 0; line-height: 0; width: calc(var(--p) * 640); }
 .st-title > .st-title-b { position: absolute; left: 0; top: 0; }
 .st-sub { margin: calc(var(--p) * -4) 0 calc(var(--p) * 20) calc(var(--p) * 22); }
@@ -82,6 +88,9 @@
 .st-findfield .kt-input { font-size: calc(var(--fs) * 17); }
 .st-findfield .kt-input:focus-visible, .st-namefield .kt-input:focus-visible { outline: none; box-shadow: none; background: linear-gradient(transparent 28%, var(--hl-swipe) 28%); }
 .st-count { flex: none; margin: calc(var(--p) * 8) 0 calc(var(--p) * 4); align-self: flex-start; }
+.st-countrow { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 10); }
+.st-countrow .st-count { align-self: center; }
+.st-alltowns { margin: calc(var(--p) * 6) 0 calc(var(--p) * 2); }
 .st-rackbox { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: calc(var(--p) * 10) calc(var(--p) * 22) calc(var(--p) * 18) calc(var(--p) * 8); }
 .st-rack { display: grid; grid-template-columns: minmax(0, 1fr); gap: calc(var(--p) * 10); margin: 0; padding: 0; }
 .st-rack li { list-style: none; }
@@ -89,6 +98,10 @@
 
 .st-cardcol { padding-top: calc(var(--p) * 12); min-width: 0; }
 .st-cardbox { position: relative; z-index: 3; margin: 0 calc(var(--p) * 14) 0 calc(var(--p) * 8); }
+/* the postcard never runs past the bottom: its middle scrolls, the buttons stay put */
+.st-post { display: flex; flex-direction: column; max-height: calc(var(--p) * 700); }
+.st-postphoto, .st-post-head, .st-post .st-acts { flex: none; }
+.st-post-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: calc(var(--p) * 6); }
 .st-post { --paper: var(--pp-buff); --edge: var(--edge-torn-b); --ring: calc(var(--p) * 1.5); --drop: calc(var(--p) * 5); padding: calc(var(--p) * 14) calc(var(--p) * 18) calc(var(--p) * 22); transform: rotate(3.5deg); color: var(--toner); }
 .st-post .st-typed { margin-bottom: calc(var(--p) * 5); }
 .st-postphoto { display: block; width: fit-content; margin: calc(var(--p) * 2) auto calc(var(--p) * 10); }
@@ -118,6 +131,22 @@
 .st-stamp.is-on { background: var(--pp-buff); outline-width: calc(var(--p) * 4); }
 .st-stamp.is-on .sb-mark, .st-stamp.is-on svg { opacity: 1; filter: none; }
 .st-stamp.is-on::before { content: ""; position: absolute; inset: calc(var(--p) * -6); border: calc(var(--p) * 3) solid var(--toner); transform: rotate(-3deg); pointer-events: none; }
+/* your lettering: a dropdown; the closed box shows your name in the hand you picked, the open list every hand there is */
+.st-letterpick { display: flex; align-items: center; gap: calc(var(--p) * 12); width: 100%; box-sizing: border-box; padding: calc(var(--p) * 6) calc(var(--p) * 12);
+  background: var(--pp-bond); border: 0; outline: calc(var(--p) * 3) solid var(--toner); outline-offset: calc(var(--p) * -3); color: var(--toner); text-align: left; cursor: pointer; }
+.st-letterpick:hover, .st-letterpick.is-open { background: var(--pp-buff); }
+.st-lp-prev { flex: 1 1 auto; min-width: 0; overflow: hidden; display: flex; align-items: center; height: calc(var(--p) * 34); }
+.st-lp-prev canvas { display: block; width: auto !important; max-width: 100%; height: calc(var(--p) * 34) !important; object-fit: contain; object-position: left center; }
+.st-lp-font { display: block; font-size: calc(var(--fs) * 24); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--toner); }
+.st-lp-name { flex: none; font: 400 calc(var(--fs) * 13)/1.2 var(--f-type); text-transform: uppercase; letter-spacing: .06em; color: var(--toner-mid, var(--toner)); }
+.st-lp-caret { flex: none; font: 400 calc(var(--fs) * 18)/1 var(--f-type); }
+.st-letterlist { list-style: none; margin: calc(var(--p) * 6) 0 0; padding: calc(var(--p) * 4); max-height: calc(var(--p) * 260); overflow-y: auto; overscroll-behavior: contain;
+  background: var(--pp-bond); outline: calc(var(--p) * 2) solid var(--toner); outline-offset: calc(var(--p) * -2); }
+.st-lp-group { margin: calc(var(--p) * 8) calc(var(--p) * 6) calc(var(--p) * 2); font: 400 calc(var(--fs) * 12)/1.2 var(--f-type); text-transform: uppercase; letter-spacing: .1em; color: var(--toner-mid, var(--toner)); }
+.st-lp-group:first-child { margin-top: calc(var(--p) * 2); }
+.st-lp-opt { display: flex; align-items: center; gap: calc(var(--p) * 12); width: 100%; box-sizing: border-box; padding: calc(var(--p) * 4) calc(var(--p) * 8); border: 0; background: none; color: var(--toner); text-align: left; cursor: pointer; }
+.st-lp-opt:hover, .st-lp-opt:focus-visible { background: var(--hl-swipe, var(--pp-buff)); outline: none; }
+.st-lp-opt.is-on { background: var(--pp-buff); box-shadow: inset calc(var(--p) * 4) 0 0 var(--toner); }
 
 .st-flybox, .st-hitcol { display: flex; flex-direction: column; align-items: center; }
 .st-myfly { position: relative; width: calc(var(--p) * 420); transform: rotate(4deg); filter: drop-shadow(var(--sh-m) 0 var(--pitch)); line-height: 0; outline: calc(var(--p) * 1.5) solid var(--toner); }
@@ -179,3 +208,11 @@
 /* the postcard's tags, each with a gloss on hover or tap (fix list 3.9) */
 .st-tag { cursor: help; text-decoration: underline dotted; text-underline-offset: .18em; }
 .st-tag:focus-visible { outline: calc(var(--p) * 2) dashed currentColor; outline-offset: calc(var(--p) * 2); }
+
+/* the map's one question, beside BOOK HERE: first time, or booked before (spec 14) */
+.st-expbox { flex: none; margin-top: calc(var(--p) * 10); }
+.st-exp { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 6) calc(var(--p) * 14); }
+.st-exp-opt { display: inline-flex; align-items: center; gap: calc(var(--p) * 7); padding: calc(var(--p) * 5) calc(var(--p) * 8) calc(var(--p) * 5) calc(var(--p) * 5); background: none; border: 0; color: var(--toner); font: calc(var(--fs) * 15)/1.2 var(--f-type); text-align: left; cursor: pointer; }
+.st-exp-tick { flex: none; display: inline-block; width: calc(var(--p) * 18); height: calc(var(--p) * 18); border: calc(var(--p) * 2) solid var(--toner); background: var(--pp-bond); font: calc(var(--fs) * 15)/calc(var(--p) * 15) var(--f-gothic); text-align: center; }
+.st-exp-opt.is-on { font-weight: 700; }
+.st-post .st-exp-note { margin: calc(var(--p) * 4) 0 0; min-height: 2.6em; }

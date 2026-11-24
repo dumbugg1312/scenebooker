@@ -160,7 +160,17 @@ SB.module('Flyer', function (SB) {
     FONTS = d;
     return d;
   }
-  function fontStr(kind, weight, em) { return (weight || WEIGHT[kind] || '700') + ' ' + Math.max(1, Math.round(em * 10) / 10) + 'px ' + (FONTS || fonts())[kind]; }
+  function fontStr(kind, weight, em) {
+    var fam = (FONTS || fonts())[kind] || (SB.Lettering && SB.Lettering.family(kind)) || 'sans-serif';
+    return (weight || WEIGHT[kind] || '700') + ' ' + Math.max(1, Math.round(em * 10) / 10) + 'px ' + fam;
+  }
+  /* a bundled font the booker letters their name in (SB.Lettering, 'f:<slug>'): its cap height and weight join the tables */
+  function ownFont(id) {
+    var l = SB.Lettering && SB.Lettering.get(id);
+    if (!l || l.kind !== 'font') return false;
+    CAP[id] = l.cap; WEIGHT[id] = String(l.weight);
+    return true;
+  }
 
   var MCTX = null;
   function measurer(ctx) {
@@ -323,7 +333,8 @@ SB.module('Flyer', function (SB) {
 
   function infoOf(spec, recipe, R) {
     var S = flags(recipe, R.t), I = {};
-    I.presenter = lab('flyer.presents', { name: spec.presenter || '' }, (spec.presenter || '') + ' presents');
+    /* no booking name yet (a first-timer before the first flyer's name sheet): no line at all, never a bare "presents" */
+    I.presenter = spec.presenter ? lab('flyer.presents', { name: spec.presenter }, spec.presenter + ' presents') : '';
     I.bands = (spec.billing || []).map(function (b) {
       return { name: String(b.name || '') + (b.unconfirmed ? '?' : ''), home: b.touring && b.home ? '(' + b.home + ')' : '',
                one: b.oneLiner || '', touring: !!b.touring, bandId: b.bandId };
@@ -552,6 +563,12 @@ SB.module('Flyer', function (SB) {
     };
 
     B.presenter = function (I, o) {
+      /* the booker's own lettering (picked with the booking name, kept as the mark's treatment): the same hand on every
+         flyer they make, whatever the template would have used (user 2026-11-24) */
+      var sp = spec0(B), own = sp && sp.mark && sp.mark.treatment, mine = sp && (!sp.maker || sp.maker.id === 'player');
+      if (!I.presenter) return null;
+      if (mine && own && (SKEL[own] || own === 'typewriter')) o = Object.assign({}, o || {}, { treat: own });
+      else if (mine && own && ownFont(own)) o = Object.assign({}, o || {}, { treat: 'font', font: own, weight: WEIGHT[own] });
       return B.text(Object.assign({ field: 'presenter', text: I.presenter, size: 30, min: 20, font: 'ui', weight: '700' }, o || {}));
     };
 
@@ -1624,6 +1641,15 @@ SB.module('Flyer', function (SB) {
     try { paint(ctx, P, spec, s.scale, opts.grit !== false, s.cw, s.ch); } finally { got = PENDING; PENDING = null; }
     /* a photo not in yet: load it, then draw this canvas again (unless something else has been drawn on it since) */
     tok = canvas.__sbFlyer = (canvas.__sbFlyer || 0) + 1;
+    /* the booker's own font not loaded yet: load it, then draw this canvas again */
+    var own = spec.mark && spec.mark.treatment;
+    if (own && SB.Lettering && SB.Lettering.isFont(own) && !SB.Lettering.ready(own) && !opts.noFontWait) {
+      SB.Lettering.ensure(own, function (ok) {
+        if (!ok || canvas.__sbFlyer !== tok) return;
+        render(canvas, r, spec, Object.assign({}, opts, { noFontWait: true }));
+        if (opts.onRedraw) opts.onRedraw(canvas);
+      });
+    }
     if (got.length && SB.Scenes && typeof SB.Scenes.loadCuts === 'function' && !opts.noWait) {
       SB.Scenes.loadCuts(got, function () {
         if (canvas.__sbFlyer !== tok) return;
@@ -1679,7 +1705,7 @@ SB.module('Flyer', function (SB) {
       return String(b.name || '') + (b.unconfirmed ? '?' : '') + (b.touring && b.home ? ' (' + b.home + ')' : '');
     });
     if (spec.tba) bands.push(lab('flyer.tba', {}, '+ more TBA'));
-    parts.push(lab('flyer.presents', { name: spec.presenter || '' }, (spec.presenter || '') + ' presents') + ': ' + bands.join(', ') + '.');
+    parts.push((spec.presenter ? lab('flyer.presents', { name: spec.presenter }, spec.presenter + ' presents') + ': ' : '') + bands.join(', ') + '.');
     when = d ? (d.dowLong || d.dow || '') + ' ' + (d.monthLong || d.mon || '') + ' ' + d.d : '';
     if (spec.doors) when += ', ' + lab('flyer.doors', { t: spec.doors }, 'doors ' + spec.doors);
     if (when) parts.push(when + '.');

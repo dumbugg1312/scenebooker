@@ -122,10 +122,40 @@ SB.module('Bands', function (SB) {
 
   function get(state, bandId) { return getBand(state, bandId, 'Bands.get'); }
 
+  /* Your band stack (user 2026-11-24): a new game starts with the bands the outgoing booker hands over (handover) and
+   * every other local band joins only when the player adds it, from its message. state.player.stack maps bandId -> the
+   * week it was added; a game without one (an old save) has every band in it. Touring bands are not kept here. */
+  function inStack(state, bandId) {
+    var b = state.bands && state.bands[bandId], st = state.player && state.player.stack;
+    if (!b) return false;
+    if (!b.local || !st || typeof st !== 'object') return true;
+    return Object.prototype.hasOwnProperty.call(st, bandId) || !!b.playerBand;
+  }
+  function addToStack(state, bandId) {
+    getBand(state, bandId, 'Bands.addToStack');
+    if (inStack(state, bandId)) return { ok: true, already: true };
+    state.player.stack[bandId] = week(state);
+    return { ok: true };
+  }
+  /** handover(state, n): the stack a new game starts with: the n biggest draws in town the walkthrough does not send you
+   *  a message from (those two write in the first week, and you add them yourself). */
+  function handover(state, n) {
+    var cast = SB.Tutorial && SB.Tutorial.cast ? (function () { try { return SB.Tutorial.cast(state); } catch (e) { return {}; } })() : {}, out = {};
+    Object.keys(state.bands || {}).filter(function (id) {
+      var b = state.bands[id];
+      return b.local && !b.playerBand && b.stage !== 'ENDED' && b.zoneId === 'city' && id !== cast.closer && id !== cast.kids;
+    }).map(function (id) { return { id: id, t: tier(state, state.bands[id], 'city') }; })
+      .sort(function (a, b) { return b.t - a.t || (a.id < b.id ? -1 : 1); })
+      .slice(0, n || 4).forEach(function (x) { out[x.id] = 0; });
+    state.player.stack = out;
+    return out;
+  }
+
   function list(state, filter) {
     filter = filter || {};
     return Object.keys(state.bands || {}).filter(function (id) {
       var b = state.bands[id];
+      if (filter.stack && !inStack(state, id)) return false;
       if (filter.local !== undefined && filter.local !== null && !!b.local !== !!filter.local) return false;
       if (filter.active === true && !active(b)) return false;
       if (filter.active === false && active(b)) return false;
@@ -1074,6 +1104,8 @@ SB.module('Bands', function (SB) {
     /* the player's own band (fix list 4.9): a free local act with a small crowd of friends, flagged playerBand, made once
        at setup. It plays by the same rules as the other locals (trust, wear, growth); only its ask is nothing. */
     addPlayerBand: addPlayerBand,
+    /* the band stack: inStack / addToStack, and handover for a new game */
+    inStack: inStack, addToStack: addToStack, handover: handover,
     /* extras (not in the manifest) */
     draw: function (state, bandId, zoneId) { return drawIn(state, getBand(state, bandId, 'Bands.draw'), zoneId || 'city'); },
     gen: function (state, bandId) { return genTruth(state, getBand(state, bandId, 'Bands.gen')); }

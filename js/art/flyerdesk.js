@@ -18,6 +18,9 @@
 
   SB.Content.ui.flyerdesk = {
     title: 'Flyer desk',
+    /* the name sheet: the first time the desk is opened with no booking name (spec 14), before the flyer itself */
+    nameTitle: 'Your name on the flyer',
+    nameSay: 'Every flyer says who\'s putting it on. What\'s your name for it?',
     closed: 'The desk opens once the room is confirmed.',
     printed: 'Printed. The bands get written in by hand as they say yes.',
     reprint: 'Make a new one and reprint ({cost}, {hrs})',
@@ -269,12 +272,14 @@
   function mount(root, params) {
     var showId = params && params.showId, rec = null, spec = null, rolls = [], offs = [], big = null, readOnly = false, closed = null, note = null, reprinting = false, printedOn = false, banner = null;
     var h = SB.UI.h, C = SB.UI.C || {}, stage = null, pending = { first: true, flyer: true }, lastRes = 0;
+    /* naming: the game has no booking name yet (a first-timer's first flyer), so the name sheet comes before the board */
+    var naming = false, nameDraft = null;
 
     function state() { return SB.UI.game(); }
 
     function load() {
       var s = state(), show = s && s.shows ? s.shows[showId] : null, jobs, pj;
-      closed = null; readOnly = false; note = null;
+      closed = null; readOnly = false; note = null; naming = false;
       if (!show) { closed = L('closed'); return; }
       if (show.status !== 'CONFIRMED' && show.status !== 'PLAYED') { closed = L('closed'); return; }
       try { spec = SB.Jobs.flyerSpec(s, showId); } catch (e) { closed = L('closed'); return; }
@@ -291,6 +296,32 @@
       if (!note && !(show.flyer && show.flyer.recipe) && !(show.promo && show.promo.flyer)) note = L('lockFirst');
       if (banner) note = banner;
       if (!rec) rec = show.flyer && show.flyer.recipe ? show.flyer.recipe : SB.Flyer.recipe(spec);
+      naming = !readOnly && !!s.player && s.player.bookingName === '' && !!(SB.UI.setupWidgets && SB.UI.setupWidgets.name) && !!SB.Game.setBookingName;
+    }
+
+    /* The name sheet (spec 14, the night of the first flyer): the same widget the opening used to ask with (the name
+     * field, the ideas, the lettering dropdown, a flyer beside it), here with this show's own flyer as the preview.
+     * Saving goes through the engine (SB.Game.setBookingName: the name, and the lettering as the mark's treatment), and
+     * the desk carries on with the flyer. */
+    function drawName() {
+      var s = state(), who = safe(function () { return SB.Chapters.slots(s, 'tutorial').outgoing; }, '') || '', box;
+      if (!nameDraft) nameDraft = { bookingName: '', mark: s.player.mark ? JSON.parse(JSON.stringify(s.player.mark)) : null, markSeeds: null, flyerBase: null, slug: s.citySlug, spec: spec };
+      nameDraft.spec = spec;
+      box = h('section', { class: 'sb-fd-namesheet', data: { tut: 'name-sheet' }, aria: { label: L('nameTitle') } }, [
+        h('h1', { class: 'sb-fd-nametitle', text: L('nameTitle') }),
+        h('p', { class: 'sb-fd-namesay' }, [who ? h('b', { text: who + ': ' }) : null, h('span', { text: L('nameSay') })])
+      ]);
+      stage.appendChild(box);
+      SB.UI.setupWidgets.name(box, { draft: nameDraft, answer: function (name, mark) {
+        var keep = rec, r;
+        rec = null;                                        // the recipe is rolled again for the flyer that now has a name on it
+        r = SB.UI.act(function (st) { return SB.Game.setBookingName(st, name, mark && mark.treatment ? { treatment: mark.treatment } : null); });
+        if (!r || r.ok === false) { rec = keep; return; }
+        nameDraft = null; pending.first = true; pending.flyer = true;
+        load(); draw();
+      } });
+      var back = h('button', { type: 'button', class: 'sb-fd-back sb-fd-nameback pz-hl', on: { click: function () { if (SB.UI.back) SB.UI.back(); } } }, L('back'));
+      box.appendChild(back);
     }
 
     function makerJob() {
@@ -307,7 +338,7 @@
     }
 
     function doRoll(aspects) {
-      if (readOnly || closed) return;
+      if (readOnly || closed || naming) return;
       push(SB.Flyer.roll(rec, spec, aspects || null));
     }
 
@@ -341,7 +372,7 @@
     /* 1.10: one press saves this flyer and makes it tonight (the job's hours are spent on the spot), then back to the card */
     function useNow(effort) {
       var r, mj, r2, can;
-      if (closed || readOnly) return;
+      if (closed || readOnly || naming) return;
       r = SB.UI.act(function (s) { return SB.Jobs.setFlyer(s, showId, rec, SB.Flyer.learn(s.player ? s.player.houseStyle : {}, rec)); });
       if (!r || r.ok === false) return;
       mj = makerJob();
@@ -533,6 +564,7 @@
           h('button', { type: 'button', class: 'sb-fd-back pz-hl', on: { click: function () { if (SB.UI.back) SB.UI.back(); } } }, L('back'))]));
           return;
       }
+      if (naming) { drawName(); return; }
       got = rec.got || {}; colors = SB.Flyer.colors(); paperHex = colors.papers[got.paper] || '#F7F6F1';
       mj = makerJob();
       sub = [spec.billing && spec.billing[0] ? spec.billing[0].name : '', spec.date ? spec.date.dow + ' ' + spec.date.mon + ' ' + spec.date.d : '', spec.room ? spec.room.name : ''].filter(Boolean).join(' · ');
@@ -602,7 +634,7 @@
       pending.first = false; pending.flyer = false;
     }
 
-    function redraw() { if (big && !closed) draw(); }
+    function redraw() { if (big && !closed && !naming) draw(); }
 
     load();
     draw();
@@ -610,7 +642,7 @@
     if (typeof document !== 'undefined' && document.addEventListener) {
       var onUse = function (e) {
         var t = e.target, tag = t && t.tagName;
-        if (closed || readOnly || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+        if (closed || readOnly || naming || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
         if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || tag === 'SUMMARY' || tag === 'A') return;
         if (SB.UI.route && SB.UI.route() !== 'flyerdesk') return;
         if (document.querySelector('[role="dialog"]:not([hidden])')) return;
@@ -631,7 +663,7 @@
       offs.push(function () { document.removeEventListener('themechange', redraw); });
     }
     if (typeof window !== 'undefined' && window.addEventListener) {
-      var onResize = function () { if (!closed && res() !== lastRes) draw(); };
+      var onResize = function () { if (!closed && !naming && res() !== lastRes) draw(); };
       window.addEventListener('resize', onResize);
       offs.push(function () { window.removeEventListener('resize', onResize); });
       /* the board settles once the close-up has landed (its entry animation moves it): tell the tutorial's tape,

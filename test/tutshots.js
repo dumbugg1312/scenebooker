@@ -44,7 +44,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await ev(`(async function () {
       localStorage.clear();
       await new Promise(function (res, rej) { SB.Cities.load('pensacola', function (e) { if (e) rej(e); else res(); }); });
-      var st = SB.Game.newGame({ seed: 'pensacola-tutshots', citySlug: 'pensacola', bookingName: 'Extension Cord Booking', mark: { v: 1, seed: 'tutshots' },
+      var st = SB.Game.newGame({ seed: 'pensacola-tutshots', citySlug: 'pensacola', bookingName: '', setupLater: true, mark: { v: 1, seed: 'tutshots' },
                                  settings: { bills: true, fog: 'NORMAL', windows: 'NORMAL' }, tune: null, tutorial: true });
       SB.UI.story.opening(st, function () { SB.UI.start(st); });
       return 'ok';

@@ -28,6 +28,8 @@ SB.Content.cutsceneAudio = {
 
   MOOD: {
     GOING_AWAY_open: 'warm',
+    GOING_AWAY_name: 'warm',
+    GOING_AWAY_setup: 'warm',
     DOORS_AT_8_close: 'warm',
     ANSWER_EVERYONE_open: 'tense',
     OUT_OF_STATE_open: 'road',

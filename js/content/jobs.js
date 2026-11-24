@@ -234,8 +234,8 @@ SB.Content.jobs = {
     card: 'Make the flyer. {hours} hours. Best done this week: a show without a flyer has not been announced.',
     why: 'Bands can\'t share it, shops can\'t hang it and nobody can pass it on until it exists.',
     ON_TIME: [
-      'Flyer\'s done. {bookingName} presents, {billLine}, {priceLine}, {agesLine}.{tbaNote} It looks like yours.',
-      'Flyer\'s done with {lead}. {bookingName} presents, {agesLine}(?askAPunk: , ask a punk for the address). Everything else can start now.'
+      'Flyer\'s done. (?bookingName: {bookingName} presents, ){billLine}, {priceLine}, {agesLine}.{tbaNote} It looks like yours.',
+      'Flyer\'s done with {lead}. (?bookingName: {bookingName} presents, ){agesLine}(?askAPunk: , ask a punk for the address). Everything else can start now.'
     ],
     LATE: [
       'The flyer took you till {daysOut} days out. Everything that needs the flyer is behind now too: posters, the bands sharing it, the record store counter.',

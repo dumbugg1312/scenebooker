@@ -372,7 +372,11 @@ body.cb-dragging { user-select: none; }
 .cb-nexttext { flex: 1 1 auto; min-width: 0; margin: 0; font-size: calc(var(--fs) * 13); line-height: 1.2; color: var(--toner); }
 .cb-next > .cb-thing, .cb-next > .cb-nofitwrap { flex: 0 0 auto; }
 .cb-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; overflow: hidden auto; overscroll-behavior: contain; }
-.cb-step { line-height: 0; }
+.cb-step { line-height: 0; position: relative; }
+.cb-whybtn { all: unset; position: absolute; z-index: 6; box-sizing: border-box; cursor: pointer; border-radius: 50%; text-align: center; font: 700 calc(var(--fs) * 12)/1 var(--f-type); color: transparent; }
+.cb-whybtn:hover, .cb-whybtn:focus-visible { background: var(--hl-solid); }
+.cb-why { margin: calc(var(--p) * 2) calc(var(--p) * 6) calc(var(--p) * 4) calc(var(--p) * 6); font: 400 calc(var(--fs) * 13)/1.35 var(--f-type); color: var(--toner); }
+.cb-why[hidden] { display: none; }
 .cb-stephead { display: block; }
 .cb-stephead.is-on { transform: rotate(-.3deg); filter: drop-shadow(calc(var(--p) * 2) calc(var(--p) * 3) 0 rgba(0, 0, 0, .5)); z-index: 3; }
 .cb-stephead.is-locked { cursor: default; }

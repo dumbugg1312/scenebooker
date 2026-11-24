@@ -5,6 +5,15 @@
 //   node tools/shots.js <name> [<name>...] [--out dir]  those shots   (default dir design/shots/current)
 //   node tools/shots.js --all [--out dir]               every shot
 //   --url http://127.0.0.1:8792                         the preview server (started here if it does not answer)
+//   --reach                                             also list every button or field a player cannot get to on each shot:
+//                                                       past the stage edge, clipped by a box that does not scroll, or covered
+//                                                       by something drawn on top. Exit 1 when one is out of reach (OFF);
+//                                                       covered ones (UNDER) are printed to check by eye.
+//   --scale 1.5                                         the text-size setting to shoot at (1, 1.25, 1.5); run --reach at 1.5,
+//                                                       the biggest, where things run out of room first. Known quirk
+//                                                       (2026-11-24): the start flow is right at 1.5 here, but the mid-game
+//                                                       shots came out laid out wrong in headless Chrome at 1.5 (fine in a
+//                                                       real browser), so check in-game screens at big text in a real one
 // No packages: Chrome is driven over its DevTools port with Node's own WebSocket and fetch (Node 22+), the way
 // test/tutshots.js does. ONE Chrome at a time on the whole machine: tools/.shots.lock (a directory) is taken first, waited
 // for when someone else holds it, and recovered when it is older than 10 minutes (or its owner is gone). Chrome, its
@@ -67,10 +76,11 @@ const SHOTS = [
 
 /* ------------------------------------------------------------------ arguments ------------------------------------------------------------------ */
 function parseArgs(argv) {
-  const a = { names: [], all: false, list: false, out: null, url: 'http://127.0.0.1:8792' };
+  const a = { names: [], all: false, list: false, out: null, url: 'http://127.0.0.1:8792', reach: false, scale: null };
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i];
-    if (x === '--all') a.all = true; else if (x === '--list') a.list = true;
+    if (x === '--all') a.all = true; else if (x === '--list') a.list = true; else if (x === '--reach') a.reach = true;
+    else if (x === '--scale') a.scale = Number(argv[++i]);
     else if (x === '--out') a.out = argv[++i]; else if (x === '--url') a.url = argv[++i];
     else if (x.startsWith('--')) { console.error('unknown option ' + x); process.exit(2); }
     else a.names.push(x);
@@ -229,6 +239,52 @@ const PAGE = `(function () {
     }
     return SB.UI.route();
   };
+  /* --reach: every control a player could want, and whether it can be got to. A box that scrolls makes what is inside it
+     reachable (the player scrolls to it), so the test climbs to the nearest scrolling box and checks that box instead. */
+  W.__reach = function () {
+    var out = [], vw = innerWidth, vh = innerHeight;
+    var sel = 'button, a[href], input:not([type=hidden]), select, textarea, [role=button], [tabindex]:not([tabindex="-1"])';
+    function scrolls(el, cs) { return /(auto|scroll)/.test(cs.overflowY + cs.overflowX) && (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1); }
+    function name(el) {
+      var t = (el.getAttribute('aria-label') || el.textContent || el.value || '').replace(/\s+/g, ' ').trim().slice(0, 40);
+      return el.tagName.toLowerCase() + (el.getAttribute('data-fk') ? '[' + el.getAttribute('data-fk') + ']' : '') + (t ? ' "' + t + '"' : '');
+    }
+    Array.prototype.slice.call(document.querySelectorAll(sel)).forEach(function (el) {
+      var r = el.getBoundingClientRect(), cs = getComputedStyle(el), box, a, acs, clip, cx, cy, hit, inScroll = false;
+      if (r.width < 2 || r.height < 2 || cs.visibility === 'hidden' || el.disabled) return;
+      if (el.closest('[inert], [aria-hidden="true"], .cb-sr')) return;
+      box = { l: r.left, t: r.top, r: r.right, b: r.bottom };
+      clip = { l: -1e9, t: -1e9, r: 1e9, b: 1e9 };          /* the clips met on the way up; the screen comes in at the end */
+      for (a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+        acs = getComputedStyle(a);
+        if (acs.display === 'none') return;
+        if (scrolls(a, acs)) {
+          /* inside a scrolling box: the clips met so far move with the control, so test against them now, then start over
+             with the scrolling box itself as the thing that has to be in view */
+          cx = (box.l + box.r) / 2; cy = (box.t + box.b) / 2;
+          if (cx < clip.l || cx > clip.r || cy < clip.t || cy > clip.b) { out.push('OFF   ' + name(el) + ' clipped inside its scrolling box'); return; }
+          var ar = a.getBoundingClientRect(); box = { l: ar.left, t: ar.top, r: ar.right, b: ar.bottom }; clip = { l: -1e9, t: -1e9, r: 1e9, b: 1e9 }; inScroll = true; continue;
+        }
+        if (/(hidden|clip)/.test(acs.overflowY + acs.overflowX)) {
+          var cr = a.getBoundingClientRect();
+          clip = { l: Math.max(clip.l, cr.left), t: Math.max(clip.t, cr.top), r: Math.min(clip.r, cr.right), b: Math.min(clip.b, cr.bottom) };
+        }
+      }
+      clip = { l: Math.max(clip.l, 0), t: Math.max(clip.t, 0), r: Math.min(clip.r, vw), b: Math.min(clip.b, vh) };
+      /* the middle of the control (or of the scrolling box it lives in) has to be inside every clip and on the screen */
+      cx = (box.l + box.r) / 2; cy = (box.t + box.b) / 2;
+      if (cx < clip.l || cx > clip.r || cy < clip.t || cy > clip.b) { out.push('OFF   ' + name(el) + ' at ' + Math.round(r.left) + ',' + Math.round(r.top) + ' (visible area ends ' + Math.round(clip.b) + ')'); return; }
+      /* covered: something else gets the click at the control's own middle (only when the control itself is in view) */
+      /* covered: something else gets the click at the control's middle. Only for controls that do not scroll (a scrolled list
+         can be moved out from under a slip), and word notes are skipped: they close with a tap. A note, not a failure. */
+      if (inScroll) return;
+      cx = (r.left + r.right) / 2; cy = (r.top + r.bottom) / 2;
+      hit = document.elementFromPoint(cx, cy);
+      if (hit && hit.closest && hit.closest('.wd-note, .wd-pop, [role=tooltip]')) return;
+      if (hit && hit !== el && !el.contains(hit) && !hit.contains(el)) out.push('UNDER ' + name(el) + ' at ' + Math.round(cx) + ',' + Math.round(cy) + ' covered by ' + hit.tagName.toLowerCase() + '.' + String(hit.className && hit.className.baseVal !== undefined ? hit.className.baseVal : hit.className).split(' ').slice(0, 2).join('.'));
+    });
+    return out;
+  };
   return 'ok';
 })()`;
 
@@ -252,7 +308,7 @@ async function main() {
   }
   await takeLock();
   const { send, ev, ws } = await launch();
-  const saved = [], skipped = [];
+  const saved = [], skipped = [], reachBad = [];
   /* peak memory of Chrome and all its helpers (everything started with our temp profile), sampled every 1.5 s */
   let peakKB = 0;
   const sample = () => { try { const o = cp.spawnSync('ps', ['-axo', 'rss=,command=']).stdout.toString(); let t = 0; o.split('\n').forEach(l => { if (l.includes('user-data-dir=' + profDir) || (l.includes('--type=') && l.includes(profDir))) t += parseInt(l, 10) || 0; }); if (t > peakKB) peakKB = t; } catch (e) { /* fine */ } };
@@ -268,12 +324,20 @@ async function main() {
     }
     if (!ok) throw new Error('the game did not load from ' + a.url);
     await ev(PAGE);
+    if (a.scale) await ev('(function () { SB.UI.prefs.set("textScale", ' + JSON.stringify(a.scale) + '); return 1; })()');
     for (let t = 0; t < 5; t++) {                              // the pack is one more script: a busy server can drop it
       try { await ev("new Promise(function (res, rej) { SB.Cities.load('pensacola', function (e) { if (e) rej(new Error(String(e && e.message || e))); else res(1); }); })"); break; }
       catch (e) { if (t === 4) throw e; await sleep(1500); }
     }
     if (built) { await ev('window.__T = ' + JSON.stringify(built.texts) + '; window.P = ' + JSON.stringify(built.P) + '; 1'); }
+
     const shot = async (name) => {
+      if (a.reach) {
+        const bad = await ev('__reach()').catch(e => ['the check failed: ' + e.message]);
+        const off = bad.filter(x => x.startsWith('OFF')), under = bad.filter(x => !x.startsWith('OFF'));
+        if (off.length) reachBad.push(name);
+        if (bad.length) console.error((off.length ? 'REACH ' : 'reach ok (covered, check by eye) ') + name + ':\n  ' + bad.join('\n  ')); else console.error('reach ok: ' + name);
+      }
       const r = await send('Page.captureScreenshot', { format: 'png' });
       const f = path.join(outDir, name + '.png'); fs.writeFileSync(f, Buffer.from(r.result.data, 'base64')); saved.push(f); console.log(f);
     };
@@ -320,7 +384,7 @@ async function main() {
       await step('name', async () => {
         /* answer each question with its first reply till the booking name is asked */
         for (let i = 0; i < 60 && !(await ev('!!__q(".cs-ask-name input")')); i++) {
-          await ev('(function () { var b = __q(".cs-root .cs-reply:not([disabled])"); if (b) b.click(); return 1; })()'); await sleep(400);
+          await ev('(function () { var b = __q(".cs-root .cs-reply:not([disabled])") || __q(".cs-root .cs-next:not([hidden])"); if (b) b.click(); return 1; })()'); await sleep(400);
         }
         await sleep(1500);
         await ev('(function () { var i = __q(".cs-ask-name input"); if (!i) throw new Error("no name field"); i.focus(); i.value = "Extension Cord Booking"; i.dispatchEvent(new Event("input", { bubbles: true })); return 1; })()');
@@ -377,6 +441,7 @@ async function main() {
   } finally { clearInterval(sampler); sample(); cleanup(); }
   console.error('peak Chrome RSS (all processes) ' + Math.round(peakKB / 1024) + ' MB');
   console.error('saved ' + saved.length + ' shot(s)' + (skipped.length ? ', skipped ' + skipped.length + ': ' + skipped.join(', ') : ''));
-  process.exit(skipped.length && !saved.length ? 1 : 0);
+  if (a.reach) console.error(reachBad.length ? 'out of reach on: ' + reachBad.join(', ') : 'every control on every shot can be reached');
+  process.exit((skipped.length && !saved.length) || (a.reach && reachBad.length) ? 1 : 0);
 }
 main().catch(e => { console.error('FAIL ' + (e && e.stack || e)); cleanup(); process.exit(1); });

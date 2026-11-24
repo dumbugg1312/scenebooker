@@ -523,6 +523,23 @@ function main() {
       /* the other start: "I've done this before" */
       const st2 = SB.Game.newGame(Object.assign({}, opts, { seed: opts.seed + '-skip', tutorial: false }));
       if (st2.story.tutorial.on || !st2.story.tutorial.skipped || !st2.patches.SKIPPED_TUTORIAL) throw new Error('opts.tutorial === false did not skip the walkthrough');
+      /* the way in (spec 14): a first-timer's opening asks nothing (the name is asked at the first flyer); somebody who
+         has booked before is asked the name and then the setup's questions in it, before the game is made */
+      const wayIn = (setup) => {
+        const draft = SB.Game.newGame(Object.assign({}, opts, { seed: opts.seed + '-in', bookingName: '' })), asked = [];
+        let got = null, made = 0;
+        SB.UI.story.openingAsk(draft, { setup, widgets: { name: (box, ctx) => { asked.push('name'); ctx.answer('Tin Lid'); },
+                                                         band: (box, ctx) => { asked.push('band'); ctx.answer({ name: 'Wet Cement', genre: null }); } } },
+                               a => { got = a; made++; return null; }, () => {});
+        if (!cut()) throw new Error('the opening did not play on the way in');
+        for (let i = 0; i < 14 && cut(); i++) { if (cut().querySelector('.cs-reply') && asked.indexOf('how') < 0) asked.push('how'); skipCut(); }
+        if (cut() || made !== 1) throw new Error('the opening did not end by making the game (made ' + made + ')');
+        return { got, asked: asked.join(' ') };
+      };
+      const in1 = wayIn(false), in2 = wayIn(true);
+      if (in1.asked !== '' || Object.keys(in1.got).length) throw new Error('a first-timer\'s opening asked: ' + in1.asked + ' -> ' + JSON.stringify(in1.got));
+      if (in2.asked !== 'name how band' || in2.got.how !== 'REALISTIC' || in2.got.bills !== true || !in2.got.band || in2.got.band.name !== 'Wet Cement')
+        throw new Error('the opening of somebody who booked before asked: ' + in2.asked + ' -> ' + JSON.stringify(in2.got));
       if (wanted('shell') || wanted('story')) report('story (' + played.join(', ') + '; tape on the phone)');
     } else SB.UI.start(state);
     if (SB.UI.game() !== state) throw new Error('SB.UI.game() is not the started state');
@@ -596,6 +613,21 @@ function main() {
       const call = nc.querySelector('.ck-call');
       if (!call) throw new Error('no CALL IT A NIGHT button on the corner clock');
       call.click();
+      /* while the walkthrough has something to do tonight, the first press asks once (NOT YET / CALL IT A NIGHT) */
+      const ask = nc.querySelector('.ck-ask');
+      if (ask) {
+        if (stop() !== 'EVENING') throw new Error('the night was called while the walkthrough question was up');
+        if (!ask.querySelector('[data-fk="notyet"]')) throw new Error('the question has no NOT YET');
+        {   // the question drops by itself once the thing it names is done
+          const real = SB.Tutorial.undone;
+          SB.Tutorial.undone = () => null;
+          try { SB.NightClock.render(state, {}); if (nc.querySelector('.ck-ask')) throw new Error('the question stayed up after the thing was done'); } finally { SB.Tutorial.undone = real; }
+        }
+        if (nc.querySelector('.ck-ask')) ask.querySelector('[data-fk="notyet"]').click();
+        if (nc.querySelector('.ck-ask') || !nc.querySelector('.ck-call')) throw new Error('NOT YET did not bring the clock back');
+        nc.querySelector('.ck-call').click();
+        if (nc.querySelector('.ck-ask') && stop() === 'EVENING') nc.querySelector('.ck-ask [data-fk="callnight"]').click();   // asked once: the second press goes through
+      }
       if (stop() === 'EVENING') throw new Error('the clock\'s button did not call it a night');
       if (!SB.UI.playing()) throw new Error('SB.UI.playing() is false after calling it a night');
       let heard = null;
@@ -682,8 +714,8 @@ function main() {
       vm.runInThisContext(fs.readFileSync(path.join(__dirname, 'tutorial-walk.js'), 'utf8'), { filename: 'test/tutorial-walk.js' });
       SB.UI.go('desk');
       if (SB.UI.playing()) SB.UI.fire('sb-play', { cmd: 'pause' });
-      const st = SB.Game.newGame({ seed: 'pensacola-tutshots', citySlug: 'pensacola', bookingName: 'Extension Cord Booking', mark: { v: 1, seed: 'tutshots' },
-                                   settings: { bills: true, fog: 'NORMAL', windows: 'NORMAL' }, tune: null, tutorial: true });
+      const st = SB.Game.newGame({ seed: 'pensacola-tutshots', citySlug: 'pensacola', bookingName: '', mark: { v: 1, seed: 'tutshots' },   // no name yet: it is asked at the first flyer (spec 14)
+                                   settings: { bills: true, fog: 'NORMAL', windows: 'NORMAL' }, tune: null, tutorial: true, setupLater: true });   // a first-timer's game: the setup is asked after the show (spec 14)
       SB.UI.story.opening(st, function () { SB.UI.start(st); });
       for (let i = 0; i < 12 && fakeDocument.querySelector('.cs-root'); i++) fakeDocument.querySelector('.cs-root .cs-skip').click();
       if (SB.UI.game() !== st || fakeDocument.querySelector('.cs-root')) throw new Error('the new game did not reach the desk');
@@ -734,6 +766,57 @@ function main() {
       if (onDesk.length && (onDesk.indexOf('notebook') < 0 || onDesk.indexOf('tin') < 0)) throw new Error('desk after one show: ' + onDesk.join(','));
       report('tutorial (ten steps by the tape; ' + walk.log[walk.log.length - 2] + '; friend did ' + byMentor.map(j => j.type).join(' ') + '; desk ' + onDesk.join(',') + ')');
     } catch (e) { report('tutorial, at "' + where + '"', e); }
+  }
+
+  /* 8b. the setup with no show played and no name yet (spec 14): a first-timer who skips the walkthrough at once gets
+   *     the setup scene in its neutral words (not "you did one"), the booking name asked in front of it, and the
+   *     replies go into the game */
+  if (wanted('tutorial')) {
+    let where = 'start';
+    try {
+      const q = sel => fakeDocument.querySelector(sel);
+      const flush = () => { for (let r = 0; r < 200 && timers.length; r++) timers.splice(0).forEach(t => { if (!t.every && (t.ms || 0) <= 5000) t.fn(); }); SB.UI.story.pump(); };
+      SB.UI.go('desk');
+      if (SB.UI.playing()) SB.UI.fire('sb-play', { cmd: 'pause' });
+      const st = SB.Game.newGame({ seed: 'pensacola-coldsetup', citySlug: 'pensacola', bookingName: '', mark: { v: 1, seed: 'cold' },
+                                   settings: { bills: true, fog: 'NORMAL', windows: 'NORMAL' }, tune: null, tutorial: true, setupLater: true });
+      SB.UI.story.opening(st, function () { SB.UI.start(st); });
+      for (let i = 0; i < 12 && q('.cs-root'); i++) q('.cs-root .cs-skip').click();
+      if (SB.UI.game() !== st || q('.cs-root')) throw new Error('the new game did not reach the desk');
+      where = 'skip';
+      timers.length = 0;
+      SB.UI.act(s => { SB.Tutorial.skip(s); SB.Chapters.check(s); return null; });
+      const n = SB.Chapters.nextCutscene(st);
+      if (!n || n.key !== 'GOING_AWAY_setup') throw new Error('the setup scene is not next after skipping (' + (n && n.key) + ')');
+      if (n.slots.after !== false || n.slots.cold !== true) throw new Error('the setup was queued as after a show: ' + JSON.stringify({ after: n.slots.after, cold: n.slots.cold }));
+      where = 'name';
+      for (let i = 0; i < 6 && !q('.cs-root [data-fk="name-in"]'); i++) flush();
+      if (q('.sy-recap')) throw new Error('a recap card came up with no show played');
+      const inp = q('.cs-root [data-fk="name-in"] input') || q('.cs-root input');
+      if (!inp || !q('.cs-root [data-fk="name-done"]')) throw new Error('the setup did not ask the booking name first, with none given yet');
+      inp.value = 'Night Owl Booking';
+      q('.cs-root [data-fk="name-done"]').click(); flush();
+      where = 'how';
+      for (let i = 0; i < 6 && !q('.cs-root .cs-reply'); i++) flush();
+      const tx = String(q('.cs-root').textContent).replace(/\s+/g, ' ');
+      if (/You did one|kitchen again/.test(tx)) throw new Error('the setup speaks as if a show was played: "' + tx.slice(0, 200) + '"');
+      if (/\{|\}|undefined/.test(tx)) throw new Error('the setup has a hole in it: "' + tx.slice(0, 200) + '"');
+      const rs = fakeDocument.querySelectorAll('.cs-root .cs-reply');
+      if (rs.length !== 3) throw new Error('the setup does not ask how to keep going (' + rs.length + ' replies)');
+      rs[0].click(); flush();
+      where = 'band';
+      const bi = q('.cs-root .cs-bandcard input');
+      if (!bi) throw new Error('the setup did not go on to ask about your band');
+      bi.value = 'Cold Cuts';
+      q('.cs-root [data-fk="band-done"]').click(); flush();
+      for (let i = 0; i < 8 && q('.cs-root'); i++) { q('.cs-root .cs-skip').click(); flush(); }
+      if (q('.cs-root')) throw new Error('the setup scene did not close');
+      where = 'after';
+      if (st.story.setup !== 'DONE') throw new Error('the setup was not marked asked (' + st.story.setup + ')');
+      if (st.player.bookingName !== 'Night Owl Booking') throw new Error('the name asked in the setup was not saved ("' + st.player.bookingName + '")');
+      if (st.settings.fog !== 'OPEN') throw new Error('"give me more to go on" was not applied (fog ' + st.settings.fog + ')');
+      report('tutorial, skipped at once: the setup in neutral words, the booking name asked first');
+    } catch (e) { report('tutorial skipped, setup at "' + where + '"', e); }
   }
 
   if (VERBOSE) {

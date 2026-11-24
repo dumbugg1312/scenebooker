@@ -28,6 +28,7 @@
     stateL: 'Only bands that are: {s}',
     none: 'No bands match.',
     noTouring: 'No touring band has written to you yet.',
+    stackHint: 'These are your bands. When a band you don\'t have yet writes to you, open their message and press ADD TO MY BANDS.',
     listen: 'listen',
     listenStop: 'stop',
     listenL: 'Hear what {name} sound like',
@@ -271,7 +272,8 @@
         var s = game(), ids = [], search;
         SB.UI.clear(wrap);
         if (!s) { wrap.appendChild(C().Empty({})); return; }
-        try { ids = SB.Bands.list(s, { local: tab === 'local' }); } catch (e) { ids = []; }
+        /* the local sheet is your band stack: the bands handed over to you and the ones you added from their messages */
+        try { ids = SB.Bands.list(s, { local: tab === 'local', stack: tab === 'local' }); } catch (e) { ids = []; }
         cardsCache = ids.map(function (id) { return SB.Bands.card(s, id); });
         if (tab === 'touring') cardsCache = cardsCache.filter(function (c) { return metTouring(s, c.id, c); });
         search = kit().input({ label: L('search'), value: q, type: 'search', placeholder: L('search'), fk: 'find', cls: 'rb-find', onInput: function (v) { q = v; piles(); } });
@@ -350,6 +352,9 @@
         scope = genre ? genreName(genre) : (tab === 'touring' ? L('tabTouring') : L('tabLocal'));
         key = tab + '|' + genre + '|' + st;
         hero(scope, shown, key);
+        /* how a band gets into the stack, while the stack is still small */
+        var gs = game();
+        if (tab === 'local' && gs && gs.player && gs.player.stack && (cardsCache || []).length < 12) body.appendChild(piece('cb-hintslip', 'white', [h('p', { class: 'cb-typed', text: L('stackHint') })]));
         if (!cards.length) { body.appendChild(piece('cb-hintslip', 'white', [h('p', { class: 'cb-typed', text: tab === 'touring' && !(cardsCache || []).length ? L('noTouring') : L('none') })])); return; }
         if (keys.length > 1) pileTabs.appendChild(words(L('allPiles'), keys.map(function (g) {
           return { text: genreName(g), label: genre === g ? L('allPiles') : L('pileL', { g: genreName(g) }), on: genre === g, fk: 'pile-' + g,

@@ -432,6 +432,41 @@ module.exports = function (t) {
     t.ok(r.stop && r.stop.kind === 'SHOW_NIGHT' && r.stop.showId === n.showId, 'calling the night opens the doors (' + JSON.stringify(r.stop) + ')');
   });
 
+  /* ---- the guided show's crowd floor on a pay-what-you-can door (spec 14: the first show can't flop) ---- */
+  H.section(t, 'the guided show: the crowd floor lifts a donation door too', () => {
+    const state = H.newGame(SB, { seed: 'clock-guided' });
+    const act = walker(state);
+    let n = null;
+    for (let nights = 0; nights < 16; nights++) {
+      const st = toEvening(state);
+      if (st && st.kind === 'END_OF_WEEK') {
+        SB.Week.close(state);
+        const b = SB.Week.nextWeek(state);
+        if (b && b.ok === false && b.code === 'BILLS_FIRST') { const bv = SB.Money.billsView(state); SB.Week.payBills(state, { pay: bv ? bv.lines.map(l => l.k) : [], late: [], ladder: [] }); SB.Week.nextWeek(state); }
+        continue;
+      }
+      if (!st || st.kind !== 'EVENING') break;
+      let k = 0; while (k++ < 12 && act()) { /* the asks */ }
+      n = tonight(state);
+      if (n.show) break;
+      SB.Week.endNight(state);
+    }
+    if (!n || !n.show) { t.fail('the guided first show never reached its night'); return; }
+    const show = state.shows[n.showId], cap = state.rooms[show.roomId].cap;
+    show.door.donation = true; show.door.suggested = 5; show.door.price = 0;
+    const fl = SB.Tutorial.floor(state, show);
+    t.ok(fl && fl.paid > 0 && fl.paid <= cap, 'a donation door has a floor: ' + JSON.stringify(fl));
+    /* a floor of the whole room, more than the night would draw by itself: the floor is what counts */
+    const real = SB.Tutorial.floor;
+    SB.Tutorial.floor = () => ({ paid: cap });
+    try { SB.Night.auto(state, show.id, { untilSettle: true }); } finally { SB.Tutorial.floor = real; }
+    t.eq(show.night.floor, { paid: cap }, 'kept at the night\'s start');
+    const v = SB.Night.settleView(state, show.id), out = show.night.outcome;
+    t.eq(v.door.paid, cap, 'the floor\'s crowd paid');
+    t.eq(v.door.gross, Math.round(cap * 5 * C.PRICE.HAT_RATE), 'and the hat money follows the crowd, as the model counts it');
+    t.ok(out && out.heads === cap && out.heads === out.paid + out.comps, 'never more heads than the room holds (' + (out && out.heads) + ' of ' + cap + ')');
+  });
+
   H.section(t, 'the night called: nothing more goes on the clock', () => {
     const state = H.newGame(SB, { seed: 'clock-called' });
     if (!toEvening(state)) { t.fail('no evening to call'); return; }

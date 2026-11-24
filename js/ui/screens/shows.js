@@ -214,6 +214,15 @@
     /* the seven steps (design/spec/11-booking-pipeline.md): one stamp each, the current one unfolded */
     steps: 'The show, step by step',
     step: { DATE: 'DATE', ROOM: 'ROOM', DEAL: 'THE DEAL', BILL: 'BILL', CREW: 'CREW', ANNOUNCE: 'ANNOUNCE', NIGHT: 'SHOW NIGHT' },
+    /* the "?" on each step's header: why the step is there, two lines, shown in place */
+    whyBtn: '?', whyL: 'Why is there a step for {step}?',
+    why: { DATE: 'A show starts with a day. Pick one that suits the band you want, and one you have the evenings to get ready for.',
+           ROOM: 'A band needs somewhere to play. Ask early, because a room can say no, or hold your date and give it to someone else.',
+           DEAL: 'This is what you promise the band before they say yes. Everybody gets paid out of the door at the end of the night, so only promise what the door can cover.',
+           BILL: 'Who plays, and in what order. People leave after the band they came for, so the band they came for goes near the end.',
+           CREW: 'Somebody has to run the sound, and somebody has to take money at the door. Ask early. The door is usually you.',
+           ANNOUNCE: 'A show nobody has heard of has no crowd. Make a flyer, then put it up, post it and hand it around.',
+           NIGHT: 'On the night you open the doors, count everybody who comes in, and pay people out of the door at the end.' },
     stepSt: { DONE: 'DONE', TODO: 'TO DO', WAITING: 'WAITING ON {name}', WAITING0: 'WAITING', LOCKED: 'NOT YET', BANG: 'somebody said no or countered' },
     opens: { ROOM: 'opens when the room is confirmed', BILL: 'opens when the bands have said yes' },
     stepL: 'Step {n}, {step}, {stamp}: {line}',
@@ -248,6 +257,7 @@
       door: 'Say who works the door. At most house shows that is you: you take the money, count who comes in, and stop letting people in when the room is full.',
       doorMe: 'I WILL',
       flyer: 'Paste up the flyer at the flyer desk.',
+      flyerName: 'Open the flyer desk and give your shows a name.',
       flyerMake: 'Make the flyer: pick how sharp, then do it tonight.',
       job: 'Do this tonight: {job}{due}.',
       jobDue: ', {due}',
@@ -264,7 +274,8 @@
       nothing: 'Nothing more to do on this show tonight. Call it a night.',
       nothingPhone: 'Nothing more to do on this show tonight. {n} on your phone need an answer, or call it a night.',
       keepOn: 'Everything is in hand: call it a night till the show.',
-      notOpen: 'This evening is over.'
+      notOpen: 'This evening is over.',
+      showNight: 'It\'s show night: press GO TO THE SHOW on the clock, then open the doors.'
     },
     look: 'HOW IT LOOKS', lookL: 'How the night looks: the crowd you can expect', lookBack: 'BACK TO {row}', lookBackL: 'Back to {row}',
     toClock: 'then call it a night, on the clock ↘', toClockShort: 'on the clock ↘',
@@ -1527,7 +1538,10 @@
             var open = sp.key === curStep, m = sp.rows.length + (sp.key === 'BILL' ? 1.5 : 0), ht = Math.max(24, Math.min(34, Math.floor(196 / Math.max(1, m))));
             return h('li', { class: 'cb-step is-' + sp.state.toLowerCase() + (open ? ' is-open' : '') }, [
               stepThing(sp, k, open),
-              open ? h('ol', { class: 'cb-cardrows', aria: { label: T('card', 'rows') } }, sp.key === 'BILL' ? billRows(v, sp.rows, ht) : sp.rows.map(function (x, j) { return h('li', null, rowThing(x, j, ht)); })) : null
+              whyButton(sp, k),
+              /* a step with one row is that row: the step's own line says it, so the row is not drawn again under it
+                 (user 2026-11-24: "isnt this the same info twice?") */
+              open && !(sp.key !== 'BILL' && sp.rows.length === 1) ? h('ol', { class: 'cb-cardrows', aria: { label: T('card', 'rows') } }, sp.key === 'BILL' ? billRows(v, sp.rows, ht) : sp.rows.map(function (x, j) { return h('li', null, rowThing(x, j, ht)); })) : null
             ]);
           })),
           foot(s, v, n)
@@ -1697,7 +1711,7 @@
         st0 = terms && terms.status !== 'YES' ? askState(terms) : 'OFFER';
         /* pencilled into the slot they will play from the moment they are offered: second to last on three or more, top of two */
         var tourPlanned = n + ['OPEN', 'MIDDLE', 'CLOSE'].reduce(function (t, k2) { return t + slots[k2].filter(function (x) { return x.kind === 'ask'; }).length; }, 0) + 1;
-        if (c) offerRow = add({ key: 'offer', kind: 'offer', slot: tourPlanned >= 3 ? 'MIDDLE' : 'CLOSE', label: T('card', 'offerRow'), band: c, ask: terms, req: q, value: c.name, st: st0, stText: (terms && terms.status === 'SENT' ? asked(terms) : null) || T('show', 'penciled'),
+        if (c) offerRow = add({ key: 'offer', kind: 'offer', slot: tourPlanned >= 3 ? 'MIDDLE' : 'CLOSE', label: T('card', 'offerRow'), band: c, ask: terms, req: q, value: c.name, st: st0, stText: terms && terms.status === 'SENT' ? asked(terms) : null,
                                 hot: !!terms && (terms.status === 'COUNTER' || terms.status === 'NO' || terms.status === 'SILENT'), state: st0 === 'OFFER' ? 'TODO' : (waitState(st0) || 'TODO'), who: c.name,
                                 why: tourPlanned >= 3 ? T('show', 'whySecondLast') : T('show', 'whyTop') });
       }
@@ -1882,7 +1896,7 @@
         case 'door':
           return { row: r.key, text: N('door'), btn: on ? { text: N('doorMe'), label: T('show', 'youWork'), fn: function () { act(function (x) { return SB.Shows.setCrew(x, showId, 'floor', 'player'); }); } } : open(N('pickCrew')) };
         case 'flyer':
-          if (!r.pasted) return { row: r.key, text: N('flyer'), btn: { text: T('show', 'flyerDeskT'), label: T('show', 'flyerDesk'), fn: function () { SB.UI.go('flyerdesk', { showId: showId }); } } };
+          if (!r.pasted) return { row: r.key, text: N(tc && tc.step === 'FLYER' && tc.stage === 'NAME' ? 'flyerName' : 'flyer'), btn: { text: T('show', 'flyerDeskT'), label: T('show', 'flyerDesk'), fn: function () { SB.UI.go('flyerdesk', { showId: showId }); } } };
           list = r.job ? [r.job] : [];
           break;
         case 'lock': list = r.job ? [r.job] : []; break;
@@ -1924,6 +1938,8 @@
         return stop.kind === 'NO_TIME' || stop.kind === 'BURNT_OUT' ? (stop.job ? N('noTime', { job: stop.job, why: stop.why }) : N('noMsg', { why: stop.why })) : N('early', { job: stop.job, why: stop.why });
       }
       if (tonightV && !tonightV.open) return nightNext(tonightV.called ? N('nothing') : N('notOpen'));
+      /* the guided show's own night: the clock's button is GO TO THE SHOW, and the card says so, as the guide does */
+      if (tc && tc.step === 'DOOR' && tc.stage === 'OPEN') return nightNext(N('showNight'));
       /* the guided first show: the card says what the guide says */
       if (tc) {
         tk = tutRow(s, v, tc); tr = tk ? rowBy(tk) : null;
@@ -1969,7 +1985,7 @@
     function nextLine(s, nx) {
       var b = nx.btn, btn = null, w = D.mw(T('card', 'next'), 20);
       /* waiting is calling it a night, and that is the pinned clock's button: the line points at it */
-      if (nx.night) btn = tonightV && tonightV.open ? h('span', { class: 'cb-typed cb-small cb-nexthint', text: T('card', /call it a night/i.test(nx.text || '') ? 'toClockShort' : 'toClock') }) : null;
+      if (nx.night) btn = tonightV && tonightV.open ? h('span', { class: 'cb-typed cb-small cb-nexthint', text: T('card', /call it a night|go to the show/i.test(nx.text || '') ? 'toClockShort' : 'toClock') }) : null;
       else if (b && b.hours > 0) btn = costAct({ text: b.text, label: b.label, fk: 'next', hours: b.hours, fn: b.fn, refusal: b.refusal, size: 12, tut: 'card-next', tutRef: showId });
       else if (b) btn = D.act(b.text, b.label || b.text, 'next', b.fn, { size: 12, tut: 'card-next', tutRef: showId });
       return h('div', { class: 'cb-next' + (nx.night ? ' is-night' : ''), role: 'group', aria: { label: T('card', 'nextL') } }, [
@@ -2012,10 +2028,15 @@
           who = String(sp.who || '').split(' ').slice(0, 2).join(' ').toUpperCase();
       stT = sp.state === 'BANG' ? '' : (sp.state === 'WAITING' ? (who ? T('card', 'stepSt.WAITING', { name: short(who, 14) }) : T('card', 'stepSt.WAITING0')) :
             (sp.state === 'SOON' ? T('card', sp.days > 1 ? 'soon' : (sp.days === 1 ? 'soon1' : 'soon0'), { n: sp.days }) : T('card', 'stepSt.' + sp.state)));
+      /* one row, its message not sent yet: the step says so (the row it would have repeated is not drawn) */
+      if (sp.key !== 'BILL' && sp.rows.length === 1 && sp.rows[0].st === 'TONIGHT') stT = T('card', 'st.TONIGHT');
       if (open) out += '<path d="M2 2H' + (W - 3) + 'L' + (W - 2) + ' ' + (ht - 2) + 'H3Z" fill="' + D.PAPER + '" stroke="' + D.TONER + '" stroke-width="2.6"/>';
       else out += '<path d="M4 ' + (ht - 1.5) + 'H' + (W - 6) + '" stroke="' + D.TONER + '" stroke-opacity="' + (locked ? '.25' : '.5') + '" stroke-width="1.2"/>';
       out += D.strip(name, x0, 1, 12, locked ? { ground: D.GRAY } : null);
       sx = x0 + D.stripW(name, 12) + 10;
+      /* the "?" (the press itself is a button laid over it, whyButton) */
+      out += '<circle cx="' + f(sx + 7) + '" cy="' + f(ht / 2) + '" r="8" fill="none" stroke="' + (locked ? D.GRAY : D.TONER) + '" stroke-width="1.5"/>' + D.type('?', sx + 7, ht / 2 + 4.5, 12, { anchor: 'middle', bold: true, fill: locked ? D.GRAY : D.TONER });
+      sx += 22;
       if (sp.state === 'BANG') { out += D.bang(W - 30, ht / 2 + 9, 19); sb = { w: 30 }; }
       else { sb = stampBox(stT, W - 8, ht / 2 + 0.5, { dashed: locked || sp.state === 'TODO' || sp.state === 'SOON', ink: sp.state === 'TODO' ? D.TONER : null, rot: i % 2 ? 1.2 : -1.2 }); out += sb.svg; }
       if (sp.state === 'DONE') { out += '<g transform="translate(' + f(sx) + ' ' + f(ht / 2 - 8) + ')">' + D.mark('DONE', 15) + '</g>'; sx += 20; }
@@ -2027,6 +2048,21 @@
       /* a locked step says what opens it, but is not a Tab stop (keyboard play, 0.9) */
       if (locked && headEl && headEl.setAttribute) { headEl.setAttribute('tabindex', '-1'); headEl.setAttribute('aria-disabled', 'true'); }
       return headEl;
+    }
+
+    /* the press over a step header's "?": its two-line why opens under the header, and closes on the next press */
+    function pq(n) { return 'calc(var(--p) * ' + n + ')'; }
+    function whyButton(sp, i) {
+      var name = (i + 1) + ' ' + T('card', 'step.' + sp.key), x = 4 + D.stripW(name, 12) + 10 + 7, p = h('p', { class: 'cb-why', hidden: true, text: T('card', 'why.' + sp.key) }), b;
+      b = h('button', { type: 'button', class: 'cb-whybtn', data: { fk: 'why-' + sp.key }, style: { left: pq(x - 10), width: pq(20), height: pq(20), top: pq(3.5) },
+        aria: { label: T('card', 'whyL', { step: T('card', 'step.' + sp.key).toLowerCase() }), expanded: 'false' }, text: T('card', 'whyBtn'),
+        on: { click: function (ev) {
+          var on = p.hasAttribute('hidden');
+          if (ev && ev.stopPropagation) ev.stopPropagation();
+          if (on) p.removeAttribute('hidden'); else p.setAttribute('hidden', '');
+          b.setAttribute('aria-expanded', on ? 'true' : 'false');
+        } } });
+      return [b, p];
     }
 
     /* one row: its name on a label-maker strip (it opens), what is written in by hand, how it stands as a stamp */
@@ -2871,7 +2907,13 @@
       var show = v.show, onBill = {}, asks = bandAsks(s, showId), ids, piles = {}, cards, keys, out = [], nAll, short = false;
       billTop = billGenreOf(s, show);
       show.bill.slots.forEach(function (x) { onBill[x.bandId] = true; });
-      ids = safe(function () { return SB.Bands.list(s, fl.freeOnly ? { local: true, active: true, freeOn: show.day } : { local: true, active: true }); }, []);
+      ids = safe(function () { return SB.Bands.list(s, fl.freeOnly ? { local: true, active: true, freeOn: show.day, stack: true } : { local: true, active: true, stack: true }); }, []);
+      /* only your band stack is offered (user 2026-11-24); the band the walkthrough is pointing at is offered even before
+         you add it, so the guided first show never waits on it */
+      (function () {
+        var tc = safe(function () { return SB.Tutorial.current(s); }, null), tb = tc && tc.bandId;
+        if (tb && ids.indexOf(tb) < 0 && s.bands && s.bands[tb] && s.bands[tb].local) ids.push(tb);
+      })();
       cards = ids.map(function (id) { return safe(function () { return SB.Bands.card(s, id); }, null); }).filter(Boolean);
       nAll = cards.length;
       /* show one: five bands worth asking for this slot, with a reason each; the rest of the town is one press away (fix list 1.7) */

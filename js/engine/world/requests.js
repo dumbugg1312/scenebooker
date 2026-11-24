@@ -1242,6 +1242,9 @@ SB.module('Requests', function (SB) {
       res.records.forEach(function (x) { records.push(x); });
       return res.requestId;
     }
+    /* while the first show is walked through nothing else arrives (design/spec/14-first-show-tutorial.md): the week's
+     * asks start again once the guided show is played */
+    if (SB.Tutorial && SB.Tutorial.walking && SB.Tutorial.walking(state)) return records;
     /* cold asks: passing tours that want the town, thinned by the player's share */
     if (!(stage === 1 && w + 1 < Q.STAGE1.fromWeek)) {
       var n = poisson(r, coldRate(state)), i;

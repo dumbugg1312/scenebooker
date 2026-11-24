@@ -183,3 +183,11 @@ body:has(.sb-fd) .nc-say { bottom: auto; top: 100%; margin: calc(var(--u) * 14) 
 .sb-fd-closed h1 { margin: 0 0 calc(var(--p) * 10); font: calc(var(--fs) * 15)/1 var(--f-type); letter-spacing: .08em; text-transform: uppercase; }
 .sb-fd-closed p { margin: 0 0 calc(var(--p) * 16); font: calc(var(--fs) * 14)/1.35 var(--f-type); }
 .sb-fd-back { border: 0; padding: calc(var(--p) * 6) calc(var(--p) * 14); background: var(--toner); color: var(--pp-bond); font: calc(var(--fs) * 14)/1 var(--f-type); text-transform: uppercase; clip-path: var(--edge-cut-2); }
+
+/* the name sheet: the first time the desk is opened with no booking name (spec 14), in front of the board */
+.sb-fd-stage .sb-fd-namesheet { position: absolute; left: calc(var(--p) * 250); top: calc(var(--p) * 24); width: calc(var(--p) * 680); max-height: calc(var(--p) * 650); overflow-y: auto; overscroll-behavior: contain; }
+.sb-fd-nametitle { display: inline-block; margin: 0 0 calc(var(--p) * 8); padding: calc(var(--p) * 5) calc(var(--p) * 10); background: var(--toner); color: var(--pp-bond); font: calc(var(--fs) * 15)/1 var(--f-type); letter-spacing: .08em; text-transform: uppercase; transform: rotate(-.8deg); }
+.sb-fd-namesay { margin: 0 0 calc(var(--p) * 10); padding: calc(var(--p) * 8) calc(var(--p) * 12); background: var(--pp-buff); color: var(--toner); font: calc(var(--fs) * 15)/1.35 var(--f-type); width: fit-content; max-width: 100%; box-sizing: border-box; }
+.sb-fd-namesheet .cs-namecard { transform: rotate(-.4deg); }
+.sb-fd-namesheet .sb-fd-nameback { display: inline-block; margin: calc(var(--p) * 12) 0 0; }
+

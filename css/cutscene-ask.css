@@ -4,15 +4,19 @@
  * copy paper under it saying what it does in the game; the picked one gets the highlighter, the rest drop away.
  * The booking name is a taped sheet on the right of the stage (js/ui/screens/start.js nameWidget). Nothing eases.
  */
-.cs-ask { align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; gap: calc(var(--p) * 8); }
-.cs-replies { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: flex-start; gap: calc(var(--p) * 12) calc(var(--p) * 22); }
+/* read top to bottom, left to right (user 2026-11-24, "this layout is so confusing"): the question, then the answers
+   side by side in equal columns, each one what you say with what it does right under it, then the foot line */
+.cs-ask { align-self: stretch; display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 10); }
+.cs-replies { align-self: stretch; display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(var(--p) * 260), 1fr)); align-items: start; gap: calc(var(--p) * 12) calc(var(--p) * 22); }
 .cs-reply {
-  display: flex; flex-direction: column; align-items: flex-end; gap: calc(var(--p) * 4); max-width: calc(var(--p) * 360);
+  display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--p) * 2); min-width: 0;
   background: none; border: 0; padding: calc(var(--p) * 4); margin: 0; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
-.cs-reply .cs-say { align-self: auto; pointer-events: none; }
+.cs-reply .cs-say { order: 1; align-self: flex-start; max-width: 100%; pointer-events: none; }
+/* the dashed balloon already says it is you; the YOU tag over each answer was one label too many */
+.cs-reply .cs-who { display: none; }
 .cs-note {
-  display: block; max-width: calc(var(--p) * 352); padding: calc(var(--p) * 5) calc(var(--p) * 12) calc(var(--p) * 6);
+  order: 2; display: block; max-width: 100%; box-sizing: border-box; margin-left: calc(var(--p) * 8); padding: calc(var(--p) * 5) calc(var(--p) * 12) calc(var(--p) * 6);
   font: 400 calc(var(--fs) * 18)/1.35 var(--f-type); color: var(--toner); background: var(--pp-bond);
   transform: rotate(.6deg); clip-path: var(--edge-cut-1);
 }
@@ -24,13 +28,13 @@
   font: 400 calc(var(--fs) * 16)/1.2 var(--f-gothic); letter-spacing: .1em; text-transform: uppercase;
   background: var(--toner); color: var(--pp-bond); transform: rotate(-2deg); vertical-align: calc(var(--p) * 1);
 }
-.cs-level-hard { background: var(--late, var(--toner)); }
+.cs-level-hard, .cs-level-difficult { background: var(--late, var(--toner)); }
 .cs-reply:focus-visible { outline: calc(var(--p) * 3) dashed var(--hl-solid); outline-offset: calc(var(--p) * 2); }
 .cs-reply[disabled] { cursor: default; }
 .cs-reply.is-dropped { opacity: 0; transform: translateY(calc(var(--p) * 10)) rotate(2deg); transition: opacity .2s steps(2, end), transform .2s steps(2, end); }
 .cs-foot {
-  margin: 0; max-width: calc(var(--p) * 700); padding: calc(var(--p) * 4) calc(var(--p) * 10) calc(var(--p) * 5);
-  font: 400 calc(var(--fs) * 17)/1.35 var(--f-type); color: var(--pp-bond); background: var(--toner); transform: rotate(-.4deg);
+  margin: calc(var(--p) * 2) 0 0; max-width: calc(var(--p) * 1000); padding: calc(var(--p) * 4) calc(var(--p) * 10) calc(var(--p) * 5);
+  font: 400 calc(var(--fs) * 16)/1.35 var(--f-type); color: var(--pp-bond); background: var(--toner); transform: rotate(-.4deg);
 }
 
 /* the booking name: the words keep the left, the sheet takes the right */
@@ -52,6 +56,12 @@
 .cs-namefly { width: calc(var(--p) * 200); transform: rotate(3deg); }
 .cs-namefly canvas { width: 100% !important; height: auto !important; }
 
+/* the two sheets never grow up past the top of the stage (big text): the sheet stops under the Skip and Back buttons
+   and scrolls inside */
+.cs-ask-name, .cs-ask-band { max-height: calc(var(--p) * 640); }
+.cs-ask-name > *, .cs-ask-band > * { flex: none; }
+.cs-ask-name > .cs-namecard, .cs-ask-band > .cs-namecard { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+
 /* a way back to the map, beside skip, while the questions are still open */
 .cs-box .cs-back { position: absolute; top: calc(var(--p) * 18); right: calc(var(--p) * 112); z-index: 5; transform: rotate(-1.2deg); }
 
@@ -60,7 +70,7 @@
 .cs-btn[disabled]:hover { background: var(--cs-tape); }
 
 /* the question as a plain sentence above the answers (fix list 1.18), and the next button gone while a question waits */
-.cs-q { margin: 0; max-width: calc(var(--p) * 700); padding: calc(var(--p) * 5) calc(var(--p) * 12) calc(var(--p) * 6); font: 400 calc(var(--fs) * 21)/1.3 var(--f-type); color: var(--toner); background: var(--pp-bond); transform: rotate(-.5deg); align-self: flex-end; }
+.cs-q { margin: 0; max-width: calc(var(--p) * 700); padding: calc(var(--p) * 5) calc(var(--p) * 12) calc(var(--p) * 6); font: 400 calc(var(--fs) * 21)/1.3 var(--f-type); color: var(--toner); background: var(--pp-bond); transform: rotate(-.5deg); align-self: flex-start; }
 .cs-btn[hidden] { display: none; }
 .cs-name-help { margin: calc(var(--p) * 4) 0 0; font: 400 calc(var(--fs) * 16)/1.3 var(--f-type); color: var(--toner-mid); }
 
@@ -68,3 +78,27 @@
 .cs-k-scene .cs-words:has(.cs-ask-band) { right: calc(var(--p) * 690); }
 .cs-ask-band { position: absolute; left: calc(100% + var(--p) * 24); bottom: 0; width: calc(var(--p) * 610); align-items: stretch; }
 .cs-bandcard .st-ideas-row { padding-left: 0; gap: calc(var(--p) * 8) calc(var(--p) * 10); }
+
+/* the words never climb under the title tape: the column stops below it and keeps to the bottom */
+.cs-k-scene .cs-words { top: calc(var(--p) * 96); justify-content: flex-end; }
+/* a question frame holds the most words: the gaps close up and the column may sit lower, over the print's bottom edge */
+.cs-k-scene .cs-words:has(.cs-ask) { bottom: calc(var(--p) * 70); gap: calc(var(--p) * 9); }
+.cs-k-scene .cs-words:has(.cs-ask) .cs-cap { margin-bottom: 0; }
+
+/* the tick box under the answers (the day job): a box inked with an X, its name, and what on or off means */
+.cs-toggle {
+  display: flex; align-items: flex-start; gap: calc(var(--p) * 12); max-width: calc(var(--p) * 760); margin: calc(var(--p) * 2) 0 0; padding: calc(var(--p) * 6) calc(var(--p) * 14) calc(var(--p) * 7) calc(var(--p) * 10);
+  border: 0; background: var(--pp-bond); color: var(--toner); font: inherit; text-align: left; cursor: pointer; transform: rotate(-.4deg); clip-path: var(--edge-cut-1);
+}
+.cs-toggle:hover, .cs-toggle:focus-visible { background: var(--pp-buff); }
+.cs-toggle:focus-visible { outline: calc(var(--p) * 3) dashed var(--hl-solid); outline-offset: calc(var(--p) * 2); }
+.cs-toggle[disabled] { cursor: default; }
+.cs-tick {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; width: calc(var(--p) * 26); height: calc(var(--p) * 26); margin-top: calc(var(--p) * 2);
+  border: calc(var(--p) * 2.5) solid var(--toner); font: 400 calc(var(--fs) * 24)/1 var(--f-gothic); color: var(--late, var(--toner));
+}
+.cs-togglecol { display: flex; flex-direction: column; gap: calc(var(--p) * 2); }
+.cs-togglelab { font: 400 calc(var(--fs) * 18)/1.2 var(--f-gothic); letter-spacing: .06em; text-transform: uppercase; }
+.cs-togglenote { font: 400 calc(var(--fs) * 16)/1.35 var(--f-type); }
+/* on a question frame the scene caption is a one-line label, so the question has the room */
+.cs-k-scene .cs-words:has(.cs-ask) .cs-cap { font-size: calc(var(--fs) * 19); max-width: none; }

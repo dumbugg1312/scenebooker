@@ -4,7 +4,9 @@
  *                     (SB.Chapters.nextCutscene -> SB.Cutscene.play -> markSeen, save), one at a time and never on the
  *                     night screen; then lands the next earned patch's card on the desk; then redraws the guidance.
  *   opening(st, cb)   GOING_AWAY_open played on a made game (no questions), before the desk appears.
- *   openingAsk(...)   the way in: GOING_AWAY_open on a draft game, asking the setup questions; then the real game.
+ *   openingAsk(...)   the way in: GOING_AWAY_open on a draft game, asking the booking name (and, for somebody who has
+ *                     booked before, the setup); then the real game. A first-timer's setup (GOING_AWAY_setup) plays from
+ *                     pump at the desk after the first show, and its replies change the game (setupScene, applySetup).
  *   phone(state)      the outgoing booker's texts for the inbox's list (the walkthrough's current step).
  *   chapters(state)   the box, as a notebook page: every opened chapter; a seen cutscene can be watched again.
  *   rewatch(key)      play one again (nothing is marked).
@@ -31,7 +33,8 @@
              rooms: 'the room keys', room: 'the room page', people: 'the address book', money: 'the cash tin', town: 'the map', city: 'the map',
              bands: 'the band stickers', band: 'the band page', files: 'the folder', shows: 'the show clips', jacket: 'the jacket', settings: 'the settings pad', close: 'the close-out' },
     leaveFirst: 'First go back to the desk.',
-    dismiss: 'Put this away',
+    dismiss: 'Put this away', clockOk: 'got it',
+    why: 'why?', whyL: 'Why, from {outgoing}', whyHide: 'Hide why',
     skipLink: 'skip the walkthrough', skipAsk: 'Skip the walkthrough? {outgoing} stops texting steps.',
     skipYes: 'skip it', skipNo: 'keep going',
     tape: 'next',
@@ -71,6 +74,7 @@
     nxWeekDone: 'The week\'s done. Close the week on the clock.',
     nxAnswer: 'Answer the message on the phone.',
     coachFlyerDesk: 'Shuffle the layout, type, ink and picture until you like it, then press Use this flyer.',
+    coachNameSheet: 'Type a name, or take one of the ideas. Pick the lettering you like, then press the button under it.',
     coachInbox: 'Press the button under their message that says the date works. That starts the show.',
     wbHead: 'Welcome back', wbNight: 'It is {dow} night, week {n}.', wbSaved: 'Saved {ago}.', wbNoShows: 'No show is booked yet.', wbNoRoom: 'no room yet',
     wbTonight: 'tonight', wbTomorrow: 'tomorrow', wbDays: '{n} days out', wbDone: 'Done: {list}.', wbTodo: 'Still to do: {list}.', wbNext: 'Next:', wbGo: 'back to it',
@@ -87,7 +91,7 @@
 
   var NUDGE_MS = 75000;
   var busy = false, pumping = false;
-  var mem = { step: null, key: null, dismissed: null, nudged: null, timer: null, onPhone: null };
+  var mem = { step: null, key: null, dismissed: null, nudged: null, timer: null, onPhone: null, why: null };
   var stripEl = null, cardEl = null, cardId = null;
 
   function h(t, a, k) { return SB.UI.h(t, a, k); }
@@ -118,7 +122,8 @@
      shows the one picked as a plain line) */
   function picked(s) {
     var set = (s && s.settings) || {}, t = (s && s.story && s.story.tutorial) || {};
-    return { bills: !!set.bills, fog: set.fog, windows: set.windows, walk: !t.skipped, name: (s && s.player && s.player.bookingName) || '', band: (s && s.player && s.player.band) ? true : null };
+    var how = set.fog === 'OPEN' ? 'EASY' : (set.fog === 'HARD' ? 'DIFFICULT' : 'REALISTIC');
+    return { how: how, bills: !!set.bills, fog: set.fog, windows: set.windows, walk: !t.skipped, name: (s && s.player && s.player.bookingName) || '', band: (s && s.player && s.player.band) ? true : null };
   }
   /* What the played show really was, as flags a recap line can ask about (fix-list 2.4): short (somebody was not paid in
    * full), none (nobody came), flyered, floor (the band was put up), bills (the money is real). Reads only. */
@@ -157,8 +162,8 @@
 
   /* the guided first show: the outgoing booker's call for what the guide asks right now (content story.coach,
    * 'TUT_' + step + '_' + stage, else 'TUT_' + step), once each. -> { key } or null */
-  /* Only the first step's call and the door's play as cutscenes with a DONE; every other step's call is folded into the
-   * mentor's text on the strip (fix list 1.19: about 35 taps and 7 cutscenes passed before the first yes). */
+  /* Only the first step's call and the door's play as cutscenes with a DONE (fix list 1.19: about 35 taps and 7
+   * cutscenes passed before the first yes); every other step is its one stage line on the strip (spec 14). */
   var COACH_SCENES = { TUT_ANSWER_REPLY: 1, TUT_DOOR: 1 };
   function coachKey(cur) {
     var key;
@@ -171,18 +176,6 @@
     var cur = safe(function () { return SB.Tutorial.current(s); }, null), key = coachKey(cur);
     return key && COACH_SCENES[key] && !seen(s, key) ? { key: key } : null;
   }
-  /* the folded call: its lines, then the map of where you are, as one block of the mentor's text */
-  function coachText(s, cur, sl) {
-    var key = coachKey(cur), c = key && !COACH_SCENES[key] ? story().coach[key] : null, bits = [], cap = '';
-    if (!c) return '';
-    function fillIn(t) { return safe(function () { return SB.text.render(String(t), sl, null); }, String(t)); }
-    (c.frames || []).forEach(function (f) {
-      (f.lines || []).forEach(function (ln) { if (ln && ln.say) bits.push(fillIn(ln.say)); });
-      if (f.caption && !cap) cap = fillIn(f.caption);
-    });
-    return bits.join(' ') + (cap ? '  ' + cap : '');
-  }
-
   /* the show's own night, before the doors open: the one call that belongs there (the show day goes straight to the
    * night screen, where nothing else plays) */
   function doorCall(s) {
@@ -200,15 +193,161 @@
       SB.Chapters.markSeen(s, n.key);                      // no words for it: off the queue, nothing to show
     }
     if (!n || guard >= 40) return false;
+    /* the setup is asked back at the desk, never over the week's close-out (or in the moment before it comes up);
+       what is queued behind it waits with it */
+    if (n.key === SETUP_KEY && (route() === 'close' || (s.clock && s.clock.phase === 'CLOSE'))) return false;
     busy = true;
     if (SB.UI.playing && SB.UI.playing()) SB.UI.fire('sb-play', { cmd: 'pause' });
     hideStrip();
+    /* The setup asked after the first show (spec 14) is at the front of the queue once that show is settled, and the
+       recap card goes in front of it: the card, one press, then the scene. Both are marked together when the scene
+       closes, so a game left in between gets the card again. */
+    if (n.key === SETUP_KEY) {
+      recapCard(s, function (shown) {
+        setupScene(s, function (r) {
+          busy = false;
+          function seenIt(st) {
+            applySetup(st, (r && r.answers) || {});
+            if (shown) SB.Chapters.markSeen(st, RECAP_SEEN);
+            return afterSeen(st, n.key);
+          }
+          if (SB.UI.game() === s) SB.UI.act(seenIt); else seenIt(s);
+        });
+      });
+      return true;
+    }
     run(s, n.key, function () {
       busy = false;
       if (SB.UI.game() === s) SB.UI.act(function (st) { return afterSeen(st, n.key); });
       else afterSeen(s, n.key);
     });
     return true;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* the recap card after the guided show (spec 14)                    */
+  /* ---------------------------------------------------------------- */
+
+  /* One card from the outgoing booker when the guided show is settled: how many came, the door total, who got paid
+   * what as a column (the room and sound, each band by name, you), one line on what went well, and the night's
+   * real-life lesson. It reads the played show's stored result (result.accounts, the shape of Money.showAccounts);
+   * the words are story.tutorial.recap. Seen once (RECAP_SEEN in story.seen); a game that has had it does not also
+   * get the old wrap-up texts (messages(), TUTORIAL_DONE). */
+  var RECAP_SEEN = 'TUTORIAL_RECAP';
+  /* -> { heads, paid, door, rows: [{ who, amount, you }], lesson } or null when there is no guided show to tell about */
+  function recapOf(s) {
+    var t = (s && s.story && s.story.tutorial) || {}, sh = t.showId && s.shows ? s.shows[t.showId] : null, r = sh && sh.result, acc, rows = [], tour = null, paidTo = {}, I, T, key, p, lesson = '', door, out = 0;
+    if (!sh || sh.status !== 'PLAYED' || !r || t.skipped || t.lapsed) return null;
+    function n(v) { return typeof v === 'number' && isFinite(v) ? v : 0; }
+    function name(id) { var b = id && s.bands ? s.bands[id] : null; return b ? b.name : ''; }
+    acc = r.accounts || {};
+    (acc.offTop || []).forEach(function (x) { if (x && x.label) rows.push({ who: String(x.label).charAt(0).toUpperCase() + String(x.label).slice(1), amount: n(x.amount) }); });
+    (acc.locals || []).forEach(function (x) { if (x && x.bandId) paidTo[x.bandId] = n(paidTo[x.bandId]) + n(x.amount); });
+    ((sh.bill && sh.bill.slots) || []).forEach(function (x) { if (x && x.role === 'TOURING' && !tour) tour = x.bandId; });
+    if (tour && name(tour)) rows.push({ who: name(tour), amount: n(acc.guarantee) + n(acc.touringShare) });
+    ((sh.bill && sh.bill.slots) || []).forEach(function (x) { if (x && x.bandId && x.bandId !== tour && name(x.bandId)) rows.push({ who: name(x.bandId), amount: n(paidTo[x.bandId]) }); });
+    /* your line is what was left of the door once everybody else had theirs, so the column adds up to the door (under
+       zero when you made up a gap out of your own pocket) */
+    door = n(typeof acc.door === 'number' ? acc.door : (r.door ? n(r.door.gross) + n(r.door.hat) : 0));
+    rows.forEach(function (x) { out += x.amount; });
+    rows.push({ who: say('story.tutorial.recap.you', {}) || 'You', amount: door - out, you: true });
+    /* the night's own lesson, the first it picked; else how the gap was covered; else the card's own */
+    I = r.irl || {}; T = (SB.Content && SB.Content.irl) || {};
+    key = (I.lessons && I.lessons[0]) || I.settle || '';
+    p = String(key).split(':');
+    if (p[0] === 'cause' && T.cause && T.cause[p[1]]) lesson = T.cause[p[1]].line || '';
+    else if (p[0] === 'job' && SB.Content.jobs && SB.Content.jobs[p[1]]) lesson = SB.Content.jobs[p[1]].why || '';
+    else if (p[0] === 'settle' && T.settle && T.settle[p[1]]) lesson = T.settle[p[1]].line || '';
+    return { heads: n(r.heads), paid: n(r.paid), door: door, rows: rows, lesson: lesson };
+  }
+  function recapDue(s) { return !seen(s, RECAP_SEEN) && !!safe(function () { return recapOf(s); }, null); }
+  /* recapCard(s, done): the card over the desk; done(true) from its one button, done(false) at once when there is
+   * nothing to show (no guided show was played, or it was read already) */
+  function recapCard(s, done) {
+    var m = recapDue(s) ? safe(function () { return recapOf(s); }, null) : null, Kt = SB.UI.Kit, base = 'story.tutorial.recap.', sl, kids, close = null, irl, went = false;
+    if (!m || !SB.UI.card || !say(base + 'title', {})) { done(false); return false; }
+    function $(v) { return SB.text.money(v); }
+    function go() { if (went) return; went = true; if (close) close(); done(true); }
+    sl = withFlags(s, safe(function () { return SB.Chapters.slots(s, 'tutorial'); }, {}) || {});
+    sl.heads = m.heads; sl.paid = m.paid; sl.door = $(m.door); sl.none = m.heads === 0; sl.all = m.heads > 0 && m.paid >= m.heads;
+    irl = SB.UI.parts && SB.UI.parts.irl ? safe(function () { return SB.UI.parts.irl(m.lesson || say(base + 'lesson', sl)); }, null) : null;
+    kids = [
+      Kt && Kt.label ? safe(function () { return Kt.label(say(base + 'from', sl), null, { cls: 'sy-recap-from', rot: -1.5 }); }, null) : h('p', { class: 'sy-recap-from', text: say(base + 'from', sl) }),
+      h('h2', { class: 'sy-recap-head', text: say(base + 'title', sl) }),
+      h('p', { class: 'sy-recap-line', text: say(base + 'came', sl) + ' ' + say(base + 'door', sl) }),
+      h('p', { class: 'sy-recap-h', text: say(base + 'paid', sl) }),
+      h('ul', { class: 'sy-recap-pay' }, m.rows.map(function (x) {
+        return h('li', { class: 'sy-recap-row' + (x.you ? ' is-you' : '') }, [h('span', { class: 'sy-recap-who', text: x.who }), h('span', { class: 'sy-recap-amt', text: $(x.amount) })]);
+      })),
+      h('p', { class: 'sy-recap-good', text: say(base + 'good', sl) }),
+      irl,
+      Kt && Kt.button ? safe(function () { return Kt.button({ kind: 'primary', label: say(base + 'go', sl) || 'Okay', fk: 'recap-go', cls: 'sy-recap-go', on: go }); }, null)
+                      : h('button', { type: 'button', class: 'sy-recap-go', data: { fk: 'recap-go' }, text: say(base + 'go', sl) || 'Okay', on: { click: go } })
+    ];
+    try { close = SB.UI.card(h('div', { class: 'sy-recap', data: { fk: 'recap' } }, kids), { label: say(base + 'title', sl), dismiss: false }); }
+    catch (e) { SB.log('warn', 'SB.UI.story', 'recap: ' + (e && e.message)); done(false); return false; }
+    return true;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* the setup, asked after the first show (spec 14)                   */
+  /* ---------------------------------------------------------------- */
+
+  /* GOING_AWAY_setup at the desk: how to keep going, the day job, your band. It plays in ask mode on the game being
+   * played, and the replies go in through the engine (applySetup). The same frames are asked inside the opening of
+   * somebody who has booked before (openingAsk, o.setup). */
+  var SETUP_KEY = 'GOING_AWAY_setup';
+  /* the one "how" question -> the two settings it stands for (js/ui/screens/start.js keeps the same table for a new game) */
+  function howTable() { return SB.UI.setupHow || {}; }
+  function setupScene(s, done) {
+    var cs = cutscene(SETUP_KEY), slots, bills = !!(s && s.settings && s.settings.bills), W, nm, ask, nameDraft, lettering = null;
+    if (!cs) { done({ key: SETUP_KEY, skipped: true, answers: {} }); return false; }
+    slots = withFlags(s, safe(function () { return SB.Chapters.slots(s, SETUP_KEY); }, {}) || {});
+    /* `after` (a show was played) or `cold` (none was: skipped before it, or it fell through) come queued with the
+       scene (SB.Chapters setupCheck); an older save's entry has neither and plays as after the show, as it always did */
+    if (typeof slots.after !== 'boolean' && typeof slots.cold !== 'boolean') slots.after = true;
+    if (slots.after) slots.cold = false;
+    /* the tick box starts where the game is: the first show was played with the day job on */
+    cs.frames = cs.frames.map(function (f) {
+      var g, k;
+      if (!f.ask || !f.ask.toggle) return f;
+      g = {}; for (k in f) g[k] = f[k];
+      g.ask = {}; for (k in f.ask) g.ask[k] = f.ask[k];
+      g.ask.toggle = {}; for (k in f.ask.toggle) g.ask.toggle[k] = f.ask.toggle[k];
+      g.ask.toggle.def = bills;
+      return g;
+    });
+    /* no name on the flyers yet (a helper made the flyer, or the flyer desk was never opened): the name is asked
+       here, in front of how to keep going (GOING_AWAY_name), so no later line reads with a hole where it goes */
+    W = SB.UI.setupWidgets || null;
+    nm = s && s.player && s.player.bookingName === '' && W && W.name ? cutscene('GOING_AWAY_name') : null;
+    if (nm) {
+      ask = nm.frames.filter(function (f) { return f && f.ask && f.ask.id === 'name'; });
+      cs.frames = ask.concat(cs.frames);
+      nameDraft = { bookingName: '', mark: s.player.mark ? JSON.parse(JSON.stringify(s.player.mark)) : null, markSeeds: null, flyerBase: null, slug: s.citySlug, spec: null };
+      W = { name: function (box, ctx) { return SB.UI.setupWidgets.name(box, { draft: nameDraft, answer: function (name, mark) { lettering = mark && mark.treatment ? mark.treatment : null; ctx.answer(name); } }); },
+            band: SB.UI.setupWidgets.band };
+    }
+    function end(r) { if (r && r.answers && lettering) r.answers.lettering = lettering; done(r); }
+    try { SB.Cutscene.play(cs, slots, end, { ask: true, widgets: W, onAnswer: function (id, v, sl) { if (id === 'name') sl.bookingName = v; } }); }
+    catch (e) { SB.log('warn', 'SB.UI.story', 'setup: ' + (e && e.message)); done({ key: SETUP_KEY, skipped: true, answers: {} }); return false; }
+    return true;
+  }
+  /* the replies, into the game: how much you can see and how strict the deadlines are at once; the day job from the
+     next week's turn (SB.Game.setSetting keeps it till then); your band onto the bill list. A question that was not
+     answered changes nothing. */
+  function applySetup(st, a) {
+    var h = a && howTable()[a.how];
+    if (!a) return;
+    if (h) {
+      safe(function () { return SB.Game.setSetting(st, 'fog', h.fog); });
+      safe(function () { return SB.Game.setSetting(st, 'windows', h.windows); });
+    }
+    if (typeof a.bills === 'boolean') safe(function () { return SB.Game.setSetting(st, 'bills', a.bills); });
+    /* the booking name, when it was asked here (no name yet): the name and the lettering picked with it */
+    if (typeof a.name === 'string' && a.name.trim() && st.player && st.player.bookingName === '' && SB.Game.setBookingName)
+      safe(function () { return SB.Game.setBookingName(st, a.name, a.lettering ? { treatment: a.lettering } : null); });
+    if (a.band && a.band.name && !(st.player && st.player.band)) safe(function () { return SB.Bands.addPlayerBand(st, a.band); });
   }
 
   /** opening(st, cb): a new career. GOING_AWAY_open plays before the desk appears; cb() sits the player down. */
@@ -224,15 +363,28 @@
   }
 
   /** openingAsk(draft, o, make, cb): the way in. GOING_AWAY_open plays on a first draft of the new game (so the scene
-   *  has its town, room and bands) and asks the setup questions in it (user, 2026-11-21): bills, how much you can see,
-   *  deadlines, the booking name, the walkthrough. Then make(answers, bill) builds the real game from the replies (bill:
+   *  has its town, room and bands) and asks nothing; with o.setup (booked before) it asks the booking name
+   *  (GOING_AWAY_name) and GOING_AWAY_setup's questions (how to play, the day job, your band). Then make(answers, bill) builds the real game from the replies (bill:
    *  the going-away bands as watched, for SB.Game.newGame's goingAway), the scene is marked seen on it and cb(state)
    *  sits the player down; cb(null) if it could not be made. o: { widgets: { name: fn(box, ctx) }, back: { label, on } }:
    *  back closes the scene and nothing is made. */
   function openingAsk(draft, o, make, cb) {
-    var key = 'GOING_AWAY_open', cs = cutscene(key), slots, bill;
+    var key = 'GOING_AWAY_open', cs = cutscene(key), slots, bill, su, fr, nm;
     o = o || {};
     if (!cs || busy) { cb(null); return false; }
+    /* o.setup (somebody who has booked before, spec 14): the setup's questions are asked here, right after the name,
+       before the game is made. Its goodbye frame is left out: the opening has its own. */
+    su = o.setup ? cutscene(SETUP_KEY) : null;
+    if (su) {
+      /* the name first (GOING_AWAY_name), then the setup's asks, all in front of the opening's last frame. A
+         first-timer's opening asks nothing: the name is asked at the first flyer (the flyer desk's name sheet). */
+      nm = cutscene('GOING_AWAY_name');
+      fr = cs.frames.slice(0, -1);
+      if (nm) nm.frames.forEach(function (g) { fr.push(g); });
+      su.frames.forEach(function (g) { if (g && g.ask) fr.push(g); });
+      fr.push(cs.frames[cs.frames.length - 1]);
+      cs.frames = fr;
+    }
     slots = safe(function () { return SB.Chapters.slots(draft, key); }, {}) || {};
     bill = { band1: slots.band1, band2: slots.band2, band2Home: slots.band2Home, band3: slots.band3 };
     busy = true;
@@ -277,41 +429,49 @@
     return null;
   }
 
-  /* -> { key, from, list: [{ text, kind }], once: seen-key or null } or null */
+  /* -> { key, from, list: [{ text, kind }], why: the longer why-it-works or '', once: seen-key or null } or null.
+   * While the walkthrough is on, the list is ONE line (spec 14, "Text budget"): a wrong bill's correction, else the
+   * nudge, else the stage's own line. The step's text (after a wrong from the step before) is `why`, with `where`, the
+   * map of the whole show, under it: one press away on that line, never pushed. */
   function messages(s) {
-    var t = s && s.story && s.story.tutorial, cur, sl, base, list = [], steps, i, prev, tx, day, lk;
+    var t = s && s.story && s.story.tutorial, cur, sl, base, line = null, why = [], steps, i, prev, tx, day, lk, idle, where;
     if (!t) return null;
     cur = safe(function () { return SB.Tutorial.current(s); }, null);
     sl = withFlags(s, safe(function () { return SB.Chapters.slots(s, 'tutorial'); }, {}) || {});
+    /* the clock lesson (spec 14, night 1): one line and nothing stacked on it, with a GOT IT on the strip (m.ok) */
+    if (cur && cur.stage === 'CLOCK' && cur.more) return { key: cur.step + ':CLOCK', step: cur.step, cur: cur, from: sl.outgoing || '', list: [{ text: cur.more, kind: 'how' }], why: '', once: null, ok: 'CLOCK' };
     if (cur) {
       steps = SB.Tutorial.STEPS; i = steps.indexOf(cur.step); prev = i > 0 ? steps[i - 1] : null;
       base = 'story.tutorial.steps.';
-      if (i === 0) { tx = say('story.tutorial.intro', sl); if (tx) list.push({ text: tx, kind: 'intro' }); }
-      if (prev && t.wrong && t.wrong[prev]) { tx = say(base + prev + '.wrong', sl); if (tx) list.push({ text: tx, kind: 'wrong' }); }
-      tx = coachText(s, cur, sl);
-      if (tx) list.push({ text: tx, kind: 'intro' });
+      if (prev && t.wrong && t.wrong[prev]) { tx = say(base + prev + '.wrong', sl); if (tx) why.push(tx); }
       tx = cur.text || say(base + cur.step + '.text', sl);
-      if (tx) list.push({ text: tx, kind: 'text' });
-      if (cur.more) list.push({ text: cur.more, kind: 'how' });
-      if (cur.wrong) { tx = say(base + cur.step + '.wrong', sl) || cur.wrong; if (tx) list.push({ text: tx, kind: 'wrong' }); }
+      if (tx) why.push(tx);
+      /* the interface's own nudges (a minute idle, or the same line a second night) are about something to do: never
+         on a stage that waits on someone else, where the line already says to call it a night */
+      idle = cur.target !== 'lamp';
+      if (cur.wrong) { tx = say(base + cur.step + '.wrong', sl) || cur.wrong; if (tx) line = { text: tx, kind: 'wrong' }; }
       /* the wait's nudge is about mail: once the phone is answered it goes, even if it was shown before (engine decides) */
-      if (cur.nudge || (mem.nudged === cur.step && cur.step !== 'WAIT')) { tx = say(base + cur.step + '.nudge', sl) || cur.nudge; if (tx) list.push({ text: tx, kind: 'nudge' }); }
+      if (!line && (cur.nudge || (idle && mem.nudged === cur.step && cur.step !== 'WAIT'))) { tx = say(base + cur.step + '.nudge', sl) || cur.nudge; if (tx) line = { text: tx, kind: 'nudge' }; }
       /* the same line is never said on two nights in a row: the second night it is the nudge, in its own words (fix-list 1.13) */
       day = s.clock && typeof s.clock.day === 'number' ? s.clock.day : 0;
       lk = cur.step + ':' + (cur.stage || '');
       if (!mem.line || mem.line.key !== lk) mem.line = { key: lk, day: day, said: false };
       /* not on the wait: its nudge is about mail, and only the engine knows when mail is waiting (0.4 step 4) */
-      else if (day > mem.line.day && cur.step !== 'WAIT' && !list.some(function (x) { return x.kind === 'nudge'; })) {
+      else if (!line && idle && day > mem.line.day && cur.step !== 'WAIT') {
         tx = say(base + cur.step + '.nudge', sl) || cur.nudge;
-        if (tx) { list = list.filter(function (x) { return x.kind !== 'how'; }); list.push({ text: tx, kind: 'nudge' }); }
+        if (tx) line = { text: tx, kind: 'nudge' };
       }
-      return list.length ? { key: cur.step + (cur.stage ? ':' + cur.stage : ''), step: cur.step, cur: cur, from: sl.outgoing || '', list: list, once: null } : null;
+      if (!line && cur.more) line = { text: cur.more, kind: 'how' };
+      if (!line && why.length) line = { text: why.shift(), kind: 'text' };
+      where = say('story.tutorial.where.' + cur.step, sl);
+      return line ? { key: cur.step + (cur.stage ? ':' + cur.stage : ''), step: cur.step, cur: cur, from: sl.outgoing || '', list: [line], why: why.join(' '), where: where, once: null } : null;
     }
     if (t.skipped && !seen(s, 'TUTORIAL_SKIP')) { tx = say('story.tutorial.skip.line', sl); return tx ? { key: 'SKIP', from: sl.outgoing || '', list: [{ text: tx, kind: 'text' }], once: 'TUTORIAL_SKIP' } : null; }
     /* the walkthrough ended because its show fell through for good: it never ends silently (fix-list 0.6) */
     if (t.lapsed && !t.skipped && !seen(s, 'TUTORIAL_LAPSED')) { tx = say('story.tutorial.lapsed', sl); if (tx) return { key: 'LAPSED', from: sl.outgoing || '', list: [{ text: tx, kind: 'text' }], once: 'TUTORIAL_LAPSED' }; }
-    if (t.done !== null && t.done !== undefined && !t.skipped && !t.lapsed && !seen(s, 'TUTORIAL_DONE')) { tx = say('story.tutorial.done', sl); return tx ? { key: 'DONE', from: sl.outgoing || '', list: [{ text: tx, kind: 'text' }, { text: say('story.tutorial.doneList', sl), kind: 'how' }], once: 'TUTORIAL_DONE' } : null; }
-    if (t.on) return null;
+    /* a game that had the recap card and the setup scene's goodbye has heard all of this already (spec 14) */
+    if (t.done !== null && t.done !== undefined && !t.skipped && !t.lapsed && !seen(s, 'TUTORIAL_DONE') && !seen(s, RECAP_SEEN)) { tx = say('story.tutorial.done', sl); return tx ? { key: 'DONE', from: sl.outgoing || '', list: [{ text: tx, kind: 'text' }, { text: say('story.tutorial.doneList', sl), kind: 'how' }], once: 'TUTORIAL_DONE' } : null; }
+    if (t.on && !(seen(s, RECAP_SEEN) && cur && cur.step === 'CLOSEOUT')) return null;   // the guided show is played and the setup is done: the new desk things get their notes
     tx = newOnDesk(s, sl);
     if (tx) return { key: 'DESKNEW:' + tx.id, from: sl.outgoing || '', list: [{ text: tx.text, kind: 'text' }], once: 'DESKNEW_' + tx.id };
     tx = firsts(s, sl);
@@ -519,8 +679,42 @@
     if (m.once) mem.onPhone = m.once;
     return h('div', { class: 'sy-dana', role: 'log', aria: { label: L('texts', { outgoing: m.from }) } }, [
       h('p', { class: 'sy-dana-from' }, h('span', { class: 'ph-strip', text: String(m.from || '').toUpperCase() })),
-      m.list.map(function (x) { return h('div', { class: 'ph-bub ph-bub--them pz-paper sy-bub sy-bub--' + x.kind }, h('p', { text: x.text })); })
+      m.list.map(function (x, i) {
+        var bub = h('div', { class: 'ph-bub ph-bub--them pz-paper sy-bub sy-bub--' + x.kind }, h('p', { text: x.text }));
+        if (i === m.list.length - 1) whyOn(bub, m, x, null);
+        return bub;
+      })
     ]);
+  }
+
+  /* "why?" on the coach line (spec 14, "Text budget"): one press unfolds the step's longer why-it-works and the map of
+   * the show in place, under the line; another folds it back. Kept open while the same line stays up (mem.why).
+   * where: the element the button goes in, the unfolded words go at its end; after() runs when it changes size. */
+  function whyKey(m, x) { return (m && m.key) + '|' + (x && x.text); }
+  function whyOn(where, m, x, after) {
+    var btn, box = null, k = whyKey(m, x);
+    if (!m || !m.cur || !(m.why || m.where)) return null;
+    function open(on) {
+      if (box && box.parentNode) box.parentNode.removeChild(box);
+      box = null;
+      if (on) {
+        box = h('div', { class: 'sy-why-box' }, [
+          m.why ? h('p', { class: 'sy-why-text', text: m.why }) : null,
+          m.where ? h('p', { class: 'sy-why-where', text: m.where }) : null
+        ]);
+        where.appendChild(box);
+      }
+      mem.why = on ? k : null;
+      btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+      btn.textContent = on ? L('whyHide').toLowerCase() : L('why');
+      if (where.classList) where.classList.toggle('is-why', !!on);
+      if (after) after();
+    }
+    btn = h('button', { type: 'button', class: 'sy-why pz-hl', data: { fk: 'tut-why' }, aria: { label: L('whyL', { outgoing: m.from || '' }), expanded: 'false' }, text: L('why'),
+                        on: { click: function (e) { if (e && e.stopPropagation) e.stopPropagation(); open(!box); } } });
+    where.appendChild(btn);
+    if (mem.why === k) open(true);
+    return btn;
   }
 
   /* which desk object carries the tape for this step */
@@ -571,6 +765,16 @@
     var d = doc(), desk = d && d.getElementById ? d.getElementById('desk') : null, main = d && d.getElementById ? d.getElementById('main') : null,
         t = cur.target, st = cur.stage, id, list = [], down = '.cu-down', wait = t === 'lamp';
     if (!d) return null;
+    /* the clock lesson: the pinned night clock itself (its ruler of hours), whatever is on screen */
+    if (t === 'clock') {
+      /* the clock: its ruler if it is drawn, else the time line (the compact clock over a card has no ruler showing) */
+      id = safe(function () {
+        var nc = d.getElementById('nightclock'), seen = function (e) { var r = e && e.getBoundingClientRect ? e.getBoundingClientRect() : null; return !!e && (!r || r.width > 0); };
+        if (!nc || nc.hidden) return null;
+        return [nc.querySelector('.ck-ruler'), nc.querySelector('.ck-top'), nc.querySelector('.ck-slip'), nc].filter(seen)[0] || nc;
+      }, null);
+      return id ? { el: id, key: 'clock' } : null;
+    }
     /* waiting at an evening is CALL IT A NIGHT, on the pinned clock, whatever is on screen (js/ui/nightclock.js) */
     if (wait && d.getElementById) {
       id = safe(function () { var nc = d.getElementById('nightclock'); return nc && !nc.hidden ? nc.querySelector('.ck-call') : null; }, null);
@@ -615,7 +819,8 @@
         list.push(fk('next'));
         down = null;
         break;
-      case 'flyerdesk': if (cur.step === 'FLYER') list.push('[data-tut="flyer-make"]'); break;
+      /* the name sheet comes first on the flyer desk while there is no booking name (stage NAME): its field, then its button */
+      case 'flyerdesk': if (cur.step === 'FLYER') list.push('[data-tut="name-sheet"] [data-fk="name-done"]', '[data-tut="name-sheet"] [data-fk="name-in"]', '[data-tut="flyer-make"]'); break;
       case 'week':
         /* the calendar's pad (the same job can be done from there): its DO IT TONIGHT tab, or the pile it is folded into */
         if (cur.step === 'PROMO' && st === 'PLAN') {
@@ -743,6 +948,13 @@
     var d = doc(), mo;
     if (!d || !d.addEventListener) return;
     ['click', 'keyup', 'change', 'input'].forEach(function (ev) { d.addEventListener(ev, function () { queued = false; retape(); soon(); }); });
+    /* a tap on the night clock while the clock lesson points at it (not on its buttons, which do what they say) */
+    d.addEventListener('click', function (e) {
+      var nc = d.getElementById ? d.getElementById('nightclock') : null, s = SB.UI.game ? SB.UI.game() : null, cur;
+      if (!s || !nc || !e || !e.target || !nc.contains(e.target) || (e.target.closest && e.target.closest('button'))) return;
+      cur = safe(function () { return SB.Tutorial.current(s); }, null);
+      if (cur && cur.stage === 'CLOCK') ackClock();
+    });
     d.addEventListener('scroll', function () { if (tapeEl && tapedEl) position(tapedEl); }, true);
     /* a thing that slaps or slides into place moves out from under the tape: put it back once it lands */
     ['animationend', 'transitionend'].forEach(function (ev) { d.addEventListener(ev, function () { if (tapeEl && tapedEl) position(tapedEl); }, true); });
@@ -753,6 +965,12 @@
     }
   }
 
+  /* the clock lesson was read: the walkthrough goes on to asking the room */
+  function ackClock() {
+    var s = SB.UI.game ? SB.UI.game() : null;
+    if (!s) return;
+    SB.UI.act(function (st) { SB.Tutorial.notify(st, 'CLOCK', null); return { ok: true }; });
+  }
   function hideStrip() { if (stripEl && stripEl.parentNode) stripEl.parentNode.removeChild(stripEl); stripEl = null; band(false); }
 
   function putAway(s, m) {
@@ -772,12 +990,10 @@
     return thing ? L('closeThing', { thing: thing }) : L('downFirst');
   }
 
-  /* what the strip says: the stage's line (what to press), after the step's own line when that is short enough to
-   * read in passing (the why); with "put this down first" in front when the tape is on a close-up's put-down tag */
+  /* what the strip says: the one line (what to do now; the why is one press away on its "why?", spec 14), with "put
+   * this down first" in front when the tape is on a close-up's put-down tag */
   function stripWords(m) {
-    var last = m.list[m.list.length - 1], t = last.text, i, main = null;
-    if (last.kind === 'how') for (i = m.list.length - 2; i >= 0; i--) if (m.list[i].kind === 'text') { main = m.list[i].text; break; }
-    if (main && main.length <= 100) t = main + ' ' + t;
+    var last = m.list[m.list.length - 1], t = last.text;
     if (tapedEl && tapedEl.classList && tapedEl.classList.contains('cu-down')) t = closeFirst(m) + ' ' + t;
     else if (tapedEl && tapedEl.getAttribute && tapedEl.getAttribute('data-fk') === 'leave' && route() === 'night') t = L('leaveFirst') + ' ' + t;
     return { text: t, kind: last.kind };
@@ -795,7 +1011,7 @@
     if (typeof window !== 'undefined' && window.dispatchEvent) safe(function () { window.dispatchEvent(new Event('resize')); }, null);
   }
   function showStrip(s, m, onDesk) {
-    var d = doc(), w = stripWords(m), sig = m.key + '|' + m.list.length + '|' + w.text + '|' + (onDesk ? 1 : 0), open, x, kids;
+    var d = doc(), w = stripWords(m), sig = m.key + '|' + m.list.length + '|' + w.text + '|' + (onDesk ? 1 : 0), open, x, kids, wb;
     if (!d || !d.body) return;
     if (stripEl && stripEl.getAttribute('data-sig') === sig && stripEl.parentNode) { band(true); return; }
     hideStrip();
@@ -806,8 +1022,13 @@
                                   on: { click: function () { if (m.go) SB.UI.go(m.go[0], m.go[1]); else SB.UI.go('inbox'); } } }, kids)
                   : h('p', { class: 'sy-strip-open sy-strip-say', aria: { label: L('stripSay', { outgoing: m.from, text: w.text }) } }, kids);
     x = m.fixed ? null : h('button', { type: 'button', class: 'sy-strip-x pz-hl', aria: { label: L('dismiss') }, text: '×', on: { click: function () { putAway(s, m); } } });
+    /* the clock lesson is read and then put away with its own GOT IT (or a tap on the clock it points at) */
+    if (m.ok === 'CLOCK') x = h('button', { type: 'button', class: 'sy-strip-ok pz-hl', data: { fk: 'clock-ok' }, text: L('clockOk').toUpperCase(), on: { click: ackClock } });
     stripEl = h('div', { class: 'sy-strip pz-paper sy-strip--' + w.kind + (onDesk ? ' sy-strip--desk' : ''), role: 'status', data: { sig: sig } }, x ? [open, x] : [open]);
     if (m.cur) stripEl.appendChild(skipTab(m));
+    /* the "why?" sits between the line and its put-away; what it unfolds goes on its own row under them */
+    wb = m.cur ? whyOn(stripEl, m, m.list[m.list.length - 1], function () { band(true); }) : null;
+    if (wb && x) stripEl.insertBefore(wb, x);
     d.body.appendChild(stripEl);
     band(true);
   }
@@ -864,7 +1085,8 @@
   function screenCoach(m, r) {
     var cur = m && m.cur, tx = '', out, list;
     if (!cur || !m.list.length || m.list[m.list.length - 1].kind !== 'how') return m;
-    if (r === 'flyerdesk' && (cur.step === 'FLYER' || cur.stage === 'MAKE')) tx = L('coachFlyerDesk');
+    if (r === 'flyerdesk' && cur.stage === 'NAME') tx = L('coachNameSheet');
+    else if (r === 'flyerdesk' && (cur.step === 'FLYER' || cur.stage === 'MAKE')) tx = L('coachFlyerDesk');
     else if (r === 'inbox' && cur.stage === 'REPLY') tx = L('coachInbox', { dow: cur.dow || '' });
     if (!tx) return m;
     list = m.list.slice();

@@ -56,6 +56,119 @@
       [[43.08, -70.7], [43.6, -71], [45.3, -71.08]]
     ];
   /** SVG path data for the state lines in SB.geo.project space, shifted by (dx, dy). */
+  /** The same lines as runs of [x, y] points, shifted by (dx, dy): for telling which side of a line a point is on. */
+  SB.stateLinesPts = function (dx, dy) {
+    dx = dx || 0; dy = dy || 0;
+    return LINES.map(function (run) { return run.map(function (c) { var q = SB.geo.project(c[0], c[1]); return [q.x + dx, q.y + dy]; }); });
+  };
+  /** The closed areas a set of lines cuts the map into, as polygons of [x, y] (the outer area left out).
+   *  runs: polylines of [x, y]; the coast goes in as one closed run. A line that stops just short of another line
+   *  (coarse data) is stretched until it meets one, up to `reach` units; ends that still meet nothing are dropped. */
+  SB.lineFaces = function (runs, reach) {
+    var segs = [], EPS = 1e-7, i, j;
+    reach = reach || 20;
+    runs.forEach(function (run) { for (var k = 1; k < run.length; k++) segs.push([run[k - 1].slice(), run[k].slice()]); });
+    function hit(a, b, c, d) {   /* where segment ab meets cd: [t on ab, u on cd] or null */
+      var rx = b[0] - a[0], ry = b[1] - a[1], sx = d[0] - c[0], sy = d[1] - c[1], den = rx * sy - ry * sx, t, u;
+      if (Math.abs(den) < 1e-12) return null;
+      t = ((c[0] - a[0]) * sy - (c[1] - a[1]) * sx) / den; u = ((c[0] - a[0]) * ry - (c[1] - a[1]) * rx) / den;
+      return t > -EPS && t < 1 + EPS && u > -EPS && u < 1 + EPS ? [t, u] : null;
+    }
+    /* points closer than TOL are one point: looked up in the grid cell and its neighbours, so rounding never splits a corner */
+    var TOL = 0.08, grid = {}, nextId = 0;
+    function key(p) {
+      var gx = Math.floor(p[0] / TOL), gy = Math.floor(p[1] / TOL), a, b, c, n;
+      for (a = -1; a <= 1; a++) for (b = -1; b <= 1; b++) {
+        c = grid[(gx + a) + ',' + (gy + b)];
+        if (c) for (n = 0; n < c.length; n++) if (Math.hypot(c[n].p[0] - p[0], c[n].p[1] - p[1]) < TOL) return c[n].id;
+      }
+      c = grid[gx + ',' + gy] = grid[gx + ',' + gy] || [];
+      c.push({ p: p, id: 'n' + (nextId++) });
+      return c[c.length - 1].id;
+    }
+    /* stretch loose ends: an end point no other segment touches is pushed along its own direction to the nearest line */
+    var count = {};
+    segs.forEach(function (s) { count[key(s[0])] = (count[key(s[0])] || 0) + 1; count[key(s[1])] = (count[key(s[1])] || 0) + 1; });
+    segs.forEach(function (s, si) {
+      [0, 1].forEach(function (end) {
+        var p = s[end], q = s[1 - end], dx, dy, len, far, best = null;
+        if (count[key(p)] !== 1) return;
+        dx = p[0] - q[0]; dy = p[1] - q[1]; len = Math.hypot(dx, dy) || 1;
+        far = [p[0] + dx / len * reach, p[1] + dy / len * reach];
+        segs.forEach(function (o, oi) {
+          var h;
+          if (oi === si) return;
+          h = hit(p, far, o[0], o[1]);
+          if (h && (best === null || h[0] < best)) best = h[0];
+        });
+        /* already resting on a line (best about 0): leave it; otherwise stretch it to the first line ahead */
+        if (best !== null && best * reach <= 0.05) return;
+        if (best !== null) { s[end] = [p[0] + (far[0] - p[0]) * best, p[1] + (far[1] - p[1]) * best]; return; }
+        /* nothing straight ahead: join the closest point of any other line within reach */
+        var near = null, nd = reach;
+        segs.forEach(function (o, oi) {
+          if (oi === si) return;
+          var ax = o[0][0], ay = o[0][1], bx = o[1][0] - ax, by = o[1][1] - ay, L2 = bx * bx + by * by, t, cx, cy, d;
+          t = L2 ? Math.max(0, Math.min(1, ((p[0] - ax) * bx + (p[1] - ay) * by) / L2)) : 0;
+          cx = ax + bx * t; cy = ay + by * t; d = Math.hypot(cx - p[0], cy - p[1]);
+          if (d > 0.05 && d < nd) { nd = d; near = [cx, cy]; }
+        });
+        if (near) segs.push([p.slice(), near]);
+      });
+    });
+    /* cut every segment where it meets another, and join the pieces at shared points */
+    var cuts = segs.map(function () { return [0, 1]; });
+    for (i = 0; i < segs.length; i++) for (j = i + 1; j < segs.length; j++) {
+      var h = hit(segs[i][0], segs[i][1], segs[j][0], segs[j][1]);
+      if (h) { cuts[i].push(Math.min(1, Math.max(0, h[0]))); cuts[j].push(Math.min(1, Math.max(0, h[1]))); }
+    }
+    var pts = {}, adj = {};
+    function node(p) { var k = key(p); if (!pts[k]) { pts[k] = p; adj[k] = {}; } return k; }
+    segs.forEach(function (s, si) {
+      var ts = cuts[si].sort(function (a, b) { return a - b; }), prev = null;
+      ts.forEach(function (t) {
+        var k = node([s[0][0] + (s[1][0] - s[0][0]) * t, s[0][1] + (s[1][1] - s[0][1]) * t]);
+        if (prev !== null && prev !== k) { adj[prev][k] = true; adj[k][prev] = true; }
+        prev = k;
+      });
+    });
+    /* drop loose ends (lines poking past the coast, dead ends) until every point closes a loop */
+    var gone = true, k2;
+    while (gone) {
+      gone = false;
+      for (k2 in adj) {
+        var nb = Object.keys(adj[k2]);
+        if (nb.length < 2) { nb.forEach(function (n) { delete adj[n][k2]; }); delete adj[k2]; gone = true; }
+      }
+    }
+    /* walk each face: from edge u->v, turn to the neighbour of v that comes next clockwise after u */
+    var order = {};
+    Object.keys(adj).forEach(function (u) {
+      var p = pts[u];
+      order[u] = Object.keys(adj[u]).sort(function (a, b) {
+        return Math.atan2(pts[a][1] - p[1], pts[a][0] - p[0]) - Math.atan2(pts[b][1] - p[1], pts[b][0] - p[0]);
+      });
+    });
+    var used = {}, faces = [];
+    Object.keys(adj).forEach(function (u0) {
+      order[u0].forEach(function (v0) {
+        var u = u0, v = v0, ring = [], guard = 0, area = 0, o, at, w;
+        if (used[u + '>' + v]) return;
+        while (!used[u + '>' + v] && guard++ < 5000) {
+          used[u + '>' + v] = true;
+          ring.push(pts[u]);
+          o = order[v]; at = o.indexOf(u);
+          w = o[(at - 1 + o.length) % o.length];
+          u = v; v = w;
+        }
+        for (var n = 0; n < ring.length; n++) { var a = ring[n], b = ring[(n + 1) % ring.length]; area += a[0] * b[1] - b[0] * a[1]; }
+        if (ring.length > 2) faces.push({ pts: ring, area: area / 2 });
+      });
+    });
+    /* in screen space (y down) the faces come out one way round and the outside the other: keep the inside ones */
+    var sign = faces.reduce(function (m, f) { return Math.abs(f.area) > Math.abs(m.area) ? f : m; }, { area: 0 }).area;
+    return faces.filter(function (f) { return f.area * sign < 0; }).map(function (f) { return f.pts; });
+  };
   SB.stateLinesD = function (dx, dy) {
     dx = dx || 0; dy = dy || 0;
     return LINES.map(function (run) {

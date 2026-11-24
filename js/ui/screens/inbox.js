@@ -32,6 +32,8 @@
     qNeighbor: 'The neighbors are close, so keep it down outside.',
     qCurfew: 'Music stops at {t}.',
     sayOther: 'say it another way',
+    addBand: 'Add to my bands', addBandL: 'Add {name} to your band stack, so you can put them on a bill',
+    addedBand: '{name} are in your band stack now.',
     passed: 'sent: a short no',
     back: 'back to messages',
     backShort: 'back',
@@ -1085,6 +1087,14 @@
           if (o && o.enabled !== false && n >= 1 && n <= 4) { e.preventDefault(); e.stopPropagation(); act(function (x) { return SB.Week.decide(x, d.id, o.id); }); }
         } } }, tabs);
       }
+      /* a local band you have not added yet: they go in your band stack only when you say so (user 2026-11-24) */
+      var bb = bandFor(s, c);
+      if (bb && bb.local && SB.Bands.inStack && !SB.Bands.inStack(s, bb.id)) {
+        tabs.push(tab('addband', L('addBand'), function () {
+          var r = act(function (x) { return SB.Bands.addToStack(x, bb.id); });
+          if (r && r.ok !== false) SB.UI.toast(L('addedBand', { name: bb.name }), 'info');
+        }, { hot: true, aria: L('addBandL', { name: bb.name }) }));
+      }
       if (ask) {
         tabs.push(tab('counter', L('takeIt'), function () {
           var p = Object.assign({}, ask.payload || {}, { acceptCounter: ask.id });
@@ -1100,12 +1110,12 @@
         var sent = queued.indexOf('INTERESTED') >= 0 || !!(s.mail && s.mail.extended && s.mail.extended[q.id]);
         if (showFor(s, q) || sent) tabs.push(bookTab(s, q, sent, null, true));
         else (q.dates || []).slice(0, 3).forEach(function (d, i) { tabs.push(bookTab(s, q, sent, d, i === 0, (q.dates || []).length > 1)); });
-        /* one press is a short, kind no, sent now; "say it another way" is the small link for a reason or a lead (fix-list 2.9) */
+        /* one press is a short, kind no, sent now */
         tabs.push(tab('PASS', L('pass'), function () {
           var r = act(function (x) { return SB.Mail.reply(x, q.id, 'PASS', { tone: 'SHORT' }); });
           if (r && r.ok !== false) { view = 'chat'; draft = {}; render(); }
         }, { done: queued.indexOf('PASS') >= 0, tut: 'req-pass', ref: q.id, aria: L('pass') }));
-        tabs.push(tab('PASS-WAYS', L('sayOther'), function () { view = 'pass'; draft.mode = 'PASS'; render(); }, { done: false, cls: 'ph-tab--small', aria: L('sayOther') }));
+        /* "say it another way" (a no with a reason or a lead) was taken off 2026-11-24 (user: "this is dumb"): a no is one press */
       }
       return tabs.length ? h('div', { class: 'ph-fringe ph-dock', role: 'group', aria: { label: L('reply') } }, tabs) : null;
     }

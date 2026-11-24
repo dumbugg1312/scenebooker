@@ -34,6 +34,7 @@
     ladderHint: 'New things show up on the desk as you play more shows. Off, everything is out at once.',
     bills: 'personal bills',
     billsLocked: 'set when the career began.',
+    billsOn: 'Changes on Monday: the day job starts.', billsOff: 'Changes on Monday: the day job goes off.',
     display: 'Display',
     theme: 'theme',
     themes: { auto: 'follow the computer', light: 'light', dark: 'dark' },
@@ -192,7 +193,7 @@
         choices('windows', L('windows'), S.windows, Object.keys(SB.Enums.WINDOWS).map(function (k) { return [k, word('windows.' + k, k.toLowerCase())]; }), function (v) { set('windows', v); }),
         tickBox('pause', L('pause'), S.pauseOnReplies !== false, function (v) { set('pauseOnReplies', v); }),
         tickBox('ladder', L('ladder'), !!S.ladder, function (v) { set('ladder', v); }, { hint: L('ladderHint') }),
-        tickBox('bills', L('bills'), !!S.bills, function (v) { set('bills', v); }, { disabled: !billsOpen, hint: billsOpen ? null : L('billsLocked') })
+        tickBox('bills', L('bills'), !!S.bills, function (v) { set('bills', v); }, { disabled: !billsOpen, hint: billsOpen ? null : (typeof S.billsNext === 'boolean' ? L(S.billsNext ? 'billsOn' : 'billsOff') : L('billsLocked')) })
       ])),
       Kt().photo({ id: 'guitar-04', cut: true, w: 200, h: 250, rot: -1.6, seed: 'sf-cut2', cls: 'sf-cut2' })];
     }

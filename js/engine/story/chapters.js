@@ -415,7 +415,32 @@ SB.module('Chapters', function (SB) {
     COUCH: function (state, c) { return c.P.couch ? {} : false; }
   };
 
-  function queue(state, story, key, more) { story.cutscenes.push({ key: key, slots: slots(state, more) }); }
+  /* While the first show is walked through (SB.Tutorial.walking) a chapter's scene does not cut in: it is queued with
+   * hold: true and nextCutscene passes over it until the guided show is played (spec 14: nothing interrupts). The way
+   * in's own scene is the one that plays. An entry without `hold` (an older save) plays as it always did. */
+  var NO_HOLD = { GOING_AWAY_open: 1 };
+  function walking(state) { return !!(SB.Tutorial && SB.Tutorial.walking && SB.Tutorial.walking(state)); }
+  function queue(state, story, key, more) {
+    var q = { key: key, slots: slots(state, more) };
+    if (!NO_HOLD[key] && walking(state)) q.hold = true;
+    spaced(state, story, q);
+    story.cutscenes.push(q);
+  }
+  /* After the guided first show the scenes do not stack (spec 14, "After the show"): the recap card and the setup come
+   * first, and each scene that was waiting gets `wait`, the first day it may play, one a day from the day after
+   * (setupCheck). A scene queued while the setup is still to be asked, or while that line of scenes is still waiting,
+   * joins the end of the line. nextCutscene passes over an entry until its day; markSeen keeps the rest a day apart.
+   * `wait` is optional: an entry without it (an older save, any other game) plays as it always did. */
+  function lastWait(story) {
+    var m = null;
+    story.cutscenes.forEach(function (x) { if (x && typeof x.wait === 'number' && (m === null || x.wait > m)) m = x.wait; });
+    return m;
+  }
+  function spaced(state, story, q) {
+    var m = lastWait(story);
+    if (q.key === SETUP || (m === null && story.setup !== 'ASK')) return;
+    q.wait = Math.max(m === null ? 0 : m, today(state)) + 1;
+  }
   function plain(o) { var out = {}, k; for (k in o) if (typeof o[k] === 'string' || typeof o[k] === 'number') out[k] = o[k]; return out; }
 
   /* -> the ids newly opened or closed, as ['ID', ...] for an opening and ['ID:closed'] for a closing; their cutscenes are queued */
@@ -451,23 +476,74 @@ SB.module('Chapters', function (SB) {
       queue(state, story, id, r);
       out.push(id);
     }
+    if (setupCheck(state, story)) out.push(SETUP);
     return out;
   }
+
+  /* The setup scene (spec 14): how to play, the day job and your band are asked after the guided first show, once
+   * the player knows what the words mean. state.story.setup is 'LATER' on a game made to ask then (SB.Game.newGame
+   * opts.setupLater), 'ASK' from the moment the scene is queued until it has played (the one time the day job may
+   * still change, SB.Game.setSetting), then 'DONE'. A save without the field never gets the scene.
+   * The scene goes to the front of the queue as soon as the guided show is played and settled (the walkthrough's last
+   * step, the week's close-out, may still be to come), or when the walkthrough falls through or is skipped. The
+   * interface shows the recap card with it; the scenes that were waiting follow one an evening (spaced, above). */
+  var SETUP = 'GOING_AWAY_setup';
+  function setupCheck(state, story) {
+    var t = story.tutorial || {}, q = story.cutscenes, i, n = 0, e, id, ch, keep = [], sh, recap;
+    var d8 = story.chapters && story.chapters.DOORS_AT_8, shown = !!(d8 && d8.closed !== null && d8.closed !== undefined);
+    if (story.setup !== 'LATER') return false;
+    /* the walkthrough is still on: not before its show is played and settled (the week's close-out is all that is left of it) */
+    if (t.on && !shown) return false;
+    /* the show was played: its chapter closes first (the same check, or the next one) */
+    if (!t.on && t.done !== null && t.done !== undefined && !t.lapsed && !t.skipped && !shown) return false;
+    /* the recap card will tell this show (js/ui/story.js recapOf: the guided show was played, not skipped or lapsed) */
+    sh = t.showId && state.shows ? state.shows[t.showId] : null;
+    recap = shown && !t.skipped && !t.lapsed && !!sh && sh.status === 'PLAYED' && !!sh.result;
+    /* the setup goes to the front, behind the recap card the interface shows with it. What was waiting plays after it,
+       one scene an evening from tomorrow. A scene held through the walkthrough that only opens a chapter the show has
+       already closed (how the touring band's night "is going to go") is put in the box unplayed: it can be watched there. */
+    for (i = 0; i < q.length; i++) {
+      e = q[i]; id = /_open$/.test(e.key) ? e.key.slice(0, -5) : null; ch = id && story.chapters ? story.chapters[id] : null;
+      if (e.hold && ch && ch.closed !== null && ch.closed !== undefined) { if (story.seen.indexOf(e.key) < 0) story.seen.push(e.key); continue; }
+      /* the recap card tells the guided show's night, so the show's own scene would only tell it again a day late: it
+         goes in the box unplayed too */
+      if (recap && e.key === 'DOORS_AT_8_close') { if (story.seen.indexOf(e.key) < 0) story.seen.push(e.key); continue; }
+      e.wait = today(state) + (++n);
+      keep.push(e);
+    }
+    q.length = 0;
+    /* `after`: a show was played, so the scene says "you did one"; `cold`: none was (the walkthrough was skipped
+       before it, or the show fell through), and the scene says neither */
+    q.push({ key: SETUP, slots: slots(state, { after: shown, cold: !shown }) });
+    for (i = 0; i < keep.length; i++) q.push(keep[i]);
+    story.setup = 'ASK';
+    return true;
+  }
+  /* -> 'LATER' | 'ASK' | 'DONE' | null (reads only) */
+  function setup(state) { var s = story0(state); return (s && s.setup) || null; }
 
   function story0(state) { return state && state.story && typeof state.story === 'object' ? state.story : null; }
 
   /* the cutscene the UI should play next: { key, slots }, or null (reads only) */
   function nextCutscene(state) {
-    var s = story0(state), q = s && isArr(s.cutscenes) ? s.cutscenes : [];
-    return q.length ? { key: q[0].key, slots: SB.util.copy(q[0].slots || {}) } : null;
+    var s = story0(state), q = s && isArr(s.cutscenes) ? s.cutscenes : [], walk = q.length ? walking(state) : false, i;
+    for (i = 0; i < q.length; i++) {
+      if (q[i].hold && walk) continue;
+      if (typeof q[i].wait === 'number' && q[i].wait > today(state)) continue;      // its evening has not come (spaced)
+      return { key: q[i].key, slots: SB.util.copy(q[i].slots || {}) };
+    }
+    return null;
   }
 
   /* played or skipped: off the queue, into the box */
   function markSeen(state, key) {
     if (typeof key !== 'string' || !key) SB.fail('Chapters.markSeen', 'key must be a cutscene key');
-    var s = ensure(state), i;
-    for (i = 0; i < s.cutscenes.length; i++) if (s.cutscenes[i].key === key) { s.cutscenes.splice(i, 1); break; }
+    var s = ensure(state), i, was = null, n = 0;
+    for (i = 0; i < s.cutscenes.length; i++) if (s.cutscenes[i].key === key) { was = s.cutscenes.splice(i, 1)[0]; break; }
+    /* one of the scenes waiting its turn after the first show has played: the next is not before tomorrow */
+    if (was && typeof was.wait === 'number') s.cutscenes.forEach(function (x) { if (x && typeof x.wait === 'number') { n++; x.wait = Math.max(x.wait, today(state) + n); } });
     if (s.seen.indexOf(key) < 0) s.seen.push(key);
+    if (key === SETUP && s.setup === 'ASK') s.setup = 'DONE';   // asked: the day job is set from here on
     return { ok: true };
   }
 
@@ -526,5 +602,5 @@ SB.module('Chapters', function (SB) {
   return { check: check, nextCutscene: nextCutscene, markSeen: markSeen, list: list, aim: aim,
            /* beyond the manifest */
            /* beyond the manifest */
-           blank: blank, ensure: ensure, slots: slots, walk: walk, billOrder: billOrder, drops: drops, IDS: IDS, DROP_IDS: DROP_IDS };
+           blank: blank, ensure: ensure, slots: slots, setup: setup, walk: walk, billOrder: billOrder, drops: drops, IDS: IDS, DROP_IDS: DROP_IDS };
 });

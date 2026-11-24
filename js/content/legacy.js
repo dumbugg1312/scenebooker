@@ -18,16 +18,26 @@ SB.Content.legacy = {
             'The door is yours. You keep the cash box and the stamp and you do the count at the end, and don\'t hand that off to anybody.\n' +
             '{host} has {room}. Everything there is done by {curfew}, and they\'ve never made an exception for me.\n\n' +
             'Three things I wish somebody told me:\n1. Answer everyone, even with a no.\n2. Don\'t promise a guarantee you can\'t pay out of your own pocket.\n3. Make the flyer the same day you confirm. I mean the same day. Don\'t sit on it till the week of the show.\n\n' +
-            'I\'ll still answer my phone, probably.\n{outgoingInitial}'
+            'I\'ll still answer my phone, probably.\n{outgoingInitial}',
+      /* the same message for a player who is walked through the first show (spec 14: 60 words or fewer, the rest is
+       * taught a night at a time). Same slots. */
+      guided: {
+        subject: 'it\'s yours if you want it',
+        body: 'I\'m doing it. I\'m moving to {bigCity} the first of the month, so the shows are yours now.\n\n' +
+              'A band already wrote you about a date. Start with them, and I\'ll text you through the first one.\n\n' +
+              '{host} has {room}, and {sound} runs sound. I\'ll still answer my phone, probably.\n{outgoingInitial}'
+      }
     },
     notes: ['Answer everyone.', 'Flyer the day you confirm.', '{room}: done by {curfew}.'],     // the first three notebook notes, conf RUMOR
     script: [                              // the scripted first weeks (story 4.4), as 03-content section 10 gives them
       { week: 0, day: 0, post: 'REQUEST', template: 'CAREFUL', first: true, from: 'PEER', dates: [18, 19], guided: [11, 12], ask: 'DOOR' },  // the first show: a band writes you (guided: a week and a half out)
-      { week: 0, day: 0, post: 'LOCAL', path: 'people.band.FIRST_ASK', band: 'CLOSER' },
-      { week: 0, day: 0, post: 'REQUEST', template: 'MASS' },
-      { week: 0, day: 0, post: 'OWNER', path: 'people.owner.HOST.HELLO' },
+      /* while the first show is walked through, night 1 has only that one message (spec 14): walkDay is the day an entry
+         arrives on instead, walkAfter holds it until the guided show is played */
+      { week: 0, day: 0, walkDay: 1, post: 'LOCAL', path: 'people.band.FIRST_ASK', band: 'CLOSER' },
+      { week: 0, day: 0, walkAfter: true, post: 'REQUEST', template: 'MASS' },
+      { week: 0, day: 0, walkAfter: true, post: 'OWNER', path: 'people.owner.HOST.HELLO' },
       { week: 0, day: 2, post: 'LOCAL', path: 'people.band.FIRST_ASK', band: 'KIDS_OPENER' },
-      { week: 1, event: 'SOUND_GOT_A_GIG' },
+      { week: 1, walkAfter: true, event: 'SOUND_GOT_A_GIG' },
       { week: 3, day: 0, post: 'REQUEST', template: 'OVERSELL', calendar: 'ANY', ask: 'GUARANTEE' },
       { week: 3, day: 0, post: 'CONTACT', path: 'people.contact.OUTGOING.NUDGE' },
       { week: 5, day: 0, post: 'REQUEST', template: 'SWAP', from: 'PEER', dates: [66, 67], cross: 'CAREFUL' },   // the first trade, once you know the basics

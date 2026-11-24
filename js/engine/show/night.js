@@ -55,7 +55,20 @@ SB.module('Night', function (SB) {
   }
 
   function outcomeNow(state, show) {
-    return SB.Model.night(state, show, show.night.demand, effMods(show), SB.Forecast.lens(state, 'TRUTH', null));
+    var out = SB.Model.night(state, show, show.night.demand, effMods(show), SB.Forecast.lens(state, 'TRUTH', null)), fl = show.night.floor, door = show.door || {}, room, cap, was;
+    /* the guided first show draws at least the crowd its door needs (SB.Tutorial.floor, kept at the night's start) */
+    if (fl && typeof fl.paid === 'number' && out.paid < fl.paid) {
+      /* never more heads than the room holds: the comps give way to the people who pay */
+      room = roomOf(state, show); cap = Math.max(fl.paid, num(room && room.cap, num(out.cap, 0)));
+      was = out.heads; out.paid = fl.paid;
+      out.comps = Math.max(0, Math.min(num(out.comps, 0), cap - out.paid));
+      out.heads = out.paid + out.comps;
+      /* the money follows the crowd, as SB.Model.night counts it: a donation door's hat is everybody in the room */
+      out.gross = door.donation ? Math.round(out.heads * Math.max(0, num(door.suggested, 0)) * C.PRICE.HAT_RATE)
+                                : Math.round(out.paid * Math.max(0, num(door.price, 0)) * (1 - num(out.leak, 0)));
+      out.byGen = out.byGen.slice(); out.byGen[out.byGen[1] >= out.byGen[0] ? 1 : 0] += Math.max(0, out.heads - was); out.exact = out.heads;
+    }
+    return out;
   }
 
   /* ---------------- the night as a sequence of things that happen ---------------- */
@@ -237,6 +250,7 @@ SB.module('Night', function (SB) {
                            dispute: null, idx: 0, ids: {}, choices: [], incidents: [], setIdx: 0, ended: false, outcome: null, accounts: null, theft: 0 };
     lens = SB.Forecast.lens(state, 'TRUTH', null);
     night.demand = SB.Model.demand(state, show, lens, night.mods);
+    if (has('Tutorial', 'floor')) { night.floor = SB.Tutorial.floor(state, show); if (!night.floor) delete night.floor; }
     stops = has('Director', 'nightStops') ? (SB.Director.nightStops(state, showId, night.demand) || []) : [];
     night.stops = stops.slice().sort(byAt);
     records.push(rec(show, 'NIGHT_START', '', { roomId: room.id, par: par.heads, call: { lo: call.lo, hi: call.hi, mid: call.mid }, cap: num(room.cap, 0) }));

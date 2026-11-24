@@ -108,11 +108,16 @@ SB.module('Game', function (SB) {
     SB.Week.refreshHours(state);
     /* the guided first show is on until the start screen skips it (opts.tutorial === false starts with it skipped) */
     if (o.tutorial !== false) SB.Tutorial.start(state);
+    /* a first-timer is asked how to play, the day job and their band after the guided first show, not before it
+       (spec 14; SB.Chapters queues GOING_AWAY_setup when the walkthrough is over) */
+    if (o.setupLater === true && o.tutorial !== false && state.story) state.story.setup = 'LATER';
     SB.Chapters.check(state);
     /* the going-away show's bill as the player watched it: the way in plays that scene on a first draft of this game
        and asks the setup questions in it, and "I've done this before" can free a different local draw for the first
        show. Kept on the chapter so the scene watched again shows the same three bands. */
     keepGoingAway(state, o.goingAway);
+    /* the bands the outgoing booker hands over; every other local band joins your stack when you add it */
+    SB.Bands.handover(state, 4);
     SB.Patches.check(state);
     return state;
   }
@@ -152,9 +157,15 @@ SB.module('Game', function (SB) {
     switch (key) {
       case 'bills':
         if (typeof value !== 'boolean') return U.no(E.REFUSE.INVALID, label('refuse.INVALID'));
-        if (value === S.bills) return U.yes();
+        if (value === S.bills) { if (state.story && state.story.setup === 'ASK') delete S.billsNext; return U.yes(); }   // back to how it is: nothing waits for the week's turn
         /* open until the first morning has been played */
-        if (state.clock.week > 0 || state.clock.opened >= 0) return U.no(E.REFUSE.LOCKED, label('refuse.LOCKED'));
+        if (state.clock.week > 0 || state.clock.opened >= 0) {
+          /* and once more at the setup asked after the first show (spec 14): the change is kept and starts with the
+             next week (turnBills, from the week's turn), never in the middle of one */
+          if (!(state.story && state.story.setup === 'ASK')) return U.no(E.REFUSE.LOCKED, label('refuse.LOCKED'));
+          S.billsNext = value;
+          return U.yes({ next: true });
+        }
         S.bills = value;
         pack = SB.Cities.pack(state);
         if (value) {
@@ -180,6 +191,32 @@ SB.module('Game', function (SB) {
     S[key] = value;
     if (key === 'noText') SB.text.off = value;
     return U.yes();
+  }
+
+  /* The day job changed at the setup after the first show (settings.billsNext, set by setSetting above) starts or
+   * stops here, at the week's turn: SB.Week calls this before it lays out the new week, so the new week's shifts and
+   * hours are the right ones from Monday. The show money already in the cash box is kept. A save without billsNext:
+   * nothing happens. -> true when the setting changed. */
+  function turnBills(state) {
+    var S = state.settings || {}, v = S.billsNext, M = state.money, P = state.player, pack;
+    if (typeof v !== 'boolean') return false;
+    delete S.billsNext;
+    if (v === !!S.bills) return false;
+    S.bills = v;
+    if (v) {
+      pack = SB.Cities.pack(state);
+      M.bank = (pack.money && typeof pack.money.startCash === 'number') ? pack.money.startCash : C.CITY.START_CASH;
+      P.dayJob = E.DAY_JOB.FULL;
+      /* the month this starts in counts as paid, as a new game's first month does */
+      M.billsMonth = { y: SB.time.date(state.clock.day).y, m: SB.time.date(state.clock.day).m };
+    } else {
+      /* no bank from here on: the float a game without bills starts with goes in the cash box, beside the show money */
+      M.fund = (M.fund || 0) + C.MONEY.BILLS_OFF.fund;
+      M.bank = null; M.lateFee = 0; M.overdraftMonths = 0;
+      P.dayJob = E.DAY_JOB.NONE; P.couch = false;
+    }
+    P.dayJobNext = null; P.dayJobLater = null; P.shiftDrops = 0;
+    return true;
   }
 
   /* ------------------------------------------------------------------ */
@@ -216,5 +253,24 @@ SB.module('Game', function (SB) {
     P.followers = Math.max(0, Math.round(v));
   }
 
-  return { newGame: newGame, strip: strip, setSetting: setSetting, adjustName: adjustName, adjustFollowers: adjustFollowers };
+  /* setBookingName(state, name, mark): the name the player puts on the flyers, and the lettering it is drawn in. A
+   * first-timer starts with no name ('') and is asked at the first flyer (spec 14, the name sheet on the flyer desk).
+   * mark is optional ({ treatment, seed, ... }): its fields are laid over the mark the game already has.
+   * -> { ok: true, name } or { ok: false, why: 'EMPTY' | 'BLOCKED' }. */
+  function setBookingName(state, name, mark) {
+    var P = state.player, n = typeof name === 'string' ? name.replace(/\s+/g, ' ').trim().slice(0, 48) : '', k, m;
+    if (!n) return { ok: false, why: 'EMPTY' };
+    if (SB.text.blocked && SB.text.blocked(n)) return { ok: false, why: 'BLOCKED' };
+    P.bookingName = n;
+    if (mark && typeof mark === 'object') {
+      m = P.mark ? U.copy(P.mark) : { v: 1 };
+      for (k in mark) if (mark[k] !== undefined && mark[k] !== null) m[k] = mark[k];
+      P.mark = m;
+    }
+    if (SB.Tutorial && SB.Tutorial.notify) SB.Tutorial.notify(state, 'NAME');
+    return { ok: true, name: n };
+  }
+
+  return { newGame: newGame, strip: strip, setSetting: setSetting, turnBills: turnBills, setBookingName: setBookingName,
+           adjustName: adjustName, adjustFollowers: adjustFollowers };
 });

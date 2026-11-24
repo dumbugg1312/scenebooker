@@ -112,7 +112,14 @@
       stickers: [1480, 450, 1.08, 0.8], book: [1220, 790, 1.2, 1], tin: [1480, 780, 1.1, -0.8]
     };
     var CLIPLAY = { x: 580, y: 620, step: 184, z: 1.12 };
-    var PINNED = {};
+    /* the cash envelope is pinned in the bottom band, like the night clock (user 2026-11-24: on the
+       table it stretched the fitted desk and left "a lot of dead space"; "it could be a pop up thing like the clock
+       piece"). Pinned things keep their place and size and are left out of the fit, so the desk fills the table. */
+    var PINNED = { tin: true };
+    /* in the bottom right corner, where the pocket player was (user 2026-11-24: "put the mixtape up there and the envelope
+       where the mixtape is"); the player picks the first corner that covers nothing (js/ui/musicbar.js corner()), so on
+       the desk it goes up to the top right */
+    LAYOUT.tin = [1462, 926, 0.74, -2];
     var TABLE = { x: 34, y: 20, w: 1532, h: 920, lip: 34 };          // the table top; its front edge drops lip units to the floor
     var AREA = { x: 60, y: 34, w: 1480, h: 850 }, AREA_GUIDED = { x: 60, y: 34, w: 1480, h: 786 };   // the walkthrough's strip takes the bottom band
     var LIGHT = { x: 760, y: 420 };                                   // the lamp's pool on the table
@@ -190,7 +197,7 @@
       v.flyered = all.filter(function (x) { return x.promo && x.promo.flyer; });
       v.held = v.upcoming.filter(function (x) { return x.hold; });
       v.bands = safe(function () {
-        return SB.Bands.list(s, { local: true }).map(function (id) { return SB.Bands.card(s, id); }).filter(Boolean)
+        return SB.Bands.list(s, { local: true, stack: true }).map(function (id) { return SB.Bands.card(s, id); }).filter(Boolean)
           .sort(function (a, b) { return (a.years || 0) - (b.years || 0) || (a.id < b.id ? -1 : 1); });
       }, []);
       /* the key ring: only the rooms the booker knows (the one the handoff named, rooms whose people they have met, rooms

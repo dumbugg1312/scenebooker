@@ -49,6 +49,9 @@ body.sy-guiding .sb-toasts { bottom: calc((100vh - var(--u) * 1000) / 2 + var(--
 .sy-strip--nudge .sy-strip-text, .sy-strip--wrong .sy-strip-text { text-decoration: underline; text-decoration-thickness: calc(var(--p) * 2); text-underline-offset: calc(var(--p) * 3); }
 .sy-strip-x { all: unset; box-sizing: border-box; flex: none; width: calc(var(--p) * 40); display: flex; align-items: center; justify-content: center; font: 400 calc(var(--fs) * 20)/1 var(--f-gothic); border-left: calc(var(--p) * 2) dashed var(--toner); }
 .sy-strip-say { margin: 0; }
+/* the clock lesson's GOT IT, where the put-away cross sits */
+.sy-strip-ok { all: unset; box-sizing: border-box; flex: none; display: flex; align-items: center; justify-content: center; padding: 0 calc(var(--u) * 16); font: 400 calc(var(--u) * 17)/1 var(--f-gothic); letter-spacing: .1em; white-space: nowrap; cursor: pointer; border-left: calc(var(--u) * 2.5) dashed var(--toner); }
+.sy-strip-ok:hover, .sy-strip-ok:focus-visible { background: var(--toner); color: var(--pp-bond); }
 .sy-strip-open:not(.sy-strip-say):hover, .sy-strip-x:hover { background: var(--toner); color: var(--pp-bond); }
 .sy-strip-open:not(.sy-strip-say):hover .sy-strip-from { background: var(--pp-bond); color: var(--toner); }
 /* while the guided show runs: a small tab on top of the strip's right end, "skip the walkthrough", asked once */
@@ -61,6 +64,18 @@ body.sy-guiding .sb-toasts { bottom: calc((100vh - var(--u) * 1000) / 2 + var(--
 .sy-skip-yes { padding: calc(var(--u) * 3) calc(var(--u) * 8) calc(var(--u) * 2); background: var(--toner); color: var(--pp-bond); text-transform: uppercase; letter-spacing: .06em; }
 .sy-strip-skip button:hover, .sy-strip-skip button:focus-visible { background: var(--hl-solid); color: var(--toner); }
 .sy-strip-skip.is-asking { z-index: 1; }
+
+/* ---------- "why?" on the coach line (spec 14): one press unfolds the longer why-it-works under the line ---------- */
+.sy-why { all: unset; box-sizing: border-box; flex: none; cursor: pointer; align-self: center; margin: 0 calc(var(--p) * 8);
+  padding: calc(var(--p) * 3) calc(var(--p) * 6); font: 400 calc(var(--fs) * 13)/1.2 var(--f-type);
+  text-decoration: underline; text-decoration-thickness: calc(var(--p) * 1.5); text-underline-offset: calc(var(--p) * 3); }
+.sy-why:hover, .sy-why:focus-visible { background: var(--hl-solid); color: var(--toner); }
+.sy-bub .sy-why { display: inline-block; margin: calc(var(--p) * 4) 0 0; }
+.sy-strip.is-why { flex-wrap: wrap; }
+.sy-why-box { flex: 1 0 100%; box-sizing: border-box; max-width: 100%; }
+.sy-strip .sy-why-box { padding: 0 calc(var(--p) * 16) calc(var(--p) * 10); border-top: calc(var(--p) * 2) dashed var(--toner); }
+.sy-why-text, .sy-why-where { margin: calc(var(--p) * 6) 0 0; font-size: .92em; }
+.sy-why-where { font-size: .8em; letter-spacing: .02em; opacity: .8; }
 
 /* ---------- the card a new patch lands on: slapped down on the desk, its patch stamped ---------- */
 .sy-card.pz-paper, .sy-card-leaving.pz-paper {
@@ -80,6 +95,19 @@ body.sy-guiding .sb-toasts { bottom: calc((100vh - var(--u) * 1000) / 2 + var(--
   font: 400 calc(var(--fs) * 13)/1 var(--f-gothic); letter-spacing: .12em; text-transform: uppercase; transform: rotate(-1.2deg);
 }
 .sy-card-go:hover { --paper: var(--toner-mid); }
+
+/* ---------- the recap card after the guided first show (spec 14): a typed sheet in the dialog card, the pay-out as a column ---------- */
+.sy-recap { display: flex; flex-direction: column; align-items: stretch; gap: calc(var(--p) * 8); padding: calc(var(--p) * 14); color: var(--toner); font: 400 calc(var(--fs) * 15)/1.4 var(--f-type); }
+.sy-recap > * { margin: 0; }
+.sy-recap-from { align-self: flex-start; }
+.sy-recap-head { font: 400 calc(var(--fs) * 26)/1 var(--f-gothic); text-transform: uppercase; letter-spacing: .05em; transform: rotate(-.8deg); transform-origin: left center; }
+.sy-recap-h { margin-top: calc(var(--p) * 4); font: 400 calc(var(--fs) * 12)/1.2 var(--f-gothic); text-transform: uppercase; letter-spacing: .12em; color: var(--toner-mid); }
+.sy-recap-pay { list-style: none; padding: 0; display: flex; flex-direction: column; }
+.sy-recap-row { display: flex; align-items: baseline; justify-content: space-between; gap: calc(var(--p) * 16); padding: calc(var(--p) * 4) 0; border-bottom: calc(var(--p) * 1) dashed var(--toner-mid); }
+.sy-recap-row.is-you { border-bottom: 0; border-top: calc(var(--p) * 2) solid var(--toner); font-weight: 700; }
+.sy-recap-who { min-width: 0; overflow-wrap: anywhere; }
+.sy-recap-amt { flex: none; font-variant-numeric: tabular-nums; }
+.sy-recap-go { align-self: flex-end; margin-top: calc(var(--p) * 4); }
 
 /* ---------- the jacket on the desk ---------- */
 .dk-live > canvas.dk-jacket { position: absolute; display: block; pointer-events: none; }

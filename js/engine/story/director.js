@@ -15,14 +15,16 @@ SB.module('Director', function (SB) {
   // SPEC?: BAND_DROPS is raised "by a band's reliability" with no rate given: (1 - rel) times this, per band per week.
   var BAND_DROP_K = 0.15;
 
-  /* The scripted first month of 03-content 10, used when SB.Content.legacy.opening.script is absent. */
+  /* The scripted first month of 03-content 10, used when SB.Content.legacy.opening.script is absent.
+   * While the first show is walked through (walking()) an entry can say where it goes instead (spec 14, night 1 has one
+   * message): walkDay is the day of its week it arrives on, walkAfter: true holds it until the guided show is played. */
   var DEFAULT_SCRIPT = [
     { week: 0, day: 0, post: 'REQUEST', template: 'CAREFUL', first: true, from: 'PEER', dates: [18, 19], guided: [11, 12], ask: 'DOOR' },
-    { week: 0, day: 0, post: 'LOCAL', path: 'people.band.FIRST_ASK', band: 'CLOSER' },
-    { week: 0, day: 0, post: 'REQUEST', template: 'MASS' },
-    { week: 0, day: 0, post: 'OWNER', path: 'people.owner.HOST.HELLO' },
+    { week: 0, day: 0, walkDay: 1, post: 'LOCAL', path: 'people.band.FIRST_ASK', band: 'CLOSER' },
+    { week: 0, day: 0, walkAfter: true, post: 'REQUEST', template: 'MASS' },
+    { week: 0, day: 0, walkAfter: true, post: 'OWNER', path: 'people.owner.HOST.HELLO' },
     { week: 0, day: 2, post: 'LOCAL', path: 'people.band.FIRST_ASK', band: 'KIDS_OPENER' },
-    { week: 1, event: 'SOUND_GOT_A_GIG' },
+    { week: 1, walkAfter: true, event: 'SOUND_GOT_A_GIG' },
     { week: 3, day: 0, post: 'REQUEST', template: 'OVERSELL', calendar: 'ANY', ask: 'GUARANTEE' },
     { week: 3, day: 0, post: 'CONTACT', path: 'people.contact.OUTGOING.NUDGE' },
     { week: 5, day: 0, post: 'REQUEST', template: 'SWAP', from: 'PEER', dates: [66, 67], cross: 'CAREFUL' },
@@ -313,6 +315,9 @@ SB.module('Director', function (SB) {
       host: firstName(state, host), room: room ? room.name : '', curfew: room ? SB.time.clock(room.curfew) : ''
     };
     var h = 'legacy.opening.handoff';
+    /* a game that is walked through its first show gets the short handoff: the rest is taught a night at a time (spec 14) */
+    d.guided = guidedStart(state);
+    if (d.guided && SB.text.has(h + '.guided.body')) h += '.guided';
     SB.Effects.post(state, { kind: E.MSG.HANDOFF, fromId: out, fromName: personName(state, out),
                              subject: line(state, h + '.subject', sl), body: line(state, h + '.body', sl), needs: false, keep: true });
     var notes = SB.Content.legacy && SB.Content.legacy.opening && isArr(SB.Content.legacy.opening.notes) ? SB.Content.legacy.opening.notes : [];
@@ -329,12 +334,14 @@ SB.module('Director', function (SB) {
 
   /* Move script entries of weeks up to w out of the script: post day-0 ones now, the rest when their day comes. */
   function runScript(state, w) {
-    var d = dir(state), sc = script(state), e, day;
+    var d = dir(state), sc = script(state), e, day, walk = walking(state);
     if (d.opening === null || d.opening === undefined) return;
     while (d.opening < sc.length && sc[d.opening].week <= w) {
       e = sc[d.opening];
-      day = e.week * 7 + (e.day || 0);
-      if (e.event) {
+      day = e.week * 7 + (walk && typeof e.walkDay === 'number' ? e.walkDay : (e.day || 0));
+      /* the walkthrough is on: this one waits until its show is played (due() lets it go) */
+      if (walk && e.walkAfter) d.later.push({ day: today(state), what: 'SCRIPT', idx: d.opening, hold: true });
+      else if (e.event) {
         day = e.week * 7 + (e.day === undefined ? 1 : e.day);
         d.queue.push({ id: U.newId(state, 'd'), eventId: e.event, day: Math.max(day, today(state)), half: 'NIGHT', bind: null, scripted: true });
       } else if (day <= today(state)) scriptPost(state, e);
@@ -362,6 +369,10 @@ SB.module('Director', function (SB) {
       return gs.length ? U.mean(gs) : 1;
     }
     if (which === 'KIDS_OPENER') {
+      /* walked through, the band that writes is the kids' band the guide names (SB.Tutorial.cast), so the message the
+         player gets and the band they are told to ask are the same one */
+      var named = walking(state) && SB.Tutorial && SB.Tutorial.cast ? SB.Tutorial.cast(state).kids : null;
+      if (named && state.bands[named] && named !== used) return named;
       var kids = ids.filter(function (id) { return id !== used && ageOf(id) < .5; });
       return kids.length ? kids[0] : ids.filter(function (id) { return id !== used; }).slice(-1)[0] || ids[0];
     }
@@ -466,6 +477,23 @@ SB.module('Director', function (SB) {
    * start screen said "I've done this before") */
   function guidedStart(state) { var t = state.story && state.story.tutorial; return !(t && t.skipped); }
 
+  /* walking(state): this game is being walked through its first show, and that show has not been played yet. Then
+   * nothing else arrives and nothing interrupts (spec 14): the script's walkAfter entries, the week's events and the
+   * guaranteed person event all wait. d.guided is written by opening() (the walkthrough itself starts just after it); a
+   * save from before it has no d.guided and goes on as it always did. Reads only. */
+  function walking(state) {
+    /* one definition, SB.Tutorial's (it needs d.guided too): Requests and Chapters ask the same one */
+    return !!(SB.Tutorial && SB.Tutorial.walking && SB.Tutorial.walking(state));
+  }
+
+  /* written(state, which): has the local band of this script role ('CLOSER', 'KIDS_OPENER') sent its first message?
+   * false only while that message is still waiting for its day. Reads only. */
+  function written(state, which) {
+    var d = state.director, sc = script(state);
+    if (!d || !isArr(d.later)) return true;
+    return !d.later.some(function (it) { var e = it.what === 'SCRIPT' ? sc[it.idx] : null; return !!e && e.post === 'LOCAL' && e.band === which; });
+  }
+
   /* the first show's request: the band that wrote on day one (an older save: the opening's swap) */
   function firstReqId(state) { var d = dir(state); return d.firstRequestId || d.swapRequestId || null; }
   function firstReq(state) { var id = firstReqId(state); return id && state.requests ? state.requests[id] || null : null; }
@@ -526,6 +554,7 @@ SB.module('Director', function (SB) {
       return false;
     });
     if (d.quietWeek === w || w === 0) return;
+    if (walking(state)) return;                     // interrupts are off until the guided show is played (spec 14)
     var budget = Math.min(D.minorMax, D.minor + Math.floor(showsInFlight(state) / 2) * D.minorPerTwoShows);
     budget -= d.queue.filter(function (q) { return q.day >= start && q.day <= end; }).length;
     var tiers = w < D.gentleOnlyBeforeWeek ? ['GENTLE'] : ['GENTLE', 'REAL'];
@@ -563,7 +592,7 @@ SB.module('Director', function (SB) {
   var PERSON_BINDS = ['person', 'touring', 'band', 'opener', 'closer'];
   function guaranteePersonEvent(state, w, start, end, takenDays) {
     var d = dir(state), r = rng(state), played = 0, wait, all, pool = [], weights = [], pick, day, half, hasOne;
-    if (!guidedStart(state)) return;
+    if (!guidedStart(state) || walking(state)) return;
     Object.keys(state.shows || {}).forEach(function (id) { if (state.shows[id] && state.shows[id].status === E.SHOW.PLAYED) played++; });
     if (played >= 2) return;
     wait = liveShows(state).filter(function (s) { return s.day >= start && s.day <= end + 7; })[0];
@@ -605,13 +634,17 @@ SB.module('Director', function (SB) {
     var d = dir(state), sc = script(state), i, q, ev, bound, dec;
     /* postponed posts whose day has come. SPEC?: due returns only a Decision, so the MESSAGE records of these posts
      * are not returned; the messages themselves are in the inbox. */
-    var later = d.later;
+    var later = d.later, walk = walking(state), e;
     d.later = [];
     later.forEach(function (it) {
-      if (it.day > day) { d.later.push(it); return; }
-      if (it.what === 'SCRIPT') { if (sc[it.idx]) scriptPost(state, sc[it.idx]); }
+      if (it.day > day || (it.hold && walk)) { d.later.push(it); return; }
+      e = it.what === 'SCRIPT' ? sc[it.idx] : null;
+      /* a week event that waited for the guided show: tomorrow night, like any scripted one */
+      if (e && e.event) d.queue.push({ id: U.newId(state, 'd'), eventId: e.event, day: day + 1, half: 'NIGHT', bind: null, scripted: true });
+      else if (it.what === 'SCRIPT') { if (e) scriptPost(state, e); }
       else SB.Effects.deliverLater(state, it);
     });
+    if (walk) return null;                          // no forced decisions while the first show is walked through
     d.queue.sort(function (a, b) { return a.day - b.day || (a.half === b.half ? 0 : (a.half === 'DAY' ? -1 : 1)); });
     for (i = 0; i < d.queue.length; i++) {
       q = d.queue[i];
@@ -850,5 +883,5 @@ SB.module('Director', function (SB) {
 
   return { opening: opening, planWeek: planWeek, due: due, resolve: resolve, nightStops: nightStops, risks: risks,
            /* extra (not in the manifest) */
-           firstShow: firstShow, firstRequestId: firstReqId };
+           firstShow: firstShow, firstRequestId: firstReqId, walking: walking, written: written };
 });

@@ -211,8 +211,14 @@
     if (!root || root.hidden || !D.elementFromPoint) return;
     root.style.visibility = 'hidden';
     try {
-      for (i = 0; i < CORNERS.length; i++) {
-        c = CORNERS[i];
+      /* on the desk the bottom right corner is the cash envelope's (js/desk/scene.js, user 2026-11-24), so the player
+         tries the top right first there */
+      var order = CORNERS, rt = '';
+      try { rt = SB.UI.route() || ''; } catch (e) { rt = ''; }
+      if (rt === 'desk') order = ['tr', 'br', 'bl', 'tl'];
+      root.classList.toggle('on-desk', rt === 'desk');
+      for (i = 0; i < order.length; i++) {
+        c = order[i];
         x = c.charAt(1) === 'r' ? ox + 1600 * u - 18 * p - w : ox + 18 * p;
         y = c.charAt(0) === 'b' ? oy + 1000 * u - 16 * p - h : oy + 12 * p;
         n = covers(x, y, w, h);

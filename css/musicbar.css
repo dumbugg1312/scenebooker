@@ -11,6 +11,8 @@
 }
 .mb[hidden] { display: none; }
 .mb.at-tr, .mb.at-tl { bottom: auto; top: calc(var(--mb-y) + var(--p) * 12); align-items: flex-start; }
+/* on the desk the player lives up in the top right corner, high, clear of the pins (user 2026-11-24) */
+.mb.on-desk.at-tr { top: calc(var(--mb-y) - var(--p) * 6); right: calc(var(--mb-x) + var(--p) * 1); }
 .mb.at-bl, .mb.at-tl { right: auto; left: calc(var(--mb-x) + var(--p) * 18); }
 
 /* ---------- the cassette ---------- */
