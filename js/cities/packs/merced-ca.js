@@ -11,7 +11,7 @@ SB.Cities.register('merced-ca', {
   blocklist: ['merced sun-star*', 'uc merced*', 'merced college*', 'castle air*', 'kbif*', 'merced county fair*', 'taco bell*', 'turlock journal*', 'yaya music fest*'],
 
   blurb: ['A San Joaquin Valley farm town on Highway 99 where a show is a garage with the door up and a cord run from the house.',
-          'Garages, halls and the odd ranch shed, run on car-pools and fog. The heat sets the clock and the neighbors set the curfew.'],
+          'The shows are in garages, halls and the odd ranch shed, run on car-pools and fog, and the heat sets the clock while the neighbors set the curfew.'],
   hard: 'Small crowd, few steady rooms, and bands usually keep driving past.',
   region: 'the Valley',
   houseType: 'GARAGE',
@@ -111,19 +111,19 @@ SB.Cities.register('merced-ca', {
   events: [
     { id: 'MERCED_CA_FOG_NIGHT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [11, 12, 1, 2] },
-      telegraph: 'The fog came down on Highway 99 this morning and it has not lifted.',
+      telegraph: 'The fog came down on Highway 99 this morning and has not lifted.',
       title: 'The van is stuck in the fog',
       body: 'The headliners are sitting in a parking lot in Modesto because the highway is shut, and the yard crowd is already standing in the cold.',
       options: [
-        { id: 'WAIT', label: 'Hold the doors until the van crawls in', likely: 'A late start and a cold crowd.',
+        { id: 'WAIT', label: 'Hold the doors until the van crawls in', likely: 'It means a late start and a cold crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The van pulled in at ten. The crowd had a fire in a barrel and nobody left.' },
-        { id: 'SHORT', label: 'Run the local bands and play on', likely: 'A thin night, but a warm one.',
+          result: 'The van pulled in at ten, and the crowd had a fire in a barrel and nobody left.' },
+        { id: 'SHORT', label: 'Run the local bands and play on', likely: 'It\'s a thin night, but a warm one.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two local bands and a long loose night. The ones who came were glad.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was two local bands and a long, loose night, and the people who came were glad.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'MERCED_CA_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -132,32 +132,32 @@ SB.Cities.register('merced-ca', {
       title: 'The midway wins',
       body: 'The fairgrounds have taken the parking and the kids, and rodeo night is the same evening as your garage show.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the rodeo lets out', likely: 'The ones who want a night out come late.',
+        { id: 'LATE', label: 'Push doors back until the rodeo lets out', likely: 'The people who want a night out come late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The crowd came in smelling like funnel cake.' },
+          result: 'Doors opened an hour late, and the crowd came in smelling like funnel cake.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the midway.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The casual crowd rode the Ferris wheel. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd rode the Ferris wheel, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'MERCED_CA_HEAT_LOAD_IN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [6, 7, 8, 9] },
       telegraph: 'It is 109 and the ranch shed is an oven all afternoon.',
       title: 'Loading in at a hundred and nine',
-      body: 'The shed past the city limits has no shade and no air, and the amps are too hot to touch. The bands want to know if anyone is bringing ice.',
+      body: 'The shed past the city limits has no shade and no air, and the amps are too hot to touch, and the bands want to know if anyone is bringing ice.',
       options: [
-        { id: 'LATER', label: 'Push everything back until the sun is down', likely: 'Most wait it out. Everyone is up late.',
+        { id: 'LATER', label: 'Push everything back until the sun is down', likely: 'Most people wait it out, and everyone is up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors at nine. Fans blew all night and the shed was packed.' },
+          result: 'Doors were at nine, and fans blew all night, and the shed was packed.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Only the committed show up.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'Half the list stayed home in the air conditioning.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

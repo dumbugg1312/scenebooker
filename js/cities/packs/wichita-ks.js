@@ -14,8 +14,8 @@ SB.Cities.register('wichita-ks', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['wichita state*', 'wichita eagle*', 'textron*', 'pizza hut*', 'spangles*', 'river festival*', 'hydraulic hall*'],
 
-  blurb: ['The Air Capital of the World on the flat Kansas plain, an aircraft-plant and meatpacking city of long arterials, ranch houses and cheap rent.',
-          'Shows hide in garages and church halls, you park on a lawn, and the storm decides the night.'],
+  blurb: ['The city calls itself the Air Capital of the World, on the flat Kansas plain, with aircraft plants and meatpacking, long arterials, ranch houses and cheap rent.',
+          'Shows hide in garages and church halls, you park on a lawn, and the weather decides the night.'],
   hard: 'Bands skip the stop; rooms are spread out and need a car.',
   region: 'the Plains',
   houseType: 'GARAGE',
@@ -115,51 +115,51 @@ SB.Cities.register('wichita-ks', {
       if: { daysOut: [0, 4] },
       telegraph: 'One of the other tenants in the shared building has been grumbling about Saturday load-ins.',
       title: 'The tenants complain',
-      body: 'The other tenants in the shared building complain about the Saturday load-in. You can move the bill to the small space or the community room.',
+      body: 'The other tenants in the shared building complain about the Saturday load-in, so you can move the bill to the small space or the community room.',
       options: [
-        { id: 'SMALL', label: 'Move to the small practice room', likely: 'Smaller and louder. Cheaper too.',
+        { id: 'SMALL', label: 'Move to the small practice room', likely: 'It\'s smaller and louder, and cheaper too.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 0.6 }],
-          result: 'The bill squeezed into the small room. It was packed and nobody upstairs minded.' },
-        { id: 'HALL', label: 'Move to the community room', likely: 'The chairs stack and the pit opens.',
+          result: 'The bill squeezed into the small room, and it was packed and nobody upstairs minded.' },
+        { id: 'HALL', label: 'Move to the community room', likely: 'The chairs stack up and the floor opens.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'The hall took the bill and a donation jar went around.' },
-        { id: 'ACCEPT', label: 'Run it as planned and load in quietly', likely: 'The tenants are watching.',
+          result: 'The hall took the bill, and a donation jar went around.' },
+        { id: 'ACCEPT', label: 'Run it as planned and load in quietly', likely: 'The other tenants are watching.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
-          result: 'You loaded in on tiptoe. Nobody complained, but nobody relaxed either.' }
+          result: 'You loaded in on tiptoe, and nobody complained, but nobody relaxed either.' }
       ] },
 
     { id: 'WICHITA_KS_DOWNTOWN_FESTIVAL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'festival' },
       telegraph: 'A nine-day festival is taking over downtown and the parking is already gone.',
       title: 'Nowhere to park',
-      body: 'A long downtown festival has taken every lot, and your Old Town show is somewhere nobody can park. The kids who can walk in from the west bank are the only ones coming.',
+      body: 'A long downtown festival has taken every lot, and nobody can park near your Old Town show, so the kids who can walk in from the west bank are the only ones coming.',
       options: [
-        { id: 'WESTBANK', label: 'Move the show to the west bank', likely: 'A smaller yard, closer to the kids who can walk.',
+        { id: 'WESTBANK', label: 'Move the show to the west bank', likely: 'It\'s a smaller yard, closer to the kids who can walk.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 0.6 }],
-          result: 'A yard took the bill with an hour to spare and the kids walked over from the bars.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The ones with cars cannot park.',
+          result: 'A yard took the bill with an hour to spare, and the kids walked over from the bars.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The people with cars cannot park.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: 'The lots were full of fireworks watchers. The ones who found you were the regulars.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The lots were full of fireworks watchers, and the people who found you were the regulars.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The festival was still going.' }
+          result: 'You moved it a day, but the festival was still going.' }
       ] },
 
     { id: 'WICHITA_KS_STORM_SIREN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [4, 5, 6] },
       telegraph: 'The sky is green in the west and the sirens are tested every noon.',
       title: 'The siren in the middle of the set',
-      body: 'A storm siren goes off mid-set at a carport show in the southeast. Everyone has to find a shelter and the hall next door has the only basement.',
+      body: 'A storm siren goes off mid-set at a carport show in the southeast, and everyone has to find shelter, and the hall next door has the only basement.',
       options: [
-        { id: 'HALL', label: 'Take the whole crowd to the hall next door', likely: 'Cramped and loud, but dry.',
+        { id: 'HALL', label: 'Take the whole crowd to the hall next door', likely: 'It\'s cramped and loud, but dry.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: 0.8 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'The hall took the bill. Folding chairs, a donation jar and a band in the corner.' },
-        { id: 'WAIT', label: 'Wait it out and play on', likely: 'A late finish.',
+          result: 'The hall took the bill, with folding chairs, a donation jar and a band in the corner.' },
+        { id: 'WAIT', label: 'Wait it out and play on', likely: 'It means a late finish.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
-          result: 'The storm passed at ten. The band went back on and the crowd stayed.' },
-        { id: 'MOVE', label: 'Call it and move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The storm passed at ten, and the band went back on and the crowd stayed.' },
+        { id: 'MOVE', label: 'Call it and move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You called it and moved the bill. Some of them could come back.' }
+          result: 'You called it and moved the bill, and some of them could come back.' }
       ] }
   ]
 });

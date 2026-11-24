@@ -11,7 +11,7 @@ SB.Cities.register('sarasota-fl', {
            'visit sarasota', 'your observer', 'sarasota observer', 'srq magazine', 'srq daily', 'wslr', 'mysuncoast', 'tampabay28', 'bradenton times', 'fox 13', 'wtsp', 'siesta key crystal classic', 'crystal classic', 'sarasota chalk festival', 'avenida de colores', 'woods of mallaranny', 'living arts festival', 'sarasota orchestra', 'thunder by the bay', 'sarasota jazz festival', 'winter opera festival', 'venice sharks tooth festival', 'ringling underground', 'circus arts conservatory', 'waterside place', 'payne park', 'lemon avenue mall', 'burns square', 'bandsintown'],
   blocklist: ['herald-tribune*', 'ringling*', 'selby gardens*', 'sarasota jungle*', 'creative loafing*', 'sarasota orchestra*', 'crystal classic*', 'srq magazine*', 'srq daily*', 'mysuncoast*'],
 
-  blurb: ['Retirees, beaches and bay condos on top, a few punk houses and warehouse nights underneath.',
+  blurb: ['The town is retirees, beaches and bay condos on top, with a few punk houses and warehouse nights underneath.',
           'Most of the audience drives in from Bradenton.'],
   hard: 'Small crowd, noise-averse retirees, and Tampa is an hour up the road.',
   region: 'the Gulf Coast',
@@ -106,51 +106,51 @@ SB.Cities.register('sarasota-fl', {
       if: { daysOut: [0, 3] },
       telegraph: 'A condo neighbor filmed the last porch show and sent it to the city commission while the sound rule is up for review.',
       title: 'The neighbor with the camera',
-      body: 'A clip of the last yard show is going around the commission, and a deputy has stopped by twice this week. Your show is on the same block.',
+      body: 'A clip of the last yard show is going around the commission, and a deputy has stopped by twice this week, and your show is on the same block.',
       options: [
-        { id: 'EARLY', label: 'Start at five and be done by nine', likely: 'The older kids miss it. The deputy stays in the car.',
+        { id: 'EARLY', label: 'Start at five and be done by nine', likely: 'The older kids miss it, but the deputy stays in the car.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Early doors, done by nine. The ones who came got a short, tight set and nobody called.' },
-        { id: 'MOVE', label: 'Move it to the warehouse side of town', likely: 'Fewer neighbors and a longer drive.',
+          result: 'You opened doors early and finished by nine, and the people who came got a short, tight set and nobody called.' },
+        { id: 'MOVE', label: 'Move it to the warehouse side of town', likely: 'There are fewer neighbors and a longer drive.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The bill moved to a bay out on the industrial edge. Loud, and nobody lives there.' },
-        { id: 'ACCEPT', label: 'Run it and keep the volume down', likely: 'A cautious room and a nervous host.',
+          result: 'The bill moved to a bay out on the industrial edge, which is loud, and nobody lives there.' },
+        { id: 'ACCEPT', label: 'Run it and keep the volume down', likely: 'It\'s a cautious room and a nervous host.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'REGULARS', pct: -.02 }],
-          result: 'You ran it quiet. Half the crowd wished you had not, and the host was tense all night.' }
+          result: 'You ran it quiet, and half the crowd wished you hadn\'t, and the host was tense all night.' }
       ] },
 
     { id: 'SARASOTA_FL_HURRICANE_WARNING', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [6, 7, 8, 9, 10, 11] },
       telegraph: 'A hurricane warning went up for the Gulf coast, and the storage units on the industrial edge are already sandbagging.',
       title: 'The warning two days out',
-      body: 'A hurricane warning is posted two days before your bill. The band\'s cinderblock unit floods in a heavy rain, and half the county is filling gas tanks.',
+      body: 'A hurricane warning is posted two days before your bill, the band\'s cinderblock unit floods in a heavy rain, and half the county is filling gas tanks.',
       options: [
-        { id: 'CALLOFF', label: 'Call it off and keep everyone safe', likely: 'A lost night, and nobody blames you.',
+        { id: 'CALLOFF', label: 'Call it off and keep everyone safe', likely: 'You lose the night, and nobody blames you.',
           effects: [{ op: 'MONEY', amount: -20 }, { op: 'REGULARS', pct: .02 }],
-          result: 'You called it two days out. The bands were relieved and the deposit was gone.' },
-        { id: 'MOVE', label: 'Move it a day, after it passes', likely: 'Breaks the date. The power may still be out.',
+          result: 'You called it two days out, and the bands were relieved, but the deposit was gone.' },
+        { id: 'MOVE', label: 'Move it a day, after it passes', likely: 'It breaks the date, and the power may still be out.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones with power and gas came.' },
-        { id: 'ACCEPT', label: 'Hold the date and see', likely: 'A thin house if the track bends your way.',
+          result: 'You moved it a day, and the people with power and gas came.' },
+        { id: 'ACCEPT', label: 'Hold the date and see', likely: 'You get a thin house if the track bends your way.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .5 }],
-          result: 'The storm turned. A third of the list came, rain still coming down.' }
+          result: 'The storm turned, and a third of the list came, with rain still coming down.' }
       ] },
 
     { id: 'SARASOTA_FL_SAND_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'A festival weekend is filling the beaches and the causeway, and every bartender is stuck in the line.',
       title: 'The causeway is closed',
-      body: 'The beach festival has the causeway at a standstill. The kid with the van and the sound man who lives on the Key are both stuck in traffic.',
+      body: 'The beach festival has the causeway at a standstill, and the kid with the van and the sound man who lives on the Key are both stuck in traffic.',
       options: [
-        { id: 'LATE', label: 'Push doors back an hour', likely: 'A late start, and the crowd trickles in.',
+        { id: 'LATE', label: 'Push doors back an hour', likely: 'It\'s a late start, and the crowd trickles in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The sound man arrived sunburned and the room filled slowly.' },
-        { id: 'SHORT', label: 'Cut the bill to the bands already in town', likely: 'A short night with a small, loyal crowd.',
+          result: 'Doors were an hour late, and the sound man arrived sunburned and the room filled slowly.' },
+        { id: 'SHORT', label: 'Cut the bill to the bands already in town', likely: 'It\'s a short night with a small, loyal crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Three bands played and the locals stayed late. The festival crowd never found the place.' },
+          result: 'Three bands played and the locals stayed late, and the festival crowd never found the place.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The tourists have the roads.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The regulars who live inland came. Everyone else was in the line.' }
+          result: 'The regulars who live inland came, and everyone else was stuck in the line.' }
       ] }
   ]
 });

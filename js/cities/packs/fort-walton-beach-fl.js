@@ -120,15 +120,15 @@ SB.Cities.register('fort-walton-beach-fl', {
       title: 'The Brooks Bridge is jammed',
       body: 'A wreck and a holiday crowd have the Brooks Bridge at a crawl the night of your show. The kids who work and live out toward the beach can\'t get across in time.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people from the beach side.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The bridge never cleared. The beach side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The bridge never cleared, so the beach side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads sat in traffic together all the way across. They\'ll remember that.' }
+          result: 'Two carloads sat in traffic together all the way across.' }
       ] },
 
     { id: 'FORT_WALTON_BEACH_FL_STILL_WATER', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -137,9 +137,9 @@ SB.Cities.register('fort-walton-beach-fl', {
       title: 'Someone across the water hears every word',
       body: 'On the still bayou the sound carries all the way across, and a neighbor has called it in. An officer is on the way with a laser to measure fifty feet from the property line.',
       options: [
-        { id: 'QUIET', label: 'Turn it down and play an acoustic set', likely: 'Quiet and strange. The crowd thins.',
+        { id: 'QUIET', label: 'Turn it down and play an acoustic set', likely: 'Quiet and strange, and the crowd thins.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The amps stayed off and the singer leaned in. The ones who stayed listened.' },
+          result: 'The amps stayed off and the singer leaned in, and the people who stayed listened.' },
         { id: 'MOVE', label: 'Move the bill to a house away from the water', likely: 'Smaller and louder, with different neighbors.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A garage across town took the bill, and the floor was packed.' },
@@ -152,17 +152,17 @@ SB.Cities.register('fort-walton-beach-fl', {
       if: { daysOut: [0, 5], calendar: 'festival' },
       telegraph: 'The waterfront festival closes streets downtown, and a fireworks barge is coming.',
       title: 'Downtown is closed for the festival',
-      body: 'The festival has downtown closed to cars for five days. The band that booked the downtown club can\'t get to the door, and the parking has been replaced by a fireworks barge.',
+      body: 'The festival has downtown closed to cars for five days, so the band that booked the downtown club can\'t get to the door, and the parking has been replaced by a fireworks barge.',
       options: [
         { id: 'EARLY', label: 'Open early and tell everyone where to park', likely: 'Most get in before the barricades. Thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came parked a mile away and walked.' },
+          result: 'Doors opened an hour early, and the people who came parked a mile away and walked.' },
         { id: 'HOUSE', label: 'Move the whole bill to a garage on the west side', likely: 'Smaller and louder, outside the closures.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A carport out west took the bill, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The streets stayed shut. Half the list never found a place to leave the car.' }
+          result: 'The streets stayed shut, and half the list never found a place to leave the car.' }
       ] }
   ]
 });

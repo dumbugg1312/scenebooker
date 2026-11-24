@@ -112,13 +112,13 @@ SB.Cities.register('vallejo-ca', {
       options: [
         { id: 'LATE', label: 'Push doors back until the fireworks are over', likely: 'The crowd walks over from the waterfront, late and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. They drifted in from the waterfront with sunburns and sparklers.' },
+          result: 'Doors opened an hour late, and they drifted in from the waterfront with sunburns and sparklers.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list is stuck behind a barricade.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The barricades kept the car crowd away. The ones on foot made it.' },
+          result: 'The barricades kept the car crowd away, but the people on foot made it.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The streets were empty and so was the sign-up sheet.' }
+          result: 'You moved it a day, and the streets were empty and so was the sign-up sheet.' }
       ] },
 
     { id: 'VALLEJO_CA_FOG_STRANDED', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -129,10 +129,10 @@ SB.Cities.register('vallejo-ca', {
       options: [
         { id: 'SHORT', label: 'Run the short bill and play on', likely: 'A thin night, but the ones who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a long, loose night. The room was half full and warm.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'A late start. The crowd gets restless.',
+          result: 'Two bands played a long, loose night in a room that was half full and warm.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'A late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van came over the bridge at ten. You started late and nobody left.' }
+          result: 'The van came over the bridge at ten, and you started late but nobody left.' }
       ] },
 
     { id: 'VALLEJO_CA_CAR_MEET', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
@@ -141,12 +141,12 @@ SB.Cities.register('vallejo-ca', {
       title: 'The car meet runs long',
       body: 'The custom-car crowd is still in the lot at doors, engines running, and the club president wants to keep the space for the evening.',
       options: [
-        { id: 'SHARE', label: 'Let them stay and open the roll-up door', likely: 'A strange, friendly crowd. A little money for the lot.',
+        { id: 'SHARE', label: 'Let them stay and open the roll-up door', likely: 'A strange, friendly crowd, and a little money for the lot.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }, { op: 'REGULARS', pct: .02 }],
-          result: 'The car crowd stood in the door and listened. Two of them asked about the next one.' },
+          result: 'The car crowd stood in the door and listened, and two of them asked about the next one.' },
         { id: 'CLEAR', label: 'Ask them to clear out and start on time', likely: 'Fewer people, no trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'They pulled out in a line with a lot of noise. You started a little late and a little small.' }
+          result: 'They pulled out in a line with a lot of noise, and you started a little late and a little small.' }
       ] }
   ]
 });

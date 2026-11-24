@@ -120,32 +120,32 @@ SB.Cities.register('kalamazoo-mi', {
       title: 'The garage is an oven',
       body: 'The big door has to stay shut for the two close neighbors, the air does not move, and the crowd is already spilling into the street just as one of them steps onto the porch.',
       options: [
-        { id: 'DOOR', label: 'Open the door and take the complaint', likely: 'Cooler and louder. The porch is watching.',
+        { id: 'DOOR', label: 'Open the door and take the complaint', likely: 'Cooler and louder, with the porch watching.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }, { op: 'STRESS', d: 1 }],
-          result: 'The door went up and the street filled. The neighbor made one call, and it was polite.' },
+          result: 'The door went up and the street filled, and the neighbor made one call, which was polite.' },
         { id: 'SHORT', label: 'Short sets and breaks outside', likely: 'A choppy night, but nobody faints.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Twenty minutes on, ten out in the yard. It was slow and sweaty and friendly.' },
+          result: 'Every band played twenty minutes and then everybody spent ten out in the yard, and it was slow and sweaty and friendly.' },
         { id: 'ACCEPT', label: 'Shut it and sweat', likely: 'Half the room goes home early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The room emptied by the second band. The ones who stayed were soaked.' }
+          result: 'The room emptied by the second band, and the people who stayed were soaked.' }
       ] },
 
     { id: 'KALAMAZOO_MI_MALL_FESTIVAL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The Mall is roped off for the weekend, and the strollers are already out.',
       title: 'The Mall is full of strollers',
-      body: 'A festival has the pedestrian mall packed just as the hall wants to load in a loud band. There is nowhere to park and the street is a crowd.',
+      body: 'A festival has the pedestrian mall packed just as the hall wants to load in a loud band, and there is nowhere to park because the street is a crowd.',
       options: [
-        { id: 'LATE', label: 'Start late, after the crowds thin out', likely: 'The night crowd comes. Later than planned.',
+        { id: 'LATE', label: 'Start late, after the crowds thin out', likely: 'The night crowd comes, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at nine. The festival crowd drifted in and some of them stayed.' },
+          result: 'Doors were at nine, and the festival crowd drifted in and some of them stayed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Gear carried through a crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Amps went through the crowd on a hand truck. The room was thin and the night was fine.' },
+          result: 'Amps went through the crowd on a hand truck, and the room was thin but the night was fine.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'KALAMAZOO_MI_HOMECOMING', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -156,13 +156,13 @@ SB.Cities.register('kalamazoo-mi', {
       options: [
         { id: 'EARLY', label: 'Start early and be done by ten', likely: 'Most of the real crowd makes it.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early and the last chord by ten. The only visitor was a cop who waved.' },
+          result: 'Doors early and the last chord by ten, and the only visitor was a cop who waved.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'A drunk crowd and a patrol car.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }, { op: 'STRESS', d: 1 }],
-          result: 'Strangers poured in from the street. It was a packed room and a nervous host.' },
+          result: 'Strangers poured in from the street, and the room was packed and the host was nervous.' },
         { id: 'MOVE', label: 'Move it off the hill to a hall', likely: 'Safer, smaller, and someone owes a favor.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .8 }],
-          result: 'A church hall took the bill. It was quiet outside and loud inside.' }
+          result: 'A church hall took the bill, and it was quiet outside and loud inside.' }
       ] },
 
     { id: 'KALAMAZOO_MI_SNOW_RUN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -171,15 +171,15 @@ SB.Cities.register('kalamazoo-mi', {
       title: 'The tour van is stuck in the snow',
       body: 'The touring band is crawling in two hours late, and the house has to decide whether to run past its quiet line.',
       options: [
-        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start. The crowd gets restless.',
+        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at ten-thirty. The neighbors got an apology in the morning.' },
+          result: 'The van pulled in at ten-thirty, and the neighbors got an apology in the morning.' },
         { id: 'LOCALS', label: 'Start with the locals and fit the headliner in last', likely: 'A shorter set, and a happy room.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
           result: 'The locals stretched their sets and the headliner played twenty minutes to a full basement.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] }
   ]
 });

@@ -125,7 +125,7 @@ SB.Cities.register('augusta-ga', {
           result: 'Two bands and a long, loose night for the ones who stayed in town.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the people who could make it came.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Everyone you know is working.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
           result: 'The room was mostly bands and their friends.' } ] },
@@ -134,14 +134,14 @@ SB.Cities.register('augusta-ga', {
       if: { daysOut: [0, 3] },
       telegraph: 'The sheriff is talking about a curfew sweep this weekend.',
       title: 'The curfew sweep',
-      body: 'Deputies are picking up minors after midnight and a parent has to come get them. The ride home for the kids on your bill just became your problem.',
+      body: 'Deputies are picking up minors after midnight and a parent has to come get them, so the ride home for the kids on your bill just became your problem.',
       options: [
-        { id: 'EARLY', label: 'End the show before the curfew', likely: 'Most of them get home in time. A short night.',
+        { id: 'EARLY', label: 'End the show before the curfew', likely: 'Most of them get home in time, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done before the cutoff. The kids went home on time.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get home.',
+          result: 'Doors opened early and you were done before the cutoff, so the kids went home on time.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'Costs two hours of your day, and most of them get home.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads drove the kids home in a convoy. Their parents noticed.' },
+          result: 'Two carloads drove the kids home in a convoy, and their parents noticed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Parents get nervous.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'Half the list stayed home rather than risk a call from the deputies.' } ] },
@@ -150,12 +150,12 @@ SB.Cities.register('augusta-ga', {
       if: { daysOut: [0, 3], months: [8, 9, 10] },
       telegraph: 'The remnants of a tropical storm are heading up the river valley.',
       title: 'The storm remnant',
-      body: 'The power is out for days. A garage show would run on a generator and an extension cord.',
+      body: 'The power is out for days, so a garage show would run on a generator and an extension cord.',
       options: [
         { id: 'GENERATOR', label: 'Run it on the generator', likely: 'Loud, dark and short on sound.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'The generator coughed through the set and the room was lit by phones.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' } ] } ]
+          result: 'You moved it a day, and not everyone could make the new date.' } ] } ]
 });

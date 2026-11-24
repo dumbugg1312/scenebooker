@@ -121,46 +121,46 @@ SB.Cities.register('san-diego', {
       title: 'A patrol car at ten',
       body: 'Ten o\'clock comes with a patrol car at the gate and a card about minors. Anyone under eighteen has to go home or leave with a parent, mid-bill.',
       options: [
-        { id: 'EARLY', label: 'Move the start up and finish before ten', likely: 'A short night. Most of the kids get a full set.',
+        { id: 'EARLY', label: 'Move the start up and finish before ten', likely: 'It\'s a short night, but most of the kids get a full set.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at five, done by ten. The patrol car drove past a quiet street.' },
-        { id: 'HALL', label: 'Move the whole bill to a hall', likely: 'Louder, bigger, and with a deposit. No neighbors.',
+          result: 'Doors were at five and you were done by ten, and the patrol car drove past a quiet street.' },
+        { id: 'HALL', label: 'Move the whole bill to a hall', likely: 'It\'s louder and bigger and costs a deposit, but there are no neighbors.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'MONEY', amount: -25 }],
-          result: 'A hall took the bill late. The crowd followed, grumbling and curious.' },
+          result: 'A hall took the bill late, and the crowd followed, grumbling and curious.' },
         { id: 'ACCEPT', label: 'Run it and send the kids home on time', likely: 'Half the crowd leaves mid-set.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the room left with parents. The late set was a tight circle of regulars.' }
+          result: 'Half the room left with parents, and the late set was a tight circle of regulars.' }
       ] },
 
     { id: 'SAN_DIEGO_CONVENTION_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival', months: [7] },
       telegraph: 'The hotels downtown are full and the rooms are tripling their prices for the convention.',
       title: 'The convention takes downtown',
-      body: 'Every downtown room fills with out-of-towners, and the cost of a bed for the touring band triples. The east county halls are empty, and far away.',
+      body: 'Every downtown room fills with out-of-towners, and the cost of a bed for the touring band triples. The east county halls are empty, but far away.',
       options: [
-        { id: 'EAST', label: 'Move the show to an east county hall', likely: 'Cheaper and calmer. You lose the downtown crowd.',
+        { id: 'EAST', label: 'Move the show to an east county hall', likely: 'It\'s cheaper and calmer, but you lose the downtown crowd.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The hall was cheap and quiet. The downtown crowd stayed downtown.' },
-        { id: 'RIDES', label: 'Put the bands up on couches and push through', likely: 'Two hours of your day. Everybody makes it.',
+          result: 'The hall was cheap and quiet, and the downtown crowd stayed downtown.' },
+        { id: 'RIDES', label: 'Put the bands up on couches and push through', likely: 'It takes two hours of your day, but everybody makes it.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Four to a floor, and the bands will remember who gave them one.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Hard to find a parking spot.',
+          result: 'The bands slept four to a floor, and they\'ll remember who gave them one.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'It\'s hard to find a parking spot.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Parking was the whole night. The ones who came, came early.' }
+          result: 'Parking was the whole night, and the ones who came, came early.' }
       ] },
 
     { id: 'SAN_DIEGO_MARINE_LAYER', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [5, 6, 7] },
       telegraph: 'The marine layer is forecast to come in thick by nine and stay all night.',
       title: 'Fog on the coast',
-      body: 'A fog bank rolls in at nine. The crowd huddles in the doorway of the beach bar and load-in is a damp, slow business in the marine layer.',
+      body: 'A fog bank rolls in at nine. The crowd huddles in the doorway of the beach bar, and load-in is a damp, slow business in the marine layer.',
       options: [
-        { id: 'WAIT', label: 'Hold the doors and let the bands load in', likely: 'A late start, and a cold crowd.',
+        { id: 'WAIT', label: 'Hold the doors and let the bands load in', likely: 'You start late, and the crowd is cold.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The bands loaded in through the mist. Doors opened late and the room warmed up fast.' },
-        { id: 'SHORT', label: 'Cut the bill and play on', likely: 'A thin night, but the ones who came stay.',
+          result: 'The bands loaded in through the mist, and doors opened late, but the room warmed up fast.' },
+        { id: 'SHORT', label: 'Cut the bill and play on', likely: 'It\'s a thin night, but the ones who came stay.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a loose set, and everyone stayed under the awning.' }
+          result: 'There were two bands and a loose set, and everyone stayed under the awning.' }
       ] }
   ]
 });

@@ -122,8 +122,8 @@ SB.Cities.register('san-jose', {
       options: [
         { id: 'EARLY', label: 'Start early and be out before the patrols', likely: 'A short night, and most of them make it.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done before dark. The ones who came got a tight, loud set.' },
-        { id: 'BASEMENT', label: 'Move the bill to a basement', likely: 'Smaller and quieter. Nobody can break up a cellar.',
+          result: 'Doors were early and you were done before dark, and the ones who came got a tight, loud set.' },
+        { id: 'BASEMENT', label: 'Move the bill to a basement', likely: 'Smaller and quieter, and nobody can break up a cellar.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A garage took the bill with an hour to spare, and it was packed to the door.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Half the list is afraid of the patrols.',
@@ -137,15 +137,15 @@ SB.Cities.register('san-jose', {
       title: 'No curb to unload at',
       body: 'The parade has the roads closed and the parking taken. The bands cannot get a van within six blocks of the room.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the streets reopen', likely: 'A late start. The crowd that wants a night out shows up.',
+        { id: 'LATE', label: 'Push doors back until the streets reopen', likely: 'The start is late, but the crowd that wants a night out shows up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in from the parade, loud and happy.' },
+          result: 'Doors opened an hour late, and the crowd came in from the parade, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned and carry the gear', likely: 'Families fill the streets and the regulars come.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The bands carried the amps six blocks. The regulars came, and not many more.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The bands carried the amps six blocks, and the regulars came but not many more.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'SAN_JOSE_SHOP_STOP', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -157,12 +157,12 @@ SB.Cities.register('san-jose', {
         { id: 'SHORT', label: 'Cut the bill short and play on', likely: 'Fewer bands, but the ones who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'Three short sets and everyone out by half past six.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everyone trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the ones who could come came.' },
         { id: 'ACCEPT', label: 'Run it as planned and hope', likely: 'The landlord may not forget.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'MONEY', amount: -25 }],
-          result: 'The police came at seven. It cost you a fine, and the landlord noticed.' }
+          result: 'The police came at seven, it cost you a fine, and the landlord noticed.' }
       ] }
   ]
 });

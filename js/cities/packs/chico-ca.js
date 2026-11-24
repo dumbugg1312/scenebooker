@@ -11,7 +11,7 @@ SB.Cities.register('chico-ca', {
   blocklist: ['sierra nevada*', 'chico news*', 'enterprise-record*', 'pioneer days*', 'wildflower century*', 'wallywood*'],
 
   blurb: ['A campus town where a loose booking crew keeps all-ages, sober punk alive on five-dollar doors. Rooms come and go, but the kids keep starting bands.',
-          'Summer empties the house shows and fire season fills the sky with smoke.'],
+          'Summer empties the house shows, and fire season fills the sky with smoke.'],
   hard: 'All-ages rooms keep closing, students turn over, and smoke kills whole weekends.',
   region: 'the Valley',
   houseType: 'GARAGE',
@@ -106,12 +106,12 @@ SB.Cities.register('chico-ca', {
       title: 'A neighbor starts counting',
       body: 'Someone on the block has decided your garage show is a party and has called it in. The unruly-gathering rule starts at about twenty people, and you have sixty.',
       options: [
-        { id: 'EARLY', label: 'Start early and be done by nine', likely: 'A short night, and the patrol car finds a dark house.',
+        { id: 'EARLY', label: 'Start early and be done by nine', likely: 'It\'s a short night, and the patrol car finds a dark house.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors early, done by nine. The ones who came got a tight set and nobody got cited.' },
-        { id: 'HALL', label: 'Move the whole bill to a rented hall', likely: 'Costs money and loses some of the crowd.',
+          result: 'You opened doors early and finished by nine, and the people who came got a tight set and nobody got cited.' },
+        { id: 'HALL', label: 'Move the whole bill to a rented hall', likely: 'It costs money and loses some of the crowd.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .8 }],
-          result: 'A club hall took the bill with a day to spare. It felt less like a show, but it ran.' },
+          result: 'A club hall took the bill with a day to spare, and it felt less like a show, but it ran.' },
         { id: 'ACCEPT', label: 'Run it and keep the door shut', likely: 'The odds are not good.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'Half the list stayed away rather than get a host cited.' }
@@ -119,19 +119,19 @@ SB.Cities.register('chico-ca', {
 
     { id: 'CHICO_CA_SMOKE_DAY', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [8, 9, 10, 11] },
-      telegraph: 'Smoke from a fire in the foothills has turned the afternoon orange and the air has a taste.',
+      telegraph: 'Smoke from a fire in the foothills has turned the afternoon orange, and the air has a taste.',
       title: 'Smoke over the stage',
-      body: 'The smoke has settled into the valley. The air is bad enough that nobody wants to stand in a lot, and the outdoor stage is dark.',
+      body: 'The smoke has settled into the valley, and the air is bad enough that nobody wants to stand in a lot, so the outdoor stage is dark.',
       options: [
-        { id: 'INSIDE', label: 'Move the bill inside to a hall', likely: 'Everyone fits and breathes. Costs a rental.',
+        { id: 'INSIDE', label: 'Move the bill inside to a hall', likely: 'Everyone fits and breathes, but it costs a rental.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The hall took the bill and the doors stayed shut against the haze.' },
+          result: 'The hall took the bill, and the doors stayed shut against the haze.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Only the committed show up, coughing.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'A thin crowd in masks, and a set cut short.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was a thin crowd in masks, and a set cut short.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The air was no better.' }
+          result: 'You moved it a day, and the air was no better.' }
       ] }
   ]
 });

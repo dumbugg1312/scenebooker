@@ -106,9 +106,9 @@ SB.Cities.register('casper-wy', {
       title: 'The curfew beats the doors',
       body: 'A fifteen-year-old regular has to be home by eleven, and the bill runs past half past ten. Her friends are doing the same math.',
       options: [
-        { id: 'EARLY', label: 'Move the first band earlier', likely: 'The kids hear everyone. A short, early night.',
+        { id: 'EARLY', label: 'Move the first band earlier', likely: 'The kids hear everyone, in a short, early night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors early and the kids heard every band. They were home before the clock.' },
+          result: 'Doors were early, the kids heard every band, and they were home before the clock.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The young ones leave before the headliner.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'Half the kids walked out at ten forty, and the room felt it.' }
@@ -120,12 +120,12 @@ SB.Cities.register('casper-wy', {
       title: 'The big week fills the town',
       body: 'Visitors have taken every downtown room and the arena parking. Your bill has to fight for the one open night.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the crowds thin', likely: 'Late, but the ones who want a night out show up.',
+        { id: 'LATE', label: 'Push doors back until the crowds thin', likely: 'It starts late, but the ones who want a night out show up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The visitors wandered in, and the locals found you.' },
+          result: 'Doors were an hour late, and the visitors wandered in and the locals found you.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids avoid the crowds.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The kids stayed home and the regulars came. A thin night.' }
+          result: 'The kids stayed home and the regulars came, so it was a thin night.' }
       ] },
 
     { id: 'CASPER_WY_WIND_CLOSURE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -134,15 +134,15 @@ SB.Cities.register('casper-wy', {
       title: 'The highway is closed',
       body: 'Blowing snow shut the interstate an hour before doors. The out-of-town band is parked at a truck stop, and half the kids who drive in are stuck at home.',
       options: [
-        { id: 'LONG', label: 'Let the local band play long', likely: 'A small, warm night.',
+        { id: 'LONG', label: 'Let the local band play long', likely: 'It\'s a small, warm night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The locals stretched out and the room stayed warm. The van never made it.' },
-        { id: 'WAIT', label: 'Hold the doors for the van', likely: 'A late start. The ones who drove in stay.',
+          result: 'The locals stretched out, and the room stayed warm. The van never made it.' },
+        { id: 'WAIT', label: 'Hold the doors for the van', likely: 'It starts late, and the ones who drove in stay.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
           result: 'The van pulled in at ten, white with snow, and the night ran long.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ]
 });

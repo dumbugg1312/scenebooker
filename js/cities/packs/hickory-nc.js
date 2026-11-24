@@ -11,8 +11,8 @@ SB.Cities.register('hickory-nc', {
   /* Dossier institutions and its unchecked invented venue names are banned: research, not content. */
   blocklist: ['lenoir-rhyne*', 'hickory daily record*', 'cheerwine*', 'bojangles*', 'spindle room*', 'hosiery hall*', 'cutting floor*', 'third shift*'],
 
-  blurb: ['Mill-town punk in carports, church halls and one stubborn back room. Everyone drives; everyone knows everyone.',
-          'Few rooms, many cousins. A show here lives or dies on one landlord and one neighbor.'],
+  blurb: ['Mill-town punk lives in carports, church halls and one stubborn back room, and everyone drives and knows everyone.',
+          'There are few rooms and many cousins, and a show here lives or dies on one landlord and one neighbor.'],
   hard: 'One or two rooms, no transit, and a noise complaint ends your night.',
   region: 'the Piedmont',
   houseType: 'GARAGE',
@@ -125,13 +125,13 @@ SB.Cities.register('hickory-nc', {
       options: [
         { id: 'LATE', label: 'Push doors back until the festival winds down', likely: 'Later, and the crowd that wants a real show finds you.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in from the street, loud and happy.' },
+          result: 'Doors opened an hour late, and the crowd came in from the street, loud and happy.' },
         { id: 'HALL', label: 'Move the bill to a church hall in Longview', likely: 'Smaller, quieter and over early.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A hall in Longview took the bill, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the festival.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The casual crowd stayed on the street. The regulars came.' }
+          result: 'The casual crowd stayed on the street, and the regulars came.' }
       ] },
 
     { id: 'HICKORY_NC_LAKE_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -143,12 +143,12 @@ SB.Cities.register('hickory-nc', {
         { id: 'GARAGE', label: 'Move it into a garage', likely: 'Smaller and louder, and dry.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A garage in town took the bill, and the floor was packed.' },
-        { id: 'WAIT', label: 'Wait for the storm to pass', likely: 'A late start. The crowd gets restless.',
+        { id: 'WAIT', label: 'Wait for the storm to pass', likely: 'The start is late, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The storm passed by ten. You started late and nobody left.' },
+          result: 'The storm passed by ten, and you started late but nobody left.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The neighbor may keep calling.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The generator coughed and the neighbor called twice. Half the list went home.' }
+          result: 'The generator coughed, the neighbor called twice, and half the list went home.' }
       ] },
 
     { id: 'HICKORY_NC_PARADE_FRIDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -160,12 +160,12 @@ SB.Cities.register('hickory-nc', {
         { id: 'HALL', label: 'Move the bill to the hall in Longview', likely: 'Smaller, early, and a clean room.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'The hall took the bill, and the families stayed on to hear the bands.' },
-        { id: 'LATE', label: 'Push doors back until the parade is over', likely: 'Later than planned. The crowd walks in from the street.',
+        { id: 'LATE', label: 'Push doors back until the parade is over', likely: 'It\'s later than planned, and the crowd walks in from the street.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The crowd came in from the parade, loud and happy.' },
+          result: 'Doors opened an hour late, and the crowd came in from the parade, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The families are at the parade.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the room was at the parade. The regulars came.' }
+          result: 'Half the room was at the parade, and the regulars came.' }
       ] }
   ]
 });

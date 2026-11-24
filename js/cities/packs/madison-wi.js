@@ -120,7 +120,7 @@ SB.Cities.register('madison-wi', {
         { id: 'SHELTER', label: 'Move to an afternoon park shelter', likely: 'Daylight, a permit and no neighbors to call.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .8 }],
           result: 'An afternoon on the lawn, with a generator and no complaints.' },
-        { id: 'BASEMENT', label: 'Move the whole bill to a basement', likely: 'Smaller and louder. Nobody inspects a basement.',
+        { id: 'BASEMENT', label: 'Move the whole bill to a basement', likely: 'Smaller and louder, and nobody inspects a basement.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .5 }],
           result: 'A student basement took the bill, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it anyway and take the risk', likely: 'The host may never speak to you again.',
@@ -136,13 +136,13 @@ SB.Cities.register('madison-wi', {
       options: [
         { id: 'LATE', label: 'Push doors back until the game crowd thins out', likely: 'The ones who want a night out come in late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd walked in from the bars, loud and happy.' },
+          result: 'Doors opened an hour late, and the crowd walked in from the bars, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed out of it. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed out of it, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'MADISON_WI_DEEP_FREEZE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -151,15 +151,15 @@ SB.Cities.register('madison-wi', {
       title: 'The deep freeze',
       body: 'It is twelve below and the basement is the only warm room you have. The crowd is arriving on studded tires.',
       options: [
-        { id: 'SHORT', label: 'Run the short bill and keep the room warm', likely: 'A small, close night. The ones who came really wanted to.',
+        { id: 'SHORT', label: 'Run the short bill and keep the room warm', likely: 'It\'s a small, close night, and the ones who came really wanted to.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'Two bands, a space heater, and the door donation in hats and blankets.' },
-        { id: 'WAIT', label: 'Hold the doors until the bands thaw out', likely: 'A late start. The crowd gets restless.',
+        { id: 'WAIT', label: 'Hold the doors until the bands thaw out', likely: 'The start is late, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at nine. Nobody left, because nobody wanted to go out.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The van pulled in at nine, and nobody left, because nobody wanted to go out.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everyone trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come came.' }
       ] }
   ]
 });

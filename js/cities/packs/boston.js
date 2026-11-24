@@ -14,8 +14,8 @@ SB.Cities.register('boston', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The subway is "the subway"; the September 1 move is "move-in weekend". */
   blocklist: ['boston calling*', 'head of the charles*', 'vanyaland*', 'boston globe*', 'dunkin*', 'narragansett*', 'allston christmas*', 'rock city*'],
 
-  blurb: ['A tight old harbor city where hardcore is a family inheritance, played in basements with the address held back until the day.',
-          'Landlords and neighbors keep closing them, and every September the houses turn over.'],
+  blurb: ['A tight old harbor city where hardcore is a family inheritance, played in basements with the address held back until the day of the show.',
+          'Landlords and neighbors keep closing the houses, and every September they turn over.'],
   hard: 'Basements get closed by landlords and neighbors; the middle rooms are gone.',
   region: 'New England',
   houseType: 'BASEMENT',
@@ -26,8 +26,8 @@ SB.Cities.register('boston', {
   ],
 
   tilt: [
-    { fan: 'hardcore', band: 'hardcore', d: .10, reason: 'A town that was one of the first to build a hardcore scene, and has not forgotten it.' },
-    { fan: 'hardcore', band: 'metal', d: .07, reason: 'The heavy festivals pull the same crowd as hardcore.' }
+    { fan: 'hardcore', band: 'hardcore', d: .10, reason: 'This town was one of the first to build a hardcore scene, and it hasn\'t forgotten.' },
+    { fan: 'hardcore', band: 'metal', d: .07, reason: 'The heavy festivals pull the same crowd as hardcore does.' }
   ],
 
   zones: [
@@ -137,19 +137,19 @@ SB.Cities.register('boston', {
   events: [
     { id: 'BOSTON_MOVE_IN_TRUCK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'movein' },
-      telegraph: 'It is move-in weekend, and every street in the neighborhood is a truck.',
+      telegraph: 'It\'s move-in weekend, and every street in the neighborhood is full of trucks.',
       title: 'A truck is stuck under the bridge',
-      body: 'A rented truck has lost its roof under a low bridge on the river road. It is blocking the way to the basement, and the band\'s gear is in the back.',
+      body: 'A rented truck has lost its roof under a low bridge on the river road. It\'s blocking the way to the basement, and the band\'s gear is in the back.',
       options: [
-        { id: 'CARRY', label: 'Carry the gear in from the bridge', likely: 'Two hours of your day. The band remembers.',
+        { id: 'CARRY', label: 'Carry the gear in from the bridge', likely: 'It takes two hours of your day, and the band remembers it.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'lateMin', v: 30 }],
-          result: 'Four of you hauled amps up the hill. The first set started late and loud.' },
-        { id: 'EARLY', label: 'Cancel the first band and start the second', likely: 'A shorter bill. A grumpy opener.',
+          result: 'Four of you hauled amps up the hill, and the first set started late and loud.' },
+        { id: 'EARLY', label: 'Cancel the first band and start the second', likely: 'The bill gets shorter, and the opener is grumpy about it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'The opener was sent home and the rest played a short night.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The opener was sent home, and the rest played a short night.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'BOSTON_ROUTE_CLOSURES', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -158,49 +158,49 @@ SB.Cities.register('boston', {
       title: 'The route has the neighborhood',
       body: 'The marathon runs through Kenmore, the ballpark lets out at the same time, and the whole neighborhood is a drunk parade. A daytime show is either packed with strangers or empty because the roads are shut.',
       options: [
-        { id: 'OPEN', label: 'Open the doors to the parade', likely: 'Louder crowd, more strangers, more risk.',
+        { id: 'OPEN', label: 'Open the doors to the parade', likely: 'The crowd is louder, with more strangers and more risk.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'The room filled with people who had never heard of the bands. A few stayed.' },
-        { id: 'EARLY', label: 'Run it early before the streets close', likely: 'Most get in. Thin to start.',
+          result: 'The room filled with people who had never heard of the bands, and a few of them stayed.' },
+        { id: 'EARLY', label: 'Run it early before the streets close', likely: 'Most get in, but it starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'lateMin', v: -90 }],
-          result: 'Doors at noon. Everybody was home before the crowd poured out.' },
+          result: 'You opened doors at noon, and everybody was home before the crowd poured out.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The streets stayed shut. Half the list never found a way in.' }
+          result: 'The streets stayed shut, and half the list never found a way in.' }
       ] },
 
     { id: 'BOSTON_SNOW_EMERGENCY', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], months: [12, 1, 2, 3] },
-      telegraph: 'A snow emergency is called for Saturday night.',
+      telegraph: 'A snow emergency has been called for Saturday night.',
       title: 'Everyone has to move their cars',
-      body: 'A parking ban means every car on the street is towed by nine, and half the audience has to move before the second band. The neighbors have saved their dug-out spots with lawn chairs.',
+      body: 'A parking ban means every car on the street is towed by nine, so half the audience has to move before the second band. The neighbors have saved their dug-out spots with lawn chairs.',
       options: [
-        { id: 'SHUTTLE', label: 'Pause the show for a car shuffle', likely: 'An hour lost. The crowd stays.',
+        { id: 'SHUTTLE', label: 'Pause the show for a car shuffle', likely: 'You lose an hour, but the crowd stays.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 45 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The set break turned into a parade of cars to the lot. Everyone came back.' },
-        { id: 'EARLY', label: 'Start an hour earlier so people can park right', likely: 'Fewer make it. The ones who do stay.',
+          result: 'The set break turned into a parade of cars to the lot, and everyone came back.' },
+        { id: 'EARLY', label: 'Start an hour earlier so people can park right', likely: 'Fewer make it, but the ones who do stay.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors early, most cars gone by nine. A smaller but warmer room.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You opened doors early and most cars were gone by nine, which left a smaller but warmer room.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The plows had finished by then.' }
+          result: 'You moved it a day, and the plows had finished by then.' }
       ] },
 
     { id: 'BOSTON_SOUTH_SHORE_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], chokepoint: true, months: [12, 1, 2, 3] },
       telegraph: 'A nor\'easter is working its way up the coast.',
       title: 'The nor\'easter has the South Shore',
-      body: 'The storm has the expressway and the Route 3 corridor in a stall. The kids from the South Shore and the Cape are not getting in tonight.',
+      body: 'The storm has the expressway and the Route 3 corridor at a standstill, and the kids from the South Shore and the Cape are not getting in tonight.',
       options: [
         { id: 'ACCEPT', label: 'Run it without them', likely: 'You lose the whole south side of the list.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The road never cleared. The south side stayed home.' },
-        { id: 'EARLY', label: 'Start early so they can beat the worst of it', likely: 'Some make it. A thin start.',
+          result: 'The road never cleared, and the south side stayed home.' },
+        { id: 'EARLY', label: 'Start early so they can beat the worst of it', likely: 'Some make it, but it starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .7, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
           result: 'A van from the Cape pulled in at the first chord.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and that costs you some trust.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The plows came through overnight.' }
+          result: 'You moved it a day, and the plows came through overnight.' }
       ] }
   ]
 });

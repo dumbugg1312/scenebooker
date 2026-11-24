@@ -122,15 +122,15 @@ SB.Cities.register('athens-ga', {
       title: 'Football has the town',
       body: 'A home game has the Loop gridlocked and the streets closed. The touring van is sitting in traffic, and half the crowd is at a tailgate and will not leave it.',
       options: [
-        { id: 'LATE', label: 'Push doors back an hour and wait out the traffic', likely: 'Most of them show up eventually. The night starts late.',
+        { id: 'LATE', label: 'Push doors back an hour and wait out the traffic', likely: 'Most of them show up eventually, but the night starts late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The ones who came did not mind the wait.' },
+          result: 'Doors opened an hour late, and the ones who came did not mind the wait.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people are stuck on the other side of the stadium.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'The headliner got there after the locals had played. The room was thin.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The headliner got there after the locals had played, and the room was thin.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'ATHENS_GA_BIKE_RACE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -139,12 +139,12 @@ SB.Cities.register('athens-ga', {
       title: 'The bike race has the streets',
       body: 'Barricades close the downtown blocks, and the load-in route is blocked. The band has to park a long way off and carry their gear.',
       options: [
-        { id: 'EARLY', label: 'Open early, tell everyone where to park', likely: 'Most get in before the barricades. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early, tell everyone where to park', likely: 'Most get in before the barricades, but the crowd is thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came walked from a mile away.' },
+          result: 'You opened doors an hour early, and the ones who came walked from a mile away.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .78 }],
-          result: 'The barricades stayed up. Half the list never found a place to leave the car.' }
+          result: 'The barricades stayed up, and half the list never found a place to leave the car.' }
       ] },
 
     { id: 'ATHENS_GA_NOISE_RULE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show'],
@@ -153,13 +153,13 @@ SB.Cities.register('athens-ga', {
       title: 'The rule changed last month',
       body: 'The county now wants anyone running amplified sound to register ahead of time, and a neighbor has noticed. A call is coming if you do not sort it out.',
       options: [
-        { id: 'REGISTER', label: 'Register the show and keep it short', likely: 'Costs a morning. The night is clean.',
+        { id: 'REGISTER', label: 'Register the show and keep it short', likely: 'It costs a morning, and the night is clean.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'The paperwork took a morning. Nobody called the police.' },
+          result: 'The paperwork took a morning, and nobody called the police.' },
         { id: 'QUIET', label: 'Turn the show acoustic on the porch', likely: 'Smaller and quieter, but safe.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The set was a porch set. The neighbors stayed in.' },
-        { id: 'RISK', label: 'Ignore it and run loud', likely: 'The neighbors call. Costs forty dollars when they do.',
+          result: 'The set was a porch set, and the neighbors stayed in.' },
+        { id: 'RISK', label: 'Ignore it and run loud', likely: 'The neighbors call, and it costs forty dollars when they do.',
           effects: [{ op: 'MONEY', amount: -40 }],
           result: 'The police came by at ten forty and the night ended early.' }
       ] },
@@ -168,14 +168,14 @@ SB.Cities.register('athens-ga', {
       if: { daysOut: [0, 4], months: [3, 4] },
       telegraph: 'The pollen is coming down yellow on every van and porch.',
       title: 'The pollen week',
-      body: 'A yellow film covers everything. Half the crowd is sneezing through the sad songs, and the singer has no voice.',
+      body: 'A yellow film covers everything, half the crowd is sneezing through the sad songs, and the singer has no voice.',
       options: [
         { id: 'GO', label: 'Run it and hand out tissues', likely: 'The room is a little smaller and a little warmer.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'REGULARS', pct: .01 }],
-          result: 'The band played through it. People remembered the box of tissues.' },
+          result: 'The band played through it, and people remembered the box of tissues.' },
         { id: 'MOVE', label: 'Move it inside', likely: 'Smaller, but dry.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A living room took the whole bill. It was cramped and the windows stayed shut.' }
+          result: 'A living room took the whole bill, and it was cramped with the windows shut.' }
       ] }
   ]
 });

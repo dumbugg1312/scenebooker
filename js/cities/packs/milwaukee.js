@@ -120,60 +120,60 @@ SB.Cities.register('milwaukee', {
       title: 'The Hoan Bridge is shut',
       body: 'The Hoan Bridge is closed for a wreck and ice. Every car from the south side and the lake towns is being sent through downtown, and it is not moving.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the bridge.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The bridge stayed shut. The south side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The bridge stayed shut, so the south side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the surface streets together. They\'ll remember that.' }
+          result: 'Two carloads took the surface streets together and made it.' }
       ] },
 
     { id: 'MILWAUKEE_BIKE_RACE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'race' },
       telegraph: 'The all-night bike race is on this weekend and the Riverwest streets are being taped off.',
       title: 'The van cannot get through',
-      body: 'The riders have the streets around your house closed for the whole night. The van is at the barricade a block away with the amps still in it.',
+      body: 'The riders have the streets around your house closed for the whole night, and the van is stuck at the barricade a block away with the amps still in it.',
       options: [
-        { id: 'CARRY', label: 'Carry the gear in by hand', likely: 'Two hours of hauling. The show still happens.',
+        { id: 'CARRY', label: 'Carry the gear in by hand', likely: 'It\'s two hours of hauling, but the show still happens.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'Everyone carried a cab and a drum down the closed street. The riders cheered the whole way.' },
+          result: 'Everyone carried a cab and a drum down the closed street, and the riders cheered the whole way.' },
         { id: 'MOVE', label: 'Move the bill to a quieter block', likely: 'A smaller house on a street that is open.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A house two blocks off the course took you in. Tight, but the street was open.' },
+          result: 'A house two blocks off the course took you in, and it was tight but the street was open.' },
         { id: 'ACCEPT', label: 'Run it and let the street crowd come', likely: 'Half the list gives up at the barricade.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the list gave up at the tape. The ones who walked in made it loud.' }
+          result: 'Half the list gave up at the tape, and the ones who walked in made it loud.' }
       ] },
 
     { id: 'MILWAUKEE_LAKEFRONT_FRIDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'A big festival on the lakefront fills every downtown bar and parking lot this weekend.',
       title: 'Downtown is spoken for',
-      body: 'The lakefront is full and the bars have all the crowd on a Friday. The kids who want something else are looking for a quiet basement in Riverwest.',
+      body: 'The lakefront is full and the bars have all the crowd on a Friday, so the kids who want something else are looking for a quiet basement in Riverwest.',
       options: [
         { id: 'BASEMENT', label: 'Move the bill to a Riverwest basement', likely: 'Smaller, louder, and the kids who skipped the festival show up.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }],
           result: 'The basement was full by nine, mostly with kids who wanted a break from the crowds.' },
         { id: 'ACCEPT', label: 'Run it as booked', likely: 'The older fans are at the festival.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Half the usual crowd was on the lakefront. The ones who came stayed for every band.' }
+          result: 'Half the usual crowd was on the lakefront, and the people who came stayed for every band.' }
       ] },
 
     { id: 'MILWAUKEE_RIVERWEST_NOTICE', when: 'WEEK', tier: 'HARD', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
       telegraph: 'A neighbor on the block has been asking about the noise after nine.',
       title: 'The landlord\'s notice',
-      body: 'A neighbor called the noise in and the landlord left a notice on the door about fines and people drinking outside. The bill is in two days.',
+      body: 'A neighbor called the noise in and the landlord left a notice on the door about fines and people drinking outside, and the bill is in two days.',
       options: [
-        { id: 'QUIET', label: 'Start early and keep it down', likely: 'Short and tight. The neighbors settle.',
+        { id: 'QUIET', label: 'Start early and keep it down', likely: 'Short and tight, and the neighbors settle.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done by nine-thirty, and nobody out on the sidewalk. The notice stayed in a drawer.' },
-        { id: 'MOVE', label: 'Move it to another house', likely: 'Breaks the date for some. Keeps the landlord calm.',
+          result: 'Doors early, done by nine-thirty, and nobody out on the sidewalk, and the notice stayed in a drawer.' },
+        { id: 'MOVE', label: 'Move it to another house', likely: 'Breaks the date for some and keeps the landlord calm.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'A friend\'s flat took the bill. Not everyone found the new address.' },
+          result: 'A friend\'s flat took the bill, and not everyone found the new address.' },
         { id: 'ACCEPT', label: 'Run it and take your chances', likely: 'The landlord may be at the door.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
           result: 'It went off, but the landlord stood at the top of the stairs for the last two bands.' }

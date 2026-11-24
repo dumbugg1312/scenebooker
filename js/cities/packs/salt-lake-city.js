@@ -14,7 +14,7 @@ SB.Cities.register('salt-lake-city', {
   /* "The valley", "the canyon road", "the university", "the train": no real institutions in game text. */
   blocklist: ['kilby court*', 'urban lounge*', 'salt lake tribune*', 'deseret*', 'crucialfest*', 'utah jazz*', 'real salt lake*', 'zions*'],
 
-  blurb: ['A mountain capital with a deep punk history and an all-ages tradition older than most cities have. Half the room does not drink, so shows are sober and loud.',
+  blurb: ['A mountain capital with a deep punk history and an all-ages tradition older than most cities have. Half the room does not drink, so the shows are sober and loud.',
           'A garden-court room, a punk bar with a 21+ corner and a merch shop that does all-ages bills carry it, with houses and warehouses by word of mouth behind them.'],
   hard: 'Rooms close on rent and zoning, and snow can shut the mountain road.',
   region: 'the Mountain West',
@@ -120,15 +120,15 @@ SB.Cities.register('salt-lake-city', {
       title: 'The canyon road is shut',
       body: 'Avalanche crews closed the canyon road at noon. The band from the mountain town and the kids from over the pass are on the wrong side of it.',
       options: [
-        { id: 'EARLY', label: 'Move the show earlier so the early cars get through', likely: 'Some get down before the gates. The night starts thin.',
+        { id: 'EARLY', label: 'Move the show earlier so the early cars get through', likely: 'Some get down before the gates close, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .6, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who made it down did so on chains.' },
-        { id: 'ACCEPT', label: 'Run it without them', likely: 'Lose everyone over the pass.',
+          result: 'You opened doors an hour early, and the people who made it down did so on chains.' },
+        { id: 'ACCEPT', label: 'Run it without them', likely: 'You lose everyone from over the pass.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .2, beyond: true }],
-          result: 'The road stayed shut all night. The mountain side watched a phone video.' },
-        { id: 'RIDES', label: 'Send a van the long way around', likely: 'Three hours of your day. Most of them get there.',
+          result: 'The road stayed shut all night, and the mountain side watched a phone video.' },
+        { id: 'RIDES', label: 'Send a van the long way around', likely: 'It takes three hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .85, beyond: true }, { op: 'HOURS', d: -3, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'The van came in late with six kids and a drum kit. They will remember that.' }
+          result: 'The van came in late with six kids and a drum kit.' }
       ] },
 
     { id: 'SALT_LAKE_CITY_INVERSION', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -137,12 +137,12 @@ SB.Cities.register('salt-lake-city', {
       title: 'The inversion has everyone indoors',
       body: 'The air is brown and the warnings say to stay inside. Half the kids are coughing, and a few parents have said no to the drive.',
       options: [
-        { id: 'GO', label: 'Run it anyway and hand out masks at the door', likely: 'Costs thirty dollars. Most of the crowd comes.',
+        { id: 'GO', label: 'Run it anyway and hand out masks at the door', likely: 'It costs thirty dollars, and most of the crowd comes.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'REGULARS', pct: .01 }],
-          result: 'A box of masks at the door. The room was sealed and loud and hazy.' },
+          result: 'You put a box of masks at the door, and the room was sealed and loud and hazy.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'The parents keep a lot of the kids home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The kids with parents stayed in. The rest came in coughing.' }
+          result: 'The kids with parents stayed in, and the rest came in coughing.' }
       ] },
 
     { id: 'SALT_LAKE_CITY_PARADE_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -151,15 +151,15 @@ SB.Cities.register('salt-lake-city', {
       title: 'The parade closes downtown',
       body: 'The streets around the room are shut, and the sidewalks are full of families until the fireworks. The kids are coming by transit, and the bar rooms are empty.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the streets reopen', likely: 'A later night, but the transit crowd makes it.',
+        { id: 'LATE', label: 'Push doors back until the streets reopen', likely: 'It\'s a later night, but the transit crowd makes it.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The kids came in off the train with flags still in their pockets.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The roads cut off the drivers.',
+          result: 'You opened doors an hour late, and the kids came in off the train with flags still in their pockets.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The road closures cut off the drivers.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The ones on foot got there. The ones in cars sat behind a barricade.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The people on foot got there, and the people in cars sat behind a barricade.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'SALT_LAKE_CITY_NOISE_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -168,15 +168,15 @@ SB.Cities.register('salt-lake-city', {
       title: 'The noise line rings at nine',
       body: 'The show is in a Victorian rental on a hill. A neighbor called the noise line right at nine, and the officer is on the porch with a flashlight.',
       options: [
-        { id: 'EARLY', label: 'Cut the bill and start earlier', likely: 'A short, tight night. Everyone is out before the officer comes back.',
+        { id: 'EARLY', label: 'Cut the bill and start earlier', likely: 'It\'s a short, tight night, and everyone is out before the officer comes back.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early and the last band stopped at nine sharp. The officer nodded and left.' },
-        { id: 'HALL', label: 'Move the whole bill to a rented hall', likely: 'Costs forty dollars and the room is bigger and drier.',
+          result: 'You opened doors early and the last band stopped at nine sharp, and the officer nodded and left.' },
+        { id: 'HALL', label: 'Move the whole bill to a rented hall', likely: 'It costs forty dollars, and the room is bigger and drier.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }],
-          result: 'A hall took the bill with an hour to spare. Nobody on the hill heard a thing.' },
-        { id: 'ACCEPT', label: 'Run it and take the warning', likely: 'The next call is a ticket.',
+          result: 'A hall took the bill with an hour to spare, and nobody on the hill heard a thing.' },
+        { id: 'ACCEPT', label: 'Run it and take the warning', likely: 'If the neighbor calls again, it\'s a ticket.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'REGULARS', pct: -.01 }],
-          result: 'You finished the set and took the warning. The host is not sure about next time.' }
+          result: 'You finished the set and took the warning, and the host is not sure about next time.' }
       ] }
   ]
 });

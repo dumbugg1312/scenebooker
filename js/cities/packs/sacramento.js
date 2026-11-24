@@ -122,17 +122,17 @@ SB.Cities.register('sacramento', {
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'Crews are working on the river bridges this week.',
       title: 'The bridge is shut',
-      body: 'A wreck has closed one of the bridges over the river, and the traffic from West Sacramento is stacked up on the other. The people from the far side are stuck.',
+      body: 'A wreck has closed one of the bridges over the river, and the traffic from West Sacramento is stacked up on the other, so the people from the far side are stuck.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the backup', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the backup', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The bridge stayed shut. The ones across the river stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The bridge stayed shut, so the people across the river stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the long way around together. They will remember that.' }
+          result: 'Two carloads took the long way around together.' }
       ] },
 
     { id: 'SACRAMENTO_TRIPLE_DIGITS', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -147,23 +147,23 @@ SB.Cities.register('sacramento', {
         { id: 'YARD', label: 'Move the bands to the yard and watch the bike rack', likely: 'Cooler and looser. The neighbors decide how long it lasts.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'The yard held everyone, and a neighbor came by once to count heads.' },
-        { id: 'ACCEPT', label: 'Run it in the heat', likely: 'Sweaty and short. Plenty will stay home.',
+        { id: 'ACCEPT', label: 'Run it in the heat', likely: 'Sweaty and short, and plenty will stay home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the list stayed in their air conditioning. The rest sweated through it.' }
+          result: 'Half the list stayed in their air conditioning, and the rest sweated through it.' }
       ] },
 
     { id: 'SACRAMENTO_TEN_OCLOCK_HALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4] },
       telegraph: 'The hall manager reminds you that anyone under eighteen has to be out by ten.',
       title: 'Under eighteen by ten',
-      body: 'The curfew for minors is the hall\'s problem the second the clock passes ten, and your headliner does not go on until a quarter to. The youngest half of the crowd is about to be asked to leave.',
+      body: 'The curfew for minors is the hall\'s problem the second the clock passes ten, and your headliner does not go on until a quarter to, so the youngest half of the crowd is about to be asked to leave.',
       options: [
-        { id: 'SWAP', label: 'Put a sibling band on first and the headliner second', likely: 'The kids get the best set. The late crowd gets a shorter night.',
+        { id: 'SWAP', label: 'Put a sibling band on first and the headliner second', likely: 'The kids get the best set, and the late crowd gets a shorter night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
           result: 'The headliner played at nine and the room emptied politely at ten.' },
         { id: 'EARLY', label: 'Start an hour early and finish before the clock', likely: 'Many get off work too late to make it.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors at five. A tight bill, and a thin start.' },
+          result: 'Doors were at five, so it was a tight bill with a thin start.' },
         { id: 'ACCEPT', label: 'Run it as planned and watch the door', likely: 'You risk the hall\'s trust.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'MONEY', amount: -25 }],
           result: 'A patrol car slowed down outside, and the manager did not look happy.' }

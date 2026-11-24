@@ -14,8 +14,8 @@ SB.Cities.register('eau-claire-wi', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Real institutions are written only in generic form. */
   blocklist: ['uwec*', 'blugold*', 'weirdfest*', 'leinenkugel*', 'kwik trip*', 'the sawmill annex*', 'half moon hall*', 'pablo center*', 'blue ox music festival*'],
 
-  blurb: ['The punks live in the shadow of the town\'s folk fame. A house-born fest, long basement bills and a hall keep them loud.',
-          'Bills run five to seven bands, and a basement that lasts a year is a good run. Rooms come and go.'],
+  blurb: ['The punks live in the shadow of the town\'s folk fame, and a house-born fest, long basement bills and a hall keep them loud.',
+          'Bills run five to seven bands, and a basement that lasts a year is a good run, because rooms come and go.'],
   hard: 'Houses last about a year, bar rooms are 21+, and the best show is a hall.',
   region: 'the Chippewa Valley',
   houseType: 'BASEMENT',
@@ -108,51 +108,51 @@ SB.Cities.register('eau-claire-wi', {
       if: { daysOut: [0, 2], months: [9, 10, 11] },
       telegraph: 'The lodge that rents out the basement has a bingo night on the calendar the same weekend.',
       title: 'The lodge calls the night before',
-      body: 'The bingo crew needs the floor at one end of the lodge basement, so the second stage has to come out. The bill was built for two stages and no gaps.',
+      body: 'The bingo crew needs the floor at one end of the lodge basement, so the second stage has to come out, and the bill was built for two stages and no gaps.',
       options: [
-        { id: 'ONE', label: 'Cut the bill to one stage and an hour', likely: 'A short, tight night. Some of the bands are sore.',
+        { id: 'ONE', label: 'Cut the bill to one stage and an hour', likely: 'It\'s a short, tight night, and some of the bands are sore about it.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'One stage, no gaps lost to bingo, and the room still filled.' },
-        { id: 'HOUSE', label: 'Move the whole bill to a basement', likely: 'Smaller and louder. The kids will find it.',
+          result: 'With one stage and no time lost to bingo, the room still filled.' },
+        { id: 'HOUSE', label: 'Move the whole bill to a basement', likely: 'It\'s smaller and louder, and the kids will find it.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement on Randall Park took the bill with an hour to spare, and the floor was packed.' },
-        { id: 'ACCEPT', label: 'Run it and let the bingo crew share the room', likely: 'Strange, but nobody leaves.',
+        { id: 'ACCEPT', label: 'Run it and let the bingo crew share the room', likely: 'It\'s strange, but nobody leaves.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Somebody called B-9 into a feedback squeal. Everyone remembers it.' }
+          result: 'Somebody called B-9 into a feedback squeal, and everybody remembers it.' }
       ] },
 
     { id: 'EAU_CLAIRE_WI_COUNTRY_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival', months: [7] },
       telegraph: 'Every hotel is full, and the sound rental is booked out on the festival grounds.',
       title: 'Country festival weekend',
-      body: 'The big festival has every bed and bar in town. The scene has emptied out, and your show needs backline from a cousin in Chippewa Falls.',
+      body: 'The big festival has every bed and bar in town and the scene has emptied out, so your show needs backline from a cousin in Chippewa Falls.',
       options: [
-        { id: 'COUSIN', label: 'Drive to the cousin and borrow the gear', likely: 'Two hours of your day. The show goes on.',
+        { id: 'COUSIN', label: 'Drive to the cousin and borrow the gear', likely: 'It takes two hours of your day, and the show goes on.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The cousin had a drum kit and a bass cab in a barn. The show started on time.' },
+          result: 'The cousin had a drum kit and a bass cab in a barn, and the show started on time.' },
         { id: 'SMALL', label: 'Play it small, in a basement', likely: 'Nobody who came for the festival will find it.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'Thirty people and a box fan. The festival was a mile away and nobody cared.' },
-        { id: 'MOVE', label: 'Move it a week', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'There were thirty people and a box fan, and the festival was a mile away and nobody cared.' },
+        { id: 'MOVE', label: 'Move it a week', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The festival was still going and half the list was busy.' }
+          result: 'You moved it a day, but the festival was still going and half the list was busy.' }
       ] },
 
     { id: 'EAU_CLAIRE_WI_DEER_OPENER', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'hunt' },
       telegraph: 'Half the county is out in blaze orange and every pickup has a rack in the back.',
       title: 'Deer opener Saturday',
-      body: 'Two out-of-town bands have cancelled to hunt, and the Eastside garage show has a drummer who just texted a photo of a tree stand.',
+      body: 'Two out-of-town bands have cancelled to hunt, and the drummer for the Eastside garage show just texted you a photo of a tree stand.',
       options: [
-        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'A thin night, but the ones who came are glad.',
+        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'It\'s a thin night, but the people who come are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a long loose night. The room was half full and warm.' },
-        { id: 'LATE', label: 'Push doors back so he can get out of the woods', likely: 'A late start. The crowd gets restless.',
+          result: 'It was two bands and a long, loose night, and the room was half full and warm.' },
+        { id: 'LATE', label: 'Push doors back so he can get out of the woods', likely: 'It means a late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The drummer got in at nine, still in orange. Nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The drummer got in at nine, still in orange, and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everybody loses some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] }
   ]
 });

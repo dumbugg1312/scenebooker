@@ -11,8 +11,8 @@ SB.Cities.register('allentown-pa', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Real colleges, the fair and the big festival are translated in game text. */
   blocklist: ['musikfest*', 'great allentown fair*', 'wdiy*', 'muhlenberg*', 'lehigh university*', 'lehigh valley underground*', 'wawa*', 'sheetz*', 'yuengling*'],
 
-  blurb: ['A dense brick rowhouse city in the Lehigh Valley with a shiny new downtown for ticketed shows. The scene is small enough that every bill is mixed and everyone knows who is late.',
-          'The old heads remember a nineties peak. Teenagers are restarting it, and the best nights are in a hall or over the river in Bethlehem.'],
+  blurb: ['A dense brick rowhouse city in the Lehigh Valley with a shiny new downtown for ticketed shows. The scene is small enough that every bill is mixed, and everyone knows who is late.',
+          'The old heads remember a peak in the nineties, and teenagers are restarting it, with the best nights in a hall or over the river in Bethlehem.'],
   hard: 'Few bands, few rooms, a closed club, and half the town never hears about shows.',
   region: 'the I-78 corridor',
   houseType: 'ROWHOUSE',
@@ -114,68 +114,68 @@ SB.Cities.register('allentown-pa', {
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'The fair opens this week and the West End is already full of trucks.',
       title: 'The fair has the West End',
-      body: 'The fair is on, parking is gone, every cop is waving traffic, and half your friends are working funnel-cake stands tonight.',
+      body: 'The fair is on and the parking is gone, every cop is waving traffic, and half your friends are working funnel-cake stands tonight.',
       options: [
-        { id: 'EARLY', label: 'Open early and send everyone to park on the side streets', likely: 'Most get in. A thinner start.',
+        { id: 'EARLY', label: 'Open early and send everyone to park on the side streets', likely: 'Most people get in, but the start is thinner.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came walked the last mile.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up on the traffic.',
+          result: 'You opened doors an hour early, and the people who came walked the last mile.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up because of the traffic.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The fair kept them away. The room was half the list.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The fair kept them away, and the room was half the list.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'ALLENTOWN_PA_FESTIVAL_DRAIN', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'festival' },
       telegraph: 'Every local band got booked on a free stage in Bethlehem this week.',
       title: 'The festival ate the scene',
-      body: 'Your local bands, sound people and half the crowd are working the free stages in Bethlehem for ten days. Everyone is tired and broke.',
+      body: 'Your local bands, sound people and half the crowd are working the free stages in Bethlehem for ten days, and everyone is tired and broke.',
       options: [
-        { id: 'TRADE', label: 'Book the tired ones for a short late set', likely: 'The crowd is smaller but friendly.',
+        { id: 'TRADE', label: 'Book the tired ones for a short late set', likely: 'The crowd is smaller, but friendly.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Short sets, late start. Everybody came after their own shift.' },
+          result: 'The sets were short and the start was late, because everybody came after their own shift.' },
         { id: 'ACCEPT', label: 'Take a thin night', likely: 'Half the list is across the river.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The festival drew them off. You played to the ones who live here.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The festival drew them off, and you played to the people who live here.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] },
 
     { id: 'ALLENTOWN_PA_I78_BREAKDOWN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 2], months: [12, 1, 2, 3] },
       telegraph: 'Snow is on the way and I-78 is the headliner\'s only road.',
       title: 'The van died on I-78',
-      body: 'The headliner\'s van quit somewhere on I-78 in a snowstorm. They can find a mechanic and a floor, or they can miss your show.',
+      body: 'The headliner\'s van quit somewhere on I-78 in a snowstorm, and they can either find a mechanic and a floor or miss your show.',
       options: [
-        { id: 'RIDES', label: 'Send someone out with a minivan', likely: 'Two hours of your day. They make it.',
+        { id: 'RIDES', label: 'Send someone out with a minivan', likely: 'It takes two hours of your day, and they make it.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }, { op: 'REGULARS', pct: .02 }],
-          result: 'You fetched them off the shoulder. They remember that.' },
-        { id: 'WAIT', label: 'Let the openers play long and wait for them', likely: 'A late start and a restless room.',
+          result: 'You fetched them off the shoulder, and they\'re grateful.' },
+        { id: 'WAIT', label: 'Let the openers play long and wait for them', likely: 'It means a late start and a restless room.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The openers filled the time. The headliner walked in at eleven.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The openers filled the time, and the headliner walked in at eleven.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everybody loses some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The roads were clear by then.' }
+          result: 'You moved it a day, and the roads were clear by then.' }
       ] },
 
     { id: 'ALLENTOWN_PA_ARENA_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'game' },
       telegraph: 'The arena has a game and a concert on your night.',
       title: 'Parking costs thirty dollars',
-      body: 'Every spot within a mile is thirty dollars and every bar downtown is full. Your crowd cannot find a place to leave the car.',
+      body: 'Every spot within a mile is thirty dollars and every bar downtown is full, so your crowd cannot find a place to leave the car.',
       options: [
-        { id: 'EARLY', label: 'Open early and point them to the free lot across the creek', likely: 'Most get in. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early and point them to the free lot across the creek', likely: 'Most people get in, but it\'s thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors early. The ones who came walked over the bridge.' },
+          result: 'You opened doors early, and the people who came walked over the bridge.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people skip it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .78 }],
-          result: 'The streets filled up. Half the list stayed home.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The streets filled up, and half the list stayed home.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

@@ -18,7 +18,7 @@ SB.Cities.register('lakeland-fl', {
   blocklist: ['publix*', 'sun n fun*', 'florida southern*', 'southeastern university*', 'legoland*', 'joker marchant*'],
 
   blurb: ['A lake city between Tampa and Orlando, so it borrows from both and builds its own in garages, carports and grove lots.',
-          'Nobody has a basement. A generator, a cooler and a pasture gate someone has to close make a show; heat and storms end it early.'],
+          'Nobody has a basement, so a generator, a cooler and a pasture gate someone has to close make a show, and heat and storms end it early.'],
   hard: 'Between two bigger coast scenes; no basements, heat, and neighbors who call.',
   region: 'central Florida',
   houseType: 'GARAGE',
@@ -116,47 +116,47 @@ SB.Cities.register('lakeland-fl', {
       options: [
         { id: 'EARLY', label: 'Start early and finish before the parade lets out', likely: 'The ones who came early get a short, tight night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at six. You beat the barricades, and the room emptied for the fireworks.' },
+          result: 'Doors were at six, you beat the barricades, and the room emptied for the fireworks.' },
         { id: 'LATE', label: 'Push doors back until the crowd clears', likely: 'The ones who stay get a late night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The streets opened at nine-thirty. The room filled up fast and loud.' },
+          result: 'The streets opened at nine-thirty, and the room filled up fast and loud.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A thin crowd. The parade has them.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The parade had the town. The regulars found a way through.' }
+          result: 'The parade had the town, but the regulars found a way through.' }
       ] },
 
     { id: 'LAKELAND_FL_AIR_SHOW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'airshow' },
       telegraph: 'Every motel on the southwest side is full for the air show, and your touring band is still looking for a bed.',
       title: 'No beds near the airport',
-      body: 'The air show has taken every room in town. The van from out of town is circling the motels, and somebody has offered a garage floor.',
+      body: 'The air show has taken every room in town, so the van from out of town is circling the motels, and somebody has offered a garage floor.',
       options: [
-        { id: 'FLOOR', label: 'Put them on the garage floor', likely: 'Free, and they will remember it. The night starts a little late.',
+        { id: 'FLOOR', label: 'Put them on the garage floor', likely: 'Free, and they will remember it, but the night starts a little late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 30 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Six people on a garage floor and a pot of rice. The set that night was loose and loud.' },
-        { id: 'MOTEL', label: 'Pay for a motel an hour away', likely: 'Costs money. They show up on time.',
+          result: 'Six people slept on a garage floor and ate a pot of rice, and the set that night was loose and loud.' },
+        { id: 'MOTEL', label: 'Pay for a motel an hour away', likely: 'Costs money, but they show up on time.',
           effects: [{ op: 'MONEY', amount: -40 }],
-          result: 'You paid for two rooms in the next county. The band was fresh and a little annoyed.' },
+          result: 'You paid for two rooms in the next county, and the band was fresh and a little annoyed.' },
         { id: 'ACCEPT', label: 'Let them figure it out', likely: 'They may not make it, and they will not forget it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'They slept in the van and played tired. The crowd noticed.' }
+          result: 'They slept in the van and played tired, and the crowd noticed.' }
       ] },
 
     { id: 'LAKELAND_FL_NEIGHBOR_CALL', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [3, 4, 5, 6, 7, 8, 9, 10] },
       telegraph: 'The city has no quiet hour, only a reasonable person, and one neighbor on the block is not feeling reasonable.',
       title: 'It is 9:40 and somebody called',
-      body: 'The porch show is loud and the code has no clock, just a reasonable-person test. One neighbor in the historic district has the phone out, and you do not know whether it is 9:40 or ten.',
+      body: 'The porch show is loud and the code has no clock, just a reasonable-person test, and one neighbor in the historic district has the phone out. You do not know whether it is 9:40 or ten.',
       options: [
-        { id: 'TURN', label: 'Turn it down and play acoustic', likely: 'A strange, quiet set. Nobody gets cited.',
+        { id: 'TURN', label: 'Turn it down and play acoustic', likely: 'A strange, quiet set, and nobody gets cited.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The amps went off and the drums went to brushes. It was odd and sweet, and the street stayed quiet.' },
+          result: 'The amps went off and the drums went to brushes, which was odd and sweet, and the street stayed quiet.' },
         { id: 'MOVE', label: 'Move the rest to a garage across town', likely: 'A smaller crowd, and nobody to call.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A garage took the rest of the bill. The door stayed up and the street heard nothing.' },
-        { id: 'ACCEPT', label: 'Keep playing and see who shows up', likely: 'It might hold. It might not.',
+          result: 'A garage took the rest of the bill, and the door stayed up and the street heard nothing.' },
+        { id: 'ACCEPT', label: 'Keep playing and see who shows up', likely: 'It might hold or it might not.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'MONEY', amount: -25 }],
-          result: 'Someone with a flashlight came by at ten. A warning, and a bill you paid.' }
+          result: 'Someone with a flashlight came by at ten, and you got a warning and a bill to pay.' }
       ] }
   ]
 });

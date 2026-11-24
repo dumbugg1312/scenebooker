@@ -119,15 +119,15 @@ SB.Cities.register('reading-pa', {
       title: 'The neighbor calls it in at ten-oh-one',
       body: 'A basement bill runs into the ten o\'clock line. The neighbor across the party wall has the number on the fridge and the clock in the window.',
       options: [
-        { id: 'EARLY', label: 'Move the start up and finish by ten', likely: 'A short night, a clean one.',
+        { id: 'EARLY', label: 'Move the start up and finish by ten', likely: 'It\'s a short night, but a clean one.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done before ten. Nobody called.' },
+          result: 'You opened doors early and were done before ten, and nobody called.' },
         { id: 'ACCEPT', label: 'Run it long and hope', likely: 'The neighbor probably has it timed to the minute.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The cops came at ten-twenty. You ended it there and apologized to the street.' },
+          result: 'The cops came at ten-twenty, and you ended it there and apologized to the street.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'READING_PA_HILLSIDE_CLOSED', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -136,15 +136,15 @@ SB.Cities.register('reading-pa', {
       title: 'The hill is closed',
       body: 'The hillside race weekend has closed the roads up the mountain. The house up there cannot get its amps in, and the bands are stuck on the wrong side of the barricades.',
       options: [
-        { id: 'EARLY', label: 'Load in early before the barricades go up', likely: 'Most of them get in. A short night.',
+        { id: 'EARLY', label: 'Load in early before the barricades go up', likely: 'Most of them get in, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Everything was in by noon. The crowd came on foot after.' },
-        { id: 'BASEMENT', label: 'Move the bill to a basement down the hill', likely: 'Smaller and louder.',
+          result: 'Everything was in by noon, and the crowd came on foot after.' },
+        { id: 'BASEMENT', label: 'Move the bill to a basement down the hill', likely: 'It\'s smaller and louder.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A basement below the barricades took the bill and the floor was packed.' },
+          result: 'A basement below the barricades took the bill, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up on the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The roads stayed shut. Half the list never got up the hill.' }
+          result: 'The roads stayed shut, and half the list never got up the hill.' }
       ] },
 
     { id: 'READING_PA_METAL_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
@@ -153,15 +153,15 @@ SB.Cities.register('reading-pa', {
       title: 'The big room is at the other thing',
       body: 'The spring metal one-day has the club\'s crowd, and your hardcore bill is on the same Saturday. The promoter wants the opener to play the pizza annex.',
       options: [
-        { id: 'ANNEX', label: 'Move the opener to the pizza annex', likely: 'A small crowd that came for the bill.',
+        { id: 'ANNEX', label: 'Move the opener to the pizza annex', likely: 'You get a small crowd that came for the bill.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The annex was packed and warm. The big room was someone else\'s night.' },
+          result: 'The annex was packed and warm, and the big room was someone else\'s night.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The metal crowd is at the other thing.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The metal day took the crowd. The ones who came were the regulars.' },
+          result: 'The metal day took the crowd, and the ones who came were the regulars.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

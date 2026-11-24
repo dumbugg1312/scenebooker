@@ -124,15 +124,15 @@ SB.Cities.register('worcester-ma', {
       title: 'The parade eats your matinee',
       body: 'The parade fills the roads west of downtown, and the load-in street is blocked from noon. The matinee crowd is standing on the curb with a drink.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the street opens', likely: 'The ones who care will find you. A later night.',
+        { id: 'LATE', label: 'Push doors back until the street opens', likely: 'The ones who care will find you, but it\'s a later night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors went up late, after the barricades came down. The room filled slowly and stayed.' },
+          result: 'Doors went up late, after the barricades came down, and the room filled slowly and stayed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The matinee crowd watches the parade.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The afternoon was empty and the parade took everyone who could walk.' },
+          result: 'The afternoon was empty, and the parade took everyone who could walk.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'WORCESTER_MA_SEPTEMBER_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -141,15 +141,15 @@ SB.Cities.register('worcester-ma', {
       title: 'Three things on one Saturday',
       body: 'The block party, the race and the detours split one crowd, and the Canal District parking is the worst of the year. Your show is competing with all of it.',
       options: [
-        { id: 'LATE', label: 'Start late, after the party breaks up', likely: 'A later start. The party crowd wanders in.',
+        { id: 'LATE', label: 'Start late, after the party breaks up', likely: 'You start late, and the party crowd wanders in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The party crowd drifted in, loud and happy.' },
+          result: 'Doors opened an hour late, and the party crowd drifted in, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The crowd is split three ways.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The regulars came and found a place to park eventually.' },
+          result: 'The regulars came and eventually found a place to park.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] },
 
     { id: 'WORCESTER_MA_YARD_NOISE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -158,15 +158,15 @@ SB.Cities.register('worcester-ma', {
       title: 'The nine o\'clock rule',
       body: 'A yard show on the northern hills has to end by dusk, or the police arrive when the band hits its first loud chord. The neighbors already have the number.',
       options: [
-        { id: 'EARLY', label: 'Move the start up and finish by dusk', likely: 'Most of them get in. A short night.',
+        { id: 'EARLY', label: 'Move the start up and finish by dusk', likely: 'Most of them get in, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors early and done before dark. The ones who came got a short, tight set.' },
-        { id: 'CELLAR', label: 'Move the whole bill to a cellar', likely: 'Smaller and louder, with the neighbors on the other side of the wall.',
+          result: 'You opened doors early and were done before dark, and the ones who came got a short, tight set.' },
+        { id: 'CELLAR', label: 'Move the whole bill to a cellar', likely: 'It\'s smaller and louder, with the neighbors on the other side of the wall.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A cellar took the bill with an hour to spare, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The police arrive at the first loud chord.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'MONEY', amount: -25 }],
-          result: 'They shut it down after two songs and a ticket for the noise.' }
+          result: 'They shut it down after two songs and wrote a ticket for the noise.' }
       ] }
   ]
 });

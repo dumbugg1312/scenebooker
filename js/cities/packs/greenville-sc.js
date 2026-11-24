@@ -12,7 +12,7 @@ SB.Cities.register('greenville-sc', {
   blocklist: ['greenville news*', 'peace center*', 'euphoria greenville*', 'artisphere*', 'bon secours*', 'fall for greenville*'],
 
   blurb: ['Mill-town suburbs under the foothills, where grind and sludge crowd the same dive bars as a fast-growing hardcore night.',
-          'Halfway between Atlanta and Charlotte, and it feels it. Few colleges, a polished downtown and a church lot next to every show.'],
+          'Halfway between Atlanta and Charlotte, and it feels it, with few colleges, a polished downtown and a church lot next to every show.'],
   hard: 'Few colleges, liquor-liability costs and a church-heavy calendar.',
   region: 'the Southeast',
   houseType: 'LIVING_ROOM',
@@ -113,31 +113,31 @@ SB.Cities.register('greenville-sc', {
       if: { daysOut: [0, 6] },
       telegraph: 'The bar owner has been quiet about the all-ages nights.',
       title: 'The insurance letter',
-      body: 'A letter came from the bar\'s insurer this week and the owner would not say what it said. Now the owner wants a word before doors.',
+      body: 'A letter came from the bar\'s insurer this week and the owner would not say what it said, and now the owner wants a word before doors.',
       options: [
-        { id: 'ADULTS', label: 'Make it 21 and up this once', likely: 'Keeps the room. Locks out the kids.',
+        { id: 'ADULTS', label: 'Make it 21 and up this once', likely: 'Keeps the room but locks out the kids.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The kids waited outside and some of them left. The bar kept you on the calendar.' },
+          result: 'The kids waited outside and some of them left, but the bar kept you on the calendar.' },
         { id: 'PAY', label: 'Cover the extra cost yourself', likely: 'Costs fifty dollars.',
           effects: [{ op: 'MONEY', amount: -50 }, { op: 'REGULARS', pct: .02 }],
           result: 'The owner took the cash and kept the door open for everyone.' },
-        { id: 'MOVE', label: 'Take it to a living room', likely: 'Smaller. Fewer rules. A church lot next door.',
+        { id: 'MOVE', label: 'Take it to a living room', likely: 'Smaller, with fewer rules and a church lot next door.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A mill village house took the whole bill. The screened porch was the green room.' }
+          result: 'A mill village house took the whole bill, and the screened porch was the green room.' }
       ] },
 
     { id: 'GREENVILLE_SC_DOWNTOWN_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4] },
       telegraph: 'The kids on the list are all under eighteen, and the downtown curfew is enforced on Fridays and Saturdays.',
       title: 'Ten o\'clock and the kids',
-      body: 'The show runs past ten in the downtown strip. Police hold anyone under eighteen until a parent comes, and half your crowd is under eighteen. The bar has no earlier slot.',
+      body: 'The show runs past ten in the downtown strip, where police hold anyone under eighteen until a parent comes, and half your crowd is under eighteen. The bar has no earlier slot.',
       options: [
-        { id: 'EARLY', label: 'Move doors up and finish before ten', likely: 'Tight. The kids get a whole bill and a ride home.',
+        { id: 'EARLY', label: 'Move doors up and finish before ten', likely: 'Tight, but the kids get a whole bill and a ride home.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The last chord rang at five to ten and every kid made it home. It felt rushed.' },
+          result: 'The last chord rang at five to ten and every kid made it home, though it felt rushed.' },
         { id: 'HOUSE', label: 'Take the bill to a living room', likely: 'Smaller, and out of the curfew zone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A mill house took the whole bill. Nobody was held at the city building.' },
+          result: 'A mill house took the whole bill, and nobody was held at the city building.' },
         { id: 'ACCEPT', label: 'Run it and hope', likely: 'The ones who get picked up never come back.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'Two vans of parents waited at the city building and the kids who went home early did not return.' }
@@ -147,28 +147,28 @@ SB.Cities.register('greenville-sc', {
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The festival kickoff is Thursday and downtown is already coned off.',
       title: 'The street is closed',
-      body: 'Main Street is shut for the festival kickoff and the van is circling the block looking for a legal place to unload. The band is on the phone.',
+      body: 'Main Street is shut for the festival kickoff and the van is circling the block looking for a legal place to unload, and the band is on the phone.',
       options: [
         { id: 'LATE', label: 'Push doors back an hour', likely: 'They get in, loud and late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'The van found a curb at last. Doors an hour late and the crowd poured in off the street.' },
+          result: 'The van found a curb at last, doors opened an hour late, and the crowd poured in off the street.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the crowd is stuck behind the barricades.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The barricades kept half the list out. The ones who walked in stayed.' }
+          result: 'The barricades kept half the list out, but the ones who walked in stayed.' }
       ] },
 
     { id: 'GREENVILLE_SC_DUSK_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9] },
       telegraph: 'The skatepark show is set for the evening light, and a neighbor has been watching it.',
       title: 'The neighbors call it in',
-      body: 'The sun is dropping and the amps are still going. One neighbor has called twice and city police are on the way.',
+      body: 'The sun is dropping and the amps are still going, and one neighbor has called twice and city police are on the way.',
       options: [
-        { id: 'SHORT', label: 'Cut the last two sets short', likely: 'You keep the park. The crowd groans.',
+        { id: 'SHORT', label: 'Cut the last two sets short', likely: 'You keep the park, and the crowd groans.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The last bands got ten minutes each. Nobody got a ticket.' },
+          result: 'The last bands got ten minutes each, and nobody got a ticket.' },
         { id: 'MOVE', label: 'Take the bill to a living room', likely: 'Smaller, and out of the light.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .5 }],
-          result: 'The crowd followed the vans to a porch. It ran late and loud.' }
+          result: 'The crowd followed the vans to a porch, and it ran late and loud.' }
       ] }
   ]
 });

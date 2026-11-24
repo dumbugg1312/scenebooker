@@ -15,7 +15,7 @@ SB.Cities.register('johnson-city-tn', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The university, the paper, the festivals and the storm are written only in generic form. */
   blocklist: ['johnson city press*', 'ballad health*', 'tweetsie*', 'bristol rhythm*', 'waffle house*', 'cook out*', 'food city*'],
 
-  blurb: ['A hospital and college town in the valley where bluegrass is the official sound. The punks bring a banjo and a car.',
+  blurb: ['A hospital and college town in the valley where bluegrass is the official sound, and the punks bring a banjo and a car.',
           'Shows live on porches, in yards and in church halls, and the night ends at a chain diner.'],
   hard: 'Small regional draw: few rooms, no real all-ages, and a car ride to everything.',
   region: 'Appalachia',
@@ -111,53 +111,53 @@ SB.Cities.register('johnson-city-tn', {
   events: [
     { id: 'JOHNSON_CITY_TN_RACE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'race' },
-      telegraph: 'Every motel on the interstate is full and half the town has gone up the road to the track.',
+      telegraph: 'Every motel on the interstate is full, and half the town has gone up the road to the track.',
       title: 'Race weekend empties the club',
-      body: 'Everyone with a truck has left for the speedway. You have a full bill and a room that is going to hold ten people.',
+      body: 'Everyone with a truck has left for the speedway, so you have a full bill and a room that is going to hold ten people.',
       options: [
-        { id: 'RUN', label: 'Run the full bill for whoever shows', likely: 'A tiny crowd and a loose, friendly night.',
+        { id: 'RUN', label: 'Run the full bill for whoever shows', likely: 'It\'s a tiny crowd and a loose, friendly night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Ten people and five bands. It was the best sound check of the year.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'There were ten people and five bands, and it was the best sound check of the year.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'PORCH', label: 'Move the bill to a porch and keep it small', likely: 'Smaller and louder, and nobody pays a cover.',
+          result: 'You moved it a day, and the people who could make it came.' },
+        { id: 'PORCH', label: 'Move the bill to a porch and keep it small', likely: 'It\'s smaller and louder, and nobody pays a cover.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The bill fit on a porch and the neighbors were at the track too.' }
+          result: 'The bill fit on a porch, and the neighbors were at the track too.' }
       ] },
 
     { id: 'JOHNSON_CITY_TN_NOISE_STRIKE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The downtown streets are closed off for the festival and the cops are walking the strip.',
       title: 'Another noise complaint',
-      body: 'A second noise violation landed on the club the night of the festival, and the license is two days short. The booker wants the bill quiet and early.',
+      body: 'A second noise violation landed on the club the night of the festival, and the license is two days short, so the booker wants the bill quiet and early.',
       options: [
-        { id: 'EARLY', label: 'Start early and finish before the hour', likely: 'A short, loud night with no trouble.',
+        { id: 'EARLY', label: 'Start early and finish before the hour', likely: 'It\'s a short, loud night with no trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done before the hour. The cops walked past twice and kept walking.' },
-        { id: 'MOVE', label: 'Move it to a house', likely: 'No license to lose. The neighbors are close.',
+          result: 'You opened doors early and finished before the hour, and the cops walked past twice and kept walking.' },
+        { id: 'MOVE', label: 'Move it to a house', likely: 'There\'s no license to lose, but the neighbors are close.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A porch took the bill with an hour to spare, and the floor was packed.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Some of the crowd stays out of the way.',
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Some of the crowd stays away.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The door was nervous all night and half the list stayed outside.' }
+          result: 'The door was nervous all night, and half the list stayed outside.' }
       ] },
 
     { id: 'JOHNSON_CITY_TN_FLASH_FLOOD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [3, 4, 5, 6, 7, 8, 9] },
-      telegraph: 'Fog in the valley and a flash-flood watch for the creeks.',
+      telegraph: 'There\'s fog in the valley and a flash-flood watch for the creeks.',
       title: 'The pass is under water',
-      body: 'A band booked from over the mountains is crawling around a closed road. They will reach the porch show three hours after load-in.',
+      body: 'A band booked from over the mountains is crawling around a closed road, and they will reach the porch show three hours after load-in.',
       options: [
-        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start. The crowd gets restless.',
+        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'It means a late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at ten. You started late and nobody left.' },
-        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'A thin night, but the ones who came are glad.',
+          result: 'The van pulled in at ten, and you started late, but nobody left.' },
+        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'It\'s a thin night, but the people who come are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a long, loose night on a wet porch.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'It was two bands and a long, loose night on a wet porch.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everybody loses some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] }
   ]
 });

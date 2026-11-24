@@ -13,7 +13,7 @@ SB.Cities.register('seattle', {
            '206 blast fest', 'hoodstock', 'cascade pbs', 'crosscut', 'spin magazine', 'mynorthwest', 'kiro 7', 'sdot', 'sdci', 'madison park times', 'seattle met'],
   blocklist: ['seattle times*', 'the stranger seattle*', 'kexp*', 'bumbershoot*', 'showbox*', 'crocodile cafe*', 'vera project*', 'neumos*'],
 
-  blurb: ['Rain, ferries and a rent crisis, but an old all-ages tradition keeps the kids coming. Metal and punk both run deep here.',
+  blurb: ['There is rain, ferries and a rent crisis, but an old all-ages tradition keeps the kids coming. Metal and punk both run deep here.',
           'A big, serious stop on I-5, where bills mix ages and genres and everyone wants the room to last.'],
   hard: 'Rent and noise complaints keep killing the rooms; every house show lives on borrowed time.',
   region: 'the Northwest',
@@ -124,15 +124,15 @@ SB.Cities.register('seattle', {
       title: 'The bridge is shut',
       body: 'The floating bridge closed for the night, and the east-side kids and the bands from over the lake cannot cross. Everyone is rerouting around the water.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the closure', likely: 'Most make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the closure', likely: 'Most make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the lake.',
+          result: 'You moved doors up an hour, and the people who wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the lake.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The bridge never reopened in time. The east side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides the long way around', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The bridge never reopened in time, and the east side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides the long way around', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads went around together. They will remember that.' }
+          result: 'Two carloads went around together.' }
       ] },
 
     { id: 'SEATTLE_WAREHOUSE_POLICE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -141,15 +141,15 @@ SB.Cities.register('seattle', {
       title: 'Police at the warehouse door',
       body: 'Police roll up to the rail-side warehouse with no noise call on file, asking for the permit. The bill is half through and the doors are still open.',
       options: [
-        { id: 'PAPERS', label: 'Show them every paper you have and keep playing', likely: 'If it holds, the night survives. A shaky one.',
+        { id: 'PAPERS', label: 'Show them every paper you have and keep playing', likely: 'If it holds, the night survives, but it\'s a shaky one.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'They read the papers for an hour. Half the room drifted out, and the rest played on.' },
-        { id: 'CLOSE', label: 'Close it down and send everyone home', likely: 'Safe. The bands lose their set.',
+          result: 'They read the papers for an hour, and half the room drifted out while the rest played on.' },
+        { id: 'CLOSE', label: 'Close it down and send everyone home', likely: 'It\'s safe, but the bands lose their set.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .5 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'You shut it at once. It was a short night and a quiet street.' },
-        { id: 'MOVE', label: 'Move the rest of the bill to a house', likely: 'Smaller and louder, and the police are not invited.',
+          result: 'You shut it at once, and it was a short night and a quiet street.' },
+        { id: 'MOVE', label: 'Move the rest of the bill to a house', likely: 'It\'s smaller and louder, and the police are not invited.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .5 }],
-          result: 'The bill went to a basement across the city. Fewer of them found it.' }
+          result: 'The bill went to a basement across the city, and fewer people found it.' }
       ] },
 
     { id: 'SEATTLE_PARADE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -158,15 +158,15 @@ SB.Cities.register('seattle', {
       title: 'The hill is full',
       body: 'The parade weekend has packed every bar on the hill, so the back stage is empty by nine and the kids are standing in the street.',
       options: [
-        { id: 'EARLY', label: 'Start early and finish before the hill fills', likely: 'Most get in. A short night.',
+        { id: 'EARLY', label: 'Start early and finish before the hill fills', likely: 'Most get in, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early and a tight set. The ones who came were out before the crowd peaked.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids are on the street.',
+          result: 'You opened doors early with a tight set, and the people who came were out before the crowd peaked.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids are out on the street.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the room stayed on the street. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Half the room stayed on the street, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

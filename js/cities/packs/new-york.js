@@ -12,8 +12,8 @@ SB.Cities.register('new-york', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The 2012 flood is 'the '12 storm' in game text. */
   blocklist: ['cabaret law*', 'west indian day*', 'nyc marathon*', 'office of nightlife*', 'lirr*', 'fdny*', 'nypd*', 'wnyc*'],
 
-  blurb: ['Dense, fast and loud: kids ride the train to a show carrying their own gear up a flight of stairs, and the bill is short and stacked.',
-          'Licensed back rooms and fragile basements live side by side, and the landlord always wins in the end.'],
+  blurb: ['It\'s dense, fast and loud, with kids riding the train to a show and carrying their own gear up a flight of stairs, and the bills are short and stacked.',
+          'Licensed back rooms and fragile basements live side by side, and the landlord wins in the end.'],
   hard: 'Rent and neighbors kill rooms fast; stairs, tolls and parking eat the guarantee.',
   region: 'the Northeast corridor',
   houseType: 'BASEMENT',
@@ -132,34 +132,34 @@ SB.Cities.register('new-york', {
       if: { daysOut: [0, 0] },
       telegraph: 'The neighbors upstairs have been giving you looks all week.',
       title: 'Someone called the city',
-      body: 'Mid-set, a neighbor calls the city complaint line about the drummer. Police are on the way, and the whole block can hear the kick drum.',
+      body: 'Mid-set, a neighbor calls the city complaint line about the drummer, and the whole block can hear the kick drum, so police are on the way.',
       options: [
-        { id: 'QUIET', label: 'Cut the set short and go acoustic', likely: 'Keeps the room, loses the night.',
+        { id: 'QUIET', label: 'Cut the set short and go acoustic', likely: 'You keep the room but lose the night.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'The set went quiet. The neighbor stopped calling, and the crowd stayed anyway.' },
-        { id: 'TALK', label: 'Go knock on their door and talk', likely: 'Costs time, maybe wins them over.',
+          result: 'The set went quiet, the neighbor stopped calling, and the crowd stayed anyway.' },
+        { id: 'TALK', label: 'Go knock on their door and talk', likely: 'It costs time, and it might win them over.',
           effects: [{ op: 'HOURS', d: -1, when: 'TODAY' }],
-          result: 'You stood at the stoop for twenty minutes. By the end they asked to be on the list.' },
-        { id: 'PLAY', label: 'Play on and hope', likely: 'A risk to the room.',
+          result: 'You stood at the stoop for twenty minutes, and by the end they asked to be on the list.' },
+        { id: 'PLAY', label: 'Play on and hope', likely: 'It puts the room at risk.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The cops showed up before the last song, and the room is on notice.' }
+          result: 'The cops showed up before the last song, and now the room is on notice.' }
       ] },
 
     { id: 'NEW_YORK_HEAT_WAVE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [6, 7, 8, 9] },
       telegraph: 'The forecast says a heat wave is coming, and the basement is already an oven.',
       title: 'The block loses power',
-      body: 'A heat wave has knocked out power on the block. The basement is a sauna and the amps are dead.',
+      body: 'A heat wave has knocked out power on the block, so the basement is a sauna and the amps are dead.',
       options: [
-        { id: 'CANDLES', label: 'Go acoustic by candlelight', likely: 'Small and strange, but people will remember it.',
+        { id: 'CANDLES', label: 'Go acoustic by candlelight', likely: 'It\'s small and strange, but people will remember it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'REGULARS', pct: .02 }],
-          result: 'The whole bill played unplugged by candlelight. It was a great night, and half the usual crowd.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust.',
+          result: 'The whole bill played unplugged by candlelight, and it was a great night with half the usual crowd.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and that costs some trust.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day when the power came back.' },
-        { id: 'ROOF', label: 'Take it up to a roof with a generator', likely: 'Cooler, louder, and a bigger risk.',
+          result: 'You moved it a day, to when the power came back.' },
+        { id: 'ROOF', label: 'Take it up to a roof with a generator', likely: 'It\'s cooler and louder, and a bigger risk.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'A rented generator on the roof kept the night alive. The super was not amused.' }
+          result: 'A rented generator on the roof kept the night alive, and the super was not amused.' }
       ] },
 
     { id: 'NEW_YORK_LANDLORD_SELLS', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show'],
@@ -168,29 +168,29 @@ SB.Cities.register('new-york', {
       title: 'The building was sold',
       body: 'The warehouse was sold to a developer overnight, and the new owner wants everyone out in two weeks.',
       options: [
-        { id: 'LASTSHOW', label: 'Throw one last big show', likely: 'A farewell crowd, and a lot of work.',
+        { id: 'LASTSHOW', label: 'Throw one last big show', likely: 'You get a farewell crowd, and a lot of work.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }, { op: 'HOURS', d: -2, when: 'TODAY' }],
           result: 'The last night packed the floor with everybody who ever played there.' },
-        { id: 'MOVEIT', label: 'Move it to a basement', likely: 'Smaller and louder, with a wall of neighbors.',
+        { id: 'MOVEIT', label: 'Move it to a basement', likely: 'It\'s smaller and louder, with a wall of neighbors on the other side.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .5 }],
-          result: 'A rowhouse basement took the bill. It was packed to the stairs.' },
-        { id: 'DROP', label: 'Cancel and look for a new room', likely: 'Costs the date and the bands\' patience.',
+          result: 'A rowhouse basement took the bill, and it was packed to the stairs.' },
+        { id: 'DROP', label: 'Cancel and look for a new room', likely: 'It costs you the date and the bands\' patience.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 7, respect: false }],
-          result: 'You pushed the show a week and went room hunting.' }
+          result: 'You pushed the show a week and went hunting for a room.' }
       ] },
 
     { id: 'NEW_YORK_TRAIN_SHUTDOWN', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'The subway line that feeds the neighborhood is shut for repairs this weekend.',
       title: 'The train is down',
-      body: 'The line most of your crowd rides is shut for repairs, and the replacement buses are crawling. Everyone has to detour, and the late train home is gone.',
+      body: 'The line most of your crowd rides is shut for repairs and the replacement buses are crawling, so everyone has to detour, and the late train home is gone.',
       options: [
-        { id: 'EARLIER', label: 'Move doors an hour earlier', likely: 'Most make it. A thin start.',
+        { id: 'EARLIER', label: 'Move doors an hour earlier', likely: 'Most people make it, but the start is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .85, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Lose the people who cross the river.',
+          result: 'You opened doors an hour early, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'You lose the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .4, beyond: true }],
-          result: 'The detour was too much. The outer-borough kids stayed home.' }
+          result: 'The detour was too much, and the outer-borough kids stayed home.' }
       ] }
   ]
 });

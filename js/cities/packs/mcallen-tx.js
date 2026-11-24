@@ -384,12 +384,12 @@ SB.Cities.register('mcallen-tx', {
       },
       "telegraph": "It is ninety-five at night and the van has been making a noise.",
       "title": "The air conditioner dies on the road",
-      "body": "The van's air conditioner quits on the way to the show and the bands pull over to fix it in the heat. Gas money is the whole guarantee and it just got smaller.",
+      "body": "The van's air conditioner quits on the way to the show, and the bands pull over to fix it in the heat. Gas money is the whole guarantee, and it just got smaller.",
       "options": [
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with everyone.",
+          "likely": "Breaks the date, which costs you trust with everyone.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -397,12 +397,12 @@ SB.Cities.register('mcallen-tx', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come, came."
         },
         {
           "id": "EARLY",
           "label": "Push doors an hour later and wait for them",
-          "likely": "Most make it. The night starts thin.",
+          "likely": "Most make it, but the night starts thin.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -415,7 +415,7 @@ SB.Cities.register('mcallen-tx', {
               "v": 60
             }
           ],
-          "result": "Doors an hour late. They came in drenched and played anyway."
+          "result": "Doors were an hour late, and they came in drenched and played anyway."
         },
         {
           "id": "ACCEPT",
@@ -428,7 +428,7 @@ SB.Cities.register('mcallen-tx', {
               "v": 0.7
             }
           ],
-          "result": "They made it halfway and called it. The bill got shorter."
+          "result": "They made it halfway and called it, and the bill got shorter."
         }
       ]
     },
@@ -458,7 +458,7 @@ SB.Cities.register('mcallen-tx', {
         {
           "id": "EARLY",
           "label": "Load in before the barricades go up",
-          "likely": "A long afternoon, and a short night.",
+          "likely": "It's a long afternoon and a short night.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -484,12 +484,12 @@ SB.Cities.register('mcallen-tx', {
               "v": 0.75
             }
           ],
-          "result": "The parade took everyone. The ones who found a way around the barricades stayed late."
+          "result": "The parade took everyone, and the ones who found a way around the barricades stayed late."
         },
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with everyone.",
+          "likely": "Breaks the date, which costs you trust with everyone.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -497,7 +497,7 @@ SB.Cities.register('mcallen-tx', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come, came."
         }
       ]
     },
@@ -540,7 +540,7 @@ SB.Cities.register('mcallen-tx', {
               "v": 0.9
             }
           ],
-          "result": "Doors at midnight. The ones with ringing ears came in for the loud part."
+          "result": "Doors were at midnight, and the people with ringing ears came in for the loud part."
         },
         {
           "id": "ACCEPT",
@@ -553,12 +553,12 @@ SB.Cities.register('mcallen-tx', {
               "v": 0.7
             }
           ],
-          "result": "A stage and a few dozen people. The ones who stayed knew every word."
+          "result": "It was a stage and a few dozen people, and the ones who stayed knew every word."
         },
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with everyone.",
+          "likely": "Breaks the date, which costs you trust with everyone.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -566,7 +566,7 @@ SB.Cities.register('mcallen-tx', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come, came."
         }
       ]
     },
@@ -587,12 +587,12 @@ SB.Cities.register('mcallen-tx', {
       },
       "telegraph": "The extension cord runs out of a carport and a neighbor is on the porch with a phone.",
       "title": "The neighbor calls at ten",
-      "body": "A backyard show in old McAllen. At ten a neighbor calls, the extension cord runs from the carport and the drummer is in a lawn chair.",
+      "body": "A backyard show in old McAllen. At ten a neighbor calls, the extension cord runs from the carport, and the drummer is in a lawn chair.",
       "options": [
         {
           "id": "UNPLUG",
           "label": "Unplug and play acoustic until the last song",
-          "likely": "Smaller and warmer. Nobody gets a ticket.",
+          "likely": "It's smaller and warmer, and nobody gets a ticket.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -605,12 +605,12 @@ SB.Cities.register('mcallen-tx', {
               "v": -1
             }
           ],
-          "result": "The amps went quiet. The drummer played a cardboard box."
+          "result": "The amps went quiet, and the drummer played a cardboard box."
         },
         {
           "id": "MOVE_IT",
           "label": "Move the whole bill to the storefront",
-          "likely": "Packed in and loud. Costs a little in the door.",
+          "likely": "It's packed in and loud, and it costs a little at the door.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -622,12 +622,12 @@ SB.Cities.register('mcallen-tx', {
               "amount": -25
             }
           ],
-          "result": "A storefront took the bill. The tile floor made it louder than the yard."
+          "result": "A storefront took the bill, and the tile floor made it louder than the yard."
         },
         {
           "id": "ACCEPT",
           "label": "Play through and see what happens",
-          "likely": "Quick end to the night.",
+          "likely": "It's a quick end to the night.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -635,7 +635,7 @@ SB.Cities.register('mcallen-tx', {
               "v": 0.75
             }
           ],
-          "result": "A car pulled up at ten past. That was the show."
+          "result": "A car pulled up at ten past, and that was the show."
         }
       ]
     }

@@ -13,7 +13,7 @@ SB.Cities.register('pittsburgh', {
   blocklist: ['iron city*', 'eat\'n park*', 'sheetz*', 'giant eagle*', 'steelers*', 'picklesburgh*', 'pittsburgh city paper*', 'three rivers arts festival*', 'anthrocon*'],
 
   blurb: ['A city of steep hills, three rivers and hundreds of bridges, where the mills shut and left cheap houses, social halls and a scene in every neighborhood.',
-          'Shows are in stone cellars, fraternal halls and old churches. Rooms close over codes, not raids, and the bands keep coming.'],
+          'Shows are in stone cellars, fraternal halls and old churches. Rooms close over building codes instead of raids, and the bands keep coming.'],
   hard: 'Code offices close good rooms; halls give weddings and fish fries priority.',
   region: 'the Rust Belt',
   houseType: 'BASEMENT',
@@ -141,13 +141,13 @@ SB.Cities.register('pittsburgh', {
       options: [
         { id: 'LATE', label: 'Push doors back until the game ends', likely: 'The crowd comes late and a little loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors at nine. The room filled right after the final whistle.' },
+          result: 'Doors were at nine, and the room filled right after the final whistle.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Most people do not come.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
           result: 'Nobody showed up until it was over, and by then it was late.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'PITTSBURGH_PARKWAY_BACKUP', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -156,15 +156,15 @@ SB.Cities.register('pittsburgh', {
       title: 'The Parkway is a parking lot',
       body: 'A wreck at the tunnel has the Parkway backed up for miles on the night of your show. The headliner and half the people from out of town are stuck in it.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the ones who wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the tunnel.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The ones from the suburbs stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The backup never cleared, and the ones from the suburbs stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the back roads together. They\'ll remember that.' }
+          result: 'Two carloads took the back roads together.' }
       ] },
 
     { id: 'PITTSBURGH_FISH_FRY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -175,13 +175,13 @@ SB.Cities.register('pittsburgh', {
       options: [
         { id: 'WAIT', label: 'Wait it out and start late', likely: 'The crowd gets in after the line clears.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The last plate went out at eight. Doors at nine, and the room smelled like fish.' },
-        { id: 'SHARE', label: 'Split the door with the volunteers', likely: 'Costs thirty dollars. They help carry gear.',
+          result: 'The last plate went out at eight, doors were at nine, and the room smelled like fish.' },
+        { id: 'SHARE', label: 'Split the door with the volunteers', likely: 'It costs thirty dollars, and they help carry gear.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'REGULARS', pct: .02 }],
           result: 'The volunteers cleared a corner and sold you plates at cost.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'PITTSBURGH_BASEMENT_FLOODS', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -190,15 +190,15 @@ SB.Cities.register('pittsburgh', {
       title: 'The river town is flooding',
       body: 'A tropical remnant has dropped a foot of rain in the ravines. The low basements by the river are going under and the hills are sliding.',
       options: [
-        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'Breaks the date. Costs trust with everyone.',
+        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'It breaks the date, and everyone trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the ones who could come came.' },
         { id: 'HILL', label: 'Move it to a house on high ground', likely: 'Smaller and louder, with a wall of neighbors on every side.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A rowhouse on the hill took the whole bill, and the floor was packed.' },
-        { id: 'SANDBAG', label: 'Sandbag the door and play on', likely: 'Costs forty dollars. The crowd stays home.',
+        { id: 'SANDBAG', label: 'Sandbag the door and play on', likely: 'It costs forty dollars, and the crowd stays home.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The water stayed on the street. The room was half full and wet to the ankle.' }
+          result: 'The water stayed on the street, and the room was half full and wet to the ankle.' }
       ] }
   ]
 });

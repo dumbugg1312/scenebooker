@@ -108,15 +108,15 @@ SB.Cities.register('roanoke-va', {
       title: 'The fair has the kids',
       body: 'The fair next door is in its second week. The Salem and Vinton kids are on the rides, and your Saturday bill is all school-age bands in a town full of carnival noise.',
       options: [
-        { id: 'EARLY', label: 'Open early and let them come after the rides', likely: 'Some come over. Short and loud.',
+        { id: 'EARLY', label: 'Open early and let them come after the rides', likely: 'Some come over, and it\'s short and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came still smelled like fried dough.' },
+          result: 'You opened doors an hour early, and the ones who came still smelled like fried dough.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The fair wins the kids.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The kids stayed on the midway. The regulars came.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The kids stayed on the midway, and the regulars came.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'ROANOKE_VA_STREET_CLOSED', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -125,12 +125,12 @@ SB.Cities.register('roanoke-va', {
       title: 'The street is closed',
       body: 'The street festival has Henry Street shut to cars all day, and the hall wants the stage down by dark. The crew has to carry gear past the barricades.',
       options: [
-        { id: 'CARRY', label: 'Hand-carry the gear and start on time', likely: 'Costs an hour of your day. Most get in.',
+        { id: 'CARRY', label: 'Hand-carry the gear and start on time', likely: 'It costs an hour of your day, and most get in.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Amps went past the barricades one at a time. The stage was ready by dark.' },
+          result: 'Amps went past the barricades one at a time, and the stage was ready by dark.' },
         { id: 'LATE', label: 'Push doors back until the street reopens', likely: 'The crowd that wants a night out shows up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors an hour late. The festival crowd drifted in.' },
+          result: 'Doors opened an hour late, and the festival crowd drifted in.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'A lot of people give up on the barricades.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'Half the list never found a way past the cones.' }
@@ -144,7 +144,7 @@ SB.Cities.register('roanoke-va', {
       options: [
         { id: 'EARLY', label: 'End the night early and clear the lot', likely: 'A short night, no trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Done before the cutoff. The lot was empty by eleven.' },
+          result: 'You were done before the cutoff, and the lot was empty by eleven.' },
         { id: 'ACCEPT', label: 'Run it and watch the clock', likely: 'Nervous parents leave early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'The patrol car sat there all night and half the kids were pulled out early.' }

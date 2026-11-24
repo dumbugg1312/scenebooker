@@ -116,17 +116,17 @@ SB.Cities.register('greensboro-nc', {
       if: { daysOut: [0, 4], calendar: 'parade' },
       telegraph: 'The east side is closing to traffic for homecoming, and every lot is taken.',
       title: 'Homecoming closes the east side',
-      body: 'Homecoming week has shut the east side to traffic on the same Saturday as your show in Glenwood. Nobody books against it.',
+      body: 'Homecoming week has shut the east side to traffic on the same Saturday as your show in Glenwood, and nobody books against it.',
       options: [
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' },
-        { id: 'LATE', label: 'Push doors back until the traffic clears', likely: 'Later than planned, but the people who come stay.',
+          result: 'You moved it a day, and not everyone could make the new one.' },
+        { id: 'LATE', label: 'Push doors back until the traffic clears', likely: 'It\'s later than planned, but the people who come stay.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The ones who made it through were loud and happy.' },
+          result: 'Doors opened an hour late, and the ones who made it through were loud and happy.' },
         { id: 'ACCEPT', label: 'Run it and take a thin door', likely: 'The casual crowd is stuck in traffic.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The door was thin. The regulars made it.' }
+          result: 'The door was thin, but the regulars made it.' }
       ] },
 
     { id: 'GREENSBORO_NC_CARPORT_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -135,32 +135,32 @@ SB.Cities.register('greensboro-nc', {
       title: 'Thunder over the carport',
       body: 'A summer thunderstorm is over the mill neighborhoods, and the generator is the only dry thing at your carport show.',
       options: [
-        { id: 'HOUSE', label: 'Move the bill inside a house', likely: 'Smaller and louder, and dry.',
+        { id: 'HOUSE', label: 'Move the bill inside a house', likely: 'It\'s smaller and louder, and dry.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A house took the whole bill, and the floor was packed.' },
-        { id: 'WAIT', label: 'Wait for the storm to pass', likely: 'A late start. The crowd gets restless.',
+        { id: 'WAIT', label: 'Wait for the storm to pass', likely: 'You start late, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
           result: 'The storm passed by ten. You started late and nobody left.' },
         { id: 'ACCEPT', label: 'Run it under the carport', likely: 'Half the list stays home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The generator held and the floor was wet. Half the list stayed home.' }
+          result: 'The generator held and the floor was wet, but half the list stayed home.' }
       ] },
 
     { id: 'GREENSBORO_NC_YOUTH_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], months: [8, 9, 10, 11] },
       telegraph: 'The city is debating a youth curfew after a shooting, and parents are nervous.',
       title: 'The curfew debate',
-      body: 'The city is talking about a curfew for kids under eighteen. The under-eighteens at your show must be out by ten, no matter who is playing.',
+      body: 'The city is talking about a curfew for kids under eighteen. If it passes, the under-eighteens at your show must be out by ten, no matter who is playing.',
       options: [
-        { id: 'EARLY', label: 'Move the start up and finish by ten', likely: 'A short, tight night. Everyone gets home.',
+        { id: 'EARLY', label: 'Move the start up and finish by ten', likely: 'It\'s a short, tight night, and everyone gets home.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done by ten. A short, tight set, and the parents were glad.' },
+          result: 'You opened doors early and were done by ten. It was a short, tight set, and the parents were glad.' },
         { id: 'SPLIT', label: 'Send the youngest home before the last set', likely: 'The last band plays to older heads.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The youngest left at ten. The late set was smaller and tighter.' },
+          result: 'The youngest left at ten, and the late set was smaller and tighter.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Parents stay home to be safe.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Some parents kept their kids home. The ones who came stayed for the whole bill.' }
+          result: 'Some parents kept their kids home, and the ones who came stayed for the whole bill.' }
       ] },
 
     { id: 'GREENSBORO_NC_FAIR_LOTS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -169,12 +169,12 @@ SB.Cities.register('greensboro-nc', {
       title: 'Fair parking',
       body: 'The county fair has parked every lot near the arena, and the club on that side is hard to reach for the bands and the crowd.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the lots clear', likely: 'Later, and the crowd gets in.',
+        { id: 'LATE', label: 'Push doors back until the lots clear', likely: 'It starts later, but the crowd gets in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. Everyone got in, slow and sweaty.' },
+          result: 'Doors opened an hour late, and everyone got in, slow and sweaty.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the ones who could come, came.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd takes one look at the lot and goes home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'The lots were full and the room was thin.' }

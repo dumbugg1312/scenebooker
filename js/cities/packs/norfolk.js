@@ -128,15 +128,15 @@ SB.Cities.register('norfolk', {
       title: 'The tunnel is shut',
       body: 'The tide and a nor\'easter have flooded the approach and the tunnel is closed. The bands and the kids from across the water cannot get to you tonight.',
       options: [
-        { id: 'EARLIER', label: 'Move the show up an hour so they can beat the tide', likely: 'Some make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show up an hour so they can beat the tide', likely: 'Some make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who could leave work early beat the water.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people on the other side of the water.',
+          result: 'You moved doors up an hour, and the people who could leave work early beat the water.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people on the other side of the water.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The tunnel never reopened. Only your side of the water showed up.' },
-        { id: 'RIDES', label: 'Organize rides the long way round', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The tunnel never reopened, and only your side of the water showed up.' },
+        { id: 'RIDES', label: 'Organize rides the long way round', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads came round by the long bridge together. They will remember that.' }
+          result: 'Two carloads came round by the long bridge together.' }
       ] },
 
     { id: 'NORFOLK_HARBOR_FESTIVAL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -145,15 +145,15 @@ SB.Cities.register('norfolk', {
       title: 'The garages are full',
       body: 'Every garage downtown is taken for the festival. Your all-ages bill is on, but the load-in street is a fireworks crowd, and the bands cannot park.',
       options: [
-        { id: 'EARLY', label: 'Have the bands load in at four', likely: 'Everyone gets in. A long wait before doors.',
+        { id: 'EARLY', label: 'Have the bands load in at four', likely: 'Everyone gets in, but there\'s a long wait before doors.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'The bands loaded in before the crowds and sat in the van for three hours. The room opened on time.' },
+          result: 'The bands loaded in before the crowds and sat in the van for three hours, and the room opened on time.' },
         { id: 'LATE', label: 'Push doors back until the fireworks end', likely: 'The crowd that wants a night out shows up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The festival crowd poured in loud and sunburned.' },
+          result: 'Doors went an hour late, and the festival crowd poured in loud and sunburned.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half of them cannot find parking.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'People circled the garages and gave up. A thin night, but a loud one.' }
+          result: 'People circled the garages and gave up, so it was a thin night but a loud one.' }
       ] },
 
     { id: 'NORFOLK_CURFEW_SIDEWALK', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -162,15 +162,15 @@ SB.Cities.register('norfolk', {
       title: 'The kids on the sidewalk at eleven',
       body: 'The bill runs long. A few seventeen-year-olds and a sailor in civvies are on the sidewalk when the curfew hour hits, and the neighbor next door is on the phone.',
       options: [
-        { id: 'CUT', label: 'Cut the last band and clear the sidewalk', likely: 'A short night. The headliner is angry.',
+        { id: 'CUT', label: 'Cut the last band and clear the sidewalk', likely: 'It\'s a short night, and the headliner is angry.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The last band got half a set. The sidewalk was empty by eleven.' },
-        { id: 'RIDES', label: 'Get the kids into cars and rides home', likely: 'Takes an hour. The kids remember.',
+          result: 'The last band got half a set, and the sidewalk was empty by eleven.' },
+        { id: 'RIDES', label: 'Get the kids into cars and rides home', likely: 'It takes an hour, and the kids remember.',
           effects: [{ op: 'HOURS', d: -1, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'You stood in the lot until every kid had a ride. Their parents noticed.' },
+          result: 'You stood in the lot until every kid had a ride, and their parents noticed.' },
         { id: 'ACCEPT', label: 'Let it run', likely: 'The room risks a visit.',
           effects: [{ op: 'MONEY', amount: -40 }],
-          result: 'City police came by at ten past eleven and wrote a warning. The room paid for it.' }
+          result: 'City police came by at ten past eleven and wrote a warning, and the room paid for it.' }
       ] }
   ]
 });

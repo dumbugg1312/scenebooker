@@ -120,13 +120,13 @@ SB.Cities.register('raleigh', {
       options: [
         { id: 'LATE', label: 'Push doors back until the stages go quiet', likely: 'The ones who want a real show come late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Doors an hour late. The festival crowd drifted over, sunburned and loud.' },
+          result: 'Doors went an hour late, and the festival crowd drifted over, sunburned and loud.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Free music beats a cover charge.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: 'The free stages took most of the street. The regulars carried the room.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The free stages took most of the street, and the regulars carried the room.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'RALEIGH_ELEVEN_SHARP', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -137,10 +137,10 @@ SB.Cities.register('raleigh', {
       options: [
         { id: 'STOP', label: 'End it at ten fifty-eight', likely: 'Everyone goes home early and happy.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'You cut the last song and the lights were off at ten fifty-eight. Nobody got a ticket.' },
+          result: 'You cut the last song and had the lights off at ten fifty-eight, and nobody got a ticket.' },
         { id: 'ONE_MORE', label: 'Let them play one more', likely: 'A great last song and a fine.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'REGULARS', pct: .02 }],
-          result: 'The last song was the best of the night. The ticket came a minute later.' }
+          result: 'The last song was the best of the night, and the ticket came a minute later.' }
       ] },
 
     { id: 'RALEIGH_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
@@ -152,9 +152,9 @@ SB.Cities.register('raleigh', {
         { id: 'SHORT', label: 'Run it as a short bill', likely: 'Half a house and a loose, easy night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'Half the room, a short bill, and a van that finally pulled in at ten.' },
-        { id: 'LATE', label: 'Hold the doors for the van', likely: 'A late start. The kids who came wait it out.',
+        { id: 'LATE', label: 'Hold the doors for the van', likely: 'A late start, and the kids who came wait it out.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'The van pulled in late. You started after nine and nobody left.' }
+          result: 'The van pulled in late, and you started after nine and nobody left.' }
       ] }
   ]
 });

@@ -12,7 +12,7 @@ SB.Cities.register('st-louis', {
   blocklist: ['riverfront times*', 'post-dispatch*', 'budweiser*', 'anheuser*', 'kdhx*', 'gateway arch*', 'busch stadium*'],
 
   blurb: ['Brick two-family basements and old halls in South City hold a hardcore-leaning underground that books itself and makes its own posters.',
-          'The venue that matters is usually closing or being rescued. The river splits the crowd between two states, and the summers are thick and wet.'],
+          'The venue that matters is usually closing or being rescued, the river splits the crowd between two states, and the summers are thick and wet.'],
   hard: 'Rooms close, and the river splits the crowd between two states.',
   region: 'the Midwest',
   houseType: 'BASEMENT',
@@ -127,15 +127,15 @@ SB.Cities.register('st-louis', {
       title: 'The bridge is a parking lot',
       body: 'A wreck has one of the river bridges down to a single lane, and the others are jammed behind it. The bands and the kids from the Illinois side are stuck in the dark.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
+          result: 'You moved doors up an hour, and the people who wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The Illinois side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The backup never cleared, and the Illinois side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the long way around together. They\'ll remember that.' }
+          result: 'Two carloads took the long way around together.' }
       ] },
 
     { id: 'ST_LOUIS_BASEMENT_HEAT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -144,32 +144,32 @@ SB.Cities.register('st-louis', {
       title: 'Sweat drips off the pipes',
       body: 'The basement has no air conditioning and the humidity is a wall. The floor is packed, the pipes are dripping, and somebody wants to move the set to the yard, where the whole street can hear.',
       options: [
-        { id: 'FANS', label: 'Borrow every fan on the block and run it', likely: 'Hot, loud and packed. People leave sticky.',
+        { id: 'FANS', label: 'Borrow every fan on the block and run it', likely: 'It\'s hot, loud and packed, and people leave sticky.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Six box fans and a lot of water. Nobody fainted, and the pipes kept dripping.' },
-        { id: 'YARD', label: 'Move the set to the backyard', likely: 'Cooler. The neighbors will hear it.',
+          result: 'You ran six box fans and a lot of water. Nobody fainted, and the pipes kept dripping.' },
+        { id: 'YARD', label: 'Move the set to the backyard', likely: 'It\'s cooler, but the neighbors will hear it.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: 1.1 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'MONEY', amount: -40 }],
-          result: 'The yard was cooler and a lot more people came. So did a complaint at ten.' },
-        { id: 'ACCEPT', label: 'Run it as it is', likely: 'The ones who can stand it come.',
+          result: 'The yard was cooler and a lot more people came, and so did a complaint at ten.' },
+        { id: 'ACCEPT', label: 'Run it as it is', likely: 'The people who can stand it come.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The weak-stomached stayed home. The ones who came wrung out their shirts.' }
+          result: 'The weak-stomached stayed home, and the people who came wrung out their shirts.' }
       ] },
 
     { id: 'ST_LOUIS_PARADE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'parade' },
       telegraph: 'Barricades are going up in the brick neighborhoods for the parade.',
       title: 'Half the crowd is at the parade',
-      body: 'The parade fills the bar streets and eats the parking. Half your crowd is stuck on the other side of it and the other half is already drunk at it.',
+      body: 'The parade fills the bar streets and eats the parking. Half your crowd is stuck on the other side of it, and the other half is already drunk at it.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the parade is over', likely: 'The ones who want a loud night come after.',
+        { id: 'LATE', label: 'Push doors back until the parade is over', likely: 'The people who want a loud night come after.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in from the street, loud and happy.' },
+          result: 'You opened doors an hour late, and the crowd came in from the street, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the parade.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The casual crowd stayed on the street. The regulars made it through.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed on the street, and the regulars made it through.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

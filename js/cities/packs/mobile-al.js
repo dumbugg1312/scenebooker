@@ -127,15 +127,15 @@ SB.Cities.register('mobile-al', {
       title: 'The room is closing',
       body: '{room} just told everyone it is done, with no reason given. Your show there is {dow}. Rooms here close and come back at a new address a year later.',
       options: [
-        { id: 'HALL', label: 'Move it to a borrowed hall', likely: 'A rental fee, and a crowd that knows every band anyway.',
+        { id: 'HALL', label: 'Move it to a borrowed hall', likely: 'It costs a rental fee, but the crowd knows every band anyway.',
           effects: [{ op: 'MOVE_SHOW', toKind: 'HALL', dayShift: 0, respect: true }, { op: 'MONEY', amount: -40 }],
-          result: 'A hall took the night. Everyone in the room knew the people on the bill.' },
-        { id: 'FAREWELL', label: 'Make it the farewell show', likely: 'A line out the door, and people sitting on the floor.',
+          result: 'A hall took the night, and everyone in the room knew the people on the bill.' },
+        { id: 'FAREWELL', label: 'Make it the farewell show', likely: 'You get a line out the door and people sitting on the floor.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.25 }, { op: 'REGULARS', pct: .02 }, { op: 'ROOM_PRESSURE', d: 10 }],
-          result: 'The line ran down the block. People sat on the floor for the last set.' },
+          result: 'The line ran down the block, and people sat on the floor for the last set.' },
         { id: 'CANCEL', label: 'Cancel', likely: 'People understand.',
           effects: [{ op: 'CANCEL_SHOW', why: 'RESPECTED' }],
-          result: 'Nobody blamed you. The bands found another floor.' }
+          result: 'Nobody blamed you, and the bands found another floor.' }
       ] },
 
     { id: 'MOBILE_AL_BAYWAY_CLOSED', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -144,15 +144,15 @@ SB.Cities.register('mobile-al', {
       title: 'The tunnel and the Bayway are backed up',
       body: 'A closure under the river and a wreck on the Bayway cut Mobile off from the Eastern Shore the night of your show. The kids from across the bay have a long way around.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can go around', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can go around', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people from across the bay.',
+          result: 'You moved doors up an hour, and the people who wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people from across the bay.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The traffic never cleared. The Eastern Shore stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The traffic never cleared, and the Eastern Shore stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads went the long way around the bay. They\'ll remember that.' }
+          result: 'Two carloads went the long way around the bay.' }
       ] },
 
     { id: 'MOBILE_AL_FAIR_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -161,15 +161,15 @@ SB.Cities.register('mobile-al', {
       title: 'The fair takes the kids',
       body: 'The fair has pulled every kid in West Mobile out to the fairgrounds, and your porch show in Midtown is the same Saturday.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the fair lets out', likely: 'The ones who still want a night come late.',
+        { id: 'LATE', label: 'Push doors back until the fair lets out', likely: 'The people who still want a night come late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. They came in smelling of funnel cake and glad of somewhere to sit.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A small crowd. Everyone knows everyone on the bill.',
+          result: 'You opened doors an hour late, and they came in smelling of funnel cake and glad of somewhere to sit.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'It\'s a small crowd, but everyone knows everyone on the bill.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The fair had the casual crowd. The room was small and the bands knew every face.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The fair had the casual crowd, so the room was small and the bands knew every face.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

@@ -118,13 +118,13 @@ SB.Cities.register('charlottesville-va', {
       options: [
         { id: 'LATE', label: 'Push doors back until the traffic clears', likely: 'The crowd that gets through is loud and happy.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The kids who got through the traffic came in cold and ready.' },
+          result: 'Doors were an hour late, and the kids who got through the traffic came in cold and ready.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is stuck in the jam.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The jam kept half the list home. The regulars walked in.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The jam kept half the list home, and the regulars walked in.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'CHARLOTTESVILLE_VA_YARD_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -133,15 +133,15 @@ SB.Cities.register('charlottesville-va', {
       title: 'The yard show gets a call at five of ten',
       body: 'The yard in the quiet riverside blocks is full, and a neighbor called it in just before ten. The city has pulled live music from this neighborhood before, and the host knows it.',
       options: [
-        { id: 'EARLY', label: 'Stop at ten and clear the yard', likely: 'A short night. The host keeps the lease.',
+        { id: 'EARLY', label: 'Stop at ten and clear the yard', likely: 'It\'s a short night, and the host keeps the lease.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The last band cut the set and the yard was empty by ten past. The host nodded.' },
-        { id: 'INSIDE', label: 'Move the last bands into a basement across town', likely: 'Most of them follow. It costs a van run.',
+          result: 'The last band cut the set and the yard was empty by ten past, and the host nodded.' },
+        { id: 'INSIDE', label: 'Move the last bands into a basement across town', likely: 'Most of them follow, and it costs a van run.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement took the last two bands. It was louder and smaller, and nobody called.' },
         { id: 'ACCEPT', label: 'Play on and take the warning', likely: 'The next call is a fine, and the host might say no.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'REGULARS', pct: -.01 }],
-          result: 'You played on and the officer wrote a warning. The host is not sure about next summer.' }
+          result: 'You played on and the officer wrote a warning, and the host is not sure about next summer.' }
       ] },
 
     { id: 'CHARLOTTESVILLE_VA_MALL_CROWD', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -150,15 +150,15 @@ SB.Cities.register('charlottesville-va', {
       title: 'The mall is full for the free concert',
       body: 'The brick street is closed for the evening crowd, and your load-in van is sitting at the end of it with the drums. The matinee crowd would have to push through to get to the hall.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the van gets in', likely: 'A late start, but the room fills.',
+        { id: 'LATE', label: 'Push doors back until the van gets in', likely: 'It starts late, but the room fills.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'The van crept through at six. Doors an hour late and the room still filled.' },
-        { id: 'CARRY', label: 'Hand-carry the gear down the side street', likely: 'Costs a couple of hours of your day. Nobody waits.',
+          result: 'The van crept through at six. Doors were an hour late, and the room still filled.' },
+        { id: 'CARRY', label: 'Hand-carry the gear down the side street', likely: 'It costs a couple of hours of your day, and nobody waits.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Six people and a hand truck, two trips. The drummer still owes everyone a drink.' },
+          result: 'Six people and a hand truck made two trips, and the drummer still owes everyone a drink.' },
         { id: 'ACCEPT', label: 'Run it as planned and let the crowd sort itself', likely: 'The concert pulls people the other way.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The free concert took the crowd. The ones who came for the bands got a good night.' }
+          result: 'The free concert took the crowd, and the ones who came for the bands got a good night.' }
       ] }
   ]
 });

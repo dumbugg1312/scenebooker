@@ -122,17 +122,17 @@ SB.Cities.register('hartford', {
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'Crews are working on the viaduct downtown this week.',
       title: 'The viaduct is a parking lot',
-      body: 'A wreck on the viaduct in rush hour has the whole river crossing backed up on the night of your show. The bands and the kids from the east side are stuck.',
+      body: 'A wreck on the viaduct in rush hour has the whole river crossing backed up on the night of your show, and the bands and the kids from the east side are stuck.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat rush hour', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat rush hour', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors an hour early. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
+          result: 'You opened doors an hour early, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The east side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The backup never cleared, and the east side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the back roads together. They will remember that.' }
+          result: 'Two carloads took the back roads together.' }
       ] },
 
     { id: 'HARTFORD_RACE_BRIDGES', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -141,15 +141,15 @@ SB.Cities.register('hartford', {
       title: 'The marathon has the bridges',
       body: 'The race shuts the river bridges and the downtown streets for the day. The east-side bands and kids can\'t cross, and the barricades come down slowly.',
       options: [
-        { id: 'EARLY', label: 'Open late enough for the barricades, and tell everyone the back way', likely: 'Most get in once the streets reopen. Thinner than usual.',
+        { id: 'EARLY', label: 'Open late enough for the barricades, and tell everyone the back way', likely: 'Most get in once the streets reopen, but it\'s thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: 30 }],
-          result: 'Doors half an hour late. The ones who came took the long way around.' },
+          result: 'Doors were half an hour late, and the ones who came took the long way around.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The bridges stayed shut past noon. Half the list never made it across.' },
+          result: 'The bridges stayed shut past noon, and half the list never made it across.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'HARTFORD_FOOTBALL_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -158,15 +158,15 @@ SB.Cities.register('hartford', {
       title: 'The football-day backup',
       body: 'A home game across the river has every exit backed up, and the van arrives at load-in an hour late. Half the crowd is stuck in the same traffic.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the traffic breaks', likely: 'The crowd that wants a night out shows up. Later than planned.',
+        { id: 'LATE', label: 'Push doors back until the traffic breaks', likely: 'The crowd that wants a night out shows up, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in tired and loud.' },
+          result: 'Doors opened an hour late, and the crowd came in tired and loud.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is stuck on the highway.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd gave up at the exit. The regulars came.' },
+          result: 'The casual crowd gave up at the exit, but the regulars came.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

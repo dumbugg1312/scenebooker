@@ -119,13 +119,13 @@ SB.Cities.register('fayetteville-nc', {
       options: [
         { id: 'DOCK', label: 'Move the bill to the lake-park dock', likely: 'Smaller, outdoors, and out by sunset.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The dock took the bill with the sun still up. A short, golden set.' },
+          result: 'The dock took the bill with the sun still up, and the set was short and golden.' },
         { id: 'CARPORT', label: 'Move it to a west-side carport', likely: 'Smaller and louder, with a neighbor next door.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A carport took the bill, and the generator held.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'FAYETTEVILLE_NC_RIVER_FLOOD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -137,12 +137,12 @@ SB.Cities.register('fayetteville-nc', {
         { id: 'CARPORT', label: 'Move it to a west-side carport', likely: 'Smaller and louder, on high ground.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A carport on the west side took the bill, dry and loud.' },
-        { id: 'SANDBAG', label: 'Sandbag the yard and play on', likely: 'Costs forty dollars. The crowd stays home.',
+        { id: 'SANDBAG', label: 'Sandbag the yard and play on', likely: 'It costs forty dollars, and the crowd stays home.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The water stayed in the ditch. The yard was half full and wet to the ankle.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The water stayed in the ditch, and the yard was half full and wet to the ankle.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'FAYETTEVILLE_NC_FREE_STAGES', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -153,13 +153,13 @@ SB.Cities.register('fayetteville-nc', {
       options: [
         { id: 'LATE', label: 'Push doors back until the stages go quiet', likely: 'The ones who want a real show come late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in loud from the free stages.' },
+          result: 'Doors went an hour late, and the crowd came in loud from the free stages.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is on the street.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'Half the room was on the street. The regulars came.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Half the room was on the street, but the regulars came.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'FAYETTEVILLE_NC_CURFEW_HALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],

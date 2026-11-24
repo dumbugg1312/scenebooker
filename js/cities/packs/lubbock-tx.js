@@ -750,7 +750,7 @@ SB.Cities.register('lubbock-tx', {
         {
           "id": "TAKE",
           "label": "Take the overflow at your place",
-          "likely": "A big, loud, costumed night. The neighbors count the cars.",
+          "likely": "It's a big, loud, costumed night, and the neighbors count the cars.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -762,12 +762,12 @@ SB.Cities.register('lubbock-tx', {
               "pct": 0.02
             }
           ],
-          "result": "The tour spilled into your yard. Somebody left in a cape at midnight."
+          "result": "The tour spilled into your yard, and somebody left in a cape at midnight."
         },
         {
           "id": "EARLY",
           "label": "Start early and finish by ten",
-          "likely": "Fewer people, no complaints.",
+          "likely": "Fewer people, and no complaints.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -823,7 +823,7 @@ SB.Cities.register('lubbock-tx', {
         {
           "id": "LATE",
           "label": "Push doors back and wait for the van",
-          "likely": "A late start. The crowd gets restless.",
+          "likely": "The start is late, and the crowd gets restless.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -836,7 +836,7 @@ SB.Cities.register('lubbock-tx', {
               "v": 0.9
             }
           ],
-          "result": "The van got in at nine. You started late and nobody left."
+          "result": "The van got in at nine, and you started late but nobody left."
         },
         {
           "id": "ACCEPT",
@@ -849,12 +849,12 @@ SB.Cities.register('lubbock-tx', {
               "v": 0.75
             }
           ],
-          "result": "Half the list was on the rides. The ones who came stayed to the end."
+          "result": "Half the list was on the rides, but the ones who came stayed to the end."
         },
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with everyone.",
+          "likely": "It breaks the date, and everyone trusts you a little less.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -862,7 +862,7 @@ SB.Cities.register('lubbock-tx', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come came."
         }
       ]
     },
@@ -902,7 +902,7 @@ SB.Cities.register('lubbock-tx', {
               "v": 0.95
             }
           ],
-          "result": "Doors an hour late. The crowd came in loud from the lots."
+          "result": "Doors were an hour late, and the crowd came in loud from the lots."
         },
         {
           "id": "ACCEPT",
@@ -915,12 +915,12 @@ SB.Cities.register('lubbock-tx', {
               "v": 0.8
             }
           ],
-          "result": "The casual crowd stayed in the stands. The regulars came."
+          "result": "The casual crowd stayed in the stands, and the regulars came."
         },
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with everyone.",
+          "likely": "It breaks the date, and everyone trusts you a little less.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -928,7 +928,7 @@ SB.Cities.register('lubbock-tx', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come came."
         }
       ]
     },
@@ -973,7 +973,7 @@ SB.Cities.register('lubbock-tx', {
               "v": -1
             }
           ],
-          "result": "You called it mid-song. The dust settled on every amp."
+          "result": "You called it mid-song, and the dust settled on every amp."
         },
         {
           "id": "INSIDE",
@@ -997,7 +997,7 @@ SB.Cities.register('lubbock-tx', {
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with everyone.",
+          "likely": "It breaks the date, and everyone trusts you a little less.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -1005,7 +1005,7 @@ SB.Cities.register('lubbock-tx', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come came."
         }
       ]
     }

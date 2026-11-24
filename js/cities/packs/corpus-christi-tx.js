@@ -111,53 +111,53 @@ SB.Cities.register('corpus-christi-tx', {
   events: [
     { id: 'CORPUS_CHRISTI_TX_BAYFRONT_FEST', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
-      telegraph: 'The bayfront festival is on, with every Saturday downtown spoken for.',
+      telegraph: 'The bayfront festival is on, and every Saturday downtown is spoken for.',
       title: 'The festival has downtown',
-      body: 'The festival has filled the bayfront with carnival rides and parking is gone. The club has cancelled your bill rather than lose the night to the crowds.',
+      body: 'The festival has filled the bayfront with carnival rides and the parking is gone. The club has cancelled your bill rather than lose the night to the crowds.',
       options: [
-        { id: 'CARPORT', label: 'Move the show to a carport on the Westside', likely: 'Smaller and louder, away from the crowds.',
+        { id: 'CARPORT', label: 'Move the show to a carport on the Westside', likely: 'It\'s smaller and louder, and away from the crowds.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A carport took the whole bill and the floor was packed.' },
-        { id: 'EARLY', label: 'Start early and finish before the crowds', likely: 'A short night.',
+          result: 'A carport took the whole bill, and the floor was packed.' },
+        { id: 'EARLY', label: 'Start early and finish before the crowds', likely: 'It makes for a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors an hour early. The ones who came parked a mile away and walked.' },
+          result: 'You opened doors an hour early, and the people who came parked a mile away and walked.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The casual crowd goes to the carnival.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The rides took the casual crowd. The regulars came.' }
+          result: 'The rides took the casual crowd, and the regulars came.' }
       ] },
 
     { id: 'CORPUS_CHRISTI_TX_STORM_WATCH', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [6, 7, 8, 9, 10, 11] },
-      telegraph: 'A tropical storm is in the gulf and the watch has been posted for the coast.',
+      telegraph: 'A tropical storm is in the Gulf, and a watch has been posted for the coast.',
       title: 'The storm watch goes up',
-      body: 'A tropical storm watch has been posted the week of a booked show. The bay is rising and the road to the island has been closed to the public.',
+      body: 'A tropical storm watch has been posted the week of a booked show. The bay is rising, and the road to the island has been closed to the public.',
       options: [
-        { id: 'INLAND', label: 'Move it to a hall inland in Robstown', likely: 'Smaller and farther, but dry.',
+        { id: 'INLAND', label: 'Move it to a hall inland in Robstown', likely: 'It\'s smaller and farther away, but dry.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'A lodge hall inland took the bill. Dry, and a long drive for everyone.' },
-        { id: 'MOVE', label: 'Call it off and move it a week', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'A lodge hall inland took the bill, and it was dry, but a long drive for everyone.' },
+        { id: 'MOVE', label: 'Call it off and move it a week', likely: 'It breaks the date, and everybody trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it. The ones who could come, came.' },
-        { id: 'SANDBAG', label: 'Run it and play on', likely: 'Costs forty dollars. The crowd stays home.',
+          result: 'You moved it, and the people who could make it came.' },
+        { id: 'SANDBAG', label: 'Run it and play on', likely: 'It costs forty dollars, and the crowd stays home.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The storm stayed offshore. The room was half full and wet to the ankle.' }
+          result: 'The storm stayed offshore, and the room was half full and wet to the ankle.' }
       ] },
 
     { id: 'CORPUS_CHRISTI_TX_YARD_PIT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
-      telegraph: 'There is a code of conduct posted on the fence, and the host is nervous.',
+      telegraph: 'There\'s a code of conduct posted on the fence, and the host is nervous.',
       title: 'The pit takes out a tooth',
-      body: 'Someone lost a tooth in the pit at the last yard show, and the host is not sure about the next one. The whole scene is arguing about it.',
+      body: 'Someone lost a tooth in the pit at the last yard show, and the host isn\'t sure about the next one. The whole scene is arguing about it.',
       options: [
-        { id: 'RULES', label: 'Talk it through and put rules on the fence', likely: 'A slower, safer night.',
+        { id: 'RULES', label: 'Talk it through and put rules on the fence', likely: 'It\'s a slower, safer night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'REGULARS', pct: .02 }],
-          result: 'A sign on the fence and a few older kids watching the pit. It was a good night.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The host might not stay patient.',
+          result: 'With a sign on the fence and a few older kids watching the pit, it was a good night.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The host might run out of patience.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The pit was just as rough, and the host looked tired at the end of the night.' },
-        { id: 'MOVE', label: 'Move it to a hall', likely: 'Calmer, and a different crowd.',
+          result: 'The pit was just as rough, and the host looked tired by the end of the night.' },
+        { id: 'MOVE', label: 'Move it to a hall', likely: 'It\'s calmer, with a different crowd.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }],
-          result: 'The hall manager watched the clock and the pit stayed small.' }
+          result: 'The hall manager watched the clock, and the pit stayed small.' }
       ] }
   ],
 

@@ -116,13 +116,13 @@ SB.Cities.register('modesto-ca', {
       options: [
         { id: 'LATE', label: 'Push the start back until the sun goes down', likely: 'Cooler, but the ones with curfews and rides are gone.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors at dusk. The ones who stayed were glad they did.' },
-        { id: 'FANS', label: 'Borrow fans and a cooler of ice, play on', likely: 'Costs a little. Fewer people come inside.',
+          result: 'Doors were at dusk, and the people who stayed were glad they did.' },
+        { id: 'FANS', label: 'Borrow fans and a cooler of ice, play on', likely: 'It costs a little, and fewer people come inside.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Two box fans and forty pounds of ice. The room was damp and the driveway was full.' },
-        { id: 'MOVE', label: 'Move it a day, when it might break', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You set up two box fans and forty pounds of ice, and the room was damp and the driveway was full.' },
+        { id: 'MOVE', label: 'Move it a day, when it might break', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. It was ninety-nine instead of a hundred and ten.' }
+          result: 'You moved it a day, and it was ninety-nine instead of a hundred and ten.' }
       ] },
 
     { id: 'MODESTO_CA_CRUISE_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -131,12 +131,12 @@ SB.Cities.register('modesto-ca', {
       title: 'The cruise closes the streets',
       body: 'Downtown is shut for the cruise and parking is gone for six blocks. Your all-ages show has no place for a van, and the kids cannot get near the door.',
       options: [
-        { id: 'HALL', label: 'Move the bill to a hall on the east side', likely: 'Away from the traffic. Not everyone finds it.',
+        { id: 'HALL', label: 'Move the bill to a hall on the east side', likely: 'It\'s away from the traffic, but not everyone finds it.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'A hall off Yosemite took the bill. A smaller night, but nobody circled for parking.' },
-        { id: 'LATE', label: 'Push doors back until the street thins out', likely: 'The cruise ends early. The crowd who stayed is loud.',
+          result: 'A hall off Yosemite took the bill, and it was a smaller night but nobody circled for parking.' },
+        { id: 'LATE', label: 'Push doors back until the street thins out', likely: 'The cruise ends early, and the crowd who stayed is loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors an hour late. The ones who waited came in smelling like exhaust and funnel cake.' },
+          result: 'Doors went an hour late, and the ones who waited came in smelling like exhaust and funnel cake.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list gives up on parking.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'The door was easy because half the list was still circling the block.' }
@@ -150,13 +150,13 @@ SB.Cities.register('modesto-ca', {
       options: [
         { id: 'LATE', label: 'Start late so the fair crowd can get back', likely: 'A later night, a better crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at nine. The fair kids showed up smelling like corn dogs and stayed.' },
+          result: 'Doors were at nine, and the fair kids showed up smelling like corn dogs and stayed.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Thin, but the loyal ones come.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'A thin Friday. The ones who came were the ones who always come.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was a thin Friday, and the people who came were the ones who always come.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The fair let out and a few more could come.' }
+          result: 'You moved it a day, and the fair let out and a few more could come.' }
       ] },
 
     { id: 'MODESTO_CA_PORCH_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 60, bind: ['show'],
@@ -168,9 +168,9 @@ SB.Cities.register('modesto-ca', {
         { id: 'JOIN', label: 'Play a porch in the afternoon and skip the night', likely: 'A better crowd for a shorter set.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }],
           result: 'Your bill played a bungalow porch in daylight. The neighbors clapped, which has never happened before.' },
-        { id: 'ACCEPT', label: 'Run the night show anyway', likely: 'Tired people, a few strays.',
+        { id: 'ACCEPT', label: 'Run the night show anyway', likely: 'The crowd is tired, with a few strays.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Everyone had been out since noon. The night show was a nap with a drum kit.' }
+          result: 'Everyone had been out since noon, so the night show was a nap with a drum kit.' }
       ] }
   ]
 });

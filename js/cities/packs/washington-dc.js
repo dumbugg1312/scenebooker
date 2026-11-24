@@ -136,15 +136,15 @@ SB.Cities.register('washington-dc', {
       title: 'Tourists and no parking',
       body: 'Blossom weekend has filled every space and every train near the Mall. The locals are staying home and the visitors are wandering into your show.',
       options: [
-        { id: 'EARLY', label: 'Open early and send the list the back way', likely: 'Most get in before the crowds. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early and send the list the back way', likely: 'Most get in before the crowds, but it\'s thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came walked in from three stops away.' },
+          result: 'Doors were an hour early, and the people who came walked in from three stops away.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the crowds.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The trains were packed with strangers. Half the list stayed home.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The trains were packed with strangers, and half the list stayed home.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'WASHINGTON_DC_HOME_GAME', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -153,15 +153,15 @@ SB.Cities.register('washington-dc', {
       title: 'The trains are packed',
       body: 'A home game on your night has stripped the parking and flooded the trains. Everyone coming from across town is stuck.',
       options: [
-        { id: 'EARLY', label: 'Open early, tell everyone to come before the crowd', likely: 'Most get in first. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early, tell everyone to come before the crowd', likely: 'Most get in first, but it\'s thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The room filled before the game let out.' },
+          result: 'Doors were an hour early, and the room filled before the game let out.' },
         { id: 'ACCEPT', label: 'Take what you get', likely: 'A lot of people give up.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The trains never cleared. Half the list never showed.' },
-        { id: 'MOVE', label: 'Move the show to Saturday', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The trains never cleared, and half the list never showed.' },
+        { id: 'MOVE', label: 'Move the show to Saturday', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] },
 
     { id: 'WASHINGTON_DC_DERECHO', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -170,15 +170,15 @@ SB.Cities.register('washington-dc', {
       title: 'The power is out',
       body: 'A fast, violent storm has knocked the power out across the neighborhood. The basement is taking on water and the yard show has no lights.',
       options: [
-        { id: 'GENERATOR', label: 'Borrow a generator and play on', likely: 'Costs thirty dollars. Smaller and louder.',
+        { id: 'GENERATOR', label: 'Borrow a generator and play on', likely: 'It costs thirty dollars, and it\'s smaller and louder.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The band played by lantern light on a generator. Nobody forgot it.' },
-        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The band played by lantern light on a generator, and nobody forgot it.' },
+        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the ones who could come, came.' },
         { id: 'ACCEPT', label: 'Call it off', likely: 'Nobody is happy, and nobody is hurt.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .4 }],
-          result: 'The storm won. A handful stayed to bail water and drink the warm beer.' }
+          result: 'The storm won, and a handful stayed to bail water and drink the warm beer.' }
       ] },
 
     { id: 'WASHINGTON_DC_CURFEW_ZONE', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 60, bind: ['show'],
@@ -187,12 +187,12 @@ SB.Cities.register('washington-dc', {
       title: 'A curfew zone for the weekend',
       body: 'The police have declared a weekend curfew zone around your neighborhood. The teenage half of the crowd has to be home early or stay out of the zone.',
       options: [
-        { id: 'EARLIER', label: 'Move the show earlier so the kids can get home', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show earlier so the kids can get home', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done before dark. The kids went home with their parents\' blessing.' },
+          result: 'Doors were early and you were done before dark, and the kids went home with their parents\' blessing.' },
         { id: 'ACCEPT', label: 'Run it as planned and lose the kids', likely: 'A lot of the crowd stays out of the zone.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The zone cleared the block by nine. The older half of the room was left.' }
+          result: 'The zone cleared the block by nine, and the older half of the room was left.' }
       ] }
   ]
 });

@@ -15,7 +15,7 @@ SB.Cities.register('cedar-rapids-ia', {
   blocklist: ['quaker oats*', 'five seasons*', 'five smells*', 'fifth season*', 'roughriders*', 'wenceslas*'],
 
   blurb: ['A small DIY room that keeps moving and a loud, loyal metal crowd, with Iowa City twenty miles down the interstate.',
-          'Door takes are small, the promoter knows everybody, and the summer metal fest is the one weekend the whole scene shows up.'],
+          'Door takes are small and the promoter knows everybody, and the summer metal fest is the one weekend the whole scene shows up.'],
   hard: 'Small crowds and a room that keeps moving make routing risky, and the cool neighbor is twenty miles south.',
   region: 'the Midwest',
   houseType: 'BASEMENT',
@@ -105,48 +105,48 @@ SB.Cities.register('cedar-rapids-ia', {
       if: { daysOut: [0, 3] },
       telegraph: 'The flyer has a new storefront on Second Avenue and a nervous line saying the vibe is the same.',
       title: 'The room moved again',
-      body: 'The all-ages room lost its lease and found another storefront two blocks away. The new place has no stage, no sign and a landlord who has not been told what it is for.',
+      body: 'The all-ages room lost its lease and found another storefront two blocks away. The new place has no stage, no sign and a landlord who hasn\'t been told what it\'s for.',
       options: [
-        { id: 'NEWPLACE', label: 'Play the new storefront', likely: 'Half the regulars will find it. Bare floor, loud.',
+        { id: 'NEWPLACE', label: 'Play the new storefront', likely: 'Half the regulars will find it, and it\'s a bare floor and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'The new room was cold and bare, and the ones who found it stayed to the end.' },
-        { id: 'HOUSE', label: 'Move the bill to a house', likely: 'Smaller and warmer. Everyone knows a basement.',
+          result: 'The new room was cold and bare, and the people who found it stayed to the end.' },
+        { id: 'HOUSE', label: 'Move the bill to a house', likely: 'It\'s smaller and warmer, and everyone knows a basement.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 0.6 }],
           result: 'A basement took the bill with a day to spare, and the floor was packed.' },
-        { id: 'LATE', label: 'Push doors back and set up a map', likely: 'A late start while people find the address.',
+        { id: 'LATE', label: 'Push doors back and set up a map', likely: 'It starts late while people find the address.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'Doors an hour late. Everybody got there eventually.' }
+          result: 'You opened doors an hour late, and everybody got there eventually.' }
       ] },
 
     { id: 'CEDAR_RAPIDS_IA_FEST_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], calendar: 'festival' },
-      telegraph: 'The metal festival is this weekend and every kid in the scene is working a table.',
+      telegraph: 'The metal festival is this weekend, and every kid in the scene is working a table.',
       title: 'The festival has everyone',
-      body: 'The big theater is full all day and every kid in the scene is working the merch table, loading in or watching. Nobody is free to run a house show.',
+      body: 'The big theater is full all day, and every kid in the scene is working the merch table, loading in or watching. Nobody is free to run a house show.',
       options: [
         { id: 'LATE', label: 'Start after the festival lets out', likely: 'The crowd that wants more shows up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Doors at ten. The festival crowd came in loud and hungry for more.' },
+          result: 'You opened doors at ten, and the festival crowd came in loud and hungry for more.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The scene is busy elsewhere.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: 'Only the ones with nowhere else to be came, and they were glad.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Only the people with nowhere else to be came, and they were glad.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] },
 
     { id: 'CEDAR_RAPIDS_IA_GAME_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'game' },
-      telegraph: 'It is a home game down in Iowa City and the interstate is full.',
+      telegraph: 'It\'s a home game down in Iowa City, and the interstate is full.',
       title: 'Game day on the interstate',
-      body: 'Half your crowd lives or works in the college town to the south. They are stuck in game traffic and will arrive an hour late with a plate of hot food.',
+      body: 'Half your crowd lives or works in the college town to the south. They\'re stuck in game traffic and will arrive an hour late with a plate of hot food.',
       options: [
-        { id: 'LATE', label: 'Push doors back an hour', likely: 'They show up, tired and loud.',
+        { id: 'LATE', label: 'Push doors back an hour', likely: 'They show up tired and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'An hour late, and the room filled up all at once.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The south-bound crowd misses the openers.',
+          result: 'They were an hour late, and the room filled up all at once.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The crowd coming from the south misses the openers.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
-          result: 'The openers played to the bartender and the loyal.' }
+          result: 'The openers played to the bartender and the loyal few.' }
       ] }
   ]
 });

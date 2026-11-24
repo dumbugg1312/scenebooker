@@ -112,15 +112,15 @@ SB.Cities.register('charlotte', {
       title: 'Home by ten',
       body: 'The city has a curfew for everyone under eighteen, ten to six, every night. Your all-ages bill is booked for eight, and the kids have to be home before it ends.',
       options: [
-        { id: 'EARLY', label: 'Start early and put the headliner on first', likely: 'Most of the kids get home on time. A short, tight night.',
+        { id: 'EARLY', label: 'Start early and put the headliner on first', likely: 'Most of the kids get home on time, but it\'s a short, tight night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, headliner first, and the kids walked out at nine-forty.' },
+          result: 'You opened doors early and put the headliner first, and the kids walked out at nine-forty.' },
         { id: 'ACCEPT', label: 'Run the bill as planned', likely: 'The younger kids stay home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the kids left before the last band. The ones left stayed to the end.' },
+          result: 'Half the kids left before the last band, and the ones left stayed to the end.' },
         { id: 'MOVE', label: 'Move it to a 21-and-over bar', likely: 'A smaller, older crowd.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'BAR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'A bar took the bill. The kids were not allowed.' }
+          result: 'A bar took the bill, and the kids were not allowed in.' }
       ] },
 
     { id: 'CHARLOTTE_RACE_VANS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -129,13 +129,13 @@ SB.Cities.register('charlotte', {
       title: 'Every hotel is full',
       body: 'Race weekend and a local festival share the same dates. The touring band cannot find a room and asks to sleep on a porch in the neighborhood.',
       options: [
-        { id: 'PORCH', label: 'Put them up on a porch', likely: 'A packed floor, a few noise complaints.',
+        { id: 'PORCH', label: 'Put them up on a porch', likely: 'You get a packed floor and a few noise complaints.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
           result: 'They slept on a porch and played like it was a hotel.' },
-        { id: 'MOTEL', label: 'Pay for a room an hour out', likely: 'Costs forty dollars. They arrive late.',
+        { id: 'MOTEL', label: 'Pay for a room an hour out', likely: 'It costs forty dollars, and they arrive late.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'A motel an hour out. They made it by doors.' },
-        { id: 'ACCEPT', label: 'Let them find their own way', likely: 'Risky. They may not come at all.',
+          result: 'You put them in a motel an hour out, and they made it by doors.' },
+        { id: 'ACCEPT', label: 'Let them find their own way', likely: 'It\'s risky, and they may not come at all.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'The band got in late and played a short set to a thin room.' }
       ] },
@@ -144,17 +144,17 @@ SB.Cities.register('charlotte', {
       if: { daysOut: [0, 4], calendar: 'game' },
       telegraph: 'A home game on Sunday has the bars and the lots on the south side full by noon.',
       title: 'The football lot is full',
-      body: 'The stadium crowd has taken the parking and the south-side bars. One night to move an uptown-adjacent show to a yard in Elizabeth.',
+      body: 'The stadium crowd has taken the parking and the south-side bars. You have one night to move an uptown-adjacent show to a yard in Elizabeth.',
       options: [
-        { id: 'YARD', label: 'Move the show to a backyard', likely: 'Smaller, looser, and nobody can tow a yard.',
+        { id: 'YARD', label: 'Move the show to a backyard', likely: 'It\'s smaller and looser, and nobody can tow a yard.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A yard took the whole bill, and the floor was packed.' },
         { id: 'LATE', label: 'Push doors back until the game is over', likely: 'The night starts late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in loud.' },
+          result: 'Doors opened an hour late, and the crowd came in loud.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The lot stayed full. The regulars came.' }
+          result: 'The lot stayed full, but the regulars came.' }
       ] }
   ]
 });

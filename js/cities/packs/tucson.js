@@ -16,8 +16,8 @@ SB.Cities.register('tucson', {
   /* "The university", "the air base", "the gem show", "the procession". Nogales is a place and is used as a place. */
   blocklist: ['hotel congress*', 'club congress*', 'arizona daily star*', 'tucson weekly*', 'rialto theatre*', 'raytheon*', 'davis-monthan*', 'pima community*'],
 
-  blurb: ['A desert town where punk keeps rebuilding the same rooms in new strip malls and backyards. Old heads and kids share a floor, and a hot night ends in a dust storm.',
-          'An all-ages room downtown, a narrow hardcore room on the south side and the east-side garages carry it, with the old club left for touring acts.'],
+  blurb: ['A desert town where punk keeps rebuilding the same rooms in new strip malls and backyards. Old heads and kids share a floor, and a hot night can end in a dust storm.',
+          'An all-ages room downtown, a narrow hardcore room on the south side and the east-side garages carry it, and the old club is left for touring acts.'],
   hard: 'Rooms close every few years, summers hit 108, and Phoenix pulls the bands.',
   region: 'the Southwest',
   houseType: 'GARAGE',
@@ -123,51 +123,51 @@ SB.Cities.register('tucson', {
       if: { daysOut: [0, 3], weather: 'RAIN', months: [7, 8, 9] },
       telegraph: 'A monsoon cell is parked over the mountains north of town.',
       title: 'The wash is running',
-      body: 'The dry wash filled in ten minutes, and the dip in the road is a brown river. The band is on the far side of it with the amps and nowhere to cross.',
+      body: 'The dry wash filled in ten minutes and the dip in the road is a brown river. The band is on the far side of it with the amps and nowhere to cross.',
       options: [
-        { id: 'WAIT', label: 'Wait it out and push doors late', likely: 'It drops in an hour. The crowd waits.',
+        { id: 'WAIT', label: 'Wait it out and push doors late', likely: 'It drops in an hour, and the crowd waits.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The water dropped by nine. The band waded the last stretch with the amp over a head.' },
-        { id: 'AROUND', label: 'Send a driver the long way round', likely: 'Two hours of your day. The band gets there.',
+          result: 'The water dropped by nine, and the band waded the last stretch with an amp held over a head.' },
+        { id: 'AROUND', label: 'Send a driver the long way round', likely: 'It takes two hours of your day, but the band gets there.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .01 }],
-          result: 'A driver took the long way and the band loaded in under an umbrella.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A driver took the long way around, and the band loaded in under an umbrella.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'TUCSON_HUNDRED_AND_EIGHT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 35, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'HEAT', months: [5, 6, 7, 8, 9] },
       telegraph: 'The forecast says one hundred and eight all week.',
       title: 'It is 108 in the garage',
-      body: 'The swamp cooler is only pushing hot air around. The sun is still on the stucco and the band wants to know who is going to last through the second set.',
+      body: 'The swamp cooler is only pushing hot air around, the sun is still on the stucco, and the band wants to know who is going to last through the second set.',
       options: [
-        { id: 'LATE', label: 'Start after nine, when the sun is down', likely: 'The ones who want to come do. Late for the neighbors.',
+        { id: 'LATE', label: 'Start after nine, when the sun is down', likely: 'The people who want to come do, but it runs late for the neighbors.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'It cooled to ninety-six by ten. The crowd was damp but happy.' },
-        { id: 'ICE', label: 'Buy ice and water for everybody', likely: 'Costs forty dollars. People stay.',
+          result: 'It cooled to ninety-six by ten, and the crowd was damp but happy.' },
+        { id: 'ICE', label: 'Buy ice and water for everybody', likely: 'It costs forty dollars, and people stay.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'REGULARS', pct: .02 }],
-          result: 'A cooler of agua fresca at the door. Nobody forgot it.' },
+          result: 'You put a cooler of agua fresca at the door, and people talked about it afterward.' },
         { id: 'ACCEPT', label: 'Run it as it is', likely: 'Half the crowd goes home early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The ones who stayed were soaked and the room emptied by ten.' }
+          result: 'The people who stayed were soaked, and the room emptied by ten.' }
       ] },
 
     { id: 'TUCSON_STREET_FAIR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'The street fair sets up on the avenue this weekend, and the parking runs out two blocks away.',
       title: 'Fair weekend on the avenue',
-      body: 'The in-store set will fill the avenue with strangers. The bar next door wants the sidewalk, and your crowd has to park a long way off.',
+      body: 'The in-store set will fill the avenue with strangers, the bar next door wants the sidewalk, and your crowd has to park a long way off.',
       options: [
-        { id: 'EARLY', label: 'Play early, before the fair crowd thickens', likely: 'The regulars get in. A short, quick set.',
+        { id: 'EARLY', label: 'Play early, before the fair crowd thickens', likely: 'The regulars get in for a short, quick set.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour early. The regulars were in and out before the lot filled.' },
+          result: 'You opened doors an hour early, and the regulars were in and out before the lot filled.' },
         { id: 'ACCEPT', label: 'Run it and let the strangers wander in', likely: 'Some come in, some never find a space to park.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'REGULARS', pct: .02 }],
-          result: 'A few fair-goers stayed for the second band. The regulars circled the block twice.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A few fair-goers stayed for the second band, and the regulars circled the block twice looking for parking.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'TUCSON_GEM_SHOW_VAN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -176,29 +176,29 @@ SB.Cities.register('tucson', {
       title: 'No beds in town',
       body: 'The gem show has taken every motel and half the parking. The out-of-town band is circling with a van, and a Midtown house offers a living room floor if the show ends by ten.',
       options: [
-        { id: 'FLOOR', label: 'Take the floor and end the show by ten', likely: 'A short night. The band is grateful.',
+        { id: 'FLOOR', label: 'Take the floor and end the show by ten', likely: 'It makes for a short night, and the band is grateful.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Done by ten, and the band slept in a living room. They said so on the way out of town.' },
-        { id: 'PAY', label: 'Pay for a motel room an hour out', likely: 'Costs forty dollars. They make doors late.',
+          result: 'The show was done by ten and the band slept in a living room, and they thanked you on the way out of town.' },
+        { id: 'PAY', label: 'Pay for a motel room an hour out', likely: 'It costs forty dollars, and they make doors late.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'The band drove in from the next town and loaded in late, but they loaded in.' },
+          result: 'The band drove in from the next town and loaded in late.' },
         { id: 'ACCEPT', label: 'Let them sort it out themselves', likely: 'They play tired and leave early.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'They played hard and short, and the van was gone before the last song died.' }
+          result: 'They played hard and short, and the van was gone before the last song had stopped ringing.' }
       ] },
 
     { id: 'TUCSON_CURFEW_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3] },
       telegraph: 'The all-ages crowd has parents who want the kids home by ten-thirty.',
       title: 'Home by midnight',
-      body: 'A sixteen-year-old with a parent\'s SUV from the foothills has to be home by midnight, and the neighbors across the street are watching the all-ages door. The last band will play to half a room.',
+      body: 'A sixteen-year-old with a parent\'s SUV from the foothills has to be home by midnight, and the neighbors across the street are watching the all-ages door, so the last band will play to half a room.',
       options: [
-        { id: 'EARLY', label: 'Move the start up so the kids hear every band', likely: 'Everyone sees the whole bill. An early night.',
+        { id: 'EARLY', label: 'Move the start up so the kids hear every band', likely: 'Everyone sees the whole bill, and it\'s an early night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors early. The kids heard every band and made the curfew with minutes to spare.' },
+          result: 'You opened doors early, and the kids heard every band and made curfew with minutes to spare.' },
         { id: 'ACCEPT', label: 'Run the bill as planned', likely: 'The last band loses the young half of the room.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The parents came at ten-thirty and the room emptied. The headliner played to the older heads.' }
+          result: 'The parents came at ten-thirty and the room emptied, so the headliner played to the older heads.' }
       ] }
   ]
 });

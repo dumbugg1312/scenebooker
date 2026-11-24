@@ -28,7 +28,7 @@ SB.Cities.register('memphis', {
   ],
 
   tilt: [
-    { fan: 'garage', band: 'garage', d: .08, reason: 'A garage-punk town. The older heads still carry it.' }
+    { fan: 'garage', band: 'garage', d: .08, reason: 'A garage-punk town, and the older heads still carry it.' }
   ],
 
   rooms: [
@@ -126,51 +126,51 @@ SB.Cities.register('memphis', {
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'Inspection crews are on the river bridges this week.',
       title: 'The river bridge is backed up',
-      body: 'A barge, a wreck and a rain delay have the bridge to Arkansas crawling on show night. The kids from across the river are stuck in the line.',
+      body: 'A barge, a wreck and a rain delay have the bridge to Arkansas crawling on show night, and the kids from across the river are stuck in the line.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors up an hour. The ones from across the river left work early.' },
+          result: 'You moved doors up an hour, and the people from across the river left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The bridge never cleared. The ones on the far side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The bridge never cleared, so the people on the far side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads crossed together. They will remember that.' }
+          result: 'Two carloads crossed together.' }
       ] },
 
     { id: 'MEMPHIS_ICE_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [12, 1, 2] },
       telegraph: 'Freezing rain is on the way and the roads will glaze over.',
       title: 'Ice storm',
-      body: 'An inch of ice on every wire and overpass. The whole weekend is shutting down, and nobody wants to drive to a living room.',
+      body: 'There is an inch of ice on every wire and overpass, the whole weekend is shutting down, and nobody wants to drive to a living room.',
       options: [
         { id: 'MOVE', label: 'Move it a day, once the roads clear', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the people who could make it came.' },
         { id: 'WALK', label: 'Tell the neighbors to walk over', likely: 'Smaller and louder.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .55 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Whoever lived within a mile showed up in boots. The floor was packed anyway.' },
+          result: 'Whoever lived within a mile showed up in boots, and the floor was packed anyway.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Most people stay home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .4 }],
-          result: 'The ice held. The bands played for the couch and the cat.' }
+          result: 'The ice held, and the bands played for the couch and the cat.' }
       ] },
 
     { id: 'MEMPHIS_STREET_FAIR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'The street fair is Saturday, and the vendors are already marking off the curbs.',
       title: 'The street fair eats the parking',
-      body: 'Every space for six blocks is gone and the streets are shut. Your garage show is one block inside the fence.',
+      body: 'Every space for six blocks is gone and the streets are shut, and your garage show is one block inside the fence.',
       options: [
-        { id: 'WAIT', label: 'Push doors back until the vendors pack up', likely: 'The crowd that wants a night out shows up. Later than planned.',
+        { id: 'WAIT', label: 'Push doors back until the vendors pack up', likely: 'The crowd that wants a night out shows up, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors at nine, when the last tent came down. People walked over from the fair still carrying their cups.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Nobody can park. The ones who live close walk in.',
+          result: 'Doors were at nine, when the last tent came down, and people walked over from the fair still carrying their cups.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Nobody can park, but the people who live close walk in.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The fair kept the crowd and the parking. The regulars walked in from three streets away.' },
+          result: 'The fair kept the crowd and the parking, but the regulars walked in from three streets away.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] }
   ]
 });

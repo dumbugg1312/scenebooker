@@ -115,15 +115,15 @@ SB.Cities.register('south-bend-in', {
       title: 'No beds on football Saturday',
       body: 'The headliner has a van and no room. Every hotel from here to the Toll Road is full, and the locals are leaving early for the game.',
       options: [
-        { id: 'LATE', label: 'Push doors back so the game crowd can come', likely: 'The ones who stay in town show up. Late.',
+        { id: 'LATE', label: 'Push doors back so the game crowd can come', likely: 'The people who stay in town show up, late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Doors an hour late. The out-of-town band slept in the van and played a loose, loud set.' },
+          result: 'You opened doors an hour late. The out-of-town band slept in the van and played a loose, loud set.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The locals are at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'Half the list was at the game. The band played to the ones who stayed.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Half the list was at the game, and the band played to the people who stayed.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'SOUTH_BEND_IN_KIDS_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -132,29 +132,29 @@ SB.Cities.register('south-bend-in', {
       title: 'The kids go home early',
       body: 'The curfew for the fifteen-to-seventeen crowd starts at eleven on a weeknight, and the headliner does not go on until half past.',
       options: [
-        { id: 'EARLY', label: 'Start early and put the headliner first', likely: 'The kids see the best band. A short night.',
+        { id: 'EARLY', label: 'Start early and put the headliner first', likely: 'The kids see the best band, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Doors early, headliner at nine. The kids got the best set and were home on time.' },
+          result: 'Doors were early and the headliner went on at nine, so the kids got the best set and were home on time.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids leave before the headliner.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
-          result: 'The kids left at ten fifty. The room that was left was older and quieter.' }
+          result: 'The kids left at ten fifty, and the room that was left was older and quieter.' }
       ] },
 
     { id: 'SOUTH_BEND_IN_LAKE_EFFECT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [12, 1, 2] },
       telegraph: 'The forecast says lake-effect snow, heavy by the lake and nothing downtown.',
       title: 'The whiteout on the Toll Road',
-      body: 'Snow is coming off the lake and the band from Chicago is crawling along the Toll Road. The room is warm and the bill is two bands short.',
+      body: 'Snow is coming off the lake and the band from Chicago is crawling along the Toll Road. The room is warm, and the bill is two bands short.',
       options: [
-        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'A thin night, but the ones who came are glad.',
+        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'It\'s a thin night, but the people who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a long, loose night. The room was half full and warm.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start. The crowd gets restless.',
+          result: 'It was two bands and a long, loose night, and the room was half full and warm.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'It\'s a late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'The van pulled in at ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The van pulled in at ten, so you started late, and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] }
   ]
 });

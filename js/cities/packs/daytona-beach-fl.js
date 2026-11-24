@@ -113,15 +113,15 @@ SB.Cities.register('daytona-beach-fl', {
       title: 'The race crowd takes the bar',
       body: 'Race week has every hotel full and the roads jammed. The bar owner wants a cover band for the visitors, and your local bill is about to lose its night.',
       options: [
-        { id: 'CARPORT', label: 'Move the whole bill to a carport in Holly Hill tonight', likely: 'Smaller and louder, away from the traffic.',
+        { id: 'CARPORT', label: 'Move the whole bill to a carport in Holly Hill tonight', likely: 'It\'s smaller and louder, away from the traffic.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A carport in Holly Hill took the bill with an hour to spare, and the driveway was packed.' },
-        { id: 'EARLY', label: 'Take the early slot and finish before the cover band', likely: 'Most of them get in before the visitors. A short night.',
+        { id: 'EARLY', label: 'Take the early slot and finish before the cover band', likely: 'Most of them get in before the visitors, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
           result: 'You played to a half-full room at six and cleared the stage for the covers.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'DAYTONA_BEACH_FL_STORM_DAY', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -130,15 +130,15 @@ SB.Cities.register('daytona-beach-fl', {
       title: 'The beach crowd runs for cover',
       body: 'A storm has scattered the oceanfront and sent everyone looking for a dry room. The cheap building you booked leaks, and the owner of the mainland room has an empty night.',
       options: [
-        { id: 'DRY', label: 'Move the bill to the mainland room that stays dry', likely: 'A better night, if you can pay for it.',
+        { id: 'DRY', label: 'Move the bill to the mainland room that stays dry', likely: 'It\'s a better night, if you can pay for it.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }],
           result: 'The dry room filled with people who had nowhere else to be.' },
-        { id: 'WAIT', label: 'Hold the doors until it passes', likely: 'A late start. The crowd gets restless.',
+        { id: 'WAIT', label: 'Hold the doors until it passes', likely: 'It\'s a late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The rain cleared at ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The rain cleared at ten, so you started late, and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] },
 
     { id: 'DAYTONA_BEACH_FL_YOUTH_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -147,12 +147,12 @@ SB.Cities.register('daytona-beach-fl', {
       title: 'The beachside curfew goes up',
       body: 'The city has put a curfew on anyone under eighteen on the beachside after eight. Your all-ages show is on the main drag, and half its crowd just got sent home.',
       options: [
-        { id: 'MAINLAND', label: 'Move the show to a mainland room', likely: 'Smaller, but the kids can get there.',
+        { id: 'MAINLAND', label: 'Move the show to a mainland room', likely: 'It\'s smaller, but the kids can get there.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A mainland garage took the bill, and the kids found it.' },
-        { id: 'EARLY', label: 'Start at five and finish before the curfew', likely: 'The kids get in. A short night.',
+        { id: 'EARLY', label: 'Start at five and finish before the curfew', likely: 'The kids get in, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -150 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors at five and out by eight. The ones who came were home on time.' },
+          result: 'Doors were at five and everyone was out by eight, so the kids who came were home on time.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Half the kids stay home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
           result: 'The kids stayed on the mainland, and the room was mostly adults.' }

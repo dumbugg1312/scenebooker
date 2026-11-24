@@ -121,15 +121,15 @@ SB.Cities.register('riverside', {
       title: 'The 91 is a parking lot',
       body: 'A wreck at the Corona interchange has the whole 91 backed up on the night of your show. The kids from Corona and Pomona are stuck, and so is the band, and the AC in their van is out.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the rush', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the rush', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the interchange.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the interchange.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The ones out west stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The backup never cleared, and the people out west stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the surface streets together. They will remember that.' }
+          result: 'Two carloads took the surface streets together.' }
       ] },
 
     { id: 'RIVERSIDE_LIGHTS_BLOCKED', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -138,12 +138,12 @@ SB.Cities.register('riverside', {
       title: 'The lights close the streets',
       body: 'Hundreds of thousands are coming downtown for the lights. Every street around your all-ages room is blocked, parking is gone, and the kids will not get near the door.',
       options: [
-        { id: 'EAST', label: 'Move the bill to a hall across the river', likely: 'Away from the crowds. Not everyone finds it.',
+        { id: 'EAST', label: 'Move the bill to a hall across the river', likely: 'It\'s away from the crowds, but not everyone finds it.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'A hall out past the river took the bill. A smaller night, and nobody circled for parking.' },
+          result: 'A hall out past the river took the bill, and it was a smaller night but nobody circled for parking.' },
         { id: 'LATE', label: 'Push doors back until the streets open up', likely: 'The ones who waited are tired and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors an hour late. The crowd came in smelling like hot cider and exhaust.' },
+          result: 'Doors went an hour late, and the crowd came in smelling like hot cider and exhaust.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list gives up on parking.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
           result: 'The door was easy because half the list was still circling the block.' }
@@ -157,13 +157,13 @@ SB.Cities.register('riverside', {
       options: [
         { id: 'LATE', label: 'Start after the sun goes down', likely: 'Cooler, but the ones with curfews are gone.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors at dusk. The ones who stayed were glad they did.' },
-        { id: 'FANS', label: 'Borrow fans and a cooler of ice, play on', likely: 'Costs a little. Fewer people come inside.',
+          result: 'Doors were at dusk, and the people who stayed were glad they did.' },
+        { id: 'FANS', label: 'Borrow fans and a cooler of ice, play on', likely: 'It costs a little, and fewer people come inside.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Two box fans and forty pounds of ice. The room was damp and the driveway was full.' },
-        { id: 'MOVE', label: 'Move it a day, when it might break', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You set up two box fans and forty pounds of ice, and the room was damp and the driveway was full.' },
+        { id: 'MOVE', label: 'Move it a day, when it might break', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. It was ninety-nine instead of a hundred and five.' }
+          result: 'You moved it a day, and it was ninety-nine instead of a hundred and five.' }
       ] },
 
     { id: 'RIVERSIDE_SMOKE_DAY', when: 'WEEK', tier: 'HARD', weight: 1, cooldown: 60, bind: ['show'],
@@ -172,15 +172,15 @@ SB.Cities.register('riverside', {
       title: 'Smoke over the brewery lot',
       body: 'Ash is falling on the cars and the sky is orange. The permit is already paid for the outdoor show, and nobody wants to breathe this for three hours.',
       options: [
-        { id: 'INSIDE', label: 'Move the bill indoors', likely: 'Smaller and sweatier, but breathable.',
+        { id: 'INSIDE', label: 'Move the bill indoors', likely: 'Smaller and sweatier, but you can breathe.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A hall took the bill with the doors shut and the air clean. Loud and tight.' },
+          result: 'A hall took the bill with the doors shut and the air clean, and the sets were loud and tight.' },
         { id: 'ACCEPT', label: 'Run it outside anyway', likely: 'The tough ones come in masks.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'The tough ones came in masks. The sets were short and the air tasted like a campfire.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The tough ones came in masks, the sets were short, and the air tasted like a campfire.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The wind turned and the sky cleared.' }
+          result: 'You moved it a day, and the wind turned and the sky cleared.' }
       ] }
   ]
 });

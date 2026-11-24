@@ -12,7 +12,7 @@ SB.Cities.register('nashville', {
            'nashville pride', 'newschannel5', 'songkick', 'nashvillego', 'nashtoday', 'ghost ship fire'],
   blocklist: ['grand ole opry*', 'tootsie*', 'ryman*', 'cma fest*', 'bonnaroo*', 'the tennessean*', 'nashville scene*'],
 
-  blurb: ['Country music sells the postcard. The kids book basements by DM and fill a nonprofit hall on the east side.',
+  blurb: ['Country music sells the postcard, and the kids book basements by message and fill a nonprofit hall on the east side.',
           'Hardcore is on the rise, the dive bars are 21 and up, and half the band works a shift on the tourist strip.'],
   hard: 'Tourist rents, fire marshals and a thin all-ages map.',
   region: 'the Mid-South',
@@ -123,17 +123,17 @@ SB.Cities.register('nashville', {
       if: { daysOut: [0, 2] },
       telegraph: 'Word is a fire inspector has been walking past warehouse rooms this month.',
       title: 'The fire marshal walks in',
-      body: 'Halfway through the second band, a man with a clipboard is counting heads and looking at the one exit. The address came by DM that afternoon and the room is a basement.',
+      body: 'Halfway through the second band, a man with a clipboard is counting heads and looking at the one exit, and the room is a basement whose address went out by message that afternoon.',
       options: [
-        { id: 'CLEAR', label: 'Clear half the room and keep playing', likely: 'Half the night is gone. You stay out of trouble.',
+        { id: 'CLEAR', label: 'Clear half the room and keep playing', likely: 'Half the night is gone, but you stay out of trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Half the room went upstairs. He wrote something down and left.' },
-        { id: 'SHUT', label: 'Shut it down and refund the door', likely: 'You lose the money and the night. Everyone knows you did right.',
+          result: 'Half the room went upstairs, and he wrote something down and left.' },
+        { id: 'SHUT', label: 'Shut it down and refund the door', likely: 'You lose the money and the night, but everyone knows you did right.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .4 }, { op: 'MONEY', amount: -30 }],
-          result: 'The lights came up. People stood on the lawn and traded stories until midnight.' },
-        { id: 'TALK', label: 'Talk to him and promise it will not happen again', likely: 'He may buy it. He may not.',
+          result: 'The lights came up, and people stood on the lawn and traded stories until midnight.' },
+        { id: 'TALK', label: 'Talk to him and promise it will not happen again', likely: 'He may or may not buy it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'He gave you a card and a warning. The set went on with the door propped open.' }
+          result: 'He gave you a card and a warning, and the set went on with the door propped open.' }
       ] },
 
     { id: 'NASHVILLE_TORNADO_WATCH', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -142,12 +142,12 @@ SB.Cities.register('nashville', {
       title: 'A tornado watch',
       body: 'The sirens are quiet but the phones are buzzing. The headliner is stuck under an overpass west of town and the opener is texting from a gas station.',
       options: [
-        { id: 'DELAY', label: 'Push doors back an hour and wait it out', likely: 'The storm passes. The crowd drifts.',
+        { id: 'DELAY', label: 'Push doors back an hour and wait it out', likely: 'The storm passes, but the crowd drifts.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The storm blew through. The headliner got there as the first band loaded in.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The storm blew through, and the headliner got there as the first band loaded in.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The weather was fine and the room was half full.' },
+          result: 'You moved it a day, and the weather was fine and the room was half full.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people stay home under a watch.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'The ones who came stayed in the basement and played anyway.' }
@@ -159,15 +159,15 @@ SB.Cities.register('nashville', {
       title: 'The festival weekend takes the block',
       body: 'The country festival has put a bachelorette bus at every bar and taken every parking space within a mile of the club. Your band is circling the block with the van.',
       options: [
-        { id: 'EARLY', label: 'Open early and get the gear in before the buses', likely: 'Most get in. A short, thin night.',
+        { id: 'EARLY', label: 'Open early and get the gear in before the buses', likely: 'Most get in, but it\'s a short, thin night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Gear in by four, doors by six. The buses did not find the side door.' },
-        { id: 'EAST', label: 'Move the whole bill to the east side', likely: 'Smaller and louder. No tourists.',
+          result: 'Gear was in by four and doors were at six, and the buses never found the side door.' },
+        { id: 'EAST', label: 'Move the whole bill to the east side', likely: 'Smaller and louder, with no tourists.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A bungalow on the east side took the bill, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Half the list cannot park.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'Half the list gave up and went home. The bachelorettes wandered in at midnight.' }
+          result: 'Half the list gave up and went home, and the bachelorettes wandered in at midnight.' }
       ] },
 
     { id: 'NASHVILLE_HEAT_WAVE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -178,13 +178,13 @@ SB.Cities.register('nashville', {
       options: [
         { id: 'YARD', label: 'Move the bill out to the yard', likely: 'Cooler, but the neighbors can hear.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'OUTDOOR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The whole bill in the backyard under a string of lights. Someone called it a good night.' },
-        { id: 'FANS', label: 'Buy fans and ice and play on', likely: 'Costs twenty-five dollars. It stays hot.',
+          result: 'The whole bill played in the backyard under a string of lights, and someone called it a good night.' },
+        { id: 'FANS', label: 'Buy fans and ice and play on', likely: 'It costs twenty-five dollars, and it stays hot.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Three fans and a cooler of ice. Everybody was soaked by the second band.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'With three fans and a cooler of ice, everybody was still soaked by the second band.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. It was still ninety-eight.' }
+          result: 'You moved it a day, and it was still ninety-eight.' }
       ] }
   ]
 });

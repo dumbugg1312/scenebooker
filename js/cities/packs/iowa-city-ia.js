@@ -112,17 +112,17 @@ SB.Cities.register('iowa-city-ia', {
       if: { daysOut: [0, 3] },
       telegraph: 'The house on the next block got nine calls over one weekend, and everyone on the street heard about it.',
       title: 'The police come before the second band',
-      body: 'Since the bars started carding at twenty-one, more of the parties have moved into basements, and the neighbors have learned the number to call. A car is at the curb and the second band has not started.',
+      body: 'Since the bars started carding at twenty-one, more of the parties have moved into basements, and the neighbors have learned the number to call. A cop car is at the curb and the second band has not started.',
       options: [
-        { id: 'TURNDOWN', label: 'Talk to the officer and turn it down', likely: 'Quieter. A few leave.',
+        { id: 'TURNDOWN', label: 'Talk to the officer and turn it down', likely: 'It\'s quieter, and a few people leave.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The amps came down and the officer left with a warning. The room leaned in close.' },
-        { id: 'HALL', label: 'Move the bill to a rented hall', likely: 'Costs money and drops the house crowd. No more calls.',
+          result: 'The amps came down and the officer left with a warning, and the room leaned in close.' },
+        { id: 'HALL', label: 'Move the bill to a rented hall', likely: 'It costs money and drops the house crowd, but there are no more calls.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'MONEY', amount: -40 }],
-          result: 'A hall took the rest of the bill. It was clean, early and a little stiff.' },
-        { id: 'END', label: 'Call it and send everyone home', likely: 'The kids are angry. The house stays open.',
+          result: 'A hall took the rest of the bill, and it was clean, early and a little stiff.' },
+        { id: 'END', label: 'Call it and send everyone home', likely: 'The kids are angry, but the house stays open.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }, { op: 'REGULARS', pct: -.01 }],
-          result: 'You shut it down. The house kept its keys and the crowd kept its grudge.' }
+          result: 'You shut it down, and the house kept its keys while the crowd kept its grudge.' }
       ] },
 
     { id: 'IOWA_CITY_IA_GAME_FRIDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -131,29 +131,29 @@ SB.Cities.register('iowa-city-ia', {
       title: 'Football week takes the town',
       body: 'The pedestrian mall is full, the bar crowd is out of reach and the near-campus blocks are walled with cars. Your show is in the middle of it.',
       options: [
-        { id: 'HOUSE', label: 'Move it to a house off the main blocks', likely: 'Smaller, but nobody parks there.',
+        { id: 'HOUSE', label: 'Move it to a house off the main blocks', likely: 'It\'s smaller, but nobody has to park there.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'The basement filled early. Nobody wanted to fight the traffic to get out.' },
-        { id: 'LATE', label: 'Push doors back until the game crowd thins', likely: 'A late start, but the right people come.',
+          result: 'The basement filled early, because nobody wanted to fight the traffic to get out.' },
+        { id: 'LATE', label: 'Push doors back until the game crowd thins', likely: 'You start late, but the right people come.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The ones who wanted music showed up as the bars filled.' },
+          result: 'Doors opened an hour late, and the ones who wanted music showed up as the bars filled.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed downtown. The regulars came.' }
+          result: 'The casual crowd stayed downtown, but the regulars came.' }
       ] },
 
     { id: 'IOWA_CITY_IA_JUNE_FLOOD', when: 'WEEK', tier: 'HARD', weight: 1, cooldown: 60, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [5, 6, 7] },
       telegraph: 'It has rained for three days and the river is over the bike path.',
       title: 'The river is in the basement',
-      body: 'A June rain on the river bottoms has the sump pump losing and the water coming up through the floor drain. The amps are already on the stairs.',
+      body: 'A June rain on the river bottoms has the sump pump losing, and the water is coming up through the floor drain. The amps are already on the stairs.',
       options: [
-        { id: 'UPSTAIRS', label: 'Run the show on the first floor', likely: 'Cramped and loud, and the host holds his breath.',
+        { id: 'UPSTAIRS', label: 'Run the show on the first floor', likely: 'It\'s cramped and loud, and the host holds his breath.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Wall to wall on the first floor. The pump kept up until the last chord.' },
+          result: 'The crowd stood wall to wall on the first floor, and the pump kept up until the last chord.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The water went down and some of the crowd did too.' }
+          result: 'You moved it a day, and the water went down and some of the crowd did too.' }
       ] }
   ]
 });

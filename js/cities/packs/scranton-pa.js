@@ -122,15 +122,15 @@ SB.Cities.register('scranton-pa', {
       title: 'The road is shut',
       body: 'The race closes the road from the north to downtown for the whole morning and half the afternoon. The kids who live up the valley cannot get through, and your band has an amp to carry.',
       options: [
-        { id: 'FOOT', label: 'Tell everyone to park up the valley and walk in', likely: 'Costs a few of them. The ones who come carry things.',
+        { id: 'FOOT', label: 'Tell everyone to park up the valley and walk in', likely: 'It costs you a few of them, and the ones who come carry things.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'lateMin', v: 60 }],
-          result: 'The amps came in on a hand truck and a wagon. People showed up late, a little sweaty, and happy.' },
-        { id: 'MOVE', label: 'Move the show to a basement up the valley', likely: 'Smaller and closer to the kids.',
+          result: 'The amps came in on a hand truck and a wagon, and people showed up late, a little sweaty, and happy.' },
+        { id: 'MOVE', label: 'Move the show to a basement up the valley', likely: 'It\'s smaller and closer to the kids.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A basement took the bill and nobody had to cross the barricades.' },
+          result: 'A basement took the bill, and nobody had to cross the barricades.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The detour eats the crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The detour was an hour. Half the list gave up on the way.' }
+          result: 'The detour was an hour, and half the list gave up on the way.' }
       ] },
 
     { id: 'SCRANTON_PA_INSPECTOR', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -139,32 +139,32 @@ SB.Cities.register('scranton-pa', {
       title: 'A man with a clipboard',
       body: 'A city inspector turns up at the upstairs room because the show was posted online. The city shut a room like this down once on safety grounds, and the stairwell is the whole fire plan.',
       options: [
-        { id: 'MOVE', label: 'Move the show to a basement tonight', likely: 'Smaller, loud and off the inspector map.',
+        { id: 'MOVE', label: 'Move the show to a basement tonight', likely: 'It\'s smaller and loud, and off the inspector\'s map.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'The bill moved across town with an hour to spare, and the floor was packed.' },
-        { id: 'CAP', label: 'Cap the room and keep the door on the count', likely: 'Fewer people, no citation.',
+        { id: 'CAP', label: 'Cap the room and keep the door on the count', likely: 'You get fewer people and no citation.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .7 }, { op: 'MONEY', amount: -25 }],
-          result: 'You counted heads at the stairs. The inspector left with his clipboard and a long look.' },
+          result: 'You counted heads at the stairs, and the inspector left with his clipboard and a long look.' },
         { id: 'ACCEPT', label: 'Run it and hope', likely: 'If the room gets closed, it stays closed.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'He stood in the back through two songs. Nobody could relax.' }
+          result: 'He stood in the back through two songs, and nobody could relax.' }
       ] },
 
     { id: 'SCRANTON_PA_LABOR_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival', months: [9] },
       telegraph: 'The festival is on downtown and a punk camping weekend is on in the hills, both on the same days.',
       title: 'Two weekends in one',
-      body: 'The festival fills downtown, takes the parking and packs the bars. The camping weekend pulls the scene kids out of town. A bill in between draws almost no one.',
+      body: 'The festival fills downtown, takes the parking and packs the bars, and the camping weekend pulls the scene kids out of town. A bill in between draws almost no one.',
       options: [
-        { id: 'LATE', label: 'Push doors back and aim at the bar crowd', likely: 'Later, and not their usual crowd.',
+        { id: 'LATE', label: 'Push doors back and aim at the bar crowd', likely: 'It\'s later, and not their usual crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. A few of the festival people wandered in and stayed.' },
+          result: 'Doors were an hour late, and a few of the festival people wandered in and stayed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids are in the hills.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The room was thin. The ones who stayed in town were glad of it.' },
-        { id: 'MOVE', label: 'Move the show a week', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The room was thin, and the ones who stayed in town were glad of it.' },
+        { id: 'MOVE', label: 'Move the show a week', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 7, respect: false }],
-          result: 'You moved it a week. Not every band could.' }
+          result: 'You moved it a week, and not every band could make it.' }
       ] }
   ]
 });

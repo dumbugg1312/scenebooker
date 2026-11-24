@@ -15,7 +15,7 @@ SB.Cities.register('state-college-pa', {
   blocklist: ['penn state*', 'beaver stadium*', 'sheetz*', 'nittany lion*', 'bucknell*', 'grange fair*', 'thon*'],
 
   blurb: ['A huge college town with a small punk pocket, reset by every lease and every football Saturday.',
-          'Rooms last a year, then the seniors graduate. Summers are empty.'],
+          'Rooms last a year, and then the seniors graduate. Summers are empty.'],
   hard: 'Students leave in summer and football eats the fall Saturdays.',
   region: 'central Pennsylvania',
   houseType: 'BASEMENT',
@@ -109,17 +109,17 @@ SB.Cities.register('state-college-pa', {
       if: { daysOut: [0, 4], calendar: 'game' },
       telegraph: 'It is a home weekend, and every bar, hotel and lot in the borough is already full.',
       title: 'The stadium takes the town',
-      body: 'The bar with the back-room stage asks you to be done early so the crowd can get home before the stadium traffic. The hall in Bellefonte is the only free room within an hour.',
+      body: 'The bar with the back-room stage asks you to be done early so the crowd can get home before the stadium traffic, and the hall in Bellefonte is the only free room within an hour.',
       options: [
-        { id: 'EARLY', label: 'Move doors up to early evening', likely: 'The crowd gets home. A short night.',
+        { id: 'EARLY', label: 'Move doors up to early evening', likely: 'The crowd gets home, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors came up and the set times shrank. Everybody was home by the first kickoff story.' },
-        { id: 'HALL', label: 'Move to the hall in the next borough', likely: 'Costs a favor. A smaller, calmer night.',
+          result: 'Doors came up and the set times shrank, and everybody was home by the first kickoff story.' },
+        { id: 'HALL', label: 'Move to the hall in the next borough', likely: 'It costs a favor, and it\'s a smaller, calmer night.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The hall took the bill and the traffic never found it. The ones with a ride made the drive.' },
+          result: 'The hall took the bill and the traffic never found it, and the ones with a ride made the drive.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is in the stands.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The casual crowd was elsewhere. The regulars came, late and loud.' }
+          result: 'The casual crowd was elsewhere, and the regulars came, late and loud.' }
       ] },
 
     { id: 'STATE_COLLEGE_PA_MOVE_OUT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -128,15 +128,15 @@ SB.Cities.register('state-college-pa', {
       title: 'The new tenants have never heard of you',
       body: 'The seniors who gave you the amp stack and the key are gone. The new tenants have never heard of you, and they are not sure they want a show.',
       options: [
-        { id: 'VOUCH', label: 'Spend the afternoon on the porch with them', likely: 'Costs time. The house stays open.',
+        { id: 'VOUCH', label: 'Spend the afternoon on the porch with them', likely: 'It costs time, but the house stays open.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two hours and a pizza later the new tenants said yes. The house is yours another year.' },
-        { id: 'MOVE', label: 'Take the bill to a practice unit', likely: 'Cheap and loud, with a landlord who may not know.',
+          result: 'Two hours and a pizza later the new tenants said yes, and the house is yours for another year.' },
+        { id: 'MOVE', label: 'Take the bill to a practice unit', likely: 'It\'s cheap and loud, with a landlord who may not know.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The unit took the bill. It was loud and sweaty, and nobody asked questions.' },
+          result: 'The unit took the bill, and it was loud and sweaty and nobody asked questions.' },
         { id: 'ACCEPT', label: 'Play it and see', likely: 'The house may not be ready.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The new tenants stood in the doorway the whole night. It was fine, and nobody was sure why.' }
+          result: 'The new tenants stood in the doorway the whole night, and it was fine, though nobody was sure why.' }
       ] },
 
     { id: 'STATE_COLLEGE_PA_RIDGE_SNOW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -145,15 +145,15 @@ SB.Cities.register('state-college-pa', {
       title: 'The ridge road is closed',
       body: 'The headliner from the west is stuck on the far side of the ridge, and the bill has a local opener who has never played two sets.',
       options: [
-        { id: 'TWO', label: 'Let the local opener play twice', likely: 'A loose, odd night for the ones who came.',
+        { id: 'TWO', label: 'Let the local opener play twice', likely: 'It\'s a loose, odd night for the ones who came.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two sets, one band, and a lot of jokes. The room was half full and warm.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'A late start. People get restless.',
+          result: 'It was two sets from one band and a lot of jokes, and the room was half full and warm.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'You start late, and people get restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van made it at ten. You started late and almost nobody left.' },
+          result: 'The van made it at ten, and you started late and almost nobody left.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ]
 });

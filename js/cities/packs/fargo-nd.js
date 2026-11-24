@@ -122,15 +122,15 @@ SB.Cities.register('fargo-nd', {
       title: 'Load-in in the snow',
       body: 'It is far below zero the night of your show. The bands are loading in through a snowbank, the van barely started, and half the kids have a long drive across the river.',
       options: [
-        { id: 'EARLY', label: 'Open early and let them warm up inside', likely: 'More make it. The night runs a bit long.',
+        { id: 'EARLY', label: 'Open early and let them warm up inside', likely: 'More make it, though the night runs a bit long.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -45 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour early. The room filled with coats and stayed warm.' },
-        { id: 'RIDES', label: 'Run a few carloads from campus', likely: 'Two hours of your day. Most of them get there.',
+          result: 'Doors were an hour early, and the room filled with coats and stayed warm.' },
+        { id: 'RIDES', label: 'Run a few carloads from campus', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'You shuttled kids in your car all evening. They remember that.' },
+          result: 'You shuttled kids in your car all evening.' },
         { id: 'ACCEPT', label: 'Run it and take what shows up', likely: 'A thin crowd of the stubborn.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The cold kept most people home. The ones who came stood close.' }
+          result: 'The cold kept most people home, and the ones who came stood close.' }
       ] },
 
     { id: 'FARGO_ND_SPRING_CREST', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -139,15 +139,15 @@ SB.Cities.register('fargo-nd', {
       title: 'The sump pump will not stop',
       body: 'The river is coming up the street. The host has a pump running all night in the basement and wants to know if you still want your show.',
       options: [
-        { id: 'MOVE', label: 'Move the bill to a dry room across town', likely: 'A smaller room. The host keeps the trust.',
+        { id: 'MOVE', label: 'Move the bill to a dry room across town', likely: 'A smaller room, and the host keeps the trust.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'A dry basement across town took the bill, and the crowd followed.' },
         { id: 'RISK', label: 'Run it with a bucket line and a pump', likely: 'Risky for the floor and the equipment.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Water crept under the amps all night. The room stayed loud and nervous.' },
-        { id: 'SKIP', label: 'Call it off and move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Water crept under the amps all night, and the room stayed loud and nervous.' },
+        { id: 'SKIP', label: 'Call it off and move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The river kept rising anyway.' }
+          result: 'You moved it a day, and the river kept rising anyway.' }
       ] },
 
     { id: 'FARGO_ND_STREET_FAIR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -156,15 +156,15 @@ SB.Cities.register('fargo-nd', {
       title: 'The streets are closed',
       body: 'All of downtown is closed off for the street fair. The parking is gone and the matinee crowd has to walk from the far lot.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the crowds thin out', likely: 'Later than planned. The ones who come, come.',
+        { id: 'LATE', label: 'Push doors back until the crowds thin out', likely: 'Later than planned, and the ones who come, come.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The fair crowd wandered in tired and loud.' },
+          result: 'Doors went an hour late, and the fair crowd wandered in tired and loud.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the kids never get past the barricades.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'The barricades turned half the list around.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make it.' }
+          result: 'You moved it a day, and not everyone could make it.' }
       ] }
   ]
 });

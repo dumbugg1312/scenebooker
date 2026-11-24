@@ -7,7 +7,7 @@ SB.Cities.register('albany-ny', {
   blocklist: ['times union*', 'metroland*', 'empire state plaza*', 'saratoga race*', 'tulip fest*', 'albany medical*', 'invisible oranges', 'chronogram', 'capital punishment series'],
 
   blurb: ['Albany, Troy and Schenectady share one small, close hardcore scene that mixes styles on every bill and still mourns the rooms it lost.',
-          'Everyone is in three bands. Bands from here have gone national, but the winter drive on the Northway is the problem.'],
+          'Everyone is in three bands, and bands from here have gone national, but the winter drive on the Northway is the problem.'],
   hard: 'One or two rooms carry everything, and touring bands skip you.',
   region: 'the Northeast',
   houseType: 'BASEMENT',
@@ -99,32 +99,32 @@ SB.Cities.register('albany-ny', {
       title: 'The bridge is shut',
       body: 'A river bridge is closed for repairs the night of your show. The bands and the kids from Troy and across the river have to go the long way around.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'It never cleared. The ones on the far side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'It never cleared, and the people on the far side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads came together the long way. They will remember that.' }
+          result: 'Two carloads came together the long way around.' }
       ] },
 
     { id: 'ALBANY_NY_STREET_FAIR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
-      telegraph: 'The strip is coned off and vendors are setting up for the weekend.',
+      telegraph: 'The strip is coned off, and vendors are setting up for the weekend.',
       title: 'The strip is a fair',
-      body: 'A street festival has taken over the nightlife strip. The load-in lane at the big club is closed, the vendors are three deep and your bill is stuck behind them.',
+      body: 'A street festival has taken over the nightlife strip. The load-in lane at the big club is closed, the vendors are three deep, and your bill is stuck behind them.',
       options: [
         { id: 'EARLY', label: 'Load in at noon before the street closes', likely: 'likely',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'The vans got in before the cones. The night started on time and the crowd had to walk through a fair to get there.' },
-        { id: 'BASEMENT', label: 'Move the bill to a basement a few blocks away', likely: 'Smaller and louder. Nobody has to park.',
+          result: 'The vans got in before the cones, and the night started on time, though the crowd had to walk through a fair to get there.' },
+        { id: 'BASEMENT', label: 'Move the bill to a basement a few blocks away', likely: 'It\'s smaller and louder, and nobody has to park.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .5 }],
-          result: 'A basement took the whole bill and the floor was packed to the stairs.' },
-        { id: 'ACCEPT', label: 'Run it and carry the gear by hand', likely: 'Slow and sweaty, and some of the crowd gives up on the parking.',
+          result: 'A basement took the whole bill, and the floor was packed to the stairs.' },
+        { id: 'ACCEPT', label: 'Run it and carry the gear by hand', likely: 'It\'s slow and sweaty, and some of the crowd gives up on the parking.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'You hauled every amp down the block. Doors were late, and the ones who stayed were glad.' }
+          result: 'You hauled every amp down the block, and doors were late, but the people who stayed were glad.' }
       ] },
 
     { id: 'ALBANY_NY_SQUALL', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -133,15 +133,15 @@ SB.Cities.register('albany-ny', {
       title: 'The opener is stuck in the snow',
       body: 'A squall hit the Northway and the opener from the big suburb is crawling in the right lane. The quiet hour is close and the room is filling.',
       options: [
-        { id: 'WAIT', label: 'Hold the doors and start an hour late', likely: 'The crowd gets restless but nobody leaves.',
+        { id: 'WAIT', label: 'Hold the doors and start an hour late', likely: 'The crowd gets restless, but nobody leaves.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'They got there at nine, covered in snow. The night ran late and loud.' },
-        { id: 'SKIP', label: 'Drop the opener and run a short bill', likely: 'A thinner night, but it ends on time.',
+          result: 'They got there at nine, covered in snow, and the night ran late and loud.' },
+        { id: 'SKIP', label: 'Drop the opener and run a short bill', likely: 'It\'s a thinner night, but it ends on time.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Short bill, tight sets, and everybody home before the roads iced over.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'You kept the bill short and the sets tight, and everybody got home before the roads iced over.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everybody trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] }
   ]
 });

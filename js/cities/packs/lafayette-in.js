@@ -118,7 +118,7 @@ SB.Cities.register('lafayette-in', {
       options: [
         { id: 'WALK', label: 'Tell everyone to walk the bridge and push doors back', likely: 'A long walk and a late crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'People crossed on foot in clumps all evening. Doors opened an hour late and the room filled slowly.' },
+          result: 'People crossed on foot in clumps all evening, so doors opened an hour late and the room filled slowly.' },
         { id: 'SIDE', label: 'Move the bill to a room on the campus side', likely: 'The crowd is already there, and so is the noise.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'A basement on the campus side took the bill and the stairs were full all night.' },
@@ -131,17 +131,17 @@ SB.Cities.register('lafayette-in', {
       if: { daysOut: [0, 3] },
       telegraph: 'The city shut a basement room a while back, and now neighbors know which office to call.',
       title: 'An inspector at the door',
-      body: 'This time it is not a cop but a city inspector with a clipboard. He wants to see the stairs, the exits and how many people are down there.',
+      body: 'This time it is a city inspector with a clipboard instead of a cop, and he wants to see the stairs, the exits and how many people are down there.',
       options: [
-        { id: 'CAP', label: 'Cut the crowd to what the stairs can hold', likely: 'A smaller night. The room stays open.',
+        { id: 'CAP', label: 'Cut the crowd to what the stairs can hold', likely: 'A smaller night, but the room stays open.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Half the list waited outside and traded places. The inspector left without writing anything.' },
+          result: 'Half the list waited outside and traded places, and the inspector left without writing anything.' },
         { id: 'MOVE', label: 'Move the bill to a hall that is allowed to be loud', likely: 'Costs money and the feel.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'MONEY', amount: -50 }],
-          result: 'The hall took the bill for a flat fee and a deposit. It felt like a different night.' },
+          result: 'The hall took the bill for a flat fee and a deposit, and it felt like a different night.' },
         { id: 'ACCEPT', label: 'Run it and hope', likely: 'The room could be shut for good.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The inspector wrote a warning. The bands played tense and short.' }
+          result: 'The inspector wrote a warning, and the bands played tense and short.' }
       ] },
 
     { id: 'LAFAYETTE_IN_FAIR_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -153,21 +153,21 @@ SB.Cities.register('lafayette-in', {
         { id: 'LATE', label: 'Push doors back until the fair lets out', likely: 'The farm kids come late and tired.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
           result: 'The fair let out at eleven and a wave of sunburned kids came through the door.' },
-        { id: 'FAIR', label: 'Put the bill on at the barn by the fairgrounds', likely: 'The crowd is already there. The sound is not good.',
+        { id: 'FAIR', label: 'Put the bill on at the barn by the fairgrounds', likely: 'The crowd is already there, but the sound is not good.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'OUTDOOR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.0 }],
           result: 'The pole barn was full of fair kids on the edge of the lot, shouting over a generator.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The county is somewhere else.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'Two people, the band and a cousin.' }
+          result: 'Two people showed up, the band and a cousin.' }
       ] },
 
     { id: 'LAFAYETTE_IN_RIVER_ROAD_JAM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The festival weekend is going to jam the river road from end to end.',
       title: 'The river road is a parking lot',
-      body: 'The living-history weekend has the river road at a crawl. The band due in from the south sits in traffic and the opener has to play twice.',
+      body: 'The living-history weekend has the river road at a crawl, so the band due in from the south sits in traffic and the opener has to play twice.',
       options: [
-        { id: 'STRETCH', label: 'Let the opener stretch and start the headliner late', likely: 'A long night. The crowd is patient.',
+        { id: 'STRETCH', label: 'Let the opener stretch and start the headliner late', likely: 'A long night, and the crowd is patient.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
           result: 'The opener played two sets and the headliner arrived in time for the last one.' },
         { id: 'DROP', label: 'Cut the late band from the bill', likely: 'Costs trust with the late band.',
@@ -175,7 +175,7 @@ SB.Cities.register('lafayette-in', {
           result: 'The bill ran short without the headliner and the room felt it.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] }
   ]
 });

@@ -14,7 +14,7 @@ SB.Cities.register('amarillo-tx', {
   /* Banned holds the dossier's real institutions and its invented venue names (unchecked). Storms and events are written generically. */
   blocklist: ['whataburger*', 'braum*', 'sod poodles*', 'tri-state fair*', 'shelterbelt*', 'caliche hall*'],
 
-  blurb: ['Big sky, few rooms. This flat Panhandle city keeps rising and nearly vanishing, and the scene lives in record stores, backyards and carports.',
+  blurb: ['This flat Panhandle city has a big sky and few rooms, it keeps rising and nearly vanishing, and the scene lives in record stores, backyards and carports.',
           'Cover bands get the paid slots, so originals play early, for free, to whoever drove in. The wind decides the outdoor ones.'],
   hard: 'Few rooms, long drives, and bars that only want cover bands.',
   region: 'the High Plains',
@@ -122,10 +122,10 @@ SB.Cities.register('amarillo-tx', {
       options: [
         { id: 'TARP', label: 'Tarp the PA and run it in the carport', likely: 'Smaller and louder, with a tarp snapping the whole night.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .7 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The PA sat under a tarp and the whole bill got through. Everyone went home grey.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The PA sat under a tarp and the whole bill got through, and everyone went home grey.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The wind quit, and so did half the people who had planned to come.' },
+          result: 'You moved it a day, and the wind quit, and so did half the people who had planned to come.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'People stay in their cars.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
           result: 'The ones who came wore bandannas. The rest watched the dust from their driveways.' }
@@ -135,17 +135,17 @@ SB.Cities.register('amarillo-tx', {
       if: { daysOut: [0, 5], calendar: 'festival' },
       telegraph: 'The old-highway festival is this weekend, and the classic cars are already coming in on the interstate.',
       title: 'Classic cars on the strip',
-      body: 'The old highway strip is wall to wall with polished cars and sightseers, and the record store has a show booked. There is nowhere to load in.',
+      body: 'The old highway strip is wall to wall with polished cars and sightseers, and the record store has a show booked, and there is nowhere to load in.',
       options: [
         { id: 'EARLY', label: 'Load in at dawn and open early', likely: 'A short night, but you get the gear in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The gear was in before the first car pulled up. Doors went an hour early to the tourists wandering by.' },
-        { id: 'ACCEPT', label: 'Run it and carry the gear a block', likely: 'Slow load-in. The strip crowd drifts in.',
+          result: 'The gear was in before the first car pulled up, and doors went an hour early to the tourists wandering by.' },
+        { id: 'ACCEPT', label: 'Run it and carry the gear a block', likely: 'The load-in is slow, and the strip crowd drifts in.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'HOURS', d: -1, when: 'TODAY' }],
-          result: 'A block of carrying under the sun. The tourists wandered in for a song or two.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You carried the gear a block under the sun, and the tourists wandered in for a song or two.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'AMARILLO_TX_FAIR_PARADE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -154,12 +154,12 @@ SB.Cities.register('amarillo-tx', {
       title: 'The fair has the kids',
       body: 'Downtown is shut for the parade and the kids are at the fairgrounds until dark. The club bill has nobody in the room before eleven.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the fair lets out', likely: 'The crowd that wants a night out shows up. Later than planned.',
+        { id: 'LATE', label: 'Push doors back until the fair lets out', likely: 'The crowd that wants a night out shows up, but later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour and a half late. They came in sunburned and loud.' },
+          result: 'Doors opened an hour and a half late, and they came in sunburned and loud.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids are at the rodeo.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The first bands played to the bar staff. The room filled after eleven.' }
+          result: 'The first bands played to the bar staff, and the room filled after eleven.' }
       ] }
   ]
 });

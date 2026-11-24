@@ -12,8 +12,8 @@ SB.Cities.register('atlanta', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Game text says "the sci-fi convention", "the big road race", "the train", "the weekly paper". */
   blocklist: ['dragon con*', 'peachtree road race*', 'creative loafing*', 'waffle house*', 'marta*', 'shaky knees*', 'artsatl*', 'the varsity*'],
 
-  blurb: ['The one big city for a hundred miles of small towns: a sprawling, car-dependent place where the underground is scattered by price, not taste.',
-          'Rooms close, rents climb, and the shows keep turning up in a house with a ticket link and a door person. Everyone knows everyone, and the neighbors know too.'],
+  blurb: ['The one big city for a hundred miles of small towns is a sprawling, car-dependent place where the underground is scattered by what people can afford.',
+          'Rooms close and rents climb, and the shows keep turning up in a house with a ticket link and a door person. Everyone knows everyone, and the neighbors know too.'],
   hard: 'Few rooms, rising rent, strict ID checks and an eleven o\'clock cutoff.',
   region: 'the Southeast',
   houseType: 'LIVING_ROOM',
@@ -135,65 +135,65 @@ SB.Cities.register('atlanta', {
       if: { daysOut: [0, 5], calendar: 'convention' },
       telegraph: 'The big convention is coming. Every downtown hotel is full.',
       title: 'Costumes everywhere',
-      body: 'The convention has taken over downtown. Every bar is full of strangers in armor, parking is gone, and one of them wanders in and asks to sit in.',
+      body: 'The convention has taken over downtown, so every bar is full of strangers in armor and the parking is gone, and one of them wanders in and asks to sit in.',
       options: [
-        { id: 'WELCOME', label: 'Welcome the strangers and give them a slot', likely: 'A weird, loud night. A few of them become regulars.',
+        { id: 'WELCOME', label: 'Welcome the strangers and give them a slot', likely: 'It\'s a weird, loud night, and a few of them become regulars.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.05 }, { op: 'REGULARS', pct: .02 }],
-          result: 'A full armor suit played a song with the openers. It was the best photo of the year.' },
-        { id: 'ACCEPT', label: 'Run it as planned and ignore them', likely: 'Parking and the streets cost you a third of the crowd.',
+          result: 'A full armor suit played a song with the openers, and it was the best photo of the year.' },
+        { id: 'ACCEPT', label: 'Run it as planned and ignore them', likely: 'Parking and the closed streets cost you a third of the crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'Half the list never found a place to park.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'ATLANTA_ROAD_RACE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'race' },
       telegraph: 'The road race closes Peachtree on the Fourth, and the van needs that road.',
       title: 'The road race has the street',
-      body: 'Thousands of runners have closed the main road the touring van needs. The band has to park a long way off and walk their gear through the crowd.',
+      body: 'Thousands of runners have closed the main road the touring van needs, so the band has to park a long way off and walk their gear through the crowd.',
       options: [
-        { id: 'EARLY', label: 'Tell them to park early and walk', likely: 'Everyone gets in. Doors an hour early.',
+        { id: 'EARLY', label: 'Tell them to park early and walk', likely: 'Everyone gets in if you open doors an hour early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'The band parked a mile off and walked through the runners. They were on time.' },
-        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
+          result: 'The band parked a mile off and walked through the runners, and they were on time.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up because of the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .78 }],
-          result: 'The street stayed shut. The list thinned out by seven.' }
+          result: 'The street stayed shut, and the list thinned out by seven.' }
       ] },
 
     { id: 'ATLANTA_BACKYARD_STORM', when: 'WEEK', tier: 'HARD', weight: 3, cooldown: 35, bind: ['show'],
       if: { daysOut: [0, 2], weather: 'RAIN', months: [6, 7, 8, 9] },
       telegraph: 'A thunderstorm is building over the city every afternoon this week.',
       title: 'The storm takes the power',
-      body: 'A summer thunderstorm has knocked out the power to the street, and the backyard show is drowning. Somebody has a generator, and a carport.',
+      body: 'A summer thunderstorm has knocked out the power to the street and the backyard show is drowning, but somebody has a generator and a carport.',
       options: [
-        { id: 'CARPORT', label: 'Move it to the carport on the generator', likely: 'Smaller and louder, a little dangerous.',
+        { id: 'CARPORT', label: 'Move it to the carport on the generator', likely: 'It\'s smaller and louder, and a little dangerous.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The band played in the carport on a generator. Everybody was soaked and happy.' },
-        { id: 'WAIT', label: 'Wait it out', likely: 'The storm passes, and half the crowd is gone.',
+          result: 'The band played in the carport on a generator, and everybody was soaked and happy.' },
+        { id: 'WAIT', label: 'Wait it out', likely: 'The storm passes, but half the crowd is gone by then.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }, { op: 'SHOW_MOD', key: 'lateMin', v: 60 }],
-          result: 'The storm passed at ten. The few who stayed got a late, slow night.' },
-        { id: 'CANCEL', label: 'Call it off', likely: 'Costs trust with the bands.',
+          result: 'The storm passed at ten, and the few who stayed got a late, slow night.' },
+        { id: 'CANCEL', label: 'Call it off', likely: 'The bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You pushed it a day. The ones who could come, came.' }
+          result: 'You pushed it a day, and the people who could make it came.' }
       ] },
 
     { id: 'ATLANTA_DECATUR_COMPLAINT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], months: [3, 4, 5, 9, 10, 11] },
       telegraph: 'A neighbor in Decatur has been looking at the street a lot lately.',
       title: 'The neighbor calls at ten fifty',
-      body: 'A neighbor has called in a noise complaint at ten fifty, and the show is not over. The house has an eleven o\'clock rule for a reason.',
+      body: 'A neighbor called in a noise complaint at ten fifty and the show is not over, and the house has an eleven o\'clock rule for a reason.',
       options: [
-        { id: 'PORCH', label: 'Finish on the porch with an acoustic set', likely: 'The neighbor is satisfied. A smaller, nicer night.',
+        { id: 'PORCH', label: 'Finish on the porch with an acoustic set', likely: 'The neighbor is satisfied, and it\'s a smaller, nicer night.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'The set moved to the porch and the street slept through it.' },
-        { id: 'END', label: 'End it early, with an apology', likely: 'Safe. Costs a little goodwill with the bands.',
+          result: 'The set moved to the porch, and the street slept through it.' },
+        { id: 'END', label: 'End it early, with an apology', likely: 'It\'s safe, but it costs a little goodwill with the bands.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The show ended at eleven sharp. The neighbor waved from the window.' },
-        { id: 'RISK', label: 'Keep playing', likely: 'The police come. Costs forty dollars.',
+          result: 'The show ended at eleven sharp, and the neighbor waved from the window.' },
+        { id: 'RISK', label: 'Keep playing', likely: 'The police come, and it costs forty dollars.',
           effects: [{ op: 'MONEY', amount: -40 }],
-          result: 'The police stopped by at eleven twenty and the night ended with a fine.' }
+          result: 'The police stopped by at eleven twenty, and the night ended with a fine.' }
       ] }
   ]
 });

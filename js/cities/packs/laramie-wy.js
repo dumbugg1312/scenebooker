@@ -15,7 +15,7 @@ SB.Cities.register('laramie-wy', {
   blocklist: ['university of wyoming*', 'laramie boomerang*', 'union pacific*', 'frontier days*', 'wyoming cowboys*', 'territorial prison*'],
 
   blurb: ['A wind-scoured college and railroad town high on the plains, with a downtown basement and a house-born collective holding the scene together.',
-          'A pop-punk town that gave the genre a famous export. Vans from Colorado fill the weekends, and half of every band leaves in May.'],
+          'A pop-punk town that gave the genre a famous export, where vans from Colorado fill the weekends and half of every band leaves in May.'],
   hard: 'A small crowd, closed interstates, and a scene that empties every May.',
   region: 'the high plains',
   houseType: 'BASEMENT',
@@ -115,15 +115,15 @@ SB.Cities.register('laramie-wy', {
       title: 'The interstate is shut',
       body: 'I-80 is closed between here and Cheyenne for snow and wind. The van with Colorado plates is sitting on the wrong side, and so is half the crowd from the east.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the weather', likely: 'The ones already in town make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the weather', likely: 'The people already in town make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors an hour early. The ones who live here showed up and the rest stayed put.' },
+          result: 'You opened doors an hour early, and the people who live here showed up while the rest stayed put.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people coming from the east.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The road never reopened. The ones across the line stayed home.' },
-        { id: 'RIDES', label: 'Organize rides on the back roads', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The road never reopened, so the people across the line stayed home.' },
+        { id: 'RIDES', label: 'Organize rides on the back roads', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two pickups took the long way together. They will remember that.' }
+          result: 'Two pickups took the long way around together and got there.' }
       ] },
 
     { id: 'LARAMIE_WY_GARAGE_WIND', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -132,15 +132,15 @@ SB.Cities.register('laramie-wy', {
       title: 'The wind takes the fence',
       body: 'A gust knocked the fence flat behind the west-side garage, and the garage door is the only wall the band has left. A neighbor on the old side is on the phone with the police non-emergency line.',
       options: [
-        { id: 'BASEMENT', label: 'Move the bill to the north blocks basement', likely: 'Smaller and out of the wind. Nobody can call about a basement.',
+        { id: 'BASEMENT', label: 'Move the bill to the north blocks basement', likely: 'Smaller and out of the wind, and nobody can call about a basement.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A basement took the bill and the floor was packed. The wind stayed outside.' },
-        { id: 'EARLY', label: 'Start early and finish before the neighbor wins', likely: 'Most get in. A short, cold night.',
+          result: 'A basement took the bill and the floor was packed, and the wind stayed outside.' },
+        { id: 'EARLY', label: 'Start early and finish before the neighbor wins', likely: 'Most get in, but it\'s a short, cold night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
           result: 'Doors early, done by nine, the garage door shaking the whole time.' },
-        { id: 'ACCEPT', label: 'Run it and hold the door down', likely: 'A rough night. Some people leave.',
+        { id: 'ACCEPT', label: 'Run it and hold the door down', likely: 'It\'s a rough night and some people leave.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The crowd stood in coats and a van door held the wall. The band played anyway.' }
+          result: 'The crowd stood in coats with a van door holding up the wall, and the band played anyway.' }
       ] },
 
     { id: 'LARAMIE_WY_STATEHOOD_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -151,13 +151,13 @@ SB.Cities.register('laramie-wy', {
       options: [
         { id: 'LATE', label: 'Push doors back until the street dance dies down', likely: 'The ones who want out of the noise find you, late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors at ten. The crowd came down the stairs sunburnt and ready.' },
+          result: 'Doors were at ten, and the crowd came down the stairs sunburnt and ready.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Parking is gone and the casual crowd is at the rodeo.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The regulars walked in. Nobody else could park.' },
+          result: 'The regulars walked in, and nobody else could park.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'LARAMIE_WY_UTAH_VAN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -168,13 +168,13 @@ SB.Cities.register('laramie-wy', {
       options: [
         { id: 'FLOOR', label: 'Put them up and move the show a day', likely: 'Breaks the date, but the band is fed and warm.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }, { op: 'REGULARS', pct: .02 }],
-          result: 'They slept on the floor and played the next night. The town was glad to see them.' },
+          result: 'They slept on the floor and played the next night, and the town was glad to see them.' },
         { id: 'SHORT', label: 'Run the show with the bands who are in town', likely: 'A thin night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two local bands and a long set. The Utah band watched from the stairs.' },
-        { id: 'WAIT', label: 'Hold the doors for the plows', likely: 'A late start. The crowd gets restless.',
+          result: 'Two local bands played long sets while the Utah band watched from the stairs.' },
+        { id: 'WAIT', label: 'Hold the doors for the plows', likely: 'A late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at ten, white to the windows. You started late and nobody left.' }
+          result: 'The van pulled in at ten, white to the windows, and you started late but nobody left.' }
       ] }
   ]
 });

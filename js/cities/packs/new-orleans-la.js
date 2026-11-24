@@ -14,7 +14,7 @@ SB.Cities.register('new-orleans-la', {
   blocklist: ['times-picayune*', 'nola.com*', 'jazz fest*', 'voodoo fest*', 'tipitina*', 'preservation hall*', 'wwoz*', 'southern decadence*', 'creepy fest*', 'new orleans and company*'],
 
   blurb: ['A humid, flood-scarred port town where crust and sludge play warehouses and punk houses.',
-          'Music is everywhere here and it is the famous kind. Punk lives in the gaps: back rooms, backyards, a shotgun double with a band in each half.'],
+          'Music is everywhere here and it is the famous kind, so punk lives in the gaps: back rooms, backyards, a shotgun double with a band in each half.'],
   hard: 'Storm season, zoning, and a city that books the tourists first.',
   region: 'the Gulf',
   whereGo: [
@@ -123,65 +123,65 @@ SB.Cities.register('new-orleans-la', {
       if: { daysOut: [0, 3], months: [1, 2, 3, 4, 5] },
       telegraph: 'A parade is rolling through the neighborhood on show day.',
       title: 'The van is stuck behind a parade',
-      body: 'A parade has the main street shut for six blocks, and the band and half the list are on the wrong side of it. Brass is playing under the overpass.',
+      body: 'A parade has the main street shut for six blocks, and the band and half the list are on the wrong side of it, with brass playing under the overpass.',
       options: [
-        { id: 'EARLY', label: 'Open early and tell everyone to come by the back streets', likely: 'Most get through before the route closes. A thinner start.',
+        { id: 'EARLY', label: 'Open early and tell everyone to come by the back streets', likely: 'Most get through before the route closes, but the start is thinner.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. Most took the back streets and some walked in with beads on.' },
+          result: 'Doors opened an hour early, and most people took the back streets while some walked in with beads on.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Many give up and join the parade.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The parade went on for hours. The room filled up after it ended.' },
+          result: 'The parade went on for hours, and the room filled up after it ended.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'NEW_ORLEANS_LA_STREETS_FLOOD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [6, 7, 8, 9, 10] },
       telegraph: 'A slow storm is parked over the city and the pumps are behind.',
       title: 'The street is a river',
-      body: 'Two inches in an hour and the low blocks are under. The sump pump in the corner is running and the load-in door is ankle deep.',
+      body: 'Two inches fell in an hour and the low blocks are under, the sump pump in the corner is running, and the load-in door is ankle deep.',
       options: [
         { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the people who could make it came.' },
         { id: 'HIGH', label: 'Move it to a house on high ground', likely: 'Smaller and louder, with a wall of neighbors on every side.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A double on the ridge took the whole bill, and the floor was packed.' },
-        { id: 'SANDBAG', label: 'Sandbag the door and play on', likely: 'Costs forty dollars. The crowd stays home.',
+        { id: 'SANDBAG', label: 'Sandbag the door and play on', likely: 'Costs forty dollars, and the crowd stays home.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The water stayed on the street. The room was half full and wet to the ankle.' }
+          result: 'The water stayed on the street, and the room was half full and wet to the ankle.' }
       ] },
 
     { id: 'NEW_ORLEANS_LA_CARNIVAL_LOADOUT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'parade' },
       telegraph: 'It is the last week of carnival and every avenue is a parade route.',
       title: 'The van cannot cross the route',
-      body: 'Every street the band needs is roped off for the night parades. The load-in waits until after midnight, and the crowd is out watching floats.',
+      body: 'Every street the band needs is roped off for the night parades, so the load-in waits until after midnight, and the crowd is out watching floats.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the parades are done', likely: 'A very late night. The crowd that stays is loud.',
+        { id: 'LATE', label: 'Push doors back until the parades are done', likely: 'A very late night, and the crowd that stays is loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors at eleven. The people who came in off the route were tired and happy.' },
+          result: 'Doors were at eleven, and the people who came in off the route were tired and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Most of the list is stuck behind a float.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The band got through at ten. The room was nearly empty and then it was not.' },
+          result: 'The band got through at ten, and the room was nearly empty and then it was not.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'NEW_ORLEANS_LA_TOURIST_BACKROOM', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The hotels are full and the bar is crawling with people who ask where the real music is.',
       title: 'A tourist wants the real thing',
-      body: 'A man in a festival wristband wandered into the back room asking where the real music is. He is buying drinks for the whole bar and his friends are outside.',
+      body: 'A man in a festival wristband wandered into the back room asking where the real music is, and he is buying drinks for the whole bar while his friends wait outside.',
       options: [
         { id: 'WELCOME', label: 'Let them in and put the merch out', likely: 'A bigger crowd and a big merch night, but not the usual one.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The merch table sold out to people who had never heard of any of it. The regulars stood in the back.' },
+          result: 'The merch table sold out to people who had never heard of any of it, and the regulars stood in the back.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The tourists wander in and out.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'He stayed for two bands and bought a shirt. The night went the way it was going to.' }
+          result: 'He stayed for two bands and bought a shirt.' }
       ] }
   ]
 });

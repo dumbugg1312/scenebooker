@@ -126,12 +126,12 @@ SB.Cities.register('new-haven-ct', {
       title: 'The basement floods',
       body: 'The rain has pushed an inch of water across the basement floor. The merch table goes up on milk crates and the singer is standing next to the dryer.',
       options: [
-        { id: 'CRATES', label: 'Put everything on milk crates and play on', likely: 'Wet and loud. Some of the crowd stays upstairs.',
+        { id: 'CRATES', label: 'Put everything on milk crates and play on', likely: 'It\'s wet and loud, and some of the crowd stays upstairs.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'The floor was wet and the band played on crates. Nobody forgot it.' },
-        { id: 'MOVE', label: 'Move it a day, once the floor dries', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The floor was wet and the band played on crates.' },
+        { id: 'MOVE', label: 'Move it a day, once the floor dries', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the ones who could come came.' },
         { id: 'HALL', label: 'Ask a social hall to take it for the night', likely: 'Dry and bigger, but with a hall member watching.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'A hall member asked what the night was called, then stayed for a set.' }
@@ -143,15 +143,15 @@ SB.Cities.register('new-haven-ct', {
       title: 'The highway is a parking lot',
       body: 'The streets and the highway around the bowl are jammed. The first band is stuck in the line, and the load-in door is blocked for an hour.',
       options: [
-        { id: 'LATE', label: 'Push the doors back an hour', likely: 'The bands get there. The crowd comes late.',
+        { id: 'LATE', label: 'Push the doors back an hour', likely: 'The bands get there, but the crowd comes late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'The van got through at nine. Doors an hour late, and the night ran tight against the ordinance.' },
+          result: 'The van got through at nine, doors opened an hour late, and the night ran tight against the ordinance.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is stuck in traffic.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Half the list sat in the jam and gave up. The regulars were already in the basement.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Half the list sat in the jam and gave up, and the regulars were already in the basement.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come came.' }
       ] },
 
     { id: 'NEW_HAVEN_CT_FORECLOSURE', when: 'WEEK', tier: 'HARD', weight: 1, cooldown: 60, bind: ['show'],
@@ -160,15 +160,15 @@ SB.Cities.register('new-haven-ct', {
       title: 'The sign on the porch',
       body: 'The house is in foreclosure and the sign went up the same week as your show. The housemates say it can happen once, if it is over by the end of the month.',
       options: [
-        { id: 'ONCE', label: 'Run it as the last one there', likely: 'A tight, sad, loud night. Quiet by ten.',
+        { id: 'ONCE', label: 'Run it as the last one there', likely: 'It\'s a tight, sad, loud night, and it\'s quiet by ten.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'Everyone knew it was the last one. The floor was packed and the singer signed the wall.' },
+          result: 'Everyone knew it was the last one, so the floor was packed and the singer signed the wall.' },
         { id: 'HOUSE', label: 'Move it to another house', likely: 'Smaller, and a stranger upstairs.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A friend of a friend took the bill with a day to spare. It was smaller and quieter.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A friend of a friend took the bill with a day to spare, and it was smaller and quieter.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come came.' }
       ] },
 
     { id: 'NEW_HAVEN_CT_LAST_BEFORE_WALL', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 60, bind: ['show'],
@@ -177,12 +177,12 @@ SB.Cities.register('new-haven-ct', {
       title: 'The last show before the drywall',
       body: 'The owner of the industrial building is putting up a wall across the garage next week. Your show is the last one before it goes up.',
       options: [
-        { id: 'PACK', label: 'Tell everyone and pack it', likely: 'A big, loud farewell. The word gets around.',
+        { id: 'PACK', label: 'Tell everyone and pack it', likely: 'It\'s a big, loud farewell, and word gets around.',
           effects: [{ op: 'MONEY', amount: -20 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.2 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Word spread and the garage was shoulder to shoulder. Somebody wrote on the new wall in marker.' },
-        { id: 'QUIET', label: 'Keep it quiet and keep the address private', likely: 'A small night. No trouble.',
+          result: 'Word spread and the garage was shoulder to shoulder, and somebody wrote on the new wall in marker.' },
+        { id: 'QUIET', label: 'Keep it quiet and keep the address private', likely: 'It\'s a small night with no trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Thirty people who knew. No owner, no police, and a long goodbye.' }
+          result: 'Thirty people who knew came, with no owner and no police, and it was a long goodbye.' }
       ] }
   ]
 });

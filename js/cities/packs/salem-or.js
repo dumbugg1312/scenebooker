@@ -14,7 +14,7 @@ SB.Cities.register('salem-or', {
   blocklist: ['statesman journal*', 'willamette university*', 'cherriots*', 'oregon state fair*', 'keizerfest*', 'capital press*'],
 
   blurb: ['A capital with no scene on paper, where garages and halls fill when kids drive in from the farm towns.',
-          'Government quiet downtown at night, and the big city is an hour up the road.'],
+          'It\'s quiet government downtown at night, and the big city is an hour up the road.'],
   hard: 'Quiet, spread out, and overshadowed by the city to the north.',
   region: 'the Valley',
   houseType: 'GARAGE',
@@ -115,30 +115,30 @@ SB.Cities.register('salem-or', {
       options: [
         { id: 'LATE', label: 'Push doors back until the fair lets out', likely: 'The crowd that wants a night out shows up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'Doors an hour late. The kids came off the midway still smelling of fried dough.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Fewer people, no trouble.',
+          result: 'Doors opened an hour late, and the kids came off the midway still smelling of fried dough.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'You get fewer people and no trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.7 }],
-          result: 'The fair kept most of the list. The ones who came had room to move.' },
+          result: 'The fair kept most of the list, and the ones who came had room to move.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'SALEM_OR_SMOKE_WEEK', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [8, 9] },
       telegraph: 'The sky over the valley has gone orange and the air has a taste.',
       title: 'Smoke over the valley',
-      body: 'A week of wildfire smoke is parked on the valley and the outdoor bill is two days away. The sound crew wants to cancel.',
+      body: 'A week of wildfire smoke is parked on the valley and the outdoor bill is two days away, and the sound crew wants to cancel.',
       options: [
-        { id: 'INSIDE', label: 'Move it indoors into a garage or hall', likely: 'Smaller and louder. Nobody has to breathe the sky.',
+        { id: 'INSIDE', label: 'Move it indoors into a garage or hall', likely: 'It\'s smaller and louder, and nobody has to breathe the sky.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 0.6 }],
-          result: 'A garage took the bill. It was packed and the door stayed shut.' },
-        { id: 'MASKS', label: 'Run it outside and hand out masks', likely: 'Costs a little. The crowd is thin and the day is short.',
+          result: 'A garage took the bill, and it was packed with the door shut.' },
+        { id: 'MASKS', label: 'Run it outside and hand out masks', likely: 'It costs a little, and the crowd is thin and the day is short.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'Masks and a short set. The ones who came coughed through the choruses.' },
+          result: 'Everybody wore masks and played a short set, and the ones who came coughed through the choruses.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The air did not clear.' }
+          result: 'You moved it a day, but the air did not clear.' }
       ] },
 
     { id: 'SALEM_OR_QUIET_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -147,13 +147,13 @@ SB.Cities.register('salem-or', {
       title: 'The ten o\'clock call',
       body: 'The garage bill is crowded under a canopy in the rain, and a neighbor has called in the quiet-hour limit while the second band is still setting up.',
       options: [
-        { id: 'SHORT', label: 'Cut it short and clear the street', likely: 'The host keeps the garage. A thin night.',
+        { id: 'SHORT', label: 'Cut it short and clear the street', likely: 'The host keeps the garage, but it\'s a thin night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
-          result: 'You stopped at ten. The host stayed on speaking terms with the street.' },
-        { id: 'KNOCK', label: 'Go talk to the neighbor', likely: 'Costs a little. A smaller crowd while you do.',
+          result: 'You stopped at ten, and the host stayed on speaking terms with the street.' },
+        { id: 'KNOCK', label: 'Go talk to the neighbor', likely: 'It costs a little, and the crowd is smaller while you do it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }, { op: 'REGULARS', pct: .02 }],
-          result: 'The neighbor listened. The night ended at half past ten with no call back.' },
-        { id: 'ACCEPT', label: 'Keep playing', likely: 'Risks the host\'s garage.',
+          result: 'The neighbor listened, and the night ended at half past ten with no call back.' },
+        { id: 'ACCEPT', label: 'Keep playing', likely: 'You risk the host\'s garage.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
           result: 'The call came back at eleven, and the host got a warning.' }
       ] }

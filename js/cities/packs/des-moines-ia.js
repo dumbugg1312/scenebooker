@@ -107,17 +107,17 @@ SB.Cities.register('des-moines-ia', {
       if: { daysOut: [0, 3], calendar: 'fair' },
       telegraph: 'Fair opening night is Thursday and the whole town is going.',
       title: 'Fair opening night',
-      body: 'Every kid in town is at the fairgrounds and the north side basement is empty. The late bands there let out at midnight with nowhere to go.',
+      body: 'Every kid in town is at the fairgrounds, and the north side basement is empty. The late bands there let out at midnight with nowhere to go.',
       options: [
         { id: 'LATE', label: 'Start after midnight', likely: 'The fair crowd has nowhere else to be.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Doors late. A tired, loud crowd poured in from the grounds.' },
+          result: 'Doors were late, and a tired, loud crowd poured in from the grounds.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is on the midway.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.7 }],
-          result: 'The basement was thin. The ones who came were the real ones.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The basement was thin, and the ones who came were the real ones.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Fewer people could make the new one.' }
+          result: 'You moved it a day, and fewer people could make the new one.' }
       ] },
 
     { id: 'DES_MOINES_IA_UNDER_21_RULE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -126,15 +126,15 @@ SB.Cities.register('des-moines-ia', {
       title: 'The nine o\'clock rule',
       body: 'The city bars minors from licensed music rooms after nine unless the room holds a special exception. The all-ages early set ends and the kids must clear out before the headliner.',
       options: [
-        { id: 'EARLY', label: 'Move the bill early', likely: 'Short sets, and the kids see everyone.',
+        { id: 'EARLY', label: 'Move the bill early', likely: 'The sets are short, and the kids see everyone.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'Doors at five. The kids got the whole bill and were home by nine.' },
-        { id: 'HALL', label: 'Move it to a hall', likely: 'No bar, no rule. Smaller and tame.',
+          result: 'Doors were at five, and the kids got the whole bill and were home by nine.' },
+        { id: 'HALL', label: 'Move it to a hall', likely: 'There\'s no bar and so no rule, and it\'s smaller and tame.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 0.7 }],
-          result: 'A hall took the bill. No beer, no rule, and the kids stayed.' },
+          result: 'A hall took the bill with no beer and no rule, and the kids stayed.' },
         { id: 'ACCEPT', label: 'Let the headliner play to the bar crowd', likely: 'The kids miss the best set.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The headliner played to the older crowd that stayed. The kids watched the door.' }
+          result: 'The headliner played to the older crowd that stayed, and the kids watched the door.' }
       ] },
 
     { id: 'DES_MOINES_IA_ARTS_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -143,15 +143,15 @@ SB.Cities.register('des-moines-ia', {
       title: 'The festival takes the parking',
       body: 'Every spot within a mile is gone. A house on Sherman Hill gets noise complaints from a street full of visitors at ten o\'clock sharp.',
       options: [
-        { id: 'EARLY', label: 'Finish by ten', likely: 'Short night, no police.',
+        { id: 'EARLY', label: 'Finish by ten', likely: 'It\'s a short night, with no police.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'Done by ten. The street was quiet when the police rolled by.' },
+          result: 'You were done by ten, and the street was quiet when the police rolled by.' },
         { id: 'ACCEPT', label: 'Run it and take the complaints', likely: 'The crowd will park far away and walk.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'The cops came twice. The bands finished anyway.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The cops came twice, and the bands finished anyway.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The streets were empty by Monday.' }
+          result: 'You moved it a day, and the streets were empty by Monday.' }
       ] }
   ]
 });

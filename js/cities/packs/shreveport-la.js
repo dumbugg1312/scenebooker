@@ -17,7 +17,7 @@ SB.Cities.register('shreveport-la', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['barksdale*', 'red river revel*', 'state fair of louisiana*', 'holiday in dixie*', 'independence bowl*', 'louisiana tech*', 'centenary*', 'mudbug madness*', 'metalbug*', 'humor and harmony*'],
 
-  blurb: ['Carports, church halls and borrowed yards hold a scene too small to split by genre. Everyone plays with everyone, in the heat.',
+  blurb: ['Carports, church halls and borrowed yards hold a scene too small to split by genre, so everyone plays with everyone, in the heat.',
           'It is a river city of casinos and old brick blocks, far from anywhere, and the best musicians leave for bigger cities.'],
   hard: 'Few rooms, brutal summers, and the one stable venue wants cover bands.',
   region: 'the Ark-La-Tex',
@@ -115,17 +115,17 @@ SB.Cities.register('shreveport-la', {
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'A big festival fills the river plaza on Saturday, and every lot downtown will be full by noon.',
       title: 'The van cannot get within six blocks',
-      body: 'The festival has the river plaza and every parking spot downtown. The band\'s van is stuck six blocks from the storefront stage, and the gear has to go in on a hand cart.',
+      body: 'The festival has the river plaza and every parking spot downtown, and the band\'s van is stuck six blocks from the storefront stage, so the gear has to go in on a hand cart.',
       options: [
-        { id: 'CART', label: 'Send a few people with hand carts', likely: 'Slow, sweaty work. Most of the gear gets there.',
+        { id: 'CART', label: 'Send a few people with hand carts', likely: 'Slow, sweaty work, but most of the gear gets there.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'HOURS', d: -2, when: 'TODAY' }],
-          result: 'Four trips with a borrowed cart. The doors opened an hour late and the room was loud.' },
+          result: 'It took four trips with a borrowed cart, the doors opened an hour late, and the room was loud.' },
         { id: 'MORNING', label: 'Load in before the vendors arrive', likely: 'The crowd comes late, but the stage is ready.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.92 }],
-          result: 'You loaded in at dawn and sat on the gear until night. The crowd came from the festival.' },
+          result: 'You loaded in at dawn and sat on the gear until night, and the crowd came from the festival.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The casual crowd is stuck in traffic.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: 'The parking never cleared. Half the list never found a place to leave the car.' }
+          result: 'The parking never cleared, and half the list never found a place to leave the car.' }
       ] },
 
     { id: 'SHREVEPORT_LA_PARISH_LINE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -134,32 +134,32 @@ SB.Cities.register('shreveport-la', {
       title: 'The deputies are at the parish line',
       body: 'The county deputies can enforce the under-18 curfew now, and the club in Bossier City has a bill that runs past ten. The kids who can come have to be gone before it starts.',
       options: [
-        { id: 'EARLY', label: 'Move the start up and finish at ten', likely: 'The kids get a full set. Everyone else gets a short night.',
+        { id: 'EARLY', label: 'Move the start up and finish at ten', likely: 'The kids get a full set, and everyone else gets a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'Doors early, done by ten. The kids got their set and went home.' },
+          result: 'Doors opened early and you were done by ten, so the kids got their set and went home.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The under-18 kids leave in the middle of the bill.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
           result: 'A patrol car idled outside and the kids left at ten, mid-song.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'SHREVEPORT_LA_LAKE_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [4, 5, 6, 7, 8, 9] },
       telegraph: 'A storm warning is out for three in the afternoon, and the lake benefit day is the same day.',
       title: 'The tarp, the generator and the sky',
-      body: 'A thirteen-band lake benefit day gets a storm warning at three. A big yard, a generator and a tarp decide whether the day survives.',
+      body: 'A thirteen-band lake benefit day gets a storm warning at three, and a big yard, a generator and a tarp decide whether the day survives.',
       options: [
-        { id: 'TARP', label: 'Rig the tarp and keep the generator dry', likely: 'A wet, loud day. A smaller crowd.',
+        { id: 'TARP', label: 'Rig the tarp and keep the generator dry', likely: 'A wet, loud day with a smaller crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The tarp held and the day went on, soaked. The ones who stayed were glad.' },
+          result: 'The tarp held and the day went on, soaked, and the people who stayed were glad.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the people who could make it came.' },
         { id: 'ACCEPT', label: 'Run it and see what the sky does', likely: 'Some bands get rained out.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'The sky opened at three. Half the bill never played.' }
+          result: 'The sky opened at three, and half the bill never played.' }
       ] }
   ]
 });

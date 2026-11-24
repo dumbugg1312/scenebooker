@@ -7,7 +7,7 @@ SB.Cities.register('buffalo', {
   blocklist: ['buffalo news*', 'buffalo bills*', 'anchor bar*', 'new era cap*', 'canalside*', 'kleinhans*', 'buffalo rising', 'visit buffalo niagara'],
 
   blurb: ['Buffalo hardcore lives in restaurant back rooms and a veterans\' hall, packed with twenty-somethings and a few old heads at the back.',
-          'It is all-ages and friendly and rowdy. The lake snow and the border decide who actually makes it.'],
+          'It is all-ages and friendly and rowdy, and the lake snow and the border decide who actually makes it.'],
   hard: 'Rooms depend on one owner\'s goodwill, and snow or the border can kill any night.',
   region: 'the Great Lakes',
   houseType: 'BASEMENT',
@@ -101,15 +101,15 @@ SB.Cities.register('buffalo', {
       title: 'The Skyway is a parking lot',
       body: 'A wreck on the Skyway has traffic backed up all the way to the lake the night of your show. The bands and the kids from the south and the border side are stuck in it.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross.',
+          result: 'You moved doors up an hour, and the people who wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'It never cleared. The ones on the far side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'It never cleared, and the people on the far side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads came together the long way. They will remember that.' }
+          result: 'Two carloads came together the long way around.' }
       ] },
 
     { id: 'BUFFALO_NEW_OWNER', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -118,15 +118,15 @@ SB.Cities.register('buffalo', {
       title: 'The new owner wants a cut-off',
       body: 'The back room changed owners the week of your show. The new owner wants the music done early and the kitchen open at nine.',
       options: [
-        { id: 'EARLY', label: 'Start at six and finish by nine', likely: 'Short and tight. The kids get there for the opener.',
+        { id: 'EARLY', label: 'Start at six and finish by nine', likely: 'It\'s short and tight, and the kids get there for the opener.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .88 }],
-          result: 'Doors at six, done by nine. The kitchen got its room and the new owner got the point.' },
-        { id: 'MOVE', label: 'Move the bill to a hall', likely: 'Loses the shared floor.',
+          result: 'Doors were at six and it was done by nine, so the kitchen got its room and the new owner got the point.' },
+        { id: 'MOVE', label: 'Move the bill to a hall', likely: 'You lose the shared floor.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }],
-          result: 'A hall took the bill. It was cleaner and a little colder.' },
+          result: 'A hall took the bill, and it was cleaner and a little colder.' },
         { id: 'ACCEPT', label: 'Run it and eat the cut-off', likely: 'Some bands lose a song.',
           effects: [{ op: 'SHOW_MOD', key: 'endEarly', v: 45 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The headliner cut a song and nobody was happy about it.' }
+          result: 'The headliner cut a song, and nobody was happy about it.' }
       ] },
 
     { id: 'BUFFALO_SNOW_THRUWAY', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -135,15 +135,15 @@ SB.Cities.register('buffalo', {
       title: 'The Thruway is closed',
       body: 'Snow closed the Thruway an hour before doors. The touring band is stuck in the next city, and the local openers are the only ones in the room.',
       options: [
-        { id: 'LONG', label: 'Let the openers play long', likely: 'A loose, warm night.',
+        { id: 'LONG', label: 'Let the openers play long', likely: 'It\'s a loose, warm night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The openers stretched out and the room stayed warm. The touring band never made it.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'A late start. The crowd gets restless.',
+          result: 'The openers stretched out and the room stayed warm, and the touring band never made it.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'It\'s a late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .88 }],
           result: 'The van pulled in at ten, covered in snow, and the night went long.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] },
 
     { id: 'BUFFALO_GAME_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -152,15 +152,15 @@ SB.Cities.register('buffalo', {
       title: 'The hall and the game',
       body: 'A home game has emptied the bars across the city and put the whole town in front of a television. The one crowd that skipped it would fill a hall show.',
       options: [
-        { id: 'HALL', label: 'Move to the hall and run it late', likely: 'The ones who skipped the game show up.',
+        { id: 'HALL', label: 'Move to the hall and run it late', likely: 'The people who skipped the game show up.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'lateMin', v: 60 }],
           result: 'The hall filled after the final whistle with everybody who did not care about the game.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed on the couch. The regulars came.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date.',
+          result: 'The casual crowd stayed on the couch, and the regulars came.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

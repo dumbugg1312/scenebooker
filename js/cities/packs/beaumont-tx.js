@@ -15,7 +15,7 @@ SB.Cities.register('beaumont-tx', {
   blocklist: ['beaumont enterprise*', 'beaumont examiner*', 'whataburger*', 'lamar university*', 'rao\'s*', 'tia juanita*', 'derrick street hall*', 'mudbug annex*'],
 
   blurb: ['A refinery town with slab-floor garages, a sober all-ages band night and a much bigger scene an hour or two west in Houston.',
-          'Metal and hardcore outlast the rest. Storms scatter the scene, and it keeps coming back.'],
+          'Metal and hardcore outlast the rest, and storms scatter the scene, but it keeps coming back.'],
   hard: 'Few rooms, no basements, and storms keep taking what exists.',
   region: 'the Gulf',
   houseType: 'CARPORT',
@@ -118,50 +118,50 @@ SB.Cities.register('beaumont-tx', {
   events: [
     { id: 'BEAUMONT_TX_STORM_WARNING', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], months: [6, 7, 8, 9, 10, 11] },
-      telegraph: 'There is a storm in the Gulf and the forecast cone has not decided yet.',
+      telegraph: 'There is a storm in the Gulf, and the forecast cone has not decided yet.',
       title: 'A storm warning on show day',
-      body: 'The Houston bands are asking whether to drive in. If the power goes down on the Eastex side the show runs on a generator, or it does not run.',
+      body: 'The Houston bands are asking whether to drive in. If the power goes down on the Eastex side, the show runs on a generator or it does not run.',
       options: [
-        { id: 'GENERATOR', label: 'Tell everyone to come and run it on the generator', likely: 'Louder, hotter and smaller. The ones who show up are the real ones.',
+        { id: 'GENERATOR', label: 'Tell everyone to come and run it on the generator', likely: 'It\'s louder, hotter and smaller, and the people who show up are the real ones.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'The lights went out at nine and the generator picked up the room. It was the loudest night in months.' },
-        { id: 'MOVE', label: 'Move it a day, once the sky clears', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The lights went out at nine and the generator picked up the room, and it was the loudest night in months.' },
+        { id: 'MOVE', label: 'Move it a day, once the sky clears', likely: 'It breaks the date, and everybody loses some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the people who could make it came.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Most people stay home and watch the radar.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .5 }],
-          result: 'The warning held. The bands played to the ones who live next door.' }
+          result: 'The warning held, and the bands played to the people who live next door.' }
       ] },
 
     { id: 'BEAUMONT_TX_BAND_NIGHT_RAIN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [3, 4, 5, 6, 7, 8, 9, 10] },
       telegraph: 'Rain is forecast for the last Saturday, the one night the yard is supposed to be full.',
       title: 'Rain on the yard night',
-      body: 'The yard is a creek and the bands are loading toward the indoor pit. The crowd and the bands will outnumber the room.',
+      body: 'The yard is a creek and the bands are loading toward the indoor pit, and the crowd and the bands will outnumber the room.',
       options: [
-        { id: 'PIT', label: 'Move it all to the indoor pit', likely: 'Packed to the walls and loud. Fewer get in.',
+        { id: 'PIT', label: 'Move it all to the indoor pit', likely: 'It\'s packed to the walls and loud, and fewer get in.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Every band squeezed into the pit and nobody left. The walls were wet with sweat.' },
-        { id: 'SHORT', label: 'Cut the bill and play on', likely: 'A shorter night with better sets.',
+          result: 'Every band squeezed into the pit and nobody left, and the walls were wet with sweat.' },
+        { id: 'SHORT', label: 'Cut the bill and play on', likely: 'It\'s a shorter night with better sets.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Three bands instead of five. The ones who got in were glad.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'There were three bands instead of five, and the people who got in were glad.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The monthly night was not the same.' }
+          result: 'You moved it a day, and the monthly night was not the same.' }
       ] },
 
     { id: 'BEAUMONT_TX_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'Fair week has the southwest side gridlocked, and parents are dropping kids at the gate.',
       title: 'Fair week takes the crowd',
-      body: 'The rodeo has half your crowd and the highway has the other half. The bar show downtown has a stage and empty chairs.',
+      body: 'The rodeo has half your crowd and the highway has the other half, so the bar show downtown has a stage and empty chairs.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the rodeo lets out', likely: 'Later than planned. The crowd comes in loud.',
+        { id: 'LATE', label: 'Push doors back until the rodeo lets out', likely: 'It starts later than planned, and the crowd comes in loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors went up at ten. They came off the highway still smelling of the arena.' },
+          result: 'Doors went up at ten, and they came off the highway still smelling of the arena.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The rodeo has the kids.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The first two bands played to the bartender. The room filled late.' }
+          result: 'The first two bands played to the bartender, and the room filled late.' }
       ] }
   ]
 });

@@ -109,17 +109,17 @@ SB.Cities.register('ithaca-ny', {
       if: { daysOut: [0, 3], weather: 'RAIN', months: [3, 4, 5] },
       telegraph: 'The creek is brown and loud, and the flats under the bridges are already wet.',
       title: 'The creek comes up',
-      body: 'A week of spring rain has the creek over its banks. The flats where the show was going to be are underwater and the basement crowd is wading in.',
+      body: 'A week of spring rain has the creek over its banks. The flats where the show was going to be are underwater, and the basement crowd is wading in.',
       options: [
-        { id: 'BASEMENT', label: 'Move the bill to a basement up the hill', likely: 'Smaller and louder. Dry, at least.',
+        { id: 'BASEMENT', label: 'Move the bill to a basement up the hill', likely: 'It\'s smaller and louder, and dry, at least.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A hill house took the bill with an hour to spare, and the floor was packed.' },
-        { id: 'WAIT', label: 'Hold the doors until the water drops', likely: 'A late start. Some of them give up.',
+        { id: 'WAIT', label: 'Hold the doors until the water drops', likely: 'It\'s a late start, and some of them give up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The water dropped by nine. You started late and the mud was part of the night.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The water dropped by nine, so you started late, and the mud was part of the night.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] },
 
     { id: 'ITHACA_NY_GRADUATION_SAT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -128,12 +128,12 @@ SB.Cities.register('ithaca-ny', {
       title: 'Every car is parked in Collegetown',
       body: 'It is graduation weekend. The campus roads are shut, every space near the show is taken by parents, and half your crowd is leaving town for good on Sunday.',
       options: [
-        { id: 'EARLY', label: 'Move the start up so people can park and walk', likely: 'Most of them get in. A short night.',
+        { id: 'EARLY', label: 'Move the start up so people can park and walk', likely: 'Most of them get in, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done before the roads reopened. The ones who came said their goodbyes loudly.' },
-        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The parents have the town. The kids have one night left.',
+          result: 'You opened doors early and finished before the roads reopened, and the people who came said their goodbyes loudly.' },
+        { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The parents have the town, and the kids have one night left.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'REGULARS', pct: .02 }],
-          result: 'A thin room full of people who would not be there again. It felt like a last night.' }
+          result: 'It was a thin room full of people who would not be there again, and it felt like a last night.' }
       ] },
 
     { id: 'ITHACA_NY_PORCH_DAY', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
@@ -142,12 +142,12 @@ SB.Cities.register('ithaca-ny', {
       title: 'The porch afternoon wants a band',
       body: 'A house that never lets a drum kit past ten has been waved through for the afternoon. They want a band on the porch, and they want a list.',
       options: [
-        { id: 'JOIN', label: 'Play a real porch for the afternoon', likely: 'Costs a little. A bigger, friendlier crowd.',
+        { id: 'JOIN', label: 'Play a real porch for the afternoon', likely: 'It costs a little, and you get a bigger, friendlier crowd.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }, { op: 'REGULARS', pct: .02 }],
-          result: 'You played a front porch to the whole street and nobody called anyone.' },
-        { id: 'SKIP', label: 'Stay off the porches and keep the night small', likely: 'Fewer people, no trouble.',
+          result: 'You played a front porch to the whole street, and nobody called anyone.' },
+        { id: 'SKIP', label: 'Stay off the porches and keep the night small', likely: 'You get fewer people and no trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'You kept to your own room. The porches took some of the crowd.' }
+          result: 'You kept to your own room, and the porches took some of the crowd.' }
       ] }
   ]
 });

@@ -13,7 +13,7 @@ SB.Cities.register('montgomery-al', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['montgomery advertiser*', 'hyundai*', 'waffle house*', 'iron bowl*', 'montgomery biscuits*', 'catoma annex*', 'chris\' hot dogs*'],
 
-  blurb: ['A thin scene in a sprawling capital where shows are carports, lodges and bar back rooms.',
+  blurb: ['A thin scene in a sprawling capital where shows are in carports, lodges and bar back rooms.',
           'Everyone drives, nobody has a basement, and a church hall will say yes if it can read the lyrics first.'],
   hard: 'Few all-ages rooms and no walkable core; every show runs on rides.',
   region: 'the Deep South',
@@ -111,17 +111,17 @@ SB.Cities.register('montgomery-al', {
       if: { daysOut: [0, 3], months: [3, 4, 5, 11] },
       telegraph: 'A tornado watch is posted for the whole county, and the sky over the river has gone green.',
       title: 'A watch on the night of the show',
-      body: 'The watch is up at six. Half the list is texting that they will stay in, and the carport crowd is already looking for an interior wall.',
+      body: 'The watch goes up at six. Half the list is texting that they\'re staying in, and the carport crowd is already looking for an interior wall.',
       options: [
-        { id: 'HALLWAY', label: 'Run it in the middle of the house, a hallway full of people', likely: 'Small, loud and strangely close. The set may restart.',
+        { id: 'HALLWAY', label: 'Run it in the middle of the house, a hallway full of people', likely: 'It\'s small, loud and strangely close, and the set may have to restart.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The power flickered and the set restarted on a phone flashlight. Nobody forgot it.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The power flickered and the set restarted by phone flashlight, and people still talk about it.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the people who could make it came.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people stay home to watch the sky.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'The watch expired at nine. By then most of the list had given up on the night.' }
+          result: 'The watch expired at nine, but by then most of the list had given up on the night.' }
       ] },
 
     { id: 'MONTGOMERY_AL_FAIR_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -130,32 +130,32 @@ SB.Cities.register('montgomery-al', {
       title: 'Half the kids are on the midway',
       body: 'The church hall show lands on a fair Saturday. The lots on the east side are closed for the fair, and the kids are riding the rides instead of coming to you.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the fair crowd thins', likely: 'The ones who still want a show come late.',
+        { id: 'LATE', label: 'Push doors back until the fair crowd thins', likely: 'The people who still want a show come late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The midway kids drifted in smelling of funnel cake.' },
+          result: 'You opened doors an hour late, and the midway kids drifted in smelling of funnel cake.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual kids are at the fair.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The casual crowd rode the rides. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd rode the rides, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'MONTGOMERY_AL_PARADE_ALLEY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'parade' },
       telegraph: 'Parade weekend is closing the streets around the 18-plus bar.',
       title: 'The band loads in past a float',
-      body: 'The parade has the street by the bar shut. The band has to load in through the alley, around a float, and the doors are stuck behind the barricades.',
+      body: 'The parade has the street by the bar shut, so the band has to load in through the alley and around a float, and the doors are stuck behind the barricades.',
       options: [
-        { id: 'EARLY', label: 'Open early and load in before the barricades', likely: 'Most get in. A short night.',
+        { id: 'EARLY', label: 'Open early and load in before the barricades', likely: 'Most get in, and it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors early, loaded in before the barricades. The ones who came walked in from the parade.' },
+          result: 'You opened doors early and loaded in before the barricades went up, and the people who came walked over from the parade.' },
         { id: 'ALLEY', label: 'Carry the gear through the alley by hand', likely: 'Two hours of your day. The band remembers it.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'You carried the amps past the float. The band told the story all night.' },
+          result: 'You carried the amps past the float, and the band told the story all night.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The streets stayed shut. Half the list never found a place to leave the car.' }
+          result: 'The streets stayed shut, and half the list never found a place to leave the car.' }
       ] }
   ]
 });

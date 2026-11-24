@@ -17,8 +17,8 @@ SB.Cities.register('springfield-ma', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Real institutions appear only as generic phrases in game text. */
   blocklist: ['baystate*', 'massmutual*', 'smith & wesson*', 'mgm*', 'thunderbirds*', 'valley advocate*', 'dunkin*', 'hall of fame*'],
 
-  blurb: ['Mill-town heavy: halls, basements and old heads who remember the metalcore boom.',
-          'The scene is small and scattered. Local bands play the valley more than they play home.'],
+  blurb: ['It\'s a heavy mill town of halls, basements and old heads who remember the metalcore boom.',
+          'The scene is small and scattered, and local bands play the valley more than they play at home.'],
   hard: 'Few rooms, and every one depends on one landlord or one parent.',
   region: 'the Valley',
   houseType: 'BASEMENT',
@@ -92,51 +92,51 @@ SB.Cities.register('springfield-ma', {
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'The big regional fair opens across the river, and the bridges will be a parking lot.',
       title: 'The bridges are a parking lot',
-      body: 'The fair has I-91 and the river bridges. A show downtown or on the west bank has bands stuck for hours and a half-empty room.',
+      body: 'The fair has I-91 and the river bridges backed up, so a show downtown or on the west bank has bands stuck for hours and a half-empty room.',
       options: [
-        { id: 'EARLIER', label: 'Move the start up so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the start up so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: 0.8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: 0.3, beyond: true }],
-          result: 'The backup never cleared. The ones across the river stayed home.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The backup never cleared, and the people across the river stayed home.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'SPRINGFIELD_MA_YARD_NOISE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
       telegraph: 'A neighbor has been talking about calling the police about the amps.',
       title: 'A patrol car at the second band',
-      body: 'The amplification rule lets a patrol car shut down a yard show even at eight on a Saturday. It is the second band, and the amps are audible down the block.',
+      body: 'The amplification rule lets a patrol car shut down a yard show even at eight on a Saturday. It\'s the second band, and the amps can be heard down the block.',
       options: [
-        { id: 'DOWN', label: 'Turn the amps down', likely: 'A quieter, looser set. The room still has a night.',
+        { id: 'DOWN', label: 'Turn the amps down', likely: 'It\'s a quieter, looser set, but the room still has a night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The amps came down and the set got tighter. The officer drove off.' },
-        { id: 'INSIDE', label: 'Move the rest of the bill inside', likely: 'Smaller and louder. Nobody can hear it from the street.',
+          result: 'The amps came down and the set got tighter, and the officer drove off.' },
+        { id: 'INSIDE', label: 'Move the rest of the bill inside', likely: 'It\'s smaller and louder, and nobody can hear it from the street.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 0.6 }],
-          result: 'The bill moved indoors and the floor was packed.' },
+          result: 'The bill moved indoors, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'They may shut it down for good.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.7 }],
-          result: 'The patrol car came back at nine. The night ended on a flat note.' }
+          result: 'The patrol car came back at nine, and the night ended on a flat note.' }
       ] },
 
     { id: 'SPRINGFIELD_MA_PARK_LIGHTS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival', months: [11, 12, 1] },
       telegraph: 'The lights drive at the big park opens, and traffic is already backing into the neighborhood.',
       title: 'Traffic is in the basement streets',
-      body: 'The lights drive backs traffic into the streets where the finished basements are for five weeks. A basement show there needs a back-road route and an early start.',
+      body: 'For five weeks the lights drive backs traffic into the streets where the finished basements are, so a basement show there needs a back-road route and an early start.',
       options: [
-        { id: 'EARLY', label: 'Open early and send everyone the back way', likely: 'Most get in before the cars. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early and send everyone the back way', likely: 'Most get in before the cars, but it\'s thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.92 }],
-          result: 'Doors early, and the back road worked. The ones who came parked a mile away.' },
+          result: 'You opened doors early and the back road worked, and the people who came parked a mile away.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up on the traffic.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: 'The cars crawled past the house all night. Half the list gave up.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The cars crawled past the house all night, and half the list gave up.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

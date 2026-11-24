@@ -358,7 +358,7 @@ SB.Cities.register('san-antonio', {
       },
       "telegraph": "Flash flood watch for the creeks and low-water crossings.",
       "title": "The crossing is under",
-      "body": "A flash flood has closed the low-water crossings on the creeks. The band from the north is stuck behind a gate and half the West Side is cut off from the other half.",
+      "body": "A flash flood has closed the low-water crossings on the creeks. The band from the north is stuck behind a gate, and half the West Side is cut off from the other half.",
       "options": [
         {
           "id": "MOVE",
@@ -371,12 +371,12 @@ SB.Cities.register('san-antonio', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come, came."
         },
         {
           "id": "EARLY",
           "label": "Open an hour early so they get across before the creek rises",
-          "likely": "Most make it. The night starts thin.",
+          "likely": "Most make it, but the night starts thin.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -389,7 +389,7 @@ SB.Cities.register('san-antonio', {
               "v": -60
             }
           ],
-          "result": "Doors early. They crossed with an inch to spare."
+          "result": "You opened doors early, and they crossed with an inch to spare."
         },
         {
           "id": "ACCEPT",
@@ -402,7 +402,7 @@ SB.Cities.register('san-antonio', {
               "v": 0.7
             }
           ],
-          "result": "The crossings stayed shut. The room was cousins and whoever lived close."
+          "result": "The crossings stayed shut, and the room was cousins and whoever lived close."
         }
       ]
     },
@@ -432,7 +432,7 @@ SB.Cities.register('san-antonio', {
         {
           "id": "OPEN",
           "label": "Open the door to the walk-ins",
-          "likely": "A huge crowd, and a nervous eye on the clock.",
+          "likely": "You get a huge crowd and a nervous eye on the clock.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -445,7 +445,7 @@ SB.Cities.register('san-antonio', {
               "v": -60
             }
           ],
-          "result": "The door stayed open. The room was packed by nine and quiet by eleven."
+          "result": "The door stayed open, and the room was packed by nine and quiet by eleven."
         },
         {
           "id": "KEEP",
@@ -458,7 +458,7 @@ SB.Cities.register('san-antonio', {
               "v": 0.8
             }
           ],
-          "result": "Half the list was in the street. The regulars filled the rest."
+          "result": "Half the list was in the street, and the regulars filled the rest."
         },
         {
           "id": "MOVE",
@@ -471,7 +471,7 @@ SB.Cities.register('san-antonio', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come, came."
         }
       ]
     },
@@ -497,7 +497,7 @@ SB.Cities.register('san-antonio', {
         {
           "id": "YES",
           "label": "Take it and keep it clean",
-          "likely": "A huge crowd and a lot of strangers. Costs an afternoon.",
+          "likely": "You get a huge crowd and a lot of strangers, and it costs an afternoon.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -514,12 +514,12 @@ SB.Cities.register('san-antonio', {
               "pct": 0.02
             }
           ],
-          "result": "Nine hundred people on a rooftop. Somebody's grandmother asked for the set list."
+          "result": "Nine hundred people came to the rooftop, and somebody's grandmother asked for the set list."
         },
         {
           "id": "NO",
           "label": "Pass and keep to your own rooms",
-          "likely": "Nothing lost, nothing gained.",
+          "likely": "You lose nothing and gain nothing.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -527,7 +527,7 @@ SB.Cities.register('san-antonio', {
               "v": 0.95
             }
           ],
-          "result": "You kept to your rooms. The roof show went on without you."
+          "result": "You kept to your rooms, and the roof show went on without you."
         }
       ]
     },
@@ -565,12 +565,12 @@ SB.Cities.register('san-antonio', {
               "pct": 0.02
             }
           ],
-          "result": "The last night was packed to the stairs. Somebody took the sign."
+          "result": "The last night was packed to the stairs, and somebody took the sign."
         },
         {
           "id": "SKIP",
           "label": "Let it go quietly",
-          "likely": "No fuss. You miss a good night.",
+          "likely": "There's no fuss, but you miss a good night.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -578,7 +578,7 @@ SB.Cities.register('san-antonio', {
               "v": 0.95
             }
           ],
-          "result": "You stayed away. The last night went on without you."
+          "result": "You stayed away, and the last night went on without you."
         }
       ]
     }

@@ -113,15 +113,15 @@ SB.Cities.register('salinas-ca', {
       title: 'The lots are full',
       body: 'It is rodeo week and the whole city is parked on North Main. The band\'s van is blocked in a block away, the hotels are full, and load-in is a maze of traffic cones.',
       options: [
-        { id: 'EARLY', label: 'Move load-in two hours earlier', likely: 'The van gets in. The night starts thin.',
+        { id: 'EARLY', label: 'Move load-in two hours earlier', likely: 'The van gets in, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Load-in at four, before the lots filled. The room was set by the time the crowds came.' },
-        { id: 'HOUSE', label: 'Move the bill to a garage across town', likely: 'Smaller and easier. Nobody has to park.',
+          result: 'Load-in was at four, before the lots filled, and the room was set by the time the crowds came.' },
+        { id: 'HOUSE', label: 'Move the bill to a garage across town', likely: 'Smaller and easier, and nobody has to park.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A garage took the bill with an hour to spare, and the driveway was packed.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Half the town is at the rodeo.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The regulars found parking. Most of the rest stayed at the carnival.' }
+          result: 'The regulars found parking, and most of the rest stayed at the carnival.' }
       ] },
 
     { id: 'SALINAS_CA_HALL_CLOSED', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -130,15 +130,15 @@ SB.Cities.register('salinas-ca', {
       title: 'The hall floor is closed',
       body: 'The city has posted that the hall is closed for repairs the week of your show. You have days to find a room for the bill.',
       options: [
-        { id: 'BANQUET', label: 'Rent a banquet hall on the east side', likely: 'Costs money and a deposit. The crowd follows.',
+        { id: 'BANQUET', label: 'Rent a banquet hall on the east side', likely: 'It costs money and a deposit, and the crowd follows.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
           result: 'A banquet hall took the date for a deposit, a guard and a long list of rules.' },
-        { id: 'GARAGE', label: 'Move it to a garage', likely: 'Smaller and louder. Nobody can close a driveway.',
+        { id: 'GARAGE', label: 'Move it to a garage', likely: 'Smaller and louder, and nobody can close a driveway.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'The bill fit in a garage and the whole street heard it.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'SALINAS_CA_PARADE_SUNDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -149,10 +149,10 @@ SB.Cities.register('salinas-ca', {
       options: [
         { id: 'EARLY', label: 'Open doors early and finish before the parade', likely: 'A short night with a good crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }],
-          result: 'Doors early, done before the first float. A tight set and a full room.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The streets are closed. Most people go to the parade.',
+          result: 'Doors were early and you were done before the first float, with a tight set and a full room.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The streets are closed, and most people go to the parade.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The parade took the crowd. The ones who came were the real regulars.' }
+          result: 'The parade took the crowd, and the ones who came were the real regulars.' }
       ] }
   ]
 });

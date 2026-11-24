@@ -14,7 +14,7 @@ SB.Cities.register('bremerton-wa', {
   blocklist: ['kitsap sun*', 'naval base kitsap*', 'psns*', 'blackberry festival*', 'armed forces day*', 'olympic college*'],
 
   blurb: ['A Navy shipyard town where one loyal all-ages club holds a small scene together with fests and weekend bills.',
-          'Punk, hardcore and metal share the bills. When the booker leaves, everyone wonders what is left.'],
+          'Punk, hardcore and metal share the bills, and when the booker leaves, everyone wonders what is left.'],
   hard: 'One room, one booker. If either goes, there is nothing else.',
   region: 'the Sound',
   houseType: 'GARAGE',
@@ -111,9 +111,9 @@ SB.Cities.register('bremerton-wa', {
       title: 'The last boat',
       body: 'The last boat leaves before the headliner, and half the Seattle crowd has to choose between the set and getting home.',
       options: [
-        { id: 'EARLY', label: 'Move the bill up so the headliner plays before the boat', likely: 'The kids who need the ferry make it. A short start.',
+        { id: 'EARLY', label: 'Move the bill up so the headliner plays before the boat', likely: 'The kids who need the ferry make it, but it\'s a short start.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors early. The headliner went on at eight and the boat crowd got home.' },
+          result: 'Doors were early, the headliner went on at eight, and the boat crowd got home.' },
         { id: 'ACCEPT', label: 'Let them choose', likely: 'The ones across the water leave early.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
           result: 'Half the room ran for the dock before the last song.' }
@@ -127,13 +127,13 @@ SB.Cities.register('bremerton-wa', {
       options: [
         { id: 'WAIT', label: 'Wait it out and start late', likely: 'The crowd comes in as the parade ends.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'The van got through at six. Doors went up late and nobody minded.' },
+          result: 'The van got through at six, and doors went up late but nobody minded.' },
         { id: 'CARRY', label: 'Carry the gear in from three blocks away', likely: 'Costs an hour of your day.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
           result: 'Amps went down the sidewalk behind the band from the high school.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'BREMERTON_WA_NIGHT_SHIFT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],

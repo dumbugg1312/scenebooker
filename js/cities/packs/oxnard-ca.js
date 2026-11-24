@@ -116,32 +116,32 @@ SB.Cities.register('oxnard-ca', {
       title: 'The line wraps the block',
       body: 'The lodge sold out before dinner and the resale is ugly. The hall is hot, the line runs around the building, and the locals who started the night are stuck outside.',
       options: [
-        { id: 'LOCALS', label: 'Hold a block of door spots for the local bands\' people', likely: 'Fewer paid tickets. The room stays honest.',
+        { id: 'LOCALS', label: 'Hold a block of door spots for the local bands\' people', likely: 'Fewer paid tickets, but the room stays honest.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'REGULARS', pct: .02 }],
           result: 'The local bands\' people got in. Nobody was happy about the resale, but nobody was shut out.' },
         { id: 'EARLY', label: 'Go on early and clear the minors by ten', likely: 'A short, tight night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'The headliner went on early and the room was out by ten. Sweaty, loud and legal.' },
+          result: 'The headliner went on early and the room was out by ten, sweaty, loud and legal.' },
         { id: 'ACCEPT', label: 'Run it and let the line sort itself out', likely: 'A packed hall and a rough door.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The hall was packed to the walls and the door was a mess. People will talk about it.' }
+          result: 'The hall was packed to the walls, the door was a mess, and people will talk about it.' }
       ] },
 
     { id: 'OXNARD_CA_PUNK_FEST_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival', months: [7, 8] },
       telegraph: 'The yearly punk festival lands on the same week as the harbor parade, and the shore is full.',
       title: 'The punk festival week collision',
-      body: 'Twelve bands on two stages across town, the beach parking gone to the parade, and your hall show in the middle of it.',
+      body: 'There are twelve bands on two stages across town, the beach parking has gone to the parade, and your hall show is in the middle of it.',
       options: [
         { id: 'LATE', label: 'Push doors back until the punk festival lets out', likely: 'The punk festival crowd wanders in, tired and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.05 }],
-          result: 'Doors an hour late. The punk festival crowd poured in with nowhere else to go.' },
+          result: 'Doors opened an hour late, and the punk festival crowd poured in with nowhere else to go.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The whole scene is across town.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The whole scene was at the punk festival. The ones who came were the ones who skipped it.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The whole scene was at the punk festival, so the ones who came were the ones who skipped it.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. A few more could come once the punk festival was over.' }
+          result: 'You moved it a day, and a few more could come once the punk festival was over.' }
       ] },
 
     { id: 'OXNARD_CA_JUNE_GLOOM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -152,13 +152,13 @@ SB.Cities.register('oxnard-ca', {
       options: [
         { id: 'GARAGE', label: 'Move the whole bill to a garage', likely: 'Smaller and louder, and dry.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A garage took the bill. Shoulder to shoulder and the door rolled down on the fog.' },
+          result: 'A garage took the bill, and everyone stood shoulder to shoulder with the door rolled down on the fog.' },
         { id: 'WAIT', label: 'Wait for the generator and play on', likely: 'A late start and a damp crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The generator coughed back to life at ten. The wet ones stayed.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The generator coughed back to life at ten, and the wet ones stayed.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The fog lifted by noon.' }
+          result: 'You moved it a day, and the fog lifted by noon.' }
       ] }
   ]
 });

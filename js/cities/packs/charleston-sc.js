@@ -16,7 +16,7 @@ SB.Cities.register('charleston-sc', {
   blocklist: ['spoleto*', 'bridge run*', 'joint base*', 'waffle house*', 'bojangles*', 'jenkins orphanage*', 'silicon harbor*'],
 
   blurb: ['Punk here is small and everybody shares one crowd. Shows live on porches, at a skatepark and at the odd waterfront DIY fest.',
-          'The best way to find a show is a social-media group, not a flyer on a pole.'],
+          'The best way to find a show is a social-media group rather than a flyer on a pole.'],
   hard: 'Few rooms left for under-21s, and one tiny crowd to split across genres.',
   region: 'the Lowcountry',
   houseType: 'CARPORT',
@@ -122,15 +122,15 @@ SB.Cities.register('charleston-sc', {
       title: 'The yard is shut at a quarter to ten',
       body: 'A neighbor and two county deputies have put a stop to the yard bill with the third band still to play. A bar across the river will take the rest, but it is 21 and over.',
       options: [
-        { id: 'BAR', label: 'Move the last bands to the bar', likely: 'The show goes on. The kids can\'t come.',
+        { id: 'BAR', label: 'Move the last bands to the bar', likely: 'The show goes on, but the kids can\'t come.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'BAR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'The bar took the bill. The over-21 crowd stayed and the kids went home.' },
-        { id: 'EARLY', label: 'End it there and send everyone home', likely: 'Everyone hears the short set. Nobody is fined.',
+          result: 'The bar took the bill, and the over-21 crowd stayed while the kids went home.' },
+        { id: 'EARLY', label: 'End it there and send everyone home', likely: 'Everyone hears the short set, and nobody is fined.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The yard emptied quietly. The deputies left without writing anything.' },
-        { id: 'ACCEPT', label: 'Argue it and run on', likely: 'A fine, and the neighbors never forget.',
+          result: 'The yard emptied quietly, and the deputies left without writing anything.' },
+        { id: 'ACCEPT', label: 'Argue it and run on', likely: 'It means a fine, and the neighbors never forget.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'MONEY', amount: -40 }],
-          result: 'The ticket cost forty dollars and the yard was empty by ten.' }
+          result: 'The ticket cost forty dollars, and the yard was empty by ten.' }
       ] },
 
     { id: 'CHARLESTON_SC_RACE_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -139,15 +139,15 @@ SB.Cities.register('charleston-sc', {
       title: 'The bridge is closed for the race',
       body: 'Saturday morning the runners have the big bridge and half the peninsula. The kids from across the water cannot drive over until the afternoon.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the streets open', likely: 'The kids get in. A late night.',
+        { id: 'LATE', label: 'Push doors back until the streets open', likely: 'The kids get in, but it\'s a late night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The kids from over the bridge came in tired and loud.' },
+          result: 'You opened doors an hour late, and the kids from over the bridge came in tired and loud.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Most of the east side stays home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The bridge never cleared. The east side stayed over the water.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The bridge never cleared, and the east side stayed over the water.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] },
 
     { id: 'CHARLESTON_SC_KING_TIDE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -156,15 +156,15 @@ SB.Cities.register('charleston-sc', {
       title: 'The tide is in the street',
       body: 'A king tide has put the low streets under a foot of water, and it is rising toward the room. The skatepark is on higher ground and the lights are on.',
       options: [
-        { id: 'SKATEPARK', label: 'Move the bill to the skatepark', likely: 'Early and outside. Daylight is the limit.',
+        { id: 'SKATEPARK', label: 'Move the bill to the skatepark', likely: 'It\'s early and outside, and daylight is the limit.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, respect: false }, { op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The skatepark took the bill and the water never reached the lot.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The skatepark took the bill, and the water never reached the lot.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'ACCEPT', label: 'Run it and wade', likely: 'Wet shoes and a thin crowd.',
+          result: 'You moved it a day, and the people who could come, came.' },
+        { id: 'ACCEPT', label: 'Run it and wade', likely: 'You get wet shoes and a thin crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The crowd came in with their pants rolled up. The floor was a puddle.' }
+          result: 'The crowd came in with their pants rolled up, and the floor was a puddle.' }
       ] }
   ]
 });

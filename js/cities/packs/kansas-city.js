@@ -120,15 +120,15 @@ SB.Cities.register('kansas-city', {
       title: 'The river bridge is closed',
       body: 'A wreck has shut one of the bridges over the Missouri, and the other is backed up for a mile. Everyone coming from the north side is stuck.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The bridge stayed shut. The north side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The bridge stayed shut, and the north side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the long way around together. They\'ll remember that.' }
+          result: 'Two carloads took the long way around together.' }
       ] },
 
     { id: 'KANSAS_CITY_SUMMER_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -137,12 +137,12 @@ SB.Cities.register('kansas-city', {
       title: 'Nine o\'clock on Westport',
       body: 'The summer curfew pushes anyone under eighteen out of the entertainment district by nine. Your all-ages bill starts at eight.',
       options: [
-        { id: 'EARLY', label: 'Start at six and finish before nine', likely: 'Short bills and early doors. Most of the kids make it.',
+        { id: 'EARLY', label: 'Start at six and finish before nine', likely: 'Short bills and early doors, and most of the kids make it.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at six and a short, fast bill. The kids were out the door before nine.' },
+          result: 'Doors were at six and the bill was short and fast, and the kids were out the door before nine.' },
         { id: 'MOVE', label: 'Move the whole bill to a basement', likely: 'Smaller and louder, out of the district.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A basement outside the district took the bill. The kids walked home late and happy.' },
+          result: 'A basement outside the district took the bill, and the kids walked home late and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids are gone by nine.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
           result: 'Half the room left at nine, ahead of the patrol.' }
@@ -154,15 +154,15 @@ SB.Cities.register('kansas-city', {
       title: 'Tailgate corridor',
       body: 'The warehouse club shares a corridor with the tailgates. The lot is full of smoke and parked cars, and the band is three blocks away with an amp.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the lot clears', likely: 'The night crowd comes. Later than planned.',
+        { id: 'LATE', label: 'Push doors back until the lot clears', likely: 'The night crowd comes, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd walked in from the tailgates, loud and happy.' },
+          result: 'Doors went an hour late, and the crowd walked in from the tailgates, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned and carry the gear', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'HOURS', d: -1, when: 'TODAY' }],
-          result: 'The band carried the amp through the smoke. The regulars were there.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The band carried the amp through the smoke, and the regulars were there.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

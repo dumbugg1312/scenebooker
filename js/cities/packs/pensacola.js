@@ -53,8 +53,8 @@ SB.Cities.register('pensacola', {
   ],
 
   tilt: [
-    { fan: 'metal', band: 'hardcore', d: .10, reason: 'A heavy town. The base and the church are what both are kicking against.' },
-    { fan: 'hardcore', band: 'metal', d: .10, reason: 'A heavy town. The base and the church are what both are kicking against.' },
+    { fan: 'metal', band: 'hardcore', d: .10, reason: 'It\'s a heavy town, and the base and the church are what both crowds are kicking against.' },
+    { fan: 'hardcore', band: 'metal', d: .10, reason: 'It\'s a heavy town, and the base and the church are what both crowds are kicking against.' },
     { fan: 'ska', band: 'street-punk', d: .15, gen: 2, reason: 'The nineties never left the beach.' },
     { fan: 'ska', band: 'pop-punk', d: .15, gen: 2, reason: 'The nineties never left the beach.' }
   ],
@@ -115,11 +115,14 @@ SB.Cities.register('pensacola', {
 
   rooms: [
     { id: 'carport', kind: 'HOUSE', hood: 'west-side', cap: 45, name: 'the Fairfield Carport', hostCut: 20, pa: .4, curfew: 1350, outdoor: true,
-      sketch: 25, standing: [65, 60, 50], pressure: 45, start: true, note: 'A carport house. Quiet by 10:30, no exceptions.' },
+      sketch: 25, standing: [65, 60, 50], pressure: 45, start: true, note: 'A carport house. Quiet by 10:30, no exceptions.',
+      parking: 'Park on the street and leave the driveway clear.', neighbor: 'The neighbor across the road waters his yard at night and gets mad if people walk across it.' },
     { id: 'cul-de-sac', kind: 'HOUSE', hood: 'north', cap: 35, hostCut: 0, pa: .3, curfew: 1320, outdoor: false,       // no name: one is generated
-      sketch: 10, standing: [75, 50, 35], pressure: 55, note: 'A kids\' room in the north suburbs. Parents nearby.' },
+      sketch: 10, standing: [75, 50, 35], pressure: 55, note: 'A kids\' room in the north suburbs. Parents nearby.',
+      parking: 'Park a block down; the street in front fills up fast.', neighbor: 'The parents are upstairs and the houses on both sides are close.' },
     { id: 'shed', kind: 'OUTDOOR', hood: 'west-side', cap: 70, rent: 15, pa: .4, curfew: 1350, sketch: 35, standing: [60, 55, 40],                     // no name: one is generated
-      note: 'A backyard with a shed in Brownsville. Fuel for the generator.' },
+      note: 'A backyard with a shed in Brownsville. Fuel for the generator.',
+      parking: 'Park along the street; the yard has room for the van only.', neighbor: 'The generator is loud, so the neighbors know when a show is on.' },
     { id: 'barn', kind: 'DIY', hood: 'west-side', cap: 120, name: 'the Rope Walk on Bayou Chico', rent: 60, pa: .6, curfew: 1440, ac: false, lowLying: true,
       sketch: 45, standing: [55, 60, 45], pressure: 60, needs: ['VOUCH'], note: 'A warehouse space by the bayou. No air conditioning. It floods.' },
     { id: 'lodge', kind: 'HALL', hood: 'west-side', cap: 160, name: 'the Mariners\' Lodge', rent: 225, deposit: 100, pa: .8, curfew: 1380, ac: true,
@@ -232,24 +235,24 @@ SB.Cities.register('pensacola', {
       title: 'The Three Mile Bridge is closed',
       body: 'Repairs close the Three Mile Bridge the night of your show. The Gulf Breeze kids can\'t get across without the long drive around.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can take the long way', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can take the long way', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people from across the bay.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The bridge stayed closed. The beach side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The bridge stayed closed, and the beach side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads went the long way around the bay. They\'ll remember that.' }
+          result: 'Two carloads of kids drove the long way around the bay to get there.' }
       ] },
 
     { id: 'PENSACOLA_STORM_WATCH', replaces: 'STORM_WATCH', when: 'WEEK', tier: 'HARD', weight: 3, cooldown: 30, bind: ['show'],
       if: { daysOut: [0, 3] },
       telegraph: 'There\'s a storm in the Gulf. Nobody knows yet where it goes.',
       title: 'Hurricane watch on show day',
-      body: 'A storm\'s in the Gulf. The bridges may close tonight. Some of the bill lives on the beach side.',
+      body: 'There\'s a storm in the Gulf and the bridges may close tonight, which is a problem, because some of the bill lives on the beach side.',
       options: [
-        { id: 'CANCEL', label: 'Cancel and reschedule', likely: 'Everyone understands. Trust holds.',
+        { id: 'CANCEL', label: 'Cancel and reschedule', likely: 'Everybody understands, and nobody holds it against you.',
           effects: [{ op: 'CANCEL_SHOW', why: 'STORM' },
                     { op: 'CHANCE', p: .5, then: [{ op: 'FLAG', key: 'storm_hit', v: true }], thenText: 'You called it. The storm came in that night and the west side lost power for a week.',
                       else: [], elseText: 'You called it. The storm turned east. Clear skies by morning, and nobody held it against you.' }],
@@ -257,12 +260,12 @@ SB.Cities.register('pensacola', {
         { id: 'MAINLAND', label: 'Go ahead with whoever is on this side of the bay', likely: 'A smaller night that people will bring up later.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: 0, beyond: true }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'MEMORY', detail: 'STORM', rarity: .9 },
                     { op: 'CHANCE', p: .25, then: [{ op: 'SHOW_MOD', key: 'endEarly', v: true }, { op: 'SHOW_MOD', key: 'qMul', v: .7 }, { op: 'FLAG', key: 'storm_hit', v: true }], thenText: 'The power went at 9:40. You finished by flashlight.',
-                      else: [{ op: 'SHOW_MOD', key: 'qAdd', v: 6 }], elseText: 'The rain held off till load-out. Everyone who came knew why they came.' }],
+                      else: [{ op: 'SHOW_MOD', key: 'qAdd', v: 6 }], elseText: 'The rain held off until load-out, and the people who came were glad they did.' }],
           result: 'You went ahead.' },
         { id: 'EARLY', label: 'Move it earlier and finish by 7', likely: 'Half the crowd, home before the weather.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .55 }, { op: 'SHOW_MOD', key: 'lateMin', v: -180 }, { op: 'MEMORY', detail: 'STORM', rarity: .7 },
-                    { op: 'CHANCE', p: .4, then: [{ op: 'FLAG', key: 'storm_hit', v: true }], thenText: 'A matinee under a grey sky. Done by 7. The storm came in at midnight.',
-                      else: [], elseText: 'A matinee under a grey sky. Done by 7. The storm never came.' }],
+                    { op: 'CHANCE', p: .4, then: [{ op: 'FLAG', key: 'storm_hit', v: true }], thenText: 'A matinee under a grey sky, done by 7. The storm came in at midnight.',
+                      else: [], elseText: 'A matinee under a grey sky, done by 7. The storm never came.' }],
           result: 'A matinee under a grey sky.' }
       ] },
 
@@ -270,17 +273,17 @@ SB.Cities.register('pensacola', {
       if: { months: [7, 8, 9, 10, 11], flag: 'storm_hit', stage: [1, 4] },
       telegraph: null,
       title: 'The generator show',
-      body: 'Half the west side has had no power for a week. {owner} has a yard, a generator and a gas can. "People need something normal."',
+      body: 'Half the west side has had no power for a week. {owner} has a yard, a generator and a gas can, and texts you: "Everybody\'s losing it sitting in the dark. Want to do a show Saturday? People need something normal."',
       options: [
         { id: 'DO_IT', label: 'Do it Saturday', likely: 'Gas money, short sets, and people who badly want a night out.',
           effects: [{ op: 'MONEY', amount: -30, cat: 'EVENT' }, { op: 'REGULARS', pct: .04 }, { op: 'NAME', d: 1.5 }, { op: 'STRESS', d: 4 }, { op: 'REL', who: '$owner', d: 3 },
                     { op: 'FLAG', key: 'storm_hit', v: false },
-                    { op: 'NOTE', text: 'After a storm, a generator show is the first normal thing. People come.', conf: 1 }],
+                    { op: 'NOTE', text: 'After a storm, a generator show is the first normal thing people get, and they come out for it.', conf: 1 }],
           result: 'Three bands on one generator and a string of work lights. Sixty people stood in a yard and nobody wanted to leave.' },
         { id: 'WAIT', label: 'Wait for the power', likely: 'Nothing lost.', effects: [{ op: 'FLAG', key: 'storm_hit', v: false }], result: 'You waited. The power came back Thursday.' },
         { id: 'ACOUSTIC', label: 'Do it without the generator', likely: 'Smaller and quieter. The neighbors won\'t mind.',
           effects: [{ op: 'REGULARS', pct: .02 }, { op: 'STRESS', d: 2 }, { op: 'FLAG', key: 'storm_hit', v: false }],
-          result: 'Two guitars and a bucket for a kick drum. It was enough.' }
+          result: 'It was two guitars and a bucket for a kick drum, and people stayed for all of it.' }
       ] },
 
     { id: 'PENSACOLA_JETS_OVER', when: 'NIGHT', tier: 'GENTLE', weight: 2, cooldown: 30, bind: ['show', 'opener'], at: 'SET:1',
@@ -289,7 +292,7 @@ SB.Cities.register('pensacola', {
       body: '{t}. The practice flights are going over the bay. Nobody can hear {opener}.',
       options: [
         { id: 'BETWEEN', label: 'Stop between passes', likely: 'The set runs long.', effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 10 }], result: '{opener} played four songs in six pieces.' },
-        { id: 'THROUGH', label: 'Play through it', likely: 'A mess. People will post about it.', effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }, { op: 'FOLLOWERS', d: 8 }, { op: 'MEMORY', detail: 'INCIDENT', rarity: .5 }],
+        { id: 'THROUGH', label: 'Play through it', likely: 'It\'ll be a mess, and people will post about it.', effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }, { op: 'FOLLOWERS', d: 8 }, { op: 'MEMORY', detail: 'INCIDENT', rarity: .5 }],
           result: '{opener} played straight through a flyover. Half the room filmed the ceiling.' },
         { id: 'LATER', label: 'Start an hour later', likely: 'Clean sets; the kids\' rides leave on time anyway.', effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }], result: 'You waited them out.' }
       ] },
@@ -297,12 +300,12 @@ SB.Cities.register('pensacola', {
     { id: 'PENSACOLA_AIR_SHOW_TRAFFIC', when: 'NIGHT', tier: 'REAL', weight: 2, cooldown: 30, bind: ['show', 'touring'], at: 'DOORS',
       if: { calendar: 'airshow' }, risk: { base: .7 },
       title: 'Air show weekend',
-      body: '{t}. Downtown is full and {touring} is stuck in the air show traffic, backed up from the base to the interstate. "An hour. Maybe more."',
+      body: '{t}. Downtown is full and {touring} are stuck in the air show traffic, backed up from the base to the interstate. They text: "Sorry, we haven\'t moved in twenty minutes. It\'s going to be an hour, maybe more."',
       options: [
         { id: 'PUSH_LAST', label: 'Push them last', likely: 'They play to whoever stays.', effects: [{ op: 'SWAP_ORDER', touringTo: 'LAST' }], result: '{touring} loaded in during the closer\'s last song and played anyway.' },
-        { id: 'HOLD', label: 'Start with locals and hold the room', likely: 'The night runs late.', effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 30 }], result: 'You stretched every changeover. They made it.' },
+        { id: 'HOLD', label: 'Start with locals and hold the room', likely: 'The night runs late.', effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 30 }], result: 'You stretched every changeover as long as you could, and they made it.' },
         { id: 'HAT', label: 'Tell the crowd and ask for gas money at the door', likely: 'People are kind about it.', effects: [{ op: 'SHOW_MOD', key: 'hatBonus', v: 1 }, { op: 'SHOW_MOD', key: 'lateMin', v: 20 }, { op: 'TRUST', who: '$touring', d: 2 }],
-          result: 'You said it from the front. The door did well after that.' }
+          result: 'You told the room what happened from the front, and people put more in at the door after that.' }
       ] },
 
     { id: 'PENSACOLA_SAILORS', when: 'NIGHT', tier: 'GENTLE', weight: 1, cooldown: 20, bind: ['show'], at: 'SET:1',
@@ -310,8 +313,8 @@ SB.Cities.register('pensacola', {
       title: 'Sailors on liberty',
       body: '{t}. A ship\'s in. A dozen sailors heard there was a punk show on Navy Boulevard and found this one instead.',
       options: [
-        { id: 'LET_IN', label: 'Let them in', likely: 'More heads. Mostly fine.', effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.08 },
-            { op: 'CHANCE', p: .15, then: [{ op: 'SHOW_MOD', key: 'qAdd', v: -4 }], thenText: 'One of them wanted a different kind of night. It took a while to explain.', else: [{ op: 'REGULARS', pct: .01 }], elseText: 'Two of them asked when the next one is.' }],
+        { id: 'LET_IN', label: 'Let them in', likely: 'More people through the door, and it\'s probably fine.', effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.08 },
+            { op: 'CHANCE', p: .15, then: [{ op: 'SHOW_MOD', key: 'qAdd', v: -4 }], thenText: 'One of them was looking for a different kind of night, and it took a while to explain that this wasn\'t it.', else: [{ op: 'REGULARS', pct: .01 }], elseText: 'Two of them asked when the next one is.' }],
           result: 'They paid at the door like everyone else.' },
         { id: 'WATCH', label: 'Let them in and put someone near them', likely: 'Safe.', needs: { hasCrew: 'floor' }, effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.08 }, { op: 'REGULARS', pct: .01 }], result: '{floor} stood by them for a set. They were the politest people in the room.' }
       ] },
@@ -322,7 +325,7 @@ SB.Cities.register('pensacola', {
       title: 'Parade Saturday',
       body: 'The parade route blocks the road to the room. Nobody will be able to park, and everybody will already have been out since noon.',
       options: [
-        { id: 'SUNDAY', label: 'Move it to Sunday', likely: 'A day\'s notice lost; a room people can reach.', effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: true }], result: 'Sunday. The bands were fine with it.' },
+        { id: 'SUNDAY', label: 'Move it to Sunday', likely: 'You lose a day of notice, but people can get to the room.', effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: true }], result: 'You moved it to Sunday, and the bands were fine with it.' },
         { id: 'PARADE_BILL', label: 'Start after the parade and catch the crowd on its way home', likely: 'A gamble.',
           effects: [{ op: 'CHANCE', p: .4, then: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.25 }], thenText: 'The parade let out and forty strangers followed the noise.', else: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }], elseText: 'Everyone went home to sleep it off.' }],
           result: 'You moved doors to the end of the parade.' },
@@ -332,12 +335,12 @@ SB.Cities.register('pensacola', {
     { id: 'PENSACOLA_MILL_SHIFT', when: 'NIGHT', tier: 'GENTLE', weight: 1, cooldown: 30, bind: ['show'], at: 'SET:PEAK',
       if: { notFlag: 'mill_shift_seen' }, risk: { base: .05, mul: [{ if: { roomKind: ['HALL', 'DIY', 'OUTDOOR'] }, x: 2 }] },
       title: 'The mill shift',
-      body: '{t}. A crew from the Cantonment mill came straight from the shift change, smelling like the mill. They are the best crowd of the night.',
+      body: '{t}. A crew from the Cantonment mill came straight from the shift change, still smelling like the mill, and they turn out to be the best crowd of the night.',
       options: [
         { id: 'GOOD', label: 'Good', likely: 'Nothing to decide.', effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: 3 }, { op: 'FLAG', key: 'mill_shift_seen', v: true }, { op: 'NOTE', text: 'Cantonment comes out on Fridays after second shift.', conf: 2 }],
           result: 'Cantonment comes out on Fridays after second shift.' },
         { id: 'TALK', label: 'Go say hello', likely: 'You miss half a set.', effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: 3 }, { op: 'FLAG', key: 'mill_shift_seen', v: true }, { op: 'REGULARS', pct: .02 }, { op: 'NOTE', text: 'Cantonment comes out on Fridays after second shift.', conf: 2 }],
-          result: 'They said nobody ever books anything they can get to after work. You said Fridays.' }
+          result: 'They said nobody ever books anything they can get to after work, so you told them to watch for Fridays.' }
       ] },
 
     { id: 'PENSACOLA_FLOODED_WAREHOUSE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show', 'room'],
@@ -346,9 +349,9 @@ SB.Cities.register('pensacola', {
       title: 'The flooded warehouse',
       body: '{room} took water in the storm and has been declared unsafe. Your show there is {dow}.',
       options: [
-        { id: 'CARPORT', label: 'Move it to a house overnight', likely: 'Capacity halves. Neighbors.', effects: [{ op: 'MOVE_SHOW', toKind: 'HOUSE', dayShift: 0, respect: true }, { op: 'ROOM_PRESSURE', d: 20 }], result: 'Same night, somebody\'s living room. You spent the day telling everyone.' },
-        { id: 'HALL', label: 'Move it to a hall', likely: 'Costs rent you did not plan for.', effects: [{ op: 'MOVE_SHOW', toKind: 'HALL', dayShift: 0, respect: true }, { op: 'ROOM_PRESSURE', d: 20 }], result: 'The hall had the night. It cost what halls cost.' },
-        { id: 'CANCEL', label: 'Cancel', likely: 'People understand.', effects: [{ op: 'CANCEL_SHOW', why: 'RESPECTED' }, { op: 'ROOM_PRESSURE', d: 20 }], result: 'Nobody blamed you. Nobody\'s going back in that building for a while.' }
+        { id: 'CARPORT', label: 'Move it to a house overnight', likely: 'Half the people fit, and you have to think about the neighbors.', effects: [{ op: 'MOVE_SHOW', toKind: 'HOUSE', dayShift: 0, respect: true }, { op: 'ROOM_PRESSURE', d: 20 }], result: 'Same night, somebody\'s living room. You spent the day telling everyone.' },
+        { id: 'HALL', label: 'Move it to a hall', likely: 'Costs rent you did not plan for.', effects: [{ op: 'MOVE_SHOW', toKind: 'HALL', dayShift: 0, respect: true }, { op: 'ROOM_PRESSURE', d: 20 }], result: 'The hall had the night open, and it cost what halls cost.' },
+        { id: 'CANCEL', label: 'Cancel', likely: 'People understand.', effects: [{ op: 'CANCEL_SHOW', why: 'RESPECTED' }, { op: 'ROOM_PRESSURE', d: 20 }], result: 'Nobody blamed you, and nobody\'s going back in that building for a while anyway.' }
       ] },
 
     { id: 'PENSACOLA_SIX_PM_STORM', when: 'NIGHT', tier: 'REAL', weight: 2, cooldown: 8, bind: ['show'], at: 'DOORS',
@@ -356,10 +359,10 @@ SB.Cities.register('pensacola', {
       title: 'The 6 p.m. storm',
       body: '{t}. The afternoon thunderstorm arrived exactly at doors.',
       options: [
-        { id: 'WAIT', label: 'Wait forty minutes. It\'ll pass', likely: 'It usually does. Set times slide.',
-          effects: [{ op: 'CHANCE', p: .8, then: [{ op: 'SHOW_MOD', key: 'lateMin', v: 40 }], thenText: 'It passed. Everything is wet and it\'s ten degrees cooler.', else: [{ op: 'SHOW_MOD', key: 'lateMin', v: 40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'INCIDENT', kind: 'RAINED_OUT', q: -6 }], elseText: 'It did not pass.' }],
+        { id: 'WAIT', label: 'Wait forty minutes. It\'ll pass', likely: 'It usually does, but the set times will slide.',
+          effects: [{ op: 'CHANCE', p: .8, then: [{ op: 'SHOW_MOD', key: 'lateMin', v: 40 }], thenText: 'It passed, and now everything is wet and it\'s ten degrees cooler.', else: [{ op: 'SHOW_MOD', key: 'lateMin', v: 40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'INCIDENT', kind: 'RAINED_OUT', q: -6 }], elseText: 'It did not pass.' }],
           result: 'You waited.' },
-        { id: 'UNDER', label: 'Move under cover and pack it tight', likely: 'Loud, close and over capacity.', effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'qAdd', v: 3 }], result: 'Everyone under one roof. The rain was louder than the opener.' },
+        { id: 'UNDER', label: 'Move under cover and pack it tight', likely: 'Loud, close and over capacity.', effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'qAdd', v: 3 }], result: 'Everybody squeezed under one roof, and the rain was louder than the opener.' },
         { id: 'CALL', label: 'Call it', likely: 'Everyone gets paid from what\'s there.', effects: [{ op: 'SHOW_MOD', key: 'endEarly', v: true }, { op: 'INCIDENT', kind: 'RAINED_OUT', q: -15 }], result: 'You called it at 6:40.' }
       ] },
 
@@ -369,7 +372,7 @@ SB.Cities.register('pensacola', {
       body: '{t}. The air conditioning at {room} is out and it\'s 92 degrees at nine o\'clock.',
       options: [
         { id: 'WATER', label: 'Doors open, fans, water by the case', likely: 'The water is on you.', effects: [{ op: 'MONEY', amount: -25, cat: 'EVENT' }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }], result: 'You bought every case the gas station had.' },
-        { id: 'SHORT', label: 'Shorter sets', likely: 'Out earlier. Bands understand.', effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -4 }, { op: 'SHOW_MOD', key: 'lateMin', v: -20 }], result: 'Twenty minutes each. Nobody complained.' },
+        { id: 'SHORT', label: 'Shorter sets', likely: 'Everybody\'s out earlier, and the bands will understand.', effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -4 }, { op: 'SHOW_MOD', key: 'lateMin', v: -20 }], result: 'Every band played twenty minutes and nobody complained.' },
         { id: 'THROUGH', label: 'Play through it', likely: 'People leave between sets.', effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -7 }, { op: 'SHOW_MOD', key: 'genMul', gen: 2, v: .8 }], result: 'The old heads went home after the second band.' }
       ] },
 
@@ -377,13 +380,13 @@ SB.Cities.register('pensacola', {
       if: { trait: 'MILITARY', trust: { who: '$band', min: 50 }, weekMin: 20 },
       telegraph: null,
       title: 'Orders',
-      body: '{band}\'s drummer got orders. Six weeks. "We don\'t know what we\'re going to do."',
+      body: '{band}\'s drummer got orders and ships out in six weeks. The singer tells you, "We honestly don\'t know what we\'re going to do. We\'ve never played with anybody else."',
       options: [
         { id: 'FAREWELL', label: 'Book them a farewell show', likely: 'It will draw, and it may be one people remember.', effects: [{ op: 'TRUST', who: '$band', d: 5 },
-                    { op: 'MESSAGE', from: '$band', text: 'ok. a last show. any saturday before he ships out. we\'ll play first, last, whatever.', delay: 2, localAsk: 'LAST_SHOW' }],
+                    { op: 'MESSAGE', from: '$band', text: 'ok, we want to do one last show with him. any saturday before he ships out works, and we\'ll play first or last or whatever you need.', delay: 2, localAsk: 'LAST_SHOW' }],
           result: 'You told them to pick a Saturday.' },
         { id: 'FIND', label: 'Help them find a drummer', likely: 'An evening of asking around.', effects: [{ op: 'HOURS', d: -2, when: 'WEEK' }, { op: 'TRUST', who: '$band', d: 4 },
-            { op: 'CHANCE', p: .5, then: [{ op: 'TRUST', who: '$band', d: 4 }], thenText: 'A kid from Pace can play. They start practicing Tuesday.', else: [], elseText: 'Nobody yet. They said thanks for trying.' }],
+            { op: 'CHANCE', p: .5, then: [{ op: 'TRUST', who: '$band', d: 4 }], thenText: 'A kid from Pace can play. They start practicing Tuesday.', else: [], elseText: 'Nobody yet, but they said thanks for trying.' }],
           result: 'You asked everyone you know who owns sticks.' },
         { id: 'LET', label: 'Let it happen', likely: 'Bands end.', effects: [{ op: 'NOTHING' }], result: 'You said you were sorry to hear it.' }
       ] },
@@ -394,8 +397,8 @@ SB.Cities.register('pensacola', {
       body: '{t}. It is 36 degrees for a backyard show and nobody here owns a real coat.',
       options: [
         { id: 'FIRE', label: 'Fire pit', likely: 'People stay.', effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: 2 }], result: '{owner} had a fire pit. Half the room stood around it all night.' },
-        { id: 'PACK', label: 'Pack everyone under the carport', likely: 'Warm, and too many people in one place.', effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: 3 }], result: 'Body heat. It worked.' },
-        { id: 'SHORT', label: 'Shorter sets', likely: 'Home by 9:30.', effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -3 }, { op: 'SHOW_MOD', key: 'lateMin', v: -20 }], result: 'Fast and cold.' }
+        { id: 'PACK', label: 'Pack everyone under the carport', likely: 'Warm, and too many people in one place.', effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: 3 }], result: 'Everybody packed in close for the body heat, and it worked.' },
+        { id: 'SHORT', label: 'Shorter sets', likely: 'Home by 9:30.', effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -3 }, { op: 'SHOW_MOD', key: 'lateMin', v: -20 }], result: 'Short sets, everybody shivering, and home by 9:30.' }
       ] },
 
     { id: 'PENSACOLA_RACE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show', 'touring'],
@@ -430,7 +433,7 @@ SB.Cities.register('pensacola', {
       body: '{t}. Someone from the punk archive is shooting the whole night for the wall. Every flyer from here goes on the shelf with the old zines.',
       options: [
         { id: 'GOOD', label: 'Let them shoot', likely: 'Nothing to decide.', effects: [{ op: 'FOLLOWERS', d: 6 }, { op: 'NAME', d: .5 },
-            { op: 'NOTE', text: 'The scene here keeps its own history. Your shows are in it now.', conf: 1 }],
+            { op: 'NOTE', text: 'The scene here keeps its own history, and your shows are part of it now.', conf: 1 }],
           result: 'Somebody will find these photos in twenty years.' },
         { id: 'FLYER', label: 'Hand them a stack of your flyers', likely: 'A few minutes.', effects: [{ op: 'FOLLOWERS', d: 6 }, { op: 'NAME', d: 1 }, { op: 'REGULARS', pct: .01 }],
           result: 'Your flyer is on the wall now, between two from before you were born.' }

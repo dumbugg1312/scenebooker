@@ -109,15 +109,15 @@ SB.Cities.register('fresno', {
       title: 'Too hot to stand on the pavement',
       body: 'At six in the evening the lot is still too hot to stand on, and there is no shade and no air conditioning. The kids are texting to ask if it is really still on.',
       options: [
-        { id: 'LATER', label: 'Push the doors back until the sun is down', likely: 'Most wait it out. Everyone is up late.',
+        { id: 'LATER', label: 'Push the doors back until the sun is down', likely: 'Most wait it out, and everyone is up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors at nine. The fans blew all night and the room was packed.' },
+          result: 'Doors were at nine, and the fans blew all night and the room was packed.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Only the committed show up.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'Half the list stayed in the air conditioning at home.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. It was still hot.' }
+          result: 'You moved it a day, and it was still hot.' }
       ] },
 
     { id: 'FRESNO_TULE_FOG', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -128,13 +128,13 @@ SB.Cities.register('fresno', {
       options: [
         { id: 'SHORT', label: 'Run the local bands and hold the headliners for the end', likely: 'A long night, and it ends when they arrive.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The locals played long and loose. The van pulled in at eleven and went on last.' },
+          result: 'The locals played long and loose, and the van pulled in at eleven and went on last.' },
         { id: 'WAIT', label: 'Cancel the headliners and run a short bill', likely: 'A thin night, but nobody is stranded.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two local bands and a lot of folding chairs. The ones who came were glad.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was two local bands and a lot of folding chairs, and the people who came were glad.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The fog had lifted by then.' }
+          result: 'You moved it a day, and the fog had lifted by then.' }
       ] },
 
     { id: 'FRESNO_CURFEW_PUSH', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -143,15 +143,15 @@ SB.Cities.register('fresno', {
       title: 'Every kid out by ten',
       body: 'Police are calling parents and driving young people home after ten at night. Half your crowd is under eighteen, and the parents are waiting in cars out front.',
       options: [
-        { id: 'EARLY', label: 'Move the set times up so everyone is out by ten', likely: 'A short, early night. Parents are glad.',
+        { id: 'EARLY', label: 'Move the set times up so everyone is out by ten', likely: 'It\'s a short, early night, and the parents are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at five, done by nine-thirty. The cars out front were all gone by ten.' },
+          result: 'Doors were at five and you were done by nine-thirty, and the cars out front were all gone by ten.' },
         { id: 'HALL', label: 'Move it to the church room', likely: 'A rule-bound room, but a safe one.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .85 }],
           result: 'The church room took the bill, and the volunteers kept the clock.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The younger kids leave early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The under-eighteens left at ten and the last bands played to who was left.' }
+          result: 'The under-eighteens left at ten and the last bands played to whoever was left.' }
       ] }
   ]
 });

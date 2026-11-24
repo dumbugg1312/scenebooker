@@ -118,51 +118,51 @@ SB.Cities.register('phoenix', {
       if: { daysOut: [0, 3], weather: 'RAIN', months: [7, 8, 9] },
       telegraph: 'The storms are building over the mountains south of town.',
       title: 'A haboob turns the sky brown',
-      body: 'A wall of dust a mile high rolled in at sunset. The yard is brown, the PA is full of grit and the host is hosing down the amps.',
+      body: 'A wall of dust a mile high rolled in at sunset. The yard is brown, the PA is full of grit, and the host is hosing down the amps.',
       options: [
-        { id: 'INSIDE', label: 'Move everything into the living room', likely: 'Smaller and sweatier. The crowd shrinks to the ones who made it.',
+        { id: 'INSIDE', label: 'Move everything into the living room', likely: 'It\'s smaller and sweatier, and the crowd shrinks to the ones who made it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
           result: 'Everyone crammed into the living room with the windows taped shut and the amps wrapped in towels.' },
         { id: 'WAIT', label: 'Wait for the dust to settle and push doors late', likely: 'The ones who wanted to come stay.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The air cleared by nine. The crowd came in coughing and loved it.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The air cleared by nine, and the crowd came in coughing and loved it.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'PHOENIX_TUNNEL_CLOSED', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'The interstate through downtown is on the overnight closure list.',
       title: 'The interstate is shut at the river',
-      body: 'A wreck at the tunnel has the whole freeway down. The east valley kids and the bands from Mesa are on the wrong side of the river.',
+      body: 'A wreck at the tunnel has the whole freeway down, and the east valley kids and the bands from Mesa are on the wrong side of the river.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The freeway never cleared. The east side stayed home.' },
-        { id: 'RAIL', label: 'Tell everyone to take the light rail', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The freeway never cleared, and the east side stayed home.' },
+        { id: 'RAIL', label: 'Tell everyone to take the light rail', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'A train full of kids with guitar cases. The last one home at midnight.' }
+          result: 'A train full of kids with guitar cases got them there, and the last one got home at midnight.' }
       ] },
 
     { id: 'PHOENIX_STATE_FAIR_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'It is fair season and the west-side roads are jammed from the fairgrounds to the freeway.',
       title: 'The fair jams the west side',
-      body: 'Saturday traffic is backed up for miles. The band lost its load-in slot in the line of cars and the crowd is trickling in late.',
+      body: 'Saturday traffic is backed up for miles. The band lost its load-in slot in the line of cars, and the crowd is trickling in late.',
       options: [
         { id: 'LATE', label: 'Push doors back an hour and wait for the roads', likely: 'The ones who wanted to come make it, tired.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The crowd came in off the freeway sweating and loud.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A thin early set.',
+          result: 'Doors were an hour late, and the crowd came in off the freeway sweating and loud.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The early set is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The first band played to the bartender. The floor filled by ten.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The first band played to the bartender, and the floor filled by ten.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'PHOENIX_ART_WALK_SWEEP', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -171,15 +171,15 @@ SB.Cities.register('phoenix', {
       title: 'The curfew sweep',
       body: 'The police are walking the arts district looking for minors out past ten. Your all-ages bill has a floor of fifteen-year-olds and a headliner at ten.',
       options: [
-        { id: 'KIDS_FIRST', label: 'Put the youngest bands on first and clear them by ten', likely: 'The kids get their set. The late crowd is older and thinner.',
+        { id: 'KIDS_FIRST', label: 'Put the youngest bands on first and clear them by ten', likely: 'The kids get their set, and the late crowd is older and thinner.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The kids played first and were home by ten. The headliner played to a thinner, older room.' },
-        { id: 'HOUSE', label: 'Move the whole bill to a rental house', likely: 'Smaller, and out of the sweep.',
+          result: 'The kids played first and were home by ten, and the headliner played to a thinner, older room.' },
+        { id: 'HOUSE', label: 'Move the whole bill to a rental house', likely: 'It\'s smaller, and out of the sweep.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A rental house took the bill with an hour to spare. Hot, packed and quiet on the porch.' },
+          result: 'A rental house took the bill with an hour to spare. It was hot and packed, and quiet on the porch.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Some parents get a call.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The police came through at ten. Half the floor left with a parent mid-song.' }
+          result: 'The police came through at ten, and half the floor left with a parent mid-song.' }
       ] }
   ]
 });

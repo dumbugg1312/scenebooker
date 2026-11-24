@@ -84,7 +84,7 @@ SB.Cities.register('tulsa', {
   ],
   "blurb": [
     "Four decades of punk in a church-ridden river city, where rooms open and shut but the house shows never stop.",
-    "All-ages is hard to keep and the clubs want you at twenty-one."
+    "All-ages is hard to keep, and the clubs want you at twenty-one."
   ],
   "hard": "All-ages rooms keep closing and the clubs want you at twenty-one.",
   "region": "the plains",
@@ -692,12 +692,12 @@ SB.Cities.register('tulsa', {
       },
       "telegraph": "The inner loop has an early curfew for kids under eighteen on weekend nights.",
       "title": "Kids out by nine",
-      "body": "Under-eighteen fans have to be out of the downtown inner loop by nine. The big room’s headliner is due at ten.",
+      "body": "Under-eighteen fans have to be out of the downtown inner loop by nine, and the big room’s headliner is due at ten.",
       "options": [
         {
           "id": "FLIP",
           "label": "Move the headliner up to a quarter past eight",
-          "likely": "The kids hear the best set. The rest is thin.",
+          "likely": "The kids hear the best set, and the rest of the night is thin.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -710,7 +710,7 @@ SB.Cities.register('tulsa', {
               "v": 0.92
             }
           ],
-          "result": "The headliner went on at eight-fifteen. Kids lined the sidewalk to leave early."
+          "result": "The headliner went on at eight-fifteen, and kids lined the sidewalk to leave early."
         },
         {
           "id": "ACCEPT",
@@ -723,7 +723,7 @@ SB.Cities.register('tulsa', {
               "v": 0.75
             }
           ],
-          "result": "The kids were out by nine. The headliner played to the grown-ups."
+          "result": "The kids were out by nine, and the headliner played to the grown-ups."
         },
         {
           "id": "MOVE",
@@ -736,7 +736,7 @@ SB.Cities.register('tulsa', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. Not everyone could make the new one."
+          "result": "You moved it a day, and not everyone could make the new one."
         }
       ]
     },
@@ -766,7 +766,7 @@ SB.Cities.register('tulsa', {
         {
           "id": "MOVE",
           "label": "Move the show up a day",
-          "likely": "Breaks the date. A smaller crowd.",
+          "likely": "It breaks the date and the crowd is smaller.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -774,12 +774,12 @@ SB.Cities.register('tulsa', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come, came."
         },
         {
           "id": "SHUTTLE",
           "label": "Run it and send people to park far away",
-          "likely": "Most walk it.",
+          "likely": "Most will walk it.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -792,7 +792,7 @@ SB.Cities.register('tulsa', {
               "v": 30
             }
           ],
-          "result": "People parked half a mile off and walked in. A late, warm night."
+          "result": "People parked half a mile off and walked in, and it was a late, warm night."
         },
         {
           "id": "ACCEPT",
@@ -805,7 +805,7 @@ SB.Cities.register('tulsa', {
               "v": 0.75
             }
           ],
-          "result": "The festival kept the crowd. The ones who came stayed to the end."
+          "result": "The festival kept the crowd, but the ones who came stayed to the end."
         }
       ]
     },
@@ -832,12 +832,12 @@ SB.Cities.register('tulsa', {
       },
       "telegraph": "A spring storm is sitting over the river and the yards in the old neighborhoods are already wet.",
       "title": "The crawlspace floods",
-      "body": "A storm has put the yard under the bungalow under an inch of water. The host is out there with a bucket and the crawlspace show is in four hours.",
+      "body": "A storm has put the yard under the bungalow under an inch of water. The host is out there with a bucket, and the crawlspace show is in four hours.",
       "options": [
         {
           "id": "MOVE",
           "label": "Move the bill to the front room",
-          "likely": "Smaller and louder.",
+          "likely": "It's smaller and louder.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -851,12 +851,12 @@ SB.Cities.register('tulsa', {
               "v": 0.6
             }
           ],
-          "result": "The bill went in the living room. It was packed and dry."
+          "result": "The bill went in the living room, and it was packed and dry."
         },
         {
           "id": "BAIL",
           "label": "Bail it out and run it",
-          "likely": "A short night and a muddy floor.",
+          "likely": "You get a short night and a muddy floor.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -869,7 +869,7 @@ SB.Cities.register('tulsa', {
               "v": 60
             }
           ],
-          "result": "You bailed until eight and opened at nine. Wet shoes and a happy room."
+          "result": "You bailed until eight and opened at nine, and the room was happy in wet shoes."
         },
         {
           "id": "MOVE_DAY",
@@ -909,7 +909,7 @@ SB.Cities.register('tulsa', {
         {
           "id": "EARLY",
           "label": "Load in at noon, before the barricades",
-          "likely": "Most get in. A long wait.",
+          "likely": "Most get in, but there's a long wait.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -922,12 +922,12 @@ SB.Cities.register('tulsa', {
               "v": 0.92
             }
           ],
-          "result": "You were set up by two. The crowd walked in through the closed streets."
+          "result": "You were set up by two, and the crowd walked in through the closed streets."
         },
         {
           "id": "ACCEPT",
           "label": "Carry it in by hand",
-          "likely": "A late start.",
+          "likely": "You start late.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -940,7 +940,7 @@ SB.Cities.register('tulsa', {
               "v": 0.85
             }
           ],
-          "result": "You hauled everything on a cart. Doors were an hour late."
+          "result": "You hauled everything on a cart, and doors were an hour late."
         },
         {
           "id": "MOVE",
@@ -953,7 +953,7 @@ SB.Cities.register('tulsa', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The barricades were gone and so was half the list."
+          "result": "You moved it a day, but the barricades were gone and so was half the list."
         }
       ]
     }

@@ -114,13 +114,13 @@ SB.Cities.register('lynchburg-va', {
       options: [
         { id: 'DETOUR', label: 'Send the bands round by the back roads', likely: 'Late, but everyone arrives.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'The van came in through the hills an hour late. The tired runners still came.' },
+          result: 'The van came in through the hills an hour late, and the tired runners still came.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A thin crowd, and nobody is fresh.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The runners went to bed early. A quiet night.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The runners went to bed early, so it was a quiet night.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'LYNCHBURG_VA_TWO_QUIET_HOURS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -129,15 +129,15 @@ SB.Cities.register('lynchburg-va', {
       title: 'The police at 9:10',
       body: 'A neighbor calls at ten past nine about the singing. The officer says the quiet hour has not started yet, but the neighbor is still on the porch.',
       options: [
-        { id: 'TURN_DOWN', label: 'Turn it down for the rest of the set', likely: 'A quieter night. Most stay.',
+        { id: 'TURN_DOWN', label: 'Turn it down for the rest of the set', likely: 'A quieter night, and most stay.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The drums went to brushes and the officer left. The neighbor stayed on the porch.' },
-        { id: 'END', label: 'End it early', likely: 'A short night. No trouble.',
+          result: 'The drums went to brushes and the officer left, but the neighbor stayed on the porch.' },
+        { id: 'END', label: 'End it early', likely: 'A short night with no trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'You stopped at ten. Nobody argued, and the street stayed loud for another hour.' },
+          result: 'You stopped at ten and nobody argued, and the street stayed loud for another hour.' },
         { id: 'ACCEPT', label: 'Argue the clock and play on', likely: 'The host pays for it later.',
           effects: [{ op: 'MONEY', amount: -25 }],
-          result: 'The officer was right about the clock and the neighbor called again at ten. The host got a ticket.' }
+          result: 'The officer was right about the clock, the neighbor called again at ten, and the host got a ticket.' }
       ] },
 
     { id: 'LYNCHBURG_VA_KIDS_CLEARED', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -148,13 +148,13 @@ SB.Cities.register('lynchburg-va', {
       options: [
         { id: 'REORDER', label: 'Move the all-ages bands first', likely: 'The young crowd sees their bands and leaves on time.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The kids got their sets and were out by nine. The late crowd found a half-empty room.' },
+          result: 'The kids got their sets and were out by nine, and the late crowd found a half-empty room.' },
         { id: 'STREET', label: 'Let the kids wait outside', likely: 'Half of them go home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Half the kids waited on the sidewalk and half went home. The sidewalk was loud.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Half the kids waited on the sidewalk and half went home, and the sidewalk was loud.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ]
 });

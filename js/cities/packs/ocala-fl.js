@@ -115,29 +115,29 @@ SB.Cities.register('ocala-fl', {
       title: 'Load-in through a parade',
       body: 'Thousands are on the brick streets for the lighting parade, and the bar show has to carry its gear in through the crowd before the floats finish.',
       options: [
-        { id: 'EARLY', label: 'Load in at noon, before the streets close', likely: 'Everything is in early. A long wait for doors.',
+        { id: 'EARLY', label: 'Load in at noon, before the streets close', likely: 'Everything is in early, but it\'s a long wait for doors.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The gear was on stage by one. The crowd found the room after the last float.' },
+          result: 'The gear was on stage by one, and the crowd found the room after the last float.' },
         { id: 'LATE', label: 'Push doors back until the parade is over', likely: 'The ones who stayed downtown wander in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The street emptied and the bar filled.' },
+          result: 'Doors opened an hour late, and the street emptied and the bar filled.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Nobody can park, and the regulars know it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the list gave up on parking. The room was thin and loud.' }
+          result: 'Half the list gave up on parking, and the room was thin and loud.' }
       ] },
 
     { id: 'OCALA_FL_HORSE_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'festival', months: [1, 2, 3, 4] },
       telegraph: 'Horse trailers are lined up on the interstate and the west side is gridlocked.',
       title: 'The west side is all trailers',
-      body: 'Week after week of riders has jammed the roads. Half your crowd is coming straight from a barn shift, in boots, and nobody knows when they will arrive.',
+      body: 'Week after week of riders has jammed the roads. Half your crowd is coming straight from a barn shift in boots, and nobody knows when they will arrive.',
       options: [
-        { id: 'LATE', label: 'Start late and let them straggle in', likely: 'A late start, but they show up.',
+        { id: 'LATE', label: 'Start late and let them straggle in', likely: 'You start late, but they show up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'The first band played to six people. By the last one the room was full of boots.' },
+          result: 'The first band played to six people, and by the last one the room was full of boots.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The early bands play to nobody.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The traffic never cleared and the early bands played for the bar staff.' }
+          result: 'The traffic never cleared, and the early bands played for the bar staff.' }
       ] },
 
     { id: 'OCALA_FL_BURN_BAN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -146,15 +146,15 @@ SB.Cities.register('ocala-fl', {
       title: 'The fire ring is off',
       body: 'The generator show on family land was built around a fire ring, and the ban is posted at the county line. The scrub is dry as paper.',
       options: [
-        { id: 'NOFIRE', label: 'Run it dark with no fire', likely: 'Safer and a little flat. Fewer come out.',
+        { id: 'NOFIRE', label: 'Run it dark with no fire', likely: 'It\'s safer and a little flat, and fewer come out.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'No fire, a few flashlights and a loud set. The ones who came did not mind.' },
-        { id: 'GARAGE', label: 'Roll it into a garage instead', likely: 'Smaller and hotter, but legal.',
+          result: 'There was no fire, just a few flashlights and a loud set, and the ones who came did not mind.' },
+        { id: 'GARAGE', label: 'Roll it into a garage instead', likely: 'It\'s smaller and hotter, but legal.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A garage took the bill and the crowd stood in the driveway with the door up.' },
+          result: 'A garage took the bill, and the crowd stood in the driveway with the door up.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

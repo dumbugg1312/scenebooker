@@ -118,15 +118,15 @@ SB.Cities.register('bridgeport-ct', {
       title: 'A truck is stuck on the river crossing',
       body: 'A broken-down truck has the highway crossing backed up for miles on the night of your show. The bands and the kids from the shore towns are stuck.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors an hour early. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the ones who wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The shore towns stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The backup never cleared, and the shore towns stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the back roads together. They will remember that.' }
+          result: 'Two carloads took the back roads together.' }
       ] },
 
     { id: 'BRIDGEPORT_CT_PARADE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -135,15 +135,15 @@ SB.Cities.register('bridgeport-ct', {
       title: 'The parade has the avenue',
       body: 'A parade and a street festival shut the avenue and half the blocks around the room. The van has to park three streets away in Brooklawn.',
       options: [
-        { id: 'EARLY', label: 'Open early and tell everyone where to park', likely: 'Most get in before the barricades. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early and tell everyone where to park', likely: 'Most get in before the barricades, but the crowd is thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came parked a mile away and carried the amps.' },
+          result: 'You opened doors an hour early, and the ones who came parked a mile away and carried the amps.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The street stayed shut. Half the list never found a place to leave the car.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The street stayed shut, and half the list never found a place to leave the car.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'BRIDGEPORT_CT_NOREASTER', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -154,13 +154,13 @@ SB.Cities.register('bridgeport-ct', {
       options: [
         { id: 'LOCAL', label: 'Let the garage band fill the slot', likely: 'A thin night, but the ones who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'One local band and a long, loose night. The room was half full and warm.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for the plows', likely: 'A late start. The crowd gets restless.',
+          result: 'It was one local band and a long, loose night, and the room was half full and warm.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for the plows', likely: 'The start is late, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The van pulled in at ten, and you started late but nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everyone trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come came.' }
       ] }
   ]
 });

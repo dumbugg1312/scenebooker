@@ -13,7 +13,7 @@ SB.Cities.register('jackson-ms', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Colleges, the fair, the papers and the stadium are written only in generic form. */
   blocklist: ['jackson free press*', 'metrocenter*', 'waffle house*', 'dixie national*', 'jackson state*', 'mississippi state*', 'ole miss*'],
 
-  blurb: ['Jackson shows hop between porches, bar stages and borrowed halls. The heat is brutal, the crowd small, and the city\'s soul music is never far away.',
+  blurb: ['Jackson shows hop between porches, bar stages and borrowed halls. The heat is brutal, the crowd is small, and the city\'s soul music is never far away.',
           'Punk shares bills and crowds with hip hop people, and everyone knows who owns the PA.'],
   hard: 'Few fixed rooms, brutal heat, and the water or power may simply be out.',
   region: 'the Deep South',
@@ -110,51 +110,51 @@ SB.Cities.register('jackson-ms', {
       if: { daysOut: [0, 3], months: [1, 2, 7, 8, 9] },
       telegraph: "The water pressure is gone on the east side, and a boil notice is expected by morning.",
       title: "The water is out again",
-      body: "A main broke and the notice went out the day of your show. The coffee shop cannot open its kitchen, and nobody wants to stand in a room without a working toilet.",
+      body: "A main broke and the notice went out the day of your show. The coffee shop can't open its kitchen, and nobody wants to stand in a room without a working toilet.",
       options: [
-        { id: 'HOUSE', label: "Move the bill to a carport with a borrowed generator", likely: "Smaller and louder, and nobody can cancel a carport.",
+        { id: 'HOUSE', label: "Move the bill to a carport with a borrowed generator", likely: "It's smaller and louder, and nobody can cancel a carport.",
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: "A friend's carport took the whole bill on an extension cord, and the floor was packed." },
-        { id: 'SHORT', label: "Run it dry and short", likely: "A thin night, but the ones who came are glad.",
+        { id: 'SHORT', label: "Run it dry and short", likely: "It's a thin night, but the people who came are glad.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: "Bottled water and a short set. The room was half full and sticky." },
-        { id: 'MOVE', label: "Move it a day", likely: "Breaks the date. Costs trust with the bands.",
+          result: "You handed out bottled water and kept the set short, and the room was half full and sticky." },
+        { id: 'MOVE', label: "Move it a day", likely: "It breaks the date, and the bands trust you a little less.",
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: "You moved it a day. Not everyone could make the new one." }
+          result: "You moved it a day, and not everyone could make the new one." }
       ] },
 
     { id: 'JACKSON_MS_FAIR_TRAFFIC', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'fair' },
-      telegraph: "The fair is open all week and the exit ramp is a parking lot every night.",
+      telegraph: "The fair is open all week, and the exit ramp is a parking lot every night.",
       title: "The fair backs up the road",
-      body: "Fair traffic has the north-end bar stuck behind a mile of taillights. But a gang of fourteen-year-olds with fair wristbands are hunting for something else to do.",
+      body: "Fair traffic has the north-end bar stuck behind a mile of taillights, but a gang of fourteen-year-olds with fair wristbands are hunting for something else to do.",
       options: [
         { id: 'EARLY', label: "Open early, before the rush", likely: "Most get in ahead of the traffic.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: "Doors an hour early. The ones who came beat the backup and stayed." },
+          result: "You opened doors an hour early, and the people who came beat the backup and stayed." },
         { id: 'ACCEPT', label: "Run it as planned", likely: "Lots of people give up on the road.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: "The ramp never cleared. Half the list stayed home." },
-        { id: 'KIDS', label: "Take the fair kids at the door", likely: "A few more heads, and a few more problems.",
+          result: "The ramp never cleared, and half the list stayed home." },
+        { id: 'KIDS', label: "Take the fair kids at the door", likely: "You get a few more people, and a few more problems.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: "A few wristbanded kids wandered in and stayed to the last song. The room was loud and a little wild." }
+          result: "A few wristbanded kids wandered in and stayed to the last song, and the room was loud and a little wild." }
       ] },
 
     { id: 'JACKSON_MS_HEAT_INDEX', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [6, 7, 8, 9], weather: 'HEAT' },
-      telegraph: "The heat index is past a hundred and ten and the warehouse has one garage door.",
+      telegraph: "The heat index is past a hundred and ten, and the warehouse has one garage door.",
       title: "The warehouse is an oven",
-      body: "The warehouse has no air conditioning and the heat index is dangerous by late afternoon. The bands are asking if they can play before the sun goes down.",
+      body: "The warehouse has no air conditioning and the heat index is dangerous by late afternoon, and the bands are asking if they can play before the sun goes down.",
       options: [
-        { id: 'EARLY', label: "Move the whole show to six in the evening", likely: "Short and sweaty, but nobody passes out.",
+        { id: 'EARLY', label: "Move the whole show to six in the evening", likely: "It's short and sweaty, but nobody passes out.",
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
-          result: "Doors at five thirty and done by nine. The garage door stayed up and the fans never stopped." },
-        { id: 'ICE', label: "Buy ice and fans and run it", likely: "Costs twenty-five dollars. A hot night.",
+          result: "You opened doors at five thirty and finished by nine, with the garage door up and the fans running the whole time." },
+        { id: 'ICE', label: "Buy ice and fans and run it", likely: "It costs twenty-five dollars, and it's still a hot night.",
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: "Ice in a cooler and every fan you could find. Hot and loud, and they stayed." },
-        { id: 'MOVE', label: "Move it a day", likely: "Breaks the date. Costs trust with the bands.",
+          result: "You brought ice in a cooler and every fan you could find, and it was hot and loud, but people stayed." },
+        { id: 'MOVE', label: "Move it a day", likely: "It breaks the date, and the bands trust you a little less.",
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: "You moved it a day. Not everyone could make the new one." }
+          result: "You moved it a day, and not everyone could make the new one." }
       ] }
   ]
 });

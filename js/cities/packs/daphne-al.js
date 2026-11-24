@@ -16,7 +16,7 @@ SB.Cities.register('daphne-al', {
   blocklist: ['airbus*', 'huntingdon*', 'bayside academy*', 'shrimp festival*', 'waffle house*'],
 
   blurb: ['A Mobile Bay eastern-shore suburb of subdivisions and church-league ball fields, the biggest town in Baldwin County and nowhere to go on a Friday.',
-          'The kids here fill the rooms across the bay and down the coast; the rooms inside town are always about to be shut.'],
+          'The kids here fill the rooms across the bay and down the coast, and the rooms inside town are always about to be shut.'],
   hard: 'Spread-out subdivisions, neighbors who call, and every room is about to be shut.',
   region: 'the Gulf',
   houseType: 'GARAGE',
@@ -132,15 +132,15 @@ SB.Cities.register('daphne-al', {
       title: 'The Bayway is jammed',
       body: 'A wreck on the Bayway and a backup at the tunnel have everyone on the Mobile side at a crawl the night of your show. The crowd from across the bay is stuck on the causeway.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people from across the bay.',
+          result: 'You moved doors up an hour, and the people who wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people from across the bay.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The traffic never cleared. Mobile stayed on its side of the water.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The traffic never cleared, and Mobile stayed on its side of the water.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads sat in traffic together all the way over. They\'ll remember that.' }
+          result: 'Two carloads sat in traffic together all the way over.' }
       ] },
 
     { id: 'DAPHNE_AL_FOOTBALL_FRIDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -149,15 +149,15 @@ SB.Cities.register('daphne-al', {
       title: 'The football Friday',
       body: 'The kids you want are at the game or in the stands with their parents, and your show is the same night. The ones who come are the ones nobody picked.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the game lets out', likely: 'The ones who care show up after. A late start.',
+        { id: 'LATE', label: 'Push doors back until the game lets out', likely: 'The people who care show up after, so it\'s a late start.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. They came straight from the game, still loud.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A thin crowd, and a loyal one.',
+          result: 'You opened doors an hour late, and they came straight from the game, still loud.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'It\'s a thin crowd, but a loyal one.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Half the list was at the game. The room was small and glad.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Half the list was at the game, and the room was small and glad.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it to Saturday. Not everyone could make the new one.' }
+          result: 'You moved it to Saturday, and not everyone could make the new one.' }
       ] },
 
     { id: 'DAPHNE_AL_ARTS_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -166,15 +166,15 @@ SB.Cities.register('daphne-al', {
       title: 'The parking is gone',
       body: 'The festival has filled the bluff, the vendors have the church hall, and a porch show means the police will come looking for a permit.',
       options: [
-        { id: 'EARLY', label: 'Move the show earlier, before the vendors pack up', likely: 'Fewer people, and nobody blocked in.',
+        { id: 'EARLY', label: 'Move the show earlier, before the vendors pack up', likely: 'You get fewer people, and nobody is blocked in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early. The set was done before the street reopened.' },
-        { id: 'BARN', label: 'Move the bill to a barn out on the edge', likely: 'Farther out, and a smaller room.',
+          result: 'You opened doors early, and the set was done before the street reopened.' },
+        { id: 'BARN', label: 'Move the bill to a barn out on the edge', likely: 'It\'s farther out and a smaller room.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .8 }],
-          result: 'A barn on a big lot took the bill. No neighbors, and no one blocked in.' },
+          result: 'A barn on a big lot took the bill, with no neighbors and nobody blocked in.' },
         { id: 'ACCEPT', label: 'Run it and hope', likely: 'The street is closed and the neighbors are watching.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'People parked a mile off and many gave up and went home.' }
+          result: 'People parked a mile off, and many gave up and went home.' }
       ] }
   ]
 });

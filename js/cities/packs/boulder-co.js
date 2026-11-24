@@ -120,14 +120,14 @@ SB.Cities.register('boulder-co', {
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The flex-building landlord has been walking the lot, and downtown is already full for the festival weekend.',
       title: 'The landlord comes by the unit',
-      body: 'The festival weekend has the parking full and the landlord of the east-side flex building has noticed cars, cables and a banner. He wants the show off his lot tonight.',
+      body: 'The festival weekend has the parking full, and the landlord of the east-side flex building has noticed the cars, cables and a banner. He wants the show off his lot tonight.',
       options: [
-        { id: 'MOVE', label: 'Move the bill to a house', likely: 'Smaller and louder, and the neighbors may call.',
+        { id: 'MOVE', label: 'Move the bill to a house', likely: 'It\'s smaller and louder, and the neighbors may call.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A house took the bill with an hour to spare, and the floor was packed.' },
-        { id: 'TRIM', label: 'Trim the bill and finish early', likely: 'Fewer bands, out before his lawyer wakes up.',
+        { id: 'TRIM', label: 'Trim the bill and finish early', likely: 'Fewer bands, and you\'re out before his lawyer wakes up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'You cut two sets and loaded out by ten. He watched the whole way.' },
+          result: 'You cut two sets and loaded out by ten, and he watched the whole way.' },
         { id: 'ACCEPT', label: 'Run it and take what comes', likely: 'The lot is full and he is angry.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'Half the crowd turned around in the lot rather than argue with him.' }
@@ -135,36 +135,36 @@ SB.Cities.register('boulder-co', {
 
     { id: 'BOULDER_CO_CANYON_ICE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [11, 12, 1, 2, 3] },
-      telegraph: 'The first real storm is coming and the canyon road is going to ice by dark.',
+      telegraph: 'The first real storm is coming, and the canyon road is going to ice by dark.',
       title: 'The canyon road ices over',
-      body: 'Ice on the canyon road the night of the bonfire set. The band is in the van at the bottom and the cabin is nine miles up.',
+      body: 'There\'s ice on the canyon road the night of the bonfire set. The band is in the van at the bottom, and the cabin is nine miles up.',
       options: [
-        { id: 'PORCH', label: 'Play the cabin porch for whoever is already up there', likely: 'A small, warm night.',
+        { id: 'PORCH', label: 'Play the cabin porch for whoever is already up there', likely: 'It\'s a small, warm night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'A dozen of them in coats on the porch with one amp. Nobody forgot it.' },
+          result: 'A dozen people in coats on the porch with one amp, and nobody forgot that night.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the band.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'ACCEPT', label: 'Run it and wait for them', likely: 'A late start and a worried crowd.',
+          result: 'You moved it a day, and the people who could make it came.' },
+        { id: 'ACCEPT', label: 'Run it and wait for them', likely: 'It starts late, and the crowd is worried.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The van crawled in at ten. The crowd was colder and louder for it.' }
+          result: 'The van crawled in at ten, and the crowd was colder and louder for the wait.' }
       ] },
 
     { id: 'BOULDER_CO_GAME_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'game' },
-      telegraph: 'The home game is Saturday, and the tailgates take the Hill by noon.',
+      telegraph: 'The home game is Saturday, and the tailgates take over the Hill by noon.',
       title: 'The Hill is a tailgate',
-      body: 'Traffic, tailgates and a loud street, and your house show is on the same block. Half the kids you counted on went north on the bus to a lodge hall night.',
+      body: 'There\'s traffic, tailgating and a loud street, and your house show is on the same block. Half the kids you counted on went north on the bus to a lodge hall night.',
       options: [
         { id: 'LATE', label: 'Push doors back until the game is over', likely: 'The crowd that wants a night out shows up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The ones who came were loud and happy.' },
+          result: 'You opened doors an hour late, and the people who came were loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed on the couch. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed on the couch, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

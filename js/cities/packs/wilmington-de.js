@@ -129,29 +129,29 @@ SB.Cities.register('wilmington-de', {
       title: 'The bridge to Jersey is shut',
       body: 'A wreck has closed the bridge over the river the night of your show. The South Jersey kids and one of the bands are stuck on the far side.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat it', likely: 'Some make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat it', likely: 'Some make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people on the far side.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people on the far side.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The bridge never reopened in time. The Jersey kids stayed home.' },
-        { id: 'RIDES', label: 'Organize rides the long way round', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The bridge never reopened in time, and the Jersey kids stayed home.' },
+        { id: 'RIDES', label: 'Organize rides the long way round', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the long way together. They\'ll remember that.' }
+          result: 'Two carloads took the long way around together.' }
       ] },
 
     { id: 'WILMINGTON_DE_HILL_FESTIVAL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], months: [6], calendar: 'festival' },
       telegraph: 'The street crews are putting up barricades on the hill for the festival.',
       title: 'The hill is closed for the festival',
-      body: 'Carnival rides and closed streets on the hill, with your house show two blocks away. Your guests have nowhere to park and the neighbors are already angry about their own spots.',
+      body: 'There are carnival rides and closed streets on the hill, and your house show is two blocks away. Your guests have nowhere to park and the neighbors are already angry about their own spots.',
       options: [
-        { id: 'WALK', label: 'Tell everyone to park across town and walk', likely: 'Some give up. The ones who come are patient.',
+        { id: 'WALK', label: 'Tell everyone to park across town and walk', likely: 'Some give up, and the ones who come are patient.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'lateMin', v: 30 }],
-          result: 'A long line of people walked up the hill together. The neighbors mostly let it go.' },
+          result: 'A long line of people walked up the hill together, and the neighbors mostly let it go.' },
         { id: 'QUIET', label: 'Keep it small and quiet', likely: 'Fewer people, fewer fights over parking.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'You kept the list short. Nobody blocked a driveway.' },
+          result: 'You kept the list short, and nobody blocked a driveway.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Angry neighbors and a thin turnout.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'The street fight over parking was louder than the band.' }
@@ -163,15 +163,15 @@ SB.Cities.register('wilmington-de', {
       title: 'Stuck behind the wreck on I-95',
       body: 'Two bands from Philadelphia are sitting in a backup on I-95. They will be an hour late, and the early set is for kids who have to be home by ten.',
       options: [
-        { id: 'REBUILD', label: 'Rebuild the bill with the local band first', likely: 'The kids see a shorter, odd set. The band gets there for the end.',
+        { id: 'REBUILD', label: 'Rebuild the bill with the local band first', likely: 'The kids see a shorter, odd set, and the band gets there for the end.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 30 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The local band played twice as long as planned. The van pulled in for the last set.' },
+          result: 'The local band played twice as long as planned, and the van pulled in for the last set.' },
         { id: 'WAIT', label: 'Hold the doors until they arrive', likely: 'The kids may miss them and leave early.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors an hour late. The kids under curfew left before the headliners.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Doors went an hour late, and the kids under curfew left before the headliners.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

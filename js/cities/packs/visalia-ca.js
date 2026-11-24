@@ -111,15 +111,15 @@ SB.Cities.register('visalia-ca', {
       title: 'Too hot to touch the drums',
       body: 'It is still triple digits at doors and the first band\'s kit is too hot to touch. The garage will not cool down until long after sundown.',
       options: [
-        { id: 'LATE', label: 'Wait for the sun to drop and start late', likely: 'The crowd that can stay up comes. Late.',
+        { id: 'LATE', label: 'Wait for the sun to drop and start late', likely: 'The crowd that can stay up comes, late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at nine, when the concrete had stopped glowing. The ones who stayed were loud.' },
-        { id: 'FANS', label: 'Rent fans and a cooler of ice', likely: 'Costs a little. A sweaty, loyal crowd.',
+          result: 'Doors were at nine, when the concrete had stopped glowing, and the ones who stayed were loud.' },
+        { id: 'FANS', label: 'Rent fans and a cooler of ice', likely: 'It costs a little, and the crowd is sweaty and loyal.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1 }],
-          result: 'Two box fans and a cooler of ice. Everybody was soaked and nobody left.' },
+          result: 'You set up two box fans and a cooler of ice, and everybody was soaked and nobody left.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'People stay home in the heat.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the list stayed in the air conditioning. The rest drank all the water.' }
+          result: 'Half the list stayed in the air conditioning, and the rest drank all the water.' }
       ] },
 
     { id: 'VISALIA_CA_FAIR_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -130,13 +130,13 @@ SB.Cities.register('visalia-ca', {
       options: [
         { id: 'LATE', label: 'Push doors back until the fair lets out', likely: 'The late crowd comes straight from the rides.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. They came in smelling like funnel cake and brought their friends.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A thin room.',
+          result: 'Doors were an hour late, and they came in smelling like funnel cake and brought their friends.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The room is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The fair kept the casual crowd. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The fair kept the casual crowd, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'VISALIA_CA_SMOKE_DAY', when: 'WEEK', tier: 'HARD', weight: 1, cooldown: 45, bind: ['show'],
@@ -145,12 +145,12 @@ SB.Cities.register('visalia-ca', {
       title: 'The yard show may not happen',
       body: 'Smoke has settled over the valley. The yard show on the farm edge is outdoors, the air is bad, and the host wants to know whether you are still on.',
       options: [
-        { id: 'INSIDE', label: 'Move the bill into a garage with the door shut', likely: 'Smaller and stuffy, but it happens.',
+        { id: 'INSIDE', label: 'Move the bill into a garage with the door shut', likely: 'It\'s smaller and stuffy, but it happens.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A garage took the bill with the door shut. It was loud and hot and everybody coughed.' },
-        { id: 'ACCEPT', label: 'Run it outside and take what you get', likely: 'Masks and a thin crowd.',
+          result: 'A garage took the bill with the door shut. It was loud and hot, and everybody coughed.' },
+        { id: 'ACCEPT', label: 'Run it outside and take what you get', likely: 'There are masks, and the crowd is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The yard was empty by ten. Everybody went home to wash their hair.' }
+          result: 'The yard was empty by ten, and everybody went home to wash their hair.' }
       ] }
   ]
 });

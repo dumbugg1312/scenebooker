@@ -91,15 +91,15 @@ SB.Cities.register('dover-de', {
       title: 'The low roads are under',
       body: 'A big rain has the St. Jones over its banks and the marsh roads east of town underwater. The farm-town kids and the bands from the coast side can\'t get through tonight.',
       options: [
-        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'Breaks the date. Costs trust with everyone.',
+        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'GARAGE', label: 'Move it to a garage on higher ground', likely: 'Smaller and louder, with a window unit that loses.',
+          result: 'You moved it a day, and the people who could come, came.' },
+        { id: 'GARAGE', label: 'Move it to a garage on higher ground', likely: 'It\'s smaller and louder, with a window unit that loses.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A garage in a tract off Route 8 took the whole bill, and the floor was packed.' },
         { id: 'PLAYON', label: 'Run it as planned and take what you get', likely: 'Most of the list stays home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The water stayed on the roads. The room was half full.' }
+          result: 'The water stayed on the roads, and the room was half full.' }
       ] }
   ]
 });

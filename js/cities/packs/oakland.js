@@ -134,7 +134,7 @@ SB.Cities.register('oakland', {
         { id: 'GENERATOR', label: 'Move it to a flatland yard with a generator', likely: 'Smaller, louder, and it works.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
           result: 'A rented generator in a West Oakland yard kept the bill alive.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
           result: 'You moved it a day once the power came back.' },
         { id: 'ACCEPT', label: 'Go acoustic and see who comes', likely: 'A small crowd.',
@@ -148,15 +148,15 @@ SB.Cities.register('oakland', {
       title: 'The Maze is a parking lot',
       body: 'A wreck at the freeway junction by the bridge toll plaza has traffic stopped for hours. The bands and the kids from across the water are stuck.',
       options: [
-        { id: 'EARLIER', label: 'Move doors an hour earlier', likely: 'Most make it. A thin start.',
+        { id: 'EARLIER', label: 'Move doors an hour earlier', likely: 'Most make it, but the start is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors an hour early. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the ones who wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the water.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The ones from across the bridge stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most get there.',
+          result: 'The backup never cleared, and the ones from across the bridge stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the back way together. They\'ll remember that.' }
+          result: 'Two carloads took the back way together.' }
       ] },
 
     { id: 'OAKLAND_FOG_ROLLS_IN', when: 'NIGHT', tier: 'REAL', weight: 2, cooldown: 30, bind: ['show'],
@@ -165,12 +165,12 @@ SB.Cities.register('oakland', {
       title: 'The fog rolls in',
       body: 'At nine the fog comes over the hills and the backyard show goes from t-shirts to hoodies. People start drifting toward the car.',
       options: [
-        { id: 'HEATERS', label: 'Pass around a heater and keep going', likely: 'Costs a little. The crowd mostly stays.',
+        { id: 'HEATERS', label: 'Pass around a heater and keep going', likely: 'It costs a little, and the crowd mostly stays.',
           effects: [{ op: 'MONEY', amount: -20 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
           result: 'A borrowed heater and a pile of blankets kept the yard warm enough.' },
         { id: 'INSIDE', label: 'Move the last sets into the garage', likely: 'Packed and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The garage held half the yard. The ones inside got the best of it.' }
+          result: 'The garage held half the yard, and the ones inside got the best of it.' }
       ] },
 
     { id: 'OAKLAND_LANDLORD_OFFER', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show'],
@@ -184,7 +184,7 @@ SB.Cities.register('oakland', {
           result: 'The block-party bill packed the floor and raised a few hundred for the move.' },
         { id: 'MOVEIT', label: 'Move it to a garage in the flats', likely: 'Smaller, closer to the neighbors.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .5 }],
-          result: 'A garage took the whole bill. It was packed to the street.' },
+          result: 'A garage took the whole bill, and it was packed to the street.' },
         { id: 'DROP', label: 'Push it a week and find another room', likely: 'Costs the date and the bands\' patience.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 7, respect: false }],
           result: 'You pushed the show a week and went hunting for a floor.' }

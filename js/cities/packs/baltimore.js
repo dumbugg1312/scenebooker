@@ -12,7 +12,7 @@ SB.Cities.register('baltimore', {
            'kinetic sculpture race', 'baltimore pride'],
   blocklist: ['johns hopkins*', 'baltimore sun*', 'baltimore banner*', 'camden yards*', 'artscape*', 'natty boh*', 'old bay*', 'preakness*', 'recher theatre*'],
 
-  blurb: ['A rowhouse port city where cheap warehouses launched a loud, close scene. Hardcore and noise bands form fast and play everywhere.',
+  blurb: ['A rowhouse port city where cheap warehouses launched a loud, close scene, and hardcore and noise bands form fast and play everywhere.',
           'Everyone is in three bands. Shows happen in basements, galleries and old industrial blocks, with a mix of ages and a rail yard out back.'],
   hard: 'Fire code and gentrifying rents keep closing the best warehouses.',
   region: 'the Mid-Atlantic',
@@ -130,49 +130,49 @@ SB.Cities.register('baltimore', {
       title: 'The festival takes the bus line',
       body: 'The streets are closed, the buses are rerouted and the lots are full. A bar show nearby has lost its parking, and the crowd has to walk.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the streets reopen', likely: 'The ones who walk in will make it. A later night.',
+        { id: 'LATE', label: 'Push doors back until the streets reopen', likely: 'The people who walk in will make it, but it\'s a later night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came on foot, loud and a little sunburnt.' },
+          result: 'You opened doors an hour late, and the crowd came on foot, loud and a little sunburnt.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list gets stuck in the crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The ones who were already in the neighborhood came. Nobody else could get through.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The people who were already in the neighborhood came, and nobody else could get through.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'BALTIMORE_SUMMER_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], months: [6, 7, 8] },
       telegraph: 'The summer youth curfew is on, and the patrol cars are out by ten on weeknights.',
       title: 'The patrol rounds up the kids',
-      body: 'Officers are driving under-17s home at ten on a weeknight, and half the bill still has to play. The all-ages crowd is looking at the clock.',
+      body: 'Officers are driving under-17s home at ten on a weeknight, and half the bill still has to play, so the all-ages crowd is looking at the clock.',
       options: [
         { id: 'EARLY', label: 'Move the start up and finish before ten', likely: 'Most of the kids get to see the whole bill.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early and the last band was done by a quarter to ten.' },
+          result: 'You opened doors early, and the last band was done by a quarter to ten.' },
         { id: 'ACCEPT', label: 'Run it and let them go home', likely: 'The kids leave before the last bands.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The kids left in the middle of the second set. The last band played to the grown-ups.' },
-        { id: 'MOVE', label: 'Move it to a bar night for the older crowd', likely: 'Smaller and later, and the kids miss it.',
+          result: 'The kids left in the middle of the second set, and the last band played to the grown-ups.' },
+        { id: 'MOVE', label: 'Move it to a bar night for the older crowd', likely: 'It\'s smaller and later, and the kids miss it.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'BAR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'A bar took the bill. The older crowd stayed late and the kids stayed home.' }
+          result: 'A bar took the bill, and the older crowd stayed late while the kids stayed home.' }
       ] },
 
     { id: 'BALTIMORE_NINE_O_CLOCK', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3] },
       telegraph: 'The night noise limit starts at nine, and the sound check started after dinner.',
       title: 'The officer read the rule',
-      body: 'A basement show has an officer at the door who read the nighttime noise code. The walls are shared and the soundcheck is already on the record.',
+      body: 'A basement show has an officer at the door who read the nighttime noise code. The walls are shared, and the soundcheck is already on the record.',
       options: [
-        { id: 'EARLY', label: 'Cut the bill short and finish by nine', likely: 'A short night, and nobody gets a ticket.',
+        { id: 'EARLY', label: 'Cut the bill short and finish by nine', likely: 'It\'s a short night, and nobody gets a ticket.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Two bands and a loud last song at five to nine. The officer waited by the stoop.' },
-        { id: 'ACCEPT', label: 'Run it and take the ticket', likely: 'The night goes on. The ticket arrives later.',
+          result: 'It was two bands and a loud last song at five to nine, and the officer waited by the stoop.' },
+        { id: 'ACCEPT', label: 'Run it and take the ticket', likely: 'The night goes on, and the ticket arrives later.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'MONEY', amount: -40 }],
-          result: 'The bill ran its length and the ticket was waiting on the door by the end.' },
-        { id: 'MOVE', label: 'Move the whole bill to a hall', likely: 'Bigger and calmer, with a flat fee.',
+          result: 'The bill ran its length, and by the end the ticket was waiting on the door.' },
+        { id: 'MOVE', label: 'Move the whole bill to a hall', likely: 'It\'s bigger and calmer, with a flat fee.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'MONEY', amount: -25 }],
-          result: 'A hall took the bill. The crowd followed the van across the neighborhood.' }
+          result: 'A hall took the bill, and the crowd followed the van across the neighborhood.' }
       ] }
   ]
 });

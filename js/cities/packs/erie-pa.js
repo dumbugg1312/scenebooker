@@ -118,17 +118,17 @@ SB.Cities.register('erie-pa', {
       if: { daysOut: [0, 3], months: [12, 1, 2, 3] },
       telegraph: 'The snow is coming off the lake overnight, and the interstate south is already slick.',
       title: 'The lake takes the road',
-      body: 'The bill is set, the snow came off the lake overnight, and the interstate to the college town is shut. Half the crowd is stuck and an opener plays two sets.',
+      body: 'The bill is set, but the snow came off the lake overnight and the interstate to the college town is shut. Half the crowd is stuck, and an opener plays two sets.',
       options: [
-        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'A thin night, but the ones who came are glad.',
+        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'It\'s a thin night, but the ones who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The local opener played two sets and the room stayed warm.' },
-        { id: 'WAIT', label: 'Hold the doors until the road clears', likely: 'A late start. The crowd gets restless.',
+          result: 'The local opener played two sets, and the room stayed warm.' },
+        { id: 'WAIT', label: 'Hold the doors until the road clears', likely: 'It starts late, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'The vans got in at ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The vans got in at ten, and you started late and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] },
 
     { id: 'ERIE_PA_CURFEW_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -137,15 +137,15 @@ SB.Cities.register('erie-pa', {
       title: 'The ten o\'clock line',
       body: 'The curfew line is ten at night for anyone under eighteen. A carload of sixteen-year-olds is still in the hall at ten past ten, and a parent has to drive in before the band packs out.',
       options: [
-        { id: 'EARLY', label: 'Stop the bill early so the kids can get home', likely: 'A shorter night. The parents notice.',
+        { id: 'EARLY', label: 'Stop the bill early so the kids can get home', likely: 'The night is shorter, and the parents notice.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }, { op: 'REGULARS', pct: .02 }],
-          result: 'You ended at half past nine. A few parents shook your hand at the door.' },
-        { id: 'RIDES', label: 'Drive the kids home yourself', likely: 'Two hours of your day. They remember it.',
+          result: 'You ended at half past nine, and a few parents shook your hand at the door.' },
+        { id: 'RIDES', label: 'Drive the kids home yourself', likely: 'It takes two hours of your day, and they remember it.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'You packed the car with sixteen-year-olds and nobody got a fine.' },
-        { id: 'ACCEPT', label: 'Let it run and hope', likely: 'A ticket for a kid, and a call to a parent.',
+          result: 'You packed the car with sixteen-year-olds, and nobody got a fine.' },
+        { id: 'ACCEPT', label: 'Let it run and hope', likely: 'A kid gets a ticket, and a parent gets a call.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'The officer waited at the corner. The kid got a warning and the bill ended in a hurry.' }
+          result: 'The officer waited at the corner. The kid got a warning, and the bill ended in a hurry.' }
       ] },
 
     { id: 'ERIE_PA_FESTIVAL_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -156,13 +156,13 @@ SB.Cities.register('erie-pa', {
       options: [
         { id: 'LATE', label: 'Push doors back until the stage lets out', likely: 'The crowd that wants a night out shows up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Doors an hour late. The crowd came in loud from the street.' },
+          result: 'Doors were an hour late, and the crowd came in loud from the street.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd stays at the festival.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'Most of the list stayed on the street. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Most of the list stayed on the street, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

@@ -113,34 +113,34 @@ SB.Cities.register('santa-fe-nm', {
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'Barricades are going up near the park, and everyone you know has a plan for Friday that is not yours.',
       title: 'The road to the park is closed',
-      body: 'The big burning night has shut the streets around downtown and drawn half the Southside to the park. The warehouse show has no parking and nobody is answering their phones.',
+      body: 'The big burning night has shut the streets around downtown and drawn half the Southside to the park. The warehouse show has no parking, and nobody is answering their phones.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the fire is out', likely: 'They come after. Later than you planned.',
+        { id: 'LATE', label: 'Push doors back until the fire is out', likely: 'They come after, later than you planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at ten. The crowd came in smelling of smoke and stayed past midnight.' },
+          result: 'Doors were at ten, and the crowd came in smelling of smoke and stayed past midnight.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the ones who could come, came.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the crowd is on the other side of the barricades.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'A thin night. The bands played for the ones who walked.' }
+          result: 'It was a thin night, and the bands played for the ones who walked.' }
       ] },
 
     { id: 'SANTA_FE_NM_MONSOON_ARROYO', when: 'WEEK', tier: 'HARD', weight: 3, cooldown: 35, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [7, 8, 9] },
       telegraph: 'The thunderheads have been building over the mountains every afternoon.',
       title: 'The arroyo is running',
-      body: 'A storm sat over the foothills for an hour. The arroyo behind the dirt-lot show is running brown and the generator is standing in water.',
+      body: 'A storm sat over the foothills for an hour. The arroyo behind the dirt-lot show is running brown, and the generator is standing in water.',
       options: [
-        { id: 'GARAGE', label: 'Haul everything to a garage in Casa Solana', likely: 'Tight and loud. Fewer people fit.',
+        { id: 'GARAGE', label: 'Haul everything to a garage in Casa Solana', likely: 'It\'s tight and loud, and fewer people fit.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A carport took the bill with an hour to spare. The rain on the roof kept time.' },
+          result: 'A carport took the bill with an hour to spare, and the rain on the roof kept time.' },
         { id: 'WAIT', label: 'Wait for it to drain and push doors late', likely: 'The ones who wanted to come stay.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The water was gone by nine. The crowd stood in the mud and did not mind.' },
-        { id: 'ACCEPT', label: 'Run it wet', likely: 'Risky with a generator and a lot of cables.',
+          result: 'The water was gone by nine, and the crowd stood in the mud and did not mind.' },
+        { id: 'ACCEPT', label: 'Run it wet', likely: 'It\'s risky with a generator and a lot of cables.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Lightning ended the set early. Nobody was hurt and nobody was happy.' }
+          result: 'Lightning ended the set early, and nobody was hurt and nobody was happy.' }
       ] },
 
     { id: 'SANTA_FE_NM_SESSION_SUITS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 60, bind: ['show'],
@@ -149,15 +149,15 @@ SB.Cities.register('santa-fe-nm', {
       title: 'The suits took the club',
       body: 'The long session has filled the Railyard club and every bar nearby with lobbyists. The all-ages hall is the only room left on a Tuesday.',
       options: [
-        { id: 'HALL', label: 'Move the bill to the hall', likely: 'Early and sober. The kids can come.',
+        { id: 'HALL', label: 'Move the bill to the hall', likely: 'It\'s early and sober, and the kids can come.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The hall took the bill at six. The kids filled it and the suits stayed away.' },
-        { id: 'LATE', label: 'Start late after the suits clear out', likely: 'A smaller, later crowd.',
+          result: 'The hall took the bill at six, and the kids filled it and the suits stayed away.' },
+        { id: 'LATE', label: 'Start late after the suits clear out', likely: 'The crowd is smaller and comes later.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The suits left by ten. The regulars drifted in after.' },
+          result: 'The suits left by ten, and the regulars drifted in after.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A crowd that came for something else.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'A few lobbyists stayed for a song. The rest of the room was empty.' }
+          result: 'A few lobbyists stayed for a song, but the rest of the room was empty.' }
       ] }
   ]
 });

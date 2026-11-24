@@ -123,15 +123,15 @@ SB.Cities.register('asheville-nc', {
       title: 'The river is coming up again',
       body: 'A flash-flood warning has the river rooms nervous, and the bill is a benefit for the last flood. The band is already in the van on the mountain road.',
       options: [
-        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'Breaks the date. Costs trust with everyone.',
+        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'Breaks the date, which costs you trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'HIGH', label: 'Move the bill to a house on high ground', likely: 'Smaller and louder, with a steep driveway.',
+          result: 'You moved it a day, and the ones who could come, came.' },
+        { id: 'HIGH', label: 'Move the bill to a house on high ground', likely: 'It\'s smaller and louder, with a steep driveway.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A hillside basement took the bill, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it and watch the water', likely: 'Half the list stays home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The water stayed in its banks. The room was half full and damp.' }
+          result: 'The water stayed in its banks, and the room was half full and damp.' }
       ] },
 
     { id: 'ASHEVILLE_NC_LEAF_MOTELS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -140,15 +140,15 @@ SB.Cities.register('asheville-nc', {
       title: 'Every motel is full',
       body: 'Leaf-peepers have taken every room from Arden to Fletcher, and the touring band has nowhere to sleep. The only floor left is a basement in West Asheville, and the driveway is full by seven.',
       options: [
-        { id: 'FLOOR', label: 'Put the band on a basement floor', likely: 'The house is happy, the neighbors less so.',
+        { id: 'FLOOR', label: 'Put the band on a basement floor', likely: 'The house is happy, and the neighbors less so.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'They slept on the floor and played like it was a hotel. The house got a few complaints.' },
-        { id: 'MOTEL', label: 'Pay for a room an hour down the road', likely: 'Costs forty dollars. They arrive late.',
+          result: 'They slept on the floor and played like it was a hotel, and the house got a few complaints.' },
+        { id: 'MOTEL', label: 'Pay for a room an hour down the road', likely: 'It costs forty dollars, and they arrive late.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'The band checked in out of town and made it by doors, barely.' },
-        { id: 'CANCEL', label: 'Shorten the bill to fit what you can sleep', likely: 'A smaller night.',
+          result: 'The band checked in out of town and barely made it by doors.' },
+        { id: 'CANCEL', label: 'Shorten the bill to fit what you can sleep', likely: 'It\'s a smaller night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Fewer bands on the bill, and a looser, quieter night.' }
+          result: 'There were fewer bands on the bill, and it was a looser, quieter night.' }
       ] },
 
     { id: 'ASHEVILLE_NC_ICE_DAY', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -157,15 +157,15 @@ SB.Cities.register('asheville-nc', {
       title: 'The steep road is closed',
       body: 'An ice day has shut the steep street to the house. The bill can still be saved if it moves to a garage unit in the river strip, with no heat.',
       options: [
-        { id: 'GARAGE', label: 'Move the bill to the unit on the river strip', likely: 'Smaller and cold. Nobody can complain.',
+        { id: 'GARAGE', label: 'Move the bill to the unit on the river strip', likely: 'It\'s smaller and cold, and nobody can complain.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A cold unit and cold fingers, and a packed floor.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was a cold unit and cold fingers and a packed floor.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' },
+          result: 'You moved it a day, and not everyone could make the new one.' },
         { id: 'ACCEPT', label: 'Wait for the plow and run it', likely: 'Most people stay in.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The road stayed bad. The few who made it were glad.' }
+          result: 'The road stayed bad, and the few who made it were glad.' }
       ] }
   ]
 });

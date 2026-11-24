@@ -15,7 +15,7 @@ SB.Cities.register('louisville', {
   blocklist: ['kentucky derby*', 'thunder over*', 'louder than life*', 'forecastle*', 'ale-8*', 'frisch*', 'waffle house*', 'white castle*'],
 
   blurb: ['An Ohio River city at the Falls with a long memory for teenage post-hardcore, indie and slow, strange rooms in odd places.',
-          'Shows happen nearly every week, and the crowd follows the bill, not the building. But the liquor board and the landlords keep taking the rooms.'],
+          'Shows happen nearly every week and the crowd follows the bill instead of the building, but the liquor board and the landlords keep taking the rooms.'],
   hard: 'All-ages means early shows, and rooms vanish by fine or by sale.',
   region: 'the Ohio Valley',
   houseType: 'BASEMENT',
@@ -124,27 +124,27 @@ SB.Cities.register('louisville', {
       options: [
         { id: 'EARLIER', label: 'Move doors an hour earlier', likely: 'Most of them beat the jam. The night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors moved up an hour. The ones who left work early made it over.' },
+          result: 'You moved doors up an hour, and the people who left work early made it over.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people from across the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The bridges never cleared. The Indiana kids stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The bridges never cleared, so the Indiana kids stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Three cars took the long way round together. They will remember that.' }
+          result: 'Three cars took the long way round together.' }
       ] },
 
     { id: 'LOUISVILLE_RACE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'race' },
       telegraph: 'Every house in the Highlands is throwing a party this weekend.',
       title: 'Race weekend has every porch',
-      body: 'It is race weekend. Every house in the Highlands has a party with hats and a television, the bars are slammed, and nobody wants a punk show until midnight.',
+      body: 'It is race weekend, and every house in the Highlands has a party with hats and a television, the bars are slammed, and nobody wants a punk show until midnight.',
       options: [
         { id: 'LATE', label: 'Start late and play to the party crowd', likely: 'A looser, drunker room that shows up after dark.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at ten. The hats came in around eleven.' },
+          result: 'Doors were at ten, and the hats came in around eleven.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of your people are at someone else\'s party.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The street was full. Your room was half empty.' },
+          result: 'The street was full and your room was half empty.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
           result: 'You moved it a day. The city was nursing its head, and so were the bands.' }
@@ -154,17 +154,17 @@ SB.Cities.register('louisville', {
       if: { daysOut: [0, 3], weather: 'COLD', months: [12, 1, 2] },
       telegraph: 'An ice storm is coming in off the river.',
       title: 'The ice has the power out',
-      body: 'An ice storm has knocked out power across the East End. The one house with a generator is the only room still lit, and the neighbors know exactly what a generator sounds like.',
+      body: 'An ice storm has knocked out power across the East End, and the one house with a generator is the only room still lit, and the neighbors know exactly what a generator sounds like.',
       options: [
-        { id: 'GENERATOR', label: 'Move it to the house with the generator', likely: 'Small, loud and dark. A neighbor may call.',
+        { id: 'GENERATOR', label: 'Move it to the house with the generator', likely: 'Small, loud and dark, and a neighbor may call.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'STRESS', d: 2 }],
-          result: 'The house took the whole bill by lantern light. The generator ran all night.' },
+          result: 'The house took the whole bill by lantern light, and the generator ran all night.' },
         { id: 'LATER', label: 'Move it a day, once the lights come back', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' },
+          result: 'You moved it a day, and not everyone could make the new date.' },
         { id: 'ACCEPT', label: 'Play on and take what you get', likely: 'Few can drive on the ice.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .5 }],
-          result: 'The roads glazed over. Only the people who could walk came.' }
+          result: 'The roads glazed over, and only the people who could walk came.' }
       ] }
   ]
 });

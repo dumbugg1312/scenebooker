@@ -116,36 +116,36 @@ SB.Cities.register('yakima-wa', {
   events: [
     { id: 'YAKIMA_WA_SMOKE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [7, 8, 9] },
-      telegraph: 'The sky has gone orange and the air tastes like a campfire. The yard show is still on the flyer.',
+      telegraph: 'The sky has gone orange and the air tastes like a campfire, and the yard show is still on the flyer.',
       title: 'The smoke settles in the valley',
       body: 'A wildfire to the west has parked its smoke over the whole valley. Your yard show in West Valley is outdoors, the air is bad, and half of your list has asthma.',
       options: [
-        { id: 'GARAGE', label: 'Squeeze the show into a garage with the door shut', likely: 'Hot and loud and close. The ones who come really want to.',
+        { id: 'GARAGE', label: 'Squeeze the show into a garage with the door shut', likely: 'It\'s hot and loud and close, and the people who come really want to.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }],
-          result: 'A space heater in July, a garage, and one open crack of door. Sweaty, tight and packed.' },
-        { id: 'ACCEPT', label: 'Run it in the yard and hand out masks', likely: 'The kids who can handle it show up. The rest stay in.',
+          result: 'It was a garage in July with one door cracked open, sweaty and tight and packed.' },
+        { id: 'ACCEPT', label: 'Run it in the yard and hand out masks', likely: 'The kids who can handle it show up, and the rest stay in.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'A thinner crowd in dusty orange light. Nobody stayed long.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, and the smoke may not clear.',
+          result: 'The crowd was thinner in dusty orange light, and nobody stayed long.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the smoke may not clear.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The air was better, the crowd was not.' }
+          result: 'You moved it a day, and the air was better but the crowd was not.' }
       ] },
 
     { id: 'YAKIMA_WA_PASS_CLOSED', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [11, 12, 1, 2, 3] },
       telegraph: 'The pass is closing with the snow, and the western band is on the wrong side of it.',
       title: 'Snow shuts the pass',
-      body: 'The band from the coast was due over the mountains today. The road is closed and the bill has a hole in the middle.',
+      body: 'The band from the coast was due over the mountains today, but the road is closed and the bill has a hole in the middle.',
       options: [
-        { id: 'LOCALS', label: 'Rebuild the bill from valley kids and the college town', likely: 'A shorter, scrappier night. Whoever can drive here, will.',
+        { id: 'LOCALS', label: 'Rebuild the bill from valley kids and the college town', likely: 'It\'s a shorter, scrappier night, with whoever can drive here.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Three garage bands and a friend of a friend. The room was loose and loud.' },
-        { id: 'WAIT', label: 'Hold the doors and hope the road reopens', likely: 'A late start. The crowd waits in the cold.',
+          result: 'It was three garage bands and a friend of a friend, and the room was loose and loud.' },
+        { id: 'WAIT', label: 'Hold the doors and hope the road reopens', likely: 'It means a late start, and the crowd waits in the cold.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van rolled in at ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The van rolled in at ten, and you started late, but nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everybody loses some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could make it, did.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] },
 
     { id: 'YAKIMA_WA_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -154,12 +154,12 @@ SB.Cities.register('yakima-wa', {
       title: 'The fair eats the weekend',
       body: 'The all-ages hall has lost another building, the fairgrounds are lit up across town, and the traffic into downtown is a crawl.',
       options: [
-        { id: 'YARD', label: 'Move the show to a yard on the Southeast side', likely: 'Smaller, closer, and away from the traffic.',
+        { id: 'YARD', label: 'Move the show to a yard on the Southeast side', likely: 'It\'s smaller and closer, and away from the traffic.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'A backyard took the bill with an hour to spare.' },
         { id: 'LATE', label: 'Push doors back until the fair crowd thins out', likely: 'The crowd that wants a night out shows up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The ones who came were glad to sit down.' },
+          result: 'Doors opened an hour late, and the people who came were glad to sit down.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list is at the fair.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'The kids who wanted the fair went to the fair.' }

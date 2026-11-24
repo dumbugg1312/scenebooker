@@ -107,13 +107,13 @@ SB.Cities.register('sioux-falls-sd', {
       options: [
         { id: 'INSIDE', label: 'Move the bands inside and lose the kids', likely: 'Fewer people, but the music goes on.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The bands crammed into the bar. The kids stood out in the rain and went home.' },
-        { id: 'WAIT', label: 'Wait out the storm', likely: 'A late start. The crowd gets restless.',
+          result: 'The bands crammed into the bar, and the kids stood out in the rain and went home.' },
+        { id: 'WAIT', label: 'Wait out the storm', likely: 'A late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The power came back near ten. Half the crowd was still there.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The power came back near ten, and half the crowd was still there.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] },
 
     { id: 'SIOUX_FALLS_SD_FAIR_CURFEW', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 45, bind: ['show'],
@@ -122,12 +122,12 @@ SB.Cities.register('sioux-falls-sd', {
       title: 'The fair takes the kids',
       body: 'Fair week has its own curfew for anyone 17 and under, and the late show is the one thing the kids on your list cannot get to.',
       options: [
-        { id: 'EARLY', label: 'Start early so the kids can get in and out', likely: 'Most of them make it. A short night.',
+        { id: 'EARLY', label: 'Start early so the kids can get in and out', likely: 'Most of them make it, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors early and done by the curfew. The kids went home on time.' },
+          result: 'Doors were early and you were done by the curfew, and the kids went home on time.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids stay away.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The fair kept the kids. The regulars over eighteen came.' }
+          result: 'The fair kept the kids, and the regulars over eighteen came.' }
       ] },
 
     { id: 'SIOUX_FALLS_SD_BLIZZARD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -136,15 +136,15 @@ SB.Cities.register('sioux-falls-sd', {
       title: 'The interstate is shut',
       body: 'A blizzard warning has closed I-29 the afternoon the Twin Cities band is due. The opener is here and the headliner is stuck in a drift.',
       options: [
-        { id: 'LONG', label: 'Let the opener play a long set', likely: 'A thin night, but the ones who came are glad.',
+        { id: 'LONG', label: 'Let the opener play a long set', likely: 'A thin night, but the people who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The opener played all night to a half-full room. Nobody minded.' },
-        { id: 'WAIT', label: 'Hold the doors for the van', likely: 'A late start. The crowd gets restless.',
+          result: 'The opener played all night to a half-full room and nobody minded.' },
+        { id: 'WAIT', label: 'Hold the doors for the van', likely: 'A late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van dug in at ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The van dug in at ten, and you started late but nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ]
 });

@@ -14,8 +14,8 @@ SB.Cities.register('slidell-la', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The storm is written only as 'the storm' in game text. */
   blocklist: ['sentry-news*', 'waffle house*', 'raising cane*', 'keesler*', 'wwoz*', 'wtul*', 'rail spur*', 'honey island barn*'],
 
-  blurb: ['A garage-and-carport town with the real night 35 minutes across the lake. Kids book what they can and watch the weather.',
-          'Houses sit on slabs, with no basements. Everyone carpools, and the crowd is half friends and family.'],
+  blurb: ['A garage-and-carport town with the real night 35 minutes across the lake, so kids book what they can and watch the weather.',
+          'Houses sit on slabs with no basements, everyone carpools, and the crowd is half friends and family.'],
   hard: 'Everyone with a van drives across the lake instead.',
   region: 'the Gulf',
   houseType: 'CARPORT',
@@ -88,17 +88,17 @@ SB.Cities.register('slidell-la', {
       if: { daysOut: [0, 4], months: [8, 9, 10] },
       telegraph: 'There is a storm in the Gulf, and the cone has moved over the weekend.',
       title: 'Everyone is checking the cone',
-      body: 'A storm in the Gulf has the forecast cone sliding toward the coast. The whole bill is watching it before anyone puts up a flyer, and a garage show cannot stand in the wind.',
+      body: 'A storm in the Gulf has the forecast cone sliding toward the coast, and the whole bill is watching it before anyone puts up a flyer, since a garage show cannot stand in the wind.',
       options: [
-        { id: 'WAIT', label: 'Hold the date and watch the cone', likely: 'Most hold out hope. The crowd comes late and thin.',
+        { id: 'WAIT', label: 'Hold the date and watch the cone', likely: 'Most hold out hope, but the crowd comes late and thin.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'The cone slid east at noon. You started late, and the ones who came were glad to be out.' },
+          result: 'The cone slid east at noon, so you started late, and the people who came were glad to be out.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the people who could make it came.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Half the list stays home with the shutters.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.6 }],
-          result: 'People were taping windows. The room was mostly the bands.' }
+          result: 'People were taping windows, and the room was mostly the bands.' }
       ] },
 
     { id: 'SLIDELL_LA_ANTIQUE_FAIR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -107,15 +107,15 @@ SB.Cities.register('slidell-la', {
       title: 'The vendors have the alley',
       body: 'The street fair has the streets and the parking, and your storefront show has to load in through the back alley before the vendors arrive.',
       options: [
-        { id: 'EARLY', label: 'Load in at dawn and open early', likely: 'The gear gets in. A tired crowd.',
+        { id: 'EARLY', label: 'Load in at dawn and open early', likely: 'The gear gets in, but the crowd is tired.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.92 }],
           result: 'You loaded in before the vendors and opened when the fair crowd wandered in.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the parking.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: 'The streets stayed shut. Half the list never found a place to leave the car.' },
+          result: 'The streets stayed shut, and half the list never found a place to leave the car.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'SLIDELL_LA_CARNIVAL_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -124,15 +124,15 @@ SB.Cities.register('slidell-la', {
       title: 'A parade, then the dark',
       body: 'A parade rolls through town in the afternoon and the crowd and the cops are both busy. A show after dark can be big or it can be empty.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the parade is over', likely: 'The parade crowd drifts in. Later than planned.',
+        { id: 'LATE', label: 'Push doors back until the parade is over', likely: 'The parade crowd drifts in, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }],
-          result: 'Doors an hour late. The parade crowd spilled in, loud and happy.' },
+          result: 'Doors opened an hour late, and the parade crowd spilled in, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the town is already worn out.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
           result: 'The parade ended, and so did the night for most of them.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] }
   ]
 });

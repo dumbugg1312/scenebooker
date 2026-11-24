@@ -121,10 +121,10 @@ SB.Cities.register('huntington-wv', {
       options: [
         { id: 'LATE', label: 'Push doors back until the game crowd thins', likely: 'The ones who want a quiet night come in late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd drifted in from the bars and the room felt like a refuge.' },
+          result: 'Doors were an hour late, and the crowd drifted in from the bars and found the room a refuge.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed downtown. The regulars filled the room.' }
+          result: 'The casual crowd stayed downtown, and the regulars filled the room.' }
       ] },
 
     { id: 'HUNTINGTON_WV_PORCH_COMPLAINT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -133,12 +133,12 @@ SB.Cities.register('huntington-wv', {
       title: 'The neighbors counted the cars',
       body: 'Someone called in the parking and the porch crowd. The host is nervous and wants to know whether the show can be quieter.',
       options: [
-        { id: 'INSIDE', label: 'Move it indoors and turn it down', likely: 'Smaller and gentler. The neighbors are won over.',
+        { id: 'INSIDE', label: 'Move it indoors and turn it down', likely: 'It\'s smaller and gentler, and the neighbors are won over.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .7 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'An acoustic night in the front room, with the porch empty. The next morning a neighbor waved.' },
-        { id: 'MOVE', label: 'Move the bill to a house on another block', likely: 'Breaks the date for a few.',
+          result: 'It was an acoustic night in the front room with the porch empty, and the next morning a neighbor waved.' },
+        { id: 'MOVE', label: 'Move the bill to a house on another block', likely: 'Breaks the date for a few people.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'A friend with a basement took the bill. Not everyone found the new street.' },
+          result: 'A friend with a basement took the bill, and not everyone found the new street.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Someone may call again.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
           result: 'It went off, but the host spent the night watching the street.' }
@@ -148,17 +148,17 @@ SB.Cities.register('huntington-wv', {
       if: { daysOut: [0, 3], weather: 'RAIN', months: [2, 3, 4, 5] },
       telegraph: 'The river is coming up after a week of rain, and the floodwall gates are being checked.',
       title: 'Water on the hall floor',
-      body: 'The river rose overnight and the village hall has water across the floor. The bill is tomorrow, and a house on higher ground is the only place left.',
+      body: 'The river rose overnight, and the village hall has water across the floor. The bill is tomorrow, and a house on higher ground is the only place left.',
       options: [
-        { id: 'HOUSE', label: 'Move the whole bill to a house on high ground', likely: 'Smaller and louder, but dry.',
+        { id: 'HOUSE', label: 'Move the whole bill to a house on high ground', likely: 'It\'s smaller and louder, but dry.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A house up the hill took the bill with hours to spare. The floor was packed.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A house up the hill took the bill with hours to spare, and the floor was packed.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'The water went down a day later. Some of the list could still make it.' },
-        { id: 'ACCEPT', label: 'Run it and wade', likely: 'A mess, and not many will come.',
+          result: 'The water went down a day later, and some of the list could still make it.' },
+        { id: 'ACCEPT', label: 'Run it and wade', likely: 'It\'s a mess, and not many will come.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'A damp, short night with boots on. The few who came remembered it.' }
+          result: 'It was a damp, short night with boots on, and the few who came remembered it.' }
       ] }
   ]
 });

@@ -117,13 +117,13 @@ SB.Cities.register('provo-ut', {
       options: [
         { id: 'LATE', label: 'Push doors back until the fireworks are over', likely: 'The kids come in after, loud and sunburned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd walked over from the fireworks with their folding chairs.' },
+          result: 'Doors opened an hour late, and the crowd walked over from the fireworks with their folding chairs.' },
         { id: 'ACCEPT', label: 'Run it as planned and let them find parking', likely: 'Half the list gives up on the roads.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The ones who walked made it. The ones who drove are still circling.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The ones who walked made it, and the ones who drove are still circling.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'PROVO_UT_WAREHOUSE_GONE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -137,10 +137,10 @@ SB.Cities.register('provo-ut', {
           result: 'You held the line at the door. The ones inside got a good night, and the ones outside got the address for next time.' },
         { id: 'MOVE', label: 'Move the whole bill to a bigger basement', likely: 'Smaller and louder, with more neighbors to hear it.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'A bigger basement across town took the bill. Half the line followed the van.' },
+          result: 'A bigger basement across town took the bill, and half the line followed the van.' },
         { id: 'ACCEPT', label: 'Let them all in and watch the clock', likely: 'A packed night, and the neighbors will call.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Wall to wall, with the windows sweating. The neighbors called at ten.' }
+          result: 'It was wall to wall with the windows sweating, and the neighbors called at ten.' }
       ] },
 
     { id: 'PROVO_UT_GAME_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -151,10 +151,10 @@ SB.Cities.register('provo-ut', {
       options: [
         { id: 'LATE', label: 'Start late and play short', likely: 'The crowd that wants a night out shows up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late, bands trimmed to fit before ten.' },
+          result: 'Doors opened an hour late, and the bands were trimmed to fit before ten.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed home. The regulars walked in from three blocks away.' }
+          result: 'The casual crowd stayed home, and the regulars walked in from three blocks away.' }
       ] }
   ]
 });

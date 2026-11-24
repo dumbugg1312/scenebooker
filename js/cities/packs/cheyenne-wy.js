@@ -16,7 +16,7 @@ SB.Cities.register('cheyenne-wy', {
   blocklist: ['frontier days*', 'warren air force*', 'union pacific*', 'tribune eagle*', 'cowboy state*', 'wyoming cowboys*'],
 
   blurb: ['A small capital on a high, windy plain at the Colorado line, where the same sixty people come to every show and the address arrives by text.',
-          'Metal and punk share rooms, ages mix, and a mom stands at the back with ear protection on her kid. Bands drive in from Colorado.'],
+          'Metal and punk share rooms and ages mix, and a mom stands at the back with ear protection on her kid. Bands drive in from Colorado.'],
   hard: 'Blizzards close the interstate, the hidden room holds sixty, and the kids leave.',
   region: 'the high plains',
   whereGo: [
@@ -26,7 +26,7 @@ SB.Cities.register('cheyenne-wy', {
   ],
 
   tilt: [
-    { fan: 'metal', band: 'metal', d: .08, reason: 'Teens booked metal shows in the park for years, and the old heads never stopped.' }
+    { fan: 'metal', band: 'metal', d: .08, reason: 'Teens booked metal shows in the park for years, and the old heads never stopped coming.' }
   ],
 
   zones: [
@@ -113,51 +113,51 @@ SB.Cities.register('cheyenne-wy', {
       if: { daysOut: [0, 3], weather: 'COLD', months: [10, 11, 12, 1, 2, 3, 4, 5] },
       telegraph: 'The forecast says blizzard, and the wind rule has the interstate shut to vans.',
       title: 'The interstate is closed',
-      body: 'A blizzard has closed the interstate on both sides of town the night of your show. The second band is stuck in Colorado, and half the kids will not risk the drive.',
+      body: 'A blizzard has closed the interstate on both sides of town the night of your show. The second band is stuck in Colorado, and half the kids won\'t risk the drive.',
       options: [
-        { id: 'MOVE', label: 'Move it a day, once the road opens', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move it a day, once the road opens', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could still come, came.' },
-        { id: 'LOCALS', label: 'Run it with the locals who can walk there', likely: 'A short bill and a small room.',
+          result: 'You moved it a day, and the people who could still make it came.' },
+        { id: 'LOCALS', label: 'Run it with the locals who can walk there', likely: 'You get a short bill and a small room.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .4 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'Two local bands played long sets to the people who lived nearby.' },
         { id: 'ACCEPT', label: 'Play on and take what you get', likely: 'Most of the crowd stays home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'The wind rocked the building all night. Those who came stayed late.' }
+          result: 'The wind rocked the building all night, and the people who came stayed late.' }
       ] },
 
     { id: 'CHEYENNE_WY_RODEO_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
-      telegraph: 'Every hotel in town is full and the parade closes the avenues the morning of your show.',
+      telegraph: 'Every hotel in town is full, and the parade closes the avenues the morning of your show.',
       title: 'The rodeo week takes the town',
       body: 'Every hotel room and parking lot is taken, a parade shuts the main avenues, and the address text will go out late. The out-of-town crowd is looking for a night out.',
       options: [
-        { id: 'LATE', label: 'Push doors back and text the address after the parade', likely: 'The ones who find it, come. Later than planned.',
+        { id: 'LATE', label: 'Push doors back and text the address after the parade', likely: 'The people who find it come, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The address went out at dusk. A crowd of locals and strangers filled the room.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half your people cannot park.',
+          result: 'The address went out at dusk, and a crowd of locals and strangers filled the room.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half your people can\'t park.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The regulars walked in from six blocks away. Nobody else found it.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The regulars walked in from six blocks away, and nobody else found it.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'CHEYENNE_WY_WIND_LOADIN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 2] },
-      telegraph: 'The wind advisory is up, and the downtown street is empty and dark by ten.',
+      telegraph: 'There\'s a wind advisory, and the downtown street is empty and dark by ten.',
       title: 'The wind takes the van door',
       body: 'A gust catches the van door while the band loads in at the unmarked storefront. The door is bent, the street is empty, and the headliner is rattled.',
       options: [
-        { id: 'FIX', label: 'Tie it shut and load in anyway', likely: 'A late start, but the show goes on.',
+        { id: 'FIX', label: 'Tie it shut and load in anyway', likely: 'It starts late, but the show goes on.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'Rope and a ratchet strap held it. The set started late and nobody minded.' },
-        { id: 'SHORT', label: 'Cut the set and let them rest', likely: 'A shorter night with a lower bar for the room.',
+          result: 'Rope and a ratchet strap held the door, and the set started late and nobody minded.' },
+        { id: 'SHORT', label: 'Cut the set and let them rest', likely: 'It\'s a shorter night, and it asks less of the room.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'A short, loose set. The kids stood close and the wind kept howling outside.' },
+          result: 'It was a short, loose set, with the kids standing close and the wind howling outside.' },
         { id: 'ACCEPT', label: 'Play on and take what you get', likely: 'Some of the crowd stays in the car.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The wind was loud and so was the band. The ones inside stayed late.' }
+          result: 'The wind was loud and so was the band, and the people inside stayed late.' }
       ] }
   ]
 });

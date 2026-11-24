@@ -13,7 +13,7 @@ SB.Cities.register('chattanooga-tn', {
   blocklist: ['bonnaroo*', 'riverbend*', 'moon pie*', 'waffle house*', 'times free press*', 'volkswagen*'],
 
   blurb: ['Chattanooga remembers its punk past and is proud of it. The pits are friendly, the bills are mixed, and the rooms are few.',
-          'Rich kids and working-class kids at the same show, and metalcore kids packing the big all-ages hall.'],
+          'Rich kids and working-class kids go to the same shows, and metalcore kids pack the big all-ages hall.'],
   hard: 'Few all-ages rooms, and the bar nights are 21+.',
   region: 'the Southeast',
   houseType: 'BASEMENT',
@@ -110,17 +110,17 @@ SB.Cities.register('chattanooga-tn', {
       if: { daysOut: [0, 5], calendar: 'race' },
       telegraph: 'The triathlon shuts the riverfront and US 27 from five in the morning.',
       title: 'The roads are shut',
-      body: 'Race day closes every road to the riverfront and US 27 from dawn. The bands, the van and the crowd are on the wrong side of the river.',
+      body: 'Race day closes every road to the riverfront and US 27 from dawn, and the bands, the van and the crowd are all on the wrong side of the river.',
       options: [
-        { id: 'HALL', label: 'Move the bill to a church hall on the right side', likely: 'Smaller and quieter. The pastor will want it out by ten.',
+        { id: 'HALL', label: 'Move the bill to a church hall on the right side', likely: 'It\'s smaller and quieter, and the pastor will want it out by ten.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'A church hall took the bill. Everyone who could get there came.' },
+          result: 'A church hall took the bill, and everyone who could get there came.' },
         { id: 'EARLY', label: 'Open early and tell everyone the back way', likely: 'Most get in before the closures bite.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors an hour early. The ones who came used the back roads.' },
+          result: 'You opened doors an hour early, and the people who came used the back roads.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Many of them give up on the roads.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The closures held all day. Half the list never got across.' }
+          result: 'The closures held all day, and half the list never got across.' }
       ] },
 
     { id: 'CHATTANOOGA_TN_FRIDAY_TOWING', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 45, bind: ['show'],
@@ -129,29 +129,29 @@ SB.Cities.register('chattanooga-tn', {
       title: 'The lots are full',
       body: 'The free concerts downtown have taken every parking lot just as the bar night starts, and the tow trucks are working the side streets.',
       options: [
-        { id: 'PARK', label: 'Tell everyone to park on the ridge and walk', likely: 'Costs some of the crowd.',
+        { id: 'PARK', label: 'Tell everyone to park on the ridge and walk', likely: 'You lose some of the crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'lateMin', v: 30 }],
-          result: 'Most of them walked down from the ridge. A few lost cars to the tow trucks anyway.' },
+          result: 'Most of them walked down from the ridge, but a few lost cars to the tow trucks anyway.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The casual crowd stays home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The lots stayed full. The regulars found a way.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The lots stayed full, and the regulars found a way.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'CHATTANOOGA_TN_DIY_FEST_SPLIT', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 4], months: [6] },
       telegraph: 'The DIY weekend splits across a bar night and an all-ages night.',
       title: 'The bar night shuts the kids out',
-      body: 'One of your bands is on the bar night, but its youngest member is under 21. The kids on your list can only get in to the all-ages night.',
+      body: 'One of your bands is on the bar night, but its youngest member is under 21, and the kids on your list can only get into the all-ages night.',
       options: [
-        { id: 'DOOR', label: 'Ask the bar to let the youngest member in', likely: 'Costs a favor. The band plays.',
+        { id: 'DOOR', label: 'Ask the bar to let the youngest member in', likely: 'It costs a favor, and the band plays.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: 1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'The bar let the kid in for the set, then out again. The band played well.' },
-        { id: 'SWAP', label: 'Swap the band to the all-ages night', likely: 'The bar night thins.',
+          result: 'The bar let the kid in for the set and then out again, and the band played well.' },
+        { id: 'SWAP', label: 'Swap the band to the all-ages night', likely: 'The bar night thins out.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The band played the all-ages night and the kids packed the floor.' }
+          result: 'The band played the all-ages night, and the kids packed the floor.' }
       ] }
   ]
 });

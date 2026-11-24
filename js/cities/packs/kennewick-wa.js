@@ -117,17 +117,17 @@ SB.Cities.register('kennewick-wa', {
       if: { daysOut: [0, 3], months: [7, 8] },
       telegraph: 'The forecast says 104 and the wind is not going to help.',
       title: 'The air conditioning quits',
-      body: 'A midsummer night, a hundred and four at doors, and the cooling gave out. The back wall is open to the parking lot and the neighbors will hear all of it.',
+      body: 'It\'s a midsummer night, a hundred and four at doors, and the cooling gave out. The back wall is open to the parking lot, and the neighbors will hear all of it.',
       options: [
-        { id: 'COOL', label: 'Open the back and run it short', likely: 'Loud to the neighbors. The ones inside survive.',
+        { id: 'COOL', label: 'Open the back and run it short', likely: 'It\'s loud to the neighbors, but the ones inside survive.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Doors open to the lot and short sets. Everybody sweated and nobody left.' },
-        { id: 'LATE', label: 'Push doors to after dark', likely: 'The heat breaks a little. Late for a school night.',
+          result: 'Doors opened to the lot and the sets were short, and everybody sweated and nobody left.' },
+        { id: 'LATE', label: 'Push doors to after dark', likely: 'The heat breaks a little, but it\'s late for a school night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at nine. The lot cooled off and the crowd came in loud.' },
+          result: 'Doors were at nine, the lot cooled off, and the crowd came in loud.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'People stay home from the heat.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'Half the list stayed in the cool. The regulars came.' }
+          result: 'Half the list stayed in the cool, and the regulars came.' }
       ] },
 
     { id: 'KENNEWICK_WA_RACE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -136,15 +136,15 @@ SB.Cities.register('kennewick-wa', {
       title: 'The river is full',
       body: 'The boat race has the hotels full, the roads shut by the water, and every ride the kids counted on is busy with family. Your show is across town.',
       options: [
-        { id: 'EARLY', label: 'Start early before the roads fill', likely: 'Most get there. A short night.',
+        { id: 'EARLY', label: 'Start early before the roads fill', likely: 'Most get there, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour early. The ones who beat the traffic got a tight night.' },
+          result: 'Doors were an hour early, and the ones who beat the traffic got a tight night.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Nobody has a ride.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The ride shortage ate the list. The ones with a car came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The ride shortage ate the list, and the ones with a car came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

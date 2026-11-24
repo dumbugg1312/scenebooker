@@ -126,17 +126,17 @@ SB.Cities.register('cincinnati', {
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'Crews are working on the big bridge over the Ohio this week.',
       title: 'The river bridge is jammed',
-      body: 'A wreck has the big bridge over the river backed up the night of your show. The Kentucky side of the scene, bands and kids, is stuck on the far bank.',
+      body: 'A wreck has the big bridge over the river backed up the night of your show, and the Kentucky side of the scene, bands and kids, is stuck on the far bank.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'It never cleared. The ones on the far side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'It never cleared, and the people on the far side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads came together the long way. They will remember that.' }
+          result: 'Two carloads came together the long way around.' }
       ] },
 
     { id: 'CINCINNATI_FIRE_MARSHAL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -147,7 +147,7 @@ SB.Cities.register('cincinnati', {
       options: [
         { id: 'CLEAR', label: 'Clear the room and hand over what is left of the donations', likely: 'The room is lost, and the night ends early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'MONEY', amount: -40 }],
-          result: 'The room emptied calmly. The money went to the cause anyway, and the space never booked again.' },
+          result: 'The room emptied calmly, the money went to the cause anyway, and the space never booked again.' },
         { id: 'MOVE', label: 'Move the rest of the bill to a basement', likely: 'Smaller and louder, with a quieter crowd.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'Half the room followed the vans to a basement and the last two bands played anyway.' },
@@ -164,13 +164,13 @@ SB.Cities.register('cincinnati', {
       options: [
         { id: 'HALL', label: 'Move the bill to the all-ages music hall', likely: 'Smaller, but the crowd follows.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The hall had the night open and took the whole bill. Half the crowd needed a ride over the bridges.' },
+          result: 'The hall had the night open and took the whole bill, and half the crowd needed a ride over the bridges.' },
         { id: 'PATIO', label: 'Take it north to a brewery stage', likely: 'Far from the bus, and a longer drive for the Kentucky bands.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'A patio stage in the suburbs. The kids who drive came, and the ones who do not, did not.' },
-        { id: 'MOVEDAY', label: 'Push the whole bill a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was a patio stage in the suburbs, and the kids who drive came and the ones who don\'t didn\'t.' },
+        { id: 'MOVEDAY', label: 'Push the whole bill a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'CINCINNATI_YOUTH_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -181,8 +181,8 @@ SB.Cities.register('cincinnati', {
       options: [
         { id: 'EARLY', label: 'Move doors up an hour and finish before eleven', likely: 'The young ones get out safely.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors early, done by half past ten, every kid out the door before the street got watched.' },
-        { id: 'RIDES', label: 'Line up rides for the young ones', likely: 'Two hours of your day. They get home.',
+          result: 'You opened doors early and finished by half past ten, so every kid was out the door before the street got watched.' },
+        { id: 'RIDES', label: 'Line up rides for the young ones', likely: 'It takes two hours of your day, and they get home.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
           result: 'The parents on the list were glad to see someone had a plan.' },
         { id: 'ACCEPT', label: 'Run it as planned and hope', likely: 'Some of them leave before the last band.',

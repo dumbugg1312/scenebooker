@@ -15,7 +15,7 @@ SB.Cities.register('philadelphia', {
   blocklist: ['septa*', 'wawa*', 'tastykake*', 'mummers*', 'philadelphia eagles*', 'phillies*', 'billy penn*', 'phillyvoice*', 'whyy*', 'wxpn*', 'odunde*', 'drexel*'],
 
   blurb: ['A city of brick rowhouses with real basements, a hardcore legacy, and a habit of building its own institutions when nobody else will.',
-          'Old-head hardcore, kids in emo shirts, a boiler in the corner and a stoop full of people between sets. An inspector, a landlord or a developer for every basement.'],
+          'Old-head hardcore, kids in emo shirts, a boiler in the corner and a stoop full of people between sets. There\'s an inspector, a landlord or a developer for every basement.'],
   hard: 'Great draw, but basements get shut fast and kids have a curfew.',
   region: 'the Northeast corridor',
   missing: 'A legal room that survives the inspectors.',
@@ -153,32 +153,32 @@ SB.Cities.register('philadelphia', {
       title: 'The expressway is a parking lot',
       body: 'A wreck on the Schuylkill Expressway and a lane closed on the bridges have the road in and out of the city at a crawl the night of your show. The kids from out of town are stuck in it.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people from outside the city.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people from outside the city.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The traffic never cleared. The suburbs and the Jersey kids stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The traffic never cleared, and the suburbs and the Jersey kids stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the back way in together. They\'ll remember that.' }
+          result: 'Two carloads of kids took the back way in together.' }
       ] },
 
     { id: 'PHILADELPHIA_TROPICAL_REMNANT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [8, 9, 10], roomKind: ['HOUSE'] },
       telegraph: 'The remnants of a hurricane are tracking up the coast.',
       title: 'The basement is taking on water',
-      body: 'A dying hurricane has dumped six inches in two hours. The expressway is shut and the water is coming up through the drain in the basement floor.',
+      body: 'A dying hurricane has dumped six inches in two hours. The expressway is shut, and the water is coming up through the drain in the basement floor.',
       options: [
-        { id: 'HALL', label: 'Move it to a hall on higher ground', likely: 'A bigger room and a rental fee. Some of the crowd follows.',
+        { id: 'HALL', label: 'Move it to a hall on higher ground', likely: 'It costs a bigger room and a rental fee, and some of the crowd follows.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'MONEY', amount: -60 }],
-          result: 'A hall took the bill. The floor was dry and a little bare.' },
-        { id: 'LATER', label: 'Move it a day, once the water goes down', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A hall took the bill, and the floor was dry and a little bare.' },
+        { id: 'LATER', label: 'Move it a day, once the water goes down', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' },
-        { id: 'BAIL', label: 'Bail it out and play on', likely: 'Wet, loud and risky. The crowd is thin.',
+          result: 'You moved it a day, and not everyone could make the new one.' },
+        { id: 'BAIL', label: 'Bail it out and play on', likely: 'It\'s wet, loud and risky, and the crowd is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }, { op: 'STRESS', d: 3 }],
-          result: 'Everyone stood on milk crates. The band played in rubber boots.' }
+          result: 'Everyone stood on milk crates, and the band played in rubber boots.' }
       ] },
 
     { id: 'PHILADELPHIA_CURFEW_HALF_ROOM', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 30, bind: ['show'],
@@ -187,15 +187,15 @@ SB.Cities.register('philadelphia', {
       title: 'The curfew takes half the room',
       body: 'Kids under eighteen have to be off the street by ten. The headliner doesn\'t go on until ten, and half your crowd is fourteen to seventeen.',
       options: [
-        { id: 'EARLY', label: 'Start at five and keep it short', likely: 'The kids get the whole bill. The adults get out of work late.',
+        { id: 'EARLY', label: 'Start at five and keep it short', likely: 'The kids get the whole bill, but the adults get out of work late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'genMul', v: .85, gen: 1 }],
-          result: 'Doors at five. The kids were home by nine and the middle crowd came late.' },
-        { id: 'SWAP', label: 'Put the headliner on early', likely: 'The kids see everyone. The headliner grumbles.',
+          result: 'Doors were at five, the kids were home by nine, and the middle crowd came late.' },
+        { id: 'SWAP', label: 'Put the headliner on early', likely: 'The kids see everyone, and the headliner grumbles.',
           effects: [{ op: 'SWAP_ORDER', touringTo: 'NOW' }, { op: 'TRUST', who: '$touring', d: -1 }],
-          result: 'The headliner played second. The kids heard the whole set.' },
+          result: 'The headliner played second, and the kids heard the whole set.' },
         { id: 'ACCEPT', label: 'Let the kids leave at ten', likely: 'The room empties in the middle of the night.',
           effects: [{ op: 'SHOW_MOD', key: 'genMul', v: .5, gen: 0 }],
-          result: 'At ten the room lost half its people. The ones who stayed were older.' }
+          result: 'At ten the room lost half its people, and the ones who stayed were older.' }
       ] },
 
     { id: 'PHILADELPHIA_INSPECTOR_AT_THE_DOOR', when: 'NIGHT', tier: 'HARD', weight: 1, cooldown: 40, bind: ['show'],
@@ -203,17 +203,17 @@ SB.Cities.register('philadelphia', {
       risk: { base: .05, incident: 'NOISE' },
       telegraph: null,
       title: 'The city inspector is at the door',
-      body: 'A neighbor called the city. An inspector is on the step, polite and tired. She mentions the assembly license, and the alarm quote.',
+      body: 'A neighbor called the city, and an inspector is on the step, polite and tired. She mentions the assembly license and the alarm quote.',
       options: [
-        { id: 'TALK', label: 'Talk to her and promise to fix the exits', likely: 'She leaves a letter. The room is on the list.',
+        { id: 'TALK', label: 'Talk to her and promise to fix the exits', likely: 'She leaves a letter, and the room is on the list.',
           effects: [{ op: 'ROOM_PRESSURE', d: 10 }],
-          result: 'She left a letter. You have thirty days.' },
-        { id: 'END', label: 'End the night now', likely: 'Safe. The crowd goes home.',
+          result: 'She left a letter, and you have thirty days.' },
+        { id: 'END', label: 'End the night now', likely: 'It\'s safe, and the crowd goes home.',
           effects: [{ op: 'SHOW_MOD', key: 'endEarly', v: true }, { op: 'ROOM_PRESSURE', d: 4 }],
           result: 'The set ended early and the room emptied onto the street.' },
-        { id: 'ARGUE', label: 'Argue that it is just a party', likely: 'Risky. Pressure on the room goes up.',
+        { id: 'ARGUE', label: 'Argue that it is just a party', likely: 'It\'s risky, and the pressure on the room goes up.',
           effects: [{ op: 'ROOM_PRESSURE', d: 20 }, { op: 'ROOM_REL', d: -10 }],
-          result: 'She wrote it all down. The landlord heard by morning.' }
+          result: 'She wrote it all down, and the landlord heard by morning.' }
       ] }
   ]
 });

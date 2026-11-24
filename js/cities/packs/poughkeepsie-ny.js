@@ -118,17 +118,17 @@ SB.Cities.register('poughkeepsie-ny', {
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'The county fair is up the road this week and every van is headed north on Route 9.',
       title: 'The fair takes the north county',
-      body: 'A fair Saturday sends every north-county kid and every touring van up Route 9. Your show downtown opens with three bands and no crowd.',
+      body: 'A fair Saturday sends every north-county kid and every touring van up Route 9, so your show downtown opens with three bands and no crowd.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the fair traffic thins', likely: 'The crowd that wants a night out shows up. Later than planned.',
+        { id: 'LATE', label: 'Push doors back until the fair traffic thins', likely: 'The crowd that wants a night out shows up, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour and a half late. The crowd came down from the fair loud and sunburnt.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A long, empty first hour.',
+          result: 'Doors were an hour and a half late, and the crowd came down from the fair loud and sunburnt.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The first hour is long and empty.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Three bands played to the bartender. By ten the room finally filled.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Three bands played to the bartender, and by ten the room finally filled.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'POUGHKEEPSIE_NY_CREEK_FLOOD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -137,9 +137,9 @@ SB.Cities.register('poughkeepsie-ny', {
       title: 'The creek floods the practice space',
       body: 'A thunderstorm has put the creek-side practice space under water the night of a benefit. The amps are fine, the floor is not.',
       options: [
-        { id: 'BARN', label: 'Move the bill to a barn over the bridge', likely: 'Smaller and farther. Nobody will complain about the noise.',
+        { id: 'BARN', label: 'Move the bill to a barn over the bridge', likely: 'It\'s smaller and farther, and nobody will complain about the noise.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A barn took the bill with an hour to spare. The ride over the bridge was half the night.' },
+          result: 'A barn took the bill with an hour to spare, and the ride over the bridge was half the night.' },
         { id: 'ACCEPT', label: 'Run it in the mud', likely: 'The ones who come will remember it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'Half the list stayed home rather than wade in.' }
@@ -151,9 +151,9 @@ SB.Cities.register('poughkeepsie-ny', {
       title: 'The last train south',
       body: 'The last train down the river leaves before the headliner goes on, and the friends who came up for the show are watching the clock instead of the stage.',
       options: [
-        { id: 'EARLY', label: 'Move the start up and put the headliner on early', likely: 'Most of them stay. A short night.',
+        { id: 'EARLY', label: 'Move the start up and put the headliner on early', likely: 'Most of them stay, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors early and the headliner on by nine. Everybody caught the train.' },
+          result: 'Doors were early and the headliner was on by nine, and everybody caught the train.' },
         { id: 'ACCEPT', label: 'Keep the order and let them leave', likely: 'The room thins before the best set.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'A third of the room walked out for the station mid-set.' }

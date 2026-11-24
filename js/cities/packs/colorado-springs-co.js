@@ -120,34 +120,34 @@ SB.Cities.register('colorado-springs-co', {
       if: { daysOut: [0, 3] },
       telegraph: 'The fire marshal has been walking downtown storefronts this week, counting exits.',
       title: 'The fire marshal walks in',
-      body: 'The marshal comes by the storefront space on a night it is holding more than its posted fifty. Forty-nine, or he closes it.',
+      body: 'The marshal comes by the storefront space on a night it is holding more than its posted fifty, and he says it has to be forty-nine or he closes it.',
       options: [
         { id: 'CAP', label: 'Cap the door and turn people away', likely: 'A smaller night, and some angry kids outside.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'You counted every head. The ones outside stood on the sidewalk and listened.' },
+          result: 'You counted every head, and the ones outside stood on the sidewalk and listened.' },
         { id: 'TRIM', label: 'Move the second band outside', likely: 'Cold, but the room breathes.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The second band played the sidewalk. The room never went over.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The second band played the sidewalk, and the room never went over.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'COLORADO_SPRINGS_CO_HAIL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [5, 6, 7, 8, 9] },
       telegraph: 'The sky over the pass has gone green, and the afternoon forecast says hail.',
       title: 'Hail over the pass',
-      body: 'Hail the size of marbles in the middle of a yard show. The set can go on. The van windows are the problem.',
+      body: 'Hail the size of marbles comes down in the middle of a yard show, and the set can go on, but the van windows are the problem.',
       options: [
         { id: 'PORCH', label: 'Pull everyone under the porch and play on', likely: 'Cramped and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Forty people under one roof and a band in the doorway. The hail drummed along.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'Forty people crowded under one roof with a band in the doorway, and the hail drummed along.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everyone trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the ones who could come came.' },
         { id: 'ACCEPT', label: 'Run it and eat the damage', likely: 'The crowd leaves to check their cars.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'MONEY', amount: -40 }],
-          result: 'Half the crowd went to look at their windshields. The band paid for a window.' }
+          result: 'Half the crowd went to look at their windshields, and the band paid for a window.' }
       ] },
 
     { id: 'COLORADO_SPRINGS_CO_HILL_CLOSURE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -156,15 +156,15 @@ SB.Cities.register('colorado-springs-co', {
       title: 'The highway north closes',
       body: 'A winter storm shuts the highway over the hill the night of your show. The touring band and the Denver-side kids are on the wrong side of it.',
       options: [
-        { id: 'EARLIER', label: 'Move doors earlier so they can beat the closure', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move doors earlier so they can beat the closure', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who left work early made it.' },
+          result: 'You opened doors an hour early, and the ones who left work early made it.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose everyone from the north.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The road never reopened. The ones from town came.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the band.',
+          result: 'The road never reopened, and the ones from town came.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the band.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Nobody could drive anyway.' }
+          result: 'You moved it a day, since nobody could drive anyway.' }
       ] }
   ]
 });

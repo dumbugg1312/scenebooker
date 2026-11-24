@@ -13,7 +13,7 @@ SB.Cities.register('chicago', {
   blocklist: ['lollapalooza*', 'riot fest*', 'wluw*', 'wnur*', 'old style*', 'chicago reader*', 'divvy*'],
 
   blurb: ['Chicago kids chase shows across a huge city, in basements and bar back rooms. A train line decides the crowd, and a licensed room is a different world from a house.',
-          'The rooms live on paperwork, luck and tolerant neighbors. Most clubs are 21+, so under-21s lean on house shows.'],
+          'The rooms live on paperwork, luck and tolerant neighbors, and most clubs are 21+, so under-21s lean on house shows.'],
   hard: 'Rooms are licensed or raided, and all-ages is the gamble.',
   region: 'the Midwest',
   houseType: 'BASEMENT',
@@ -129,15 +129,15 @@ SB.Cities.register('chicago', {
       title: 'The Skyway is shut',
       body: 'Lake-effect snow has closed the Skyway and backed up the Dan Ryan. The out-of-town band and everyone coming from Indiana are stuck on the wrong side.',
       options: [
-        { id: 'EARLIER', label: 'Move doors an hour earlier', likely: 'Most who can make it do. The night starts thin.',
+        { id: 'EARLIER', label: 'Move doors an hour earlier', likely: 'Most who can make it do, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors an hour early. The ones who beat the snow came in with wet boots.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the closure.',
+          result: 'Doors were an hour early, and the ones who beat the snow came in with wet boots.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the closure.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The road stayed shut. The Indiana kids stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The road stayed shut, and the Indiana kids stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the back roads together. They will remember that.' }
+          result: 'Two carloads of kids took the back roads together.' }
       ] },
 
     { id: 'CHICAGO_TOW_BAN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -146,49 +146,49 @@ SB.Cities.register('chicago', {
       title: 'The tow trucks are out',
       body: 'Snow is coming down and the street ban is in force. Every car left on the block after three in the morning gets hauled, and the band\'s van is one of them.',
       options: [
-        { id: 'EARLY', label: 'End early so people can move their cars', likely: 'Everyone leaves in time. The night is short.',
+        { id: 'EARLY', label: 'End early so people can move their cars', likely: 'Everyone leaves in time, but the night is short.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The show ended at midnight and every car was gone by two.' },
-        { id: 'LOT', label: 'Pay a lot to hold the van and a few cars', likely: 'Costs forty dollars. The bands appreciate it.',
+          result: 'The show ended at midnight, and every car was gone by two.' },
+        { id: 'LOT', label: 'Pay a lot to hold the van and a few cars', likely: 'It costs forty dollars, and the bands appreciate it.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'REGULARS', pct: .01 }],
-          result: 'The lot kept the van safe. The band left a thank-you on the flyer.' },
-        { id: 'GAMBLE', label: 'Tell everyone to take the L and leave the van', likely: 'Thinner crowd, and a risk to the van.',
+          result: 'The lot kept the van safe, and the band left a thank-you on the flyer.' },
+        { id: 'GAMBLE', label: 'Tell everyone to take the L and leave the van', likely: 'The crowd is thinner, and the van is at risk.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Half the room came by train. The van was still there in the morning.' }
+          result: 'Half the room came by train, and the van was still there in the morning.' }
       ] },
 
     { id: 'CHICAGO_HOME_GAME', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'game' },
       telegraph: 'There is a home game on the North Side this weekend.',
       title: 'A home game empties the block',
-      body: 'A home game has closed every street within a mile and filled the trains. Nobody can park near the room and the people coming from the other side of town are stuck on a bus.',
+      body: 'A home game has closed every street within a mile and filled the trains. Nobody can park near the room, and the people coming from the other side of town are stuck on a bus.',
       options: [
-        { id: 'EARLY', label: 'Open early and tell everyone where to park', likely: 'Most get in before the crowds. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early and tell everyone where to park', likely: 'Most get in before the crowds, but it\'s thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came parked a mile away and walked.' },
+          result: 'Doors were an hour early, and the ones who came parked a mile away and walked.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The streets stayed full. Half the list never found a place to leave the car.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The streets stayed full, and half the list never found a place to leave the car.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'CHICAGO_VIADUCT_FLOOD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [6, 7, 8, 9] },
       telegraph: 'A line of thunderstorms is headed across the lake.',
       title: 'The viaduct floods',
-      body: 'The storm dropped three inches in an hour. The viaduct on the way in is under water and the basement is taking it through the wall.',
+      body: 'The storm dropped three inches in an hour. The viaduct on the way in is under water, and the basement is taking it through the wall.',
       options: [
-        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'Breaks the date. Costs trust with everyone.',
+        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'Breaks the date, which costs you trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'UP', label: 'Move it to a house upstairs', likely: 'Smaller and louder, with neighbors on every side.',
+          result: 'You moved it a day, and the ones who could come, came.' },
+        { id: 'UP', label: 'Move it to a house upstairs', likely: 'It\'s smaller and louder, with neighbors on every side.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A third-floor flat took the whole bill, and the floor was packed.' },
-        { id: 'MOP', label: 'Mop and play on', likely: 'Costs forty dollars. The crowd stays home.',
+        { id: 'MOP', label: 'Mop and play on', likely: 'It costs forty dollars, and the crowd stays home.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The water stayed on the floor. The room was half full and wet to the ankle.' }
+          result: 'The water stayed on the floor, and the room was half full and wet to the ankle.' }
       ] }
   ]
 });

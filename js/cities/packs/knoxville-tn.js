@@ -120,13 +120,13 @@ SB.Cities.register('knoxville-tn', {
       options: [
         { id: 'INSIDE', label: 'Pack everyone into the kitchen and front room', likely: 'Loud, tight and a little damp.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Forty people in a kitchen. The neighbors will hear about this one.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Forty people crammed into a kitchen, and the neighbors will hear about this one.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The sky was clear and fewer people could come.' },
-        { id: 'TARP', label: 'Hang a tarp and play on', likely: 'Costs thirty dollars. The crowd thins.',
+          result: 'You moved it a day, and the sky was clear and fewer people could come.' },
+        { id: 'TARP', label: 'Hang a tarp and play on', likely: 'It costs thirty dollars, and the crowd thins.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The tarp sagged and dripped on the drummer. The room stayed half full.' }
+          result: 'The tarp sagged and dripped on the drummer, and the room stayed half full.' }
       ] },
 
     { id: 'KNOXVILLE_TN_GAME_DAY_PORCH', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -137,13 +137,13 @@ SB.Cities.register('knoxville-tn', {
       options: [
         { id: 'LATE', label: 'Push doors back until the traffic clears', likely: 'The crowd that wants a night out shows up, late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The street cleared and the porch filled.' },
+          result: 'Doors went an hour late, and the street cleared and the porch filled.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed home. The regulars carried amps up the hill.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed home, and the regulars carried amps up the hill.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'KNOXVILLE_TN_PARADE_MATINEE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -154,10 +154,10 @@ SB.Cities.register('knoxville-tn', {
       options: [
         { id: 'MATINEE', label: 'Move the bill to the patio matinee', likely: 'Early, small and sunny.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'SHOP', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'Four bands before the roads closed. Everyone was home by dark.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Four bands played before the roads closed, and everyone was home by dark.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The streets were open and fewer people could come.' },
+          result: 'You moved it a day, and the streets were open and fewer people could come.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Everyone walks in past the barricades.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'Load-in was on foot and the door was slow.' }

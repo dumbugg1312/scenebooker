@@ -11,7 +11,7 @@ SB.Cities.register('ann-arbor-mi', {
   blocklist: ['university of michigan*', 'michigan daily*', 'ann arbor art fair*', 'hash bash*', 'wcbn*', 'wemu*', 'ann arbor observer*', 'michigan stadium*'],
 
   blurb: ['Co-op rooms and fraternity basements keep it going, but every spring the organizers graduate and the rooms change hands.',
-          'The room is found by asking, not by posting. Rents push the rougher shows east to Ypsilanti, and Detroit pulls the bands away.'],
+          'You find the room by asking, not by posting. Rents push the rougher shows east to Ypsilanti, and Detroit pulls the bands away.'],
   hard: 'Rooms and organizers vanish every spring with the student calendar.',
   region: 'the Midwest',
   houseType: 'BASEMENT',
@@ -122,15 +122,15 @@ SB.Cities.register('ann-arbor-mi', {
       title: 'The stadium has the town',
       body: 'Parking is gone, the main road south is one-way after the game and the crowds are drunk and loud. Anyone who wants to reach the show has to cross it.',
       options: [
-        { id: 'EARLY', label: 'Open early and tell everyone where to park', likely: 'Most get in before the game lets out. A thin start.',
+        { id: 'EARLY', label: 'Open early and tell everyone where to park', likely: 'Most get in before the game lets out, but the start is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came parked a mile out and walked.' },
+          result: 'You opened doors an hour early, and the people who came parked a mile out and walked.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up on the traffic.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The streets were a parking lot. Half the list stayed home.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The streets were a parking lot, and half the list stayed home.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'ANN_ARBOR_MI_STREET_FAIR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -139,15 +139,15 @@ SB.Cities.register('ann-arbor-mi', {
       title: 'Every street is tents',
       body: 'The fair has downtown and campus, and the band has nowhere to sleep. Parking is gone and the crowd cannot get near the center.',
       options: [
-        { id: 'FLOOR', label: 'Find the band a floor and move the show out of the center', likely: 'Smaller and farther out. They sleep.',
+        { id: 'FLOOR', label: 'Find the band a floor and move the show out of the center', likely: 'It\'s smaller and farther out, but the band gets somewhere to sleep.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'A co-op housemate gave up the front room. The band remembered.' },
+          result: 'A co-op housemate gave up the front room, and the band remembered it.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up on the crowds.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The fair had everyone. You played to a handful.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The fair had everyone, and you played to a handful.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The tents were down by then.' }
+          result: 'You moved it a day, and the tents were down by then.' }
       ] },
 
     { id: 'ANN_ARBOR_MI_COMMENCEMENT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -156,15 +156,15 @@ SB.Cities.register('ann-arbor-mi', {
       title: 'The town is a ghost town',
       body: 'Three thousand students are gone, hotels cost double and your headliner is about to play to fourteen people and one visiting parent.',
       options: [
-        { id: 'LOCALS', label: 'Call the old regulars and the Ypsilanti kids', likely: 'A small room, but a real one.',
+        { id: 'LOCALS', label: 'Call the old regulars and the Ypsilanti kids', likely: 'It\'s a small room, but a real one.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'HOURS', d: -2, when: 'TODAY' }],
-          result: 'The ones who stayed all year came. A short, happy night.' },
+          result: 'The people who stayed all year came, and it was a short, happy night.' },
         { id: 'ACCEPT', label: 'Play to whoever is left', likely: 'A very thin room.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'Fourteen people and a parent. The band was kind about it.' },
-        { id: 'MOVE', label: 'Move it a week', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Fourteen people and a parent came, and the band was kind about it.' },
+        { id: 'MOVE', label: 'Move it a week', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 7, respect: false }],
-          result: 'You moved it a week. The ones who came back were the ones you wanted.' }
+          result: 'You moved it a week, and the people who came back were the ones you wanted.' }
       ] },
 
     { id: 'ANN_ARBOR_MI_THAW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -173,15 +173,15 @@ SB.Cities.register('ann-arbor-mi', {
       title: 'The ice storm',
       body: 'Freezing rain has shut US-23 and I-94 and the headliner is stranded in Jackson. The openers can play long, but the room is thin.',
       options: [
-        { id: 'WAIT', label: 'Let the openers play long and wait for them', likely: 'A late start and a restless room.',
+        { id: 'WAIT', label: 'Let the openers play long and wait for them', likely: 'It\'s a late start and a restless room.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The openers filled the time. The headliner walked in at eleven.' },
-        { id: 'RIDES', label: 'Send someone out to fetch them', likely: 'Two hours of your day. They make it.',
+          result: 'The openers filled the time, and the headliner walked in at eleven.' },
+        { id: 'RIDES', label: 'Send someone out to fetch them', likely: 'It takes two hours of your day, but they make it.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }, { op: 'REGULARS', pct: .02 }],
-          result: 'You drove out on the slush and brought them in. They remember that.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'You drove out on the slush and brought them in.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The roads were clear by then.' }
+          result: 'You moved it a day, and the roads were clear by then.' }
       ] }
   ]
 });

@@ -15,8 +15,8 @@ SB.Cities.register('providence', {
            'atwells avenue festival', 'new england hardcore festival', 'boston bruins'],
   blocklist: ['providence journal*', 'projo*', 'waterfire*', 'fort thunder*', 'lupos heartbreak*', 'risd*', 'brown university*'],
 
-  blurb: ['A tiny old mill port at the head of the bay where everyone is twenty minutes from everyone. Art-school weirdos and working-class punks share the same corner of the same loft.',
-          'The old-timers say the good rooms are gone. The kids book the same corner of the mill district anyway, and the same few hundred faces find the next basement.'],
+  blurb: ['A tiny old mill port at the head of the bay where everyone is twenty minutes from everyone, and where art-school weirdos and working-class punks share the same corner of the same loft.',
+          'The old-timers say the good rooms are gone, but the kids book the same corner of the mill district anyway, and the same few hundred faces find the next basement.'],
   hard: 'Landlords and neighbors keep killing the good rooms; every show is a favor.',
   region: 'New England',
   houseType: 'BASEMENT',
@@ -122,15 +122,15 @@ SB.Cities.register('providence', {
       title: 'The bridge is down to one lane',
       body: 'An inspection has closed most of the bridge to the east side. Everyone coming from across the river, and from the mill city beyond, is stuck in the line.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the line', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the line', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors an hour early. The ones who wanted to come left work early.' },
+          result: 'You opened doors an hour early, and the people who really wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people from across the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
           result: 'The line never cleared. The east side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides the long way round', likely: 'Two hours of your day. Most of them get there.',
+        { id: 'RIDES', label: 'Organize rides the long way round', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads came round by the back streets together. They will remember that.' }
+          result: 'Two carloads came round by the back streets together.' }
       ] },
 
     { id: 'PROVIDENCE_MILL_SOLD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show'],
@@ -139,10 +139,10 @@ SB.Cities.register('providence', {
       title: 'The mill is sold',
       body: 'The building that holds your show has been sold to an apartment developer. The new owner wants the floor cleared by the weekend, and the freight elevator is the only way down.',
       options: [
-        { id: 'GO', label: 'Run it fast and be out by eleven', likely: 'A shorter night. The elevator is slow and the ones who come are loyal.',
+        { id: 'GO', label: 'Run it fast and be out by eleven', likely: 'It\'s a shorter night, because the elevator is slow, and the people who come are loyal.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors early, a fast bill, and everything out in the elevator by midnight.' },
-        { id: 'BASEMENT', label: 'Move the bill to a house basement', likely: 'Smaller, and it will not be the same room.',
+          result: 'You opened doors early, ran a fast bill, and had everything out in the elevator by midnight.' },
+        { id: 'BASEMENT', label: 'Move the bill to a house basement', likely: 'It\'s a smaller room, and it won\'t be the same night.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement took the bill with a few hours to spare, and it was packed to the stairs.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Word gets around that the building is changing hands.',
@@ -156,15 +156,15 @@ SB.Cities.register('providence', {
       title: 'The streets are closed for the fire',
       body: 'Crowds fill the rivers on Saturday, and the one-way streets leading downtown are blocked. The van cannot get to the load-in.',
       options: [
-        { id: 'EARLY', label: 'Load in at four and wait it out', likely: 'The gear gets there. A long wait before doors.',
+        { id: 'EARLY', label: 'Load in at four and wait it out', likely: 'The gear gets there, but there\'s a long wait before doors.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Everything was in by dark. Doors opened late and the crowd drifted in from the rivers.' },
-        { id: 'ACCEPT', label: 'Run it and hope the van squeezes through', likely: 'Late and rattled. The crowd is in the traffic too.',
+          result: 'Everything was in by dark, and doors opened late as the crowd drifted in from the rivers.' },
+        { id: 'ACCEPT', label: 'Run it and hope the van squeezes through', likely: 'You\'ll be late and rattled, and the crowd is stuck in the same traffic.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The van sat in the line for an hour. The first band went on without a drummer.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The van sat in the line for an hour, and the first band went on without a drummer.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] },
 
     { id: 'PROVIDENCE_TEN_PM', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 35, bind: ['show'],
@@ -173,29 +173,29 @@ SB.Cities.register('providence', {
       title: 'Ten o\'clock sharp',
       body: 'At ten the neighbors call it in, and the officer who comes is counting heads for overcrowding as much as listening for noise.',
       options: [
-        { id: 'EARLY', label: 'Cut the last band and clear the floor', likely: 'A short night. Nobody gets a ticket.',
+        { id: 'EARLY', label: 'Cut the last band and clear the floor', likely: 'It\'s a short night, and nobody gets a ticket.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The last band packed up on the porch and the officer left without a word.' },
+          result: 'The last band packed up on the porch, and the officer left without saying a word.' },
         { id: 'ACCEPT', label: 'Argue it and run on', likely: 'People get nervous and drift out.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'MONEY', amount: -25 }],
-          result: 'A fine and a long talk on the stoop, and half the floor went home.' }
+          result: 'You got a fine and a long talk on the stoop, and half the floor went home.' }
       ] },
 
     { id: 'PROVIDENCE_NOREASTER', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [8, 9, 10, 11, 12, 1, 2, 3] },
       telegraph: 'The forecast has a nor\'easter coming up the coast, and the basements are already damp.',
       title: 'The basement is under water',
-      body: 'The storm has put two inches on the floor of tonight\'s basement. The only dry room in town that takes all ages is the arts complex downtown.',
+      body: 'The storm has put two inches of water on the floor of tonight\'s basement, and the only dry room in town that takes all ages is the arts complex downtown.',
       options: [
-        { id: 'ARTS', label: 'Move the bill to the arts room', likely: 'A bigger room, a cover and a cleaner sound.',
+        { id: 'ARTS', label: 'Move the bill to the arts room', likely: 'It\'s a bigger room with a cover charge and a cleaner sound.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The arts room took the bill, and the storm kept the weak ones at home.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The arts room took the bill, and the storm kept the people who weren\'t sure at home.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'ACCEPT', label: 'Run it in the wet', likely: 'Cold feet and thin crowds.',
+          result: 'You moved it a day, and the people who could make it came.' },
+        { id: 'ACCEPT', label: 'Run it in the wet', likely: 'Everybody gets cold feet, and the crowd is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'Everybody stood on the stairs in their shoes. It was loud and nobody stayed long.' }
+          result: 'Everybody stood on the stairs in their shoes, and it was loud and nobody stayed long.' }
       ] }
   ]
 });

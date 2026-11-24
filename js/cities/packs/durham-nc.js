@@ -13,8 +13,8 @@ SB.Cities.register('durham-nc', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Real institutions are written only in generic form. */
   blocklist: ['unc*', 'nccu*', 'cook out*', 'waffle house*', 'bull city*', 'indy week*', 'the pollen room*', 'wral*', 'dpac*', 'centerfest*'],
 
-  blurb: ['Small, political and queer-friendly. Screamo, grind and hardcore share bills, and a benefit night is the normal kind of show.',
-          'Old-timers tell squat stories. The kids fill the downtown club, and a promoter, a band member and the door person are the same three people.'],
+  blurb: ['The scene is small, political and queer-friendly, with screamo, grind and hardcore sharing bills, and a benefit night is the normal kind of show.',
+          'The old-timers tell squat stories, and the kids fill the downtown club, where the promoter, a band member and the door person are the same three people.'],
   hard: 'Few cheap rooms are left. Club nights are 18+ and houses vanish to rent.',
   region: 'the Piedmont',
   houseType: 'GARAGE',
@@ -122,51 +122,51 @@ SB.Cities.register('durham-nc', {
       if: { daysOut: [0, 4], calendar: 'parade' },
       telegraph: 'The homecoming parade closes the east-side streets at six in the morning.',
       title: 'The parade has the east side',
-      body: 'The streets near the show are closed from dawn and the crowd is alumni and kids with nowhere to park. The all-ages bill is still on.',
+      body: 'The streets near the show are closed from dawn, and the crowd is alumni and kids with nowhere to park, but the all-ages bill is still on.',
       options: [
-        { id: 'EARLY', label: 'Open early and tell them where to park', likely: 'Most get in. A tired, loud night.',
+        { id: 'EARLY', label: 'Open early and tell them where to park', likely: 'Most people get in, and it\'s a tired, loud night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors an hour early. The ones who came parked a mile away.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up on the closures.',
+          result: 'You opened doors an hour early, and the people who came parked a mile away.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up because of the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The streets stayed shut. Half the list never found a place to park.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The streets stayed shut, and half the list never found a place to park.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'DURHAM_NC_PRIDE_DOOR', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'festival' },
       telegraph: 'The pride week benefit is booked for the same weekend as the arts festival.',
       title: 'The door fight',
-      body: 'The bar with the stage wants a 21-and-over door, and the kids want all ages. Pride week and the downtown arts festival have the same stage booked.',
+      body: 'The bar with the stage wants a 21-and-over door, and the kids want all ages, and pride week and the downtown arts festival have the same stage booked.',
       options: [
-        { id: 'ALL', label: 'Make it all ages and move it to the hall', likely: 'Smaller, and the kids can come.',
+        { id: 'ALL', label: 'Make it all ages and move it to the hall', likely: 'It\'s smaller, and the kids can come.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'The hall took the bill and the kids filled the floor.' },
+          result: 'The hall took the bill, and the kids filled the floor.' },
         { id: 'BAR', label: 'Keep it at the bar, 21 and over', likely: 'The kids are shut out.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'The bar was packed, and the kids stood on the sidewalk.' },
-        { id: 'SPLIT', label: 'Run an early all-ages set and a late bar set', likely: 'Two nights in one.',
+        { id: 'SPLIT', label: 'Run an early all-ages set and a late bar set', likely: 'It\'s two nights in one.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }, { op: 'SHOW_MOD', key: 'lateMin', v: 30 }],
-          result: 'Early set for the kids, a late one for the bar. Everyone got a night.' }
+          result: 'You ran an early set for the kids and a late one for the bar, and everyone got a night.' }
       ] },
 
     { id: 'DURHAM_NC_NOISE_CALL', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], months: [3, 4, 5, 6, 7, 8, 9, 10] },
       telegraph: 'A neighbor on the porch street has called in the last two shows.',
       title: 'The third noise call',
-      body: 'The house has had two noise calls and the sound ordinance bars amplified music after eleven. Tonight the set must stop mid-song or move to a cellar.',
+      body: 'The house has had two noise calls, and the sound ordinance bars amplified music after eleven, so tonight the set must stop mid-song or move to a cellar.',
       options: [
-        { id: 'CELLAR', label: 'Move the bill to a cellar in the mill', likely: 'Smaller and sweatier. Nobody can hear it.',
+        { id: 'CELLAR', label: 'Move the bill to a cellar in the mill', likely: 'It\'s smaller and sweatier, and nobody outside can hear it.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A cellar took the whole bill, and the floor was packed.' },
-        { id: 'EARLY', label: 'Start at six and end by ten', likely: 'Most of them get there. A short night.',
+        { id: 'EARLY', label: 'Start at six and end by ten', likely: 'Most of them get there, and it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Done by ten-thirty, and the street stayed quiet.' },
-        { id: 'ACCEPT', label: 'Run it and take the knock', likely: 'A visit from the officers.',
+          result: 'You were done by ten-thirty, and the street stayed quiet.' },
+        { id: 'ACCEPT', label: 'Run it and take the knock', likely: 'You get a visit from the officers.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The knock came at eleven. The last band played one song unplugged.' }
+          result: 'The knock came at eleven, and the last band played one song unplugged.' }
       ] }
   ]
 });

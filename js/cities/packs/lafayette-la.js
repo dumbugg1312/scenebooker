@@ -122,13 +122,13 @@ SB.Cities.register('lafayette-la', {
       options: [
         { id: 'HALL', label: 'Move the whole bill to a rented hall', likely: 'A flat fee and no glass, but dry.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'MONEY', amount: -80 }],
-          result: 'The hall owner opened the doors with an hour to spare. It was dry and the floor was full.' },
-        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The hall owner opened the doors with an hour to spare, and it was dry and the floor was full.' },
+        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'It breaks the date, and everyone trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the ones who could come came.' },
         { id: 'ACCEPT', label: 'Run it under the carport roof', likely: 'Wet, loud and thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'Everyone stood in a corner under the tin. The ones who came stayed.' }
+          result: 'Everyone stood in a corner under the tin, and the ones who came stayed.' }
       ] },
 
     { id: 'LAFAYETTE_LA_FESTIVAL_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -137,15 +137,15 @@ SB.Cities.register('lafayette-la', {
       title: 'The streets are closed',
       body: 'Parking is gone and the downtown streets are full of people with nowhere to go after dark. Your bar bill is stuck behind the barricades, but the crowd is already in town and wants a loud late night.',
       options: [
-        { id: 'LATE', label: 'Start late and play to the festival crowd', likely: 'Everyone is downtown anyway. A late night.',
+        { id: 'LATE', label: 'Start late and play to the festival crowd', likely: 'Everyone is downtown anyway, so it\'s a late night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.05 }],
-          result: 'Doors late. The festival let out loud and drunk and the room was full.' },
+          result: 'Doors opened late, and the festival let out loud and drunk and the room was full.' },
         { id: 'ACCEPT', label: 'Run it as planned and tell people where to park', likely: 'Some give up on the barricades.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'People walked eight blocks with their gear. Half the list made it.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'People walked eight blocks with their gear, and half the list made it.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'LAFAYETTE_LA_CURFEW_PUSH', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -154,15 +154,15 @@ SB.Cities.register('lafayette-la', {
       title: 'The curfew push',
       body: 'Police stopped kids walking home from an all-ages hall show at ten past eleven on a weeknight. The parents are angry, and now they are coming to the next one.',
       options: [
-        { id: 'EARLY', label: 'End by ten-thirty and walk the kids to their rides', likely: 'A shorter night. The parents relax.',
+        { id: 'EARLY', label: 'End by ten-thirty and walk the kids to their rides', likely: 'It\'s a shorter night, and the parents relax.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Done by ten-thirty, with parents waiting at the curb. They remembered it.' },
+          result: 'You were done by ten-thirty, with parents waiting at the curb.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Some of the kids stay home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The younger ones were kept home. The rest came and left early.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The younger ones were kept home, and the rest came and left early.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] }
   ]
 });

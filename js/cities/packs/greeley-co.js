@@ -123,13 +123,13 @@ SB.Cities.register('greeley-co', {
       options: [
         { id: 'LATE', label: 'Push doors back until the parade is done', likely: 'The overflow crowd drifts in late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The parade crowd wandered in loud and happy.' },
-        { id: 'EASTSIDE', label: 'Play the quiet east side while the park is full', likely: 'Smaller and local. Nobody has to park downtown.',
+          result: 'Doors went an hour late, and the parade crowd wandered in loud and happy.' },
+        { id: 'EASTSIDE', label: 'Play the quiet east side while the park is full', likely: 'Smaller and local, and nobody has to park downtown.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A garage on the east side took the bill. The street was empty and the room was packed.' },
+          result: 'A garage on the east side took the bill, and the street was empty and the room was packed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The fairgrounds crowd stays at the fairgrounds.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .78 }],
-          result: 'The parade took the town. The regulars came and not many others.' }
+          result: 'The parade took the town, and the regulars came and not many others.' }
       ] },
 
     { id: 'GREELEY_CO_TEN_PM_CUTOFF', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -138,15 +138,15 @@ SB.Cities.register('greeley-co', {
       title: 'Ten o\'clock on the dot',
       body: 'The cutoff for amplified sound is ten, and the headliner does not go on until nine-fifteen. A neighbor across the alley has already said he will call.',
       options: [
-        { id: 'EARLY', label: 'Start an hour early and finish at the cutoff', likely: 'A short night. Some miss the start.',
+        { id: 'EARLY', label: 'Start an hour early and finish at the cutoff', likely: 'It\'s a short night, and some miss the start.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early and a tight night. The last song was unplugged, and nobody minded.' },
-        { id: 'UNPLUG', label: 'Go unplugged for the last hour', likely: 'Quieter and strange. The crowd stays.',
+          result: 'Doors were early and the night was tight, and the last song was unplugged and nobody minded.' },
+        { id: 'UNPLUG', label: 'Go unplugged for the last hour', likely: 'Quieter and strange, and the crowd stays.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Acoustic after ten, shouted along by everybody. The call came in anyway.' },
+          result: 'It went acoustic after ten and everybody shouted along, but the call came in anyway.' },
         { id: 'ACCEPT', label: 'Run it long and take the risk', likely: 'The call is coming.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'MONEY', amount: -30 }],
-          result: 'A patrol car rolled up at ten past. You pulled the plug and paid a thirty-dollar warning fee.' }
+          result: 'A patrol car rolled up at ten past, and you pulled the plug and paid a thirty-dollar warning fee.' }
       ] },
 
     { id: 'GREELEY_CO_SPRING_BLIZZARD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -157,13 +157,13 @@ SB.Cities.register('greeley-co', {
       options: [
         { id: 'LOCAL', label: 'Run it with the locals who can walk there', likely: 'A thin bill, but everyone who comes is glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two local bands and a long, loose night. The room was half full and warm.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for the plows', likely: 'A late start. The crowd gets restless.',
+          result: 'It was two local bands and a long, loose night, and the room was half full and warm.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for the plows', likely: 'A late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The van pulled in at ten, and you started late but nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ]
 });

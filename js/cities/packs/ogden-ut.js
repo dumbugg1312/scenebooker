@@ -16,7 +16,7 @@ SB.Cities.register('ogden-ut', {
   blocklist: ['standard-examiner*', 'weber state*', 'hill air force*', 'peach days*', 'cafe rio*', 'switch shack*', 'two-bit annex*', 'weber grange*'],
 
   blurb: ['Sober kids pack basements and halls before curfew, and the bar rooms are a different, older crowd.',
-          'A satellite of the big city forty minutes south: modest turnouts, loyal locals, and bands that skip it.'],
+          'A satellite of the big city forty minutes south, with modest turnouts, loyal locals, and bands that skip it.'],
   hard: 'Bars can\'t take minors, so the two crowds never share a bill.',
   region: 'the Mountain West',
   houseType: 'BASEMENT',
@@ -122,13 +122,13 @@ SB.Cities.register('ogden-ut', {
       options: [
         { id: 'EARLY', label: 'Start early and trim the changeovers', likely: 'Everyone gets a set, but nobody gets comfortable.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, short sets, and the kids were out before the curfew.' },
-        { id: 'CUT', label: 'Cut a band and keep it tight', likely: 'The ones who came are happy. The bands are not.',
+          result: 'Doors were early with short sets, and the kids were out before the curfew.' },
+        { id: 'CUT', label: 'Cut a band and keep it tight', likely: 'The people who came are happy, but the bands are not.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Four bands became three. Everyone made it home in time.' },
+          result: 'Four bands became three, and everyone made it home in time.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The game ran long and the crowd came late.' }
+          result: 'The game ran long, and the crowd came late.' }
       ] },
 
     { id: 'OGDEN_UT_PARADE_CLOSURES', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -137,15 +137,15 @@ SB.Cities.register('ogden-ut', {
       title: 'The streets are closed for the parade',
       body: 'A fill-date band is loading in during the parade closures and cannot get the van within six blocks of the room.',
       options: [
-        { id: 'CART', label: 'Hand-carry the gear from the edge of the closure', likely: 'Slow and sweaty. Doors go late.',
+        { id: 'CART', label: 'Hand-carry the gear from the edge of the closure', likely: 'It\'s slow and sweaty, and doors go late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
           result: 'You ferried the amps six blocks on a borrowed dolly and started late.' },
-        { id: 'BASEMENT', label: 'Move the whole bill to a basement', likely: 'Smaller and louder. No road closures under a house.',
+        { id: 'BASEMENT', label: 'Move the whole bill to a basement', likely: 'It\'s smaller and louder, with no road closures under a house.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement took the bill with an hour to spare, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The parade crowd is not your crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The fireworks took the town and the regulars made do.' }
+          result: 'The fireworks took the town, and the regulars made do.' }
       ] },
 
     { id: 'OGDEN_UT_CANYON_SNOW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -154,15 +154,15 @@ SB.Cities.register('ogden-ut', {
       title: 'The opener is stuck in the canyon',
       body: 'A snow closure has stranded the opening band on the wrong side of the mountains. The bill is short and the kids know a basement.',
       options: [
-        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'A thin night, but the ones who came are glad.',
+        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'It\'s a thin night, but the people who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a long, loose night in a warm room.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start. The crowd gets restless.',
+          result: 'It was two bands and a long, loose night in a warm room.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'It\'s a late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The van pulled in at ten, so you started late, and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] }
   ]
 });

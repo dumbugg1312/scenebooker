@@ -14,7 +14,7 @@ SB.Cities.register('akron-oh', {
   blocklist: ['porchrokr*', 'akron marathon*', 'soap box derby*', 'beacon journal*', 'goodyear*', 'firestone*', 'galley boy*', 'rubber bowl*'],
 
   blurb: ['A shrunken rubber town in Northeast Ohio, where a house or a porch every few hundred feet holds a four-band bill, free or pay what you can.',
-          'Locals are proud of the old art-punk years and tired of hearing about them, with Cleveland up the road swallowing the tours. The 330 books its own.'],
+          'Locals are proud of the old art-punk years and tired of hearing about them, and with Cleveland up the road swallowing the tours, the 330 books its own.'],
   hard: 'Cleveland swallows the tours, and hosts worry about fire code and the next closure.',
   region: 'Northeast Ohio',
   houseType: 'BASEMENT',
@@ -130,10 +130,10 @@ SB.Cities.register('akron-oh', {
       title: 'The city turns off the lights',
       body: 'After an incident in the bar district the city has set a midnight closing for the bars and an early one for the parking lots, with towing after. Your show is in the middle of it.',
       options: [
-        { id: 'EARLY', label: 'Move the start up and finish before the closing', likely: 'Most of them get in. A short night.',
+        { id: 'EARLY', label: 'Move the start up and finish before the closing', likely: 'Most of them get in, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done before the lots closed. The ones who came got a short, tight set.' },
-        { id: 'BASEMENT', label: 'Move the whole bill to a basement', likely: 'Smaller and louder. Nobody can tow a house.',
+          result: 'You opened doors early and finished before the lots closed, so the people who came got a short, tight set.' },
+        { id: 'BASEMENT', label: 'Move the whole bill to a basement', likely: 'It\'s smaller and louder, and nobody can tow a house.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement took the bill with an hour to spare, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'People are nervous about the towing.',
@@ -147,15 +147,15 @@ SB.Cities.register('akron-oh', {
       title: 'The football-day collision',
       body: 'A game at the stadium, a big Ohio game on every screen, and your show at eight in the same neighborhood as three tailgates.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the games are over', likely: 'The crowd that wants a night out shows up. Later than planned.',
+        { id: 'LATE', label: 'Push doors back until the games are over', likely: 'The crowd that wants a night out shows up, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in from the bars, loud and happy.' },
+          result: 'You opened doors an hour late, and the crowd came in from the bars, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed on the couch. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed on the couch, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'AKRON_OH_LAKE_EFFECT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -164,15 +164,15 @@ SB.Cities.register('akron-oh', {
       title: 'The snow is on the Turnpike',
       body: 'The band from Pittsburgh hit a snow squall on the Turnpike that never reached Akron. They are crawling, and the bill has two of its five bands.',
       options: [
-        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'A thin night, but the ones who came are glad.',
+        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'It\'s a thin night, but the people who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a long, loose night. The room was half full and warm.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start. The crowd gets restless.',
+          result: 'It was two bands and a long, loose night, and the room was half full and warm.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'It\'s a late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The van pulled in at ten, so you started late, and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] },
 
     { id: 'AKRON_OH_PORCH_NOISE', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
@@ -181,12 +181,12 @@ SB.Cities.register('akron-oh', {
       title: 'The porch weekend wants a permit',
       body: 'A neighborhood porch-music weekend is on, and your band wants in as a legitimate act. The association asks for a noise permit and a list of porches.',
       options: [
-        { id: 'JOIN', label: 'Get the permit and play a real porch', likely: 'Costs a little. A bigger, friendlier crowd.',
+        { id: 'JOIN', label: 'Get the permit and play a real porch', likely: 'It costs a little, and you get a bigger, friendlier crowd.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Permit in hand, you played a front porch to the whole street.' },
-        { id: 'SKIP', label: 'Stay off the porches and keep it small', likely: 'Fewer people, no trouble.',
+          result: 'With the permit in hand, you played a front porch to the whole street.' },
+        { id: 'SKIP', label: 'Stay off the porches and keep it small', likely: 'You get fewer people and no trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'You kept to your own room. The festival took some of the crowd.' }
+          result: 'You kept to your own room, and the festival took some of the crowd.' }
       ] }
   ]
 });

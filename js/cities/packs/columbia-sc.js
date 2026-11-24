@@ -123,30 +123,30 @@ SB.Cities.register('columbia-sc', {
       options: [
         { id: 'LATE', label: 'Push doors back until the midway thins out', likely: 'The ones who walk over come in late and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }],
-          result: 'Doors an hour late. The midway crowd came in by the dozens.' },
+          result: 'Doors opened an hour late, and the midway crowd came in by the dozens.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The regulars can\'t park.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'The regulars circled the block twice and went home.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] },
 
     { id: 'COLUMBIA_SC_FIRE_TIP', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 3] },
       telegraph: 'The address went around the record shop on Tuesday, and someone you do not know was asking about it.',
       title: 'A tip goes to the fire marshal',
-      body: 'Somebody has called in the room with no posted address. The fire marshal will be by before doors, and the only place that cannot be reached is a club across the river under a different police department.',
+      body: 'Somebody has called in the room with no posted address, and the fire marshal will be by before doors. The only place the marshal can\'t reach is a club across the river under a different police department.',
       options: [
-        { id: 'RIVER', label: 'Move the bill across the river', likely: 'A different town\'s rules, and 21 and over.',
+        { id: 'RIVER', label: 'Move the bill across the river', likely: 'It\'s a different town\'s rules, and 21 and over.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'CLUB', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The club across the river took the bill. The kids under 21 never made it in.' },
-        { id: 'HOUSE', label: 'Move the bill to a house', likely: 'Smaller, and word has to get around fast.',
+          result: 'The club across the river took the bill, and the kids under 21 never made it in.' },
+        { id: 'HOUSE', label: 'Move the bill to a house', likely: 'It\'s smaller, and word has to get around fast.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A living room took the bill with an hour to spare, and the porch overflowed.' },
         { id: 'ACCEPT', label: 'Run it and hope', likely: 'If they come, the show ends early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'MONEY', amount: -40 }],
-          result: 'The marshal counted heads, wrote a warning and the room was half empty by ten.' }
+          result: 'The marshal counted heads and wrote a warning, and the room was half empty by ten.' }
       ] },
 
     { id: 'COLUMBIA_SC_GAME_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -155,15 +155,15 @@ SB.Cities.register('columbia-sc', {
       title: 'The tailgaters wander in',
       body: 'The all-ages matinee at the club is on, but the game lets out at five and drunk tailgaters will fill the strip all afternoon.',
       options: [
-        { id: 'LATE', label: 'Push the matinee back until the strip clears', likely: 'The kids get in. A later night.',
+        { id: 'LATE', label: 'Push the matinee back until the strip clears', likely: 'The kids get in, but it\'s a later night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The kids came in after the crowd had cleared out.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Tailgaters mix with the kids. It gets messy.',
+          result: 'Doors opened an hour late, and the kids came in after the crowd had cleared out.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Tailgaters mix with the kids, and it gets messy.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Half the floor was strangers in team colors. It was loud and not very kind.' },
+          result: 'Half the floor was strangers in team colors, and it was loud and not very kind.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ]
 });

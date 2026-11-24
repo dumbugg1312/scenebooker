@@ -13,7 +13,7 @@ SB.Cities.register('college-station-tx', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['texas a&m*', 'aggie*', 'kyle field*', 'post oak mall*', 'the battalion*', 'kanm*', 'blue bell*'],
 
-  blurb: ['The campus is all football and red dirt. The punk kids found the old brick downtown next door in Bryan and made it theirs.',
+  blurb: ['The campus is all football and red dirt, so the punk kids found the old brick downtown next door in Bryan and made it theirs.',
           'Bands form fast and leave at graduation, so every year the scene starts over.'],
   hard: 'Student turnover, football weekends and a summer ghost town.',
   region: 'the Brazos Valley',
@@ -105,34 +105,34 @@ SB.Cities.register('college-station-tx', {
       if: { daysOut: [0, 4], calendar: 'game' },
       telegraph: 'A home game is on Saturday, and every hotel in two towns is full.',
       title: 'Football swallows the strip',
-      body: 'A home Saturday has put the whole town in traffic. A drive across it takes half an hour, and the show is on the other side.',
+      body: 'A home Saturday has put the whole town in traffic, so a drive across it takes half an hour, and the show is on the other side.',
       options: [
-        { id: 'EARLY', label: 'Open early, before the traffic builds', likely: 'Most get in. A short night.',
+        { id: 'EARLY', label: 'Open early, before the traffic builds', likely: 'Most get in, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early. The crowd got in before the tailgates started and left before the traffic broke.' },
-        { id: 'LATE', label: 'Push doors back until the game traffic clears', likely: 'The crowd that wants a night out shows up. Later than planned.',
+          result: 'Doors opened early, and the crowd got in before the tailgates started and left before the traffic broke.' },
+        { id: 'LATE', label: 'Push doors back until the game traffic clears', likely: 'The crowd that wants a night out shows up, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in from the bars, loud and happy.' },
+          result: 'Doors opened an hour late, and the crowd came in from the bars, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is stuck in traffic.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed on the couch. The regulars came.' }
+          result: 'The casual crowd stayed on the couch, but the regulars came.' }
       ] },
 
     { id: 'COLLEGE_STATION_TX_BAR_SHUTS', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [8, 9, 10, 11, 2, 3, 4, 5] },
       telegraph: 'A bar on the strip has a notice on the door, and the owner will not say why.',
       title: 'The bar locks its doors',
-      body: 'The campus-edge bar that was hosting your show has shut with no warning, over what the owner owed the suppliers. The bands are already on the road.',
+      body: 'The campus-edge bar that was hosting your show has shut with no warning, over what the owner owed the suppliers, and the bands are already on the road.',
       options: [
         { id: 'BAR', label: 'Move the bill to a cafe-bar downtown', likely: 'Smaller and quieter, and a different crowd.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'BAR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'A cafe-bar in Bryan took the bill with a day to spare. A smaller room, and a better one.' },
+          result: 'A cafe-bar in Bryan took the bill with a day to spare, and it was a smaller room but a better one.' },
         { id: 'YARD', label: 'Move it to a backyard on short notice', likely: 'Smaller and louder, with neighbors on every side.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A backyard took the whole bill, and the floor was packed.' },
         { id: 'MOVE', label: 'Move it a week', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it. Not everyone could make the new one.' }
+          result: 'You moved it, and not everyone could make the new date.' }
       ] },
 
     { id: 'COLLEGE_STATION_TX_FEST_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -143,30 +143,30 @@ SB.Cities.register('college-station-tx', {
       options: [
         { id: 'OFFSPOT', label: 'Move the bill to a barn or a garage', likely: 'Smaller and loud, away from the crowd.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A garage took the bill. The ones who wanted the loud room found it.' },
+          result: 'A garage took the bill, and the people who wanted the loud room found it.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The casual crowd goes to the free stages.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The free stages took the casual crowd. The regulars came.' },
+          result: 'The free stages took the casual crowd, but the regulars came.' },
         { id: 'EARLY', label: 'Start early and finish before the headliners', likely: 'A short night, and it shares the crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors early. You were done before the big stages let out.' }
+          result: 'Doors opened early, and you were done before the big stages let out.' }
       ] },
 
     { id: 'COLLEGE_STATION_TX_GRAD_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'graduation' },
       telegraph: 'Graduation is this week, and half the people you know are packing a truck.',
       title: 'The bands graduate',
-      body: 'Three of the four bands on the bill lost a member to a job somewhere else. The booker has to find fill-ins or play short.',
+      body: 'Three of the four bands on the bill lost a member to a job somewhere else, so you have to find fill-ins or play short.',
       options: [
         { id: 'SHORT', label: 'Run a shorter bill', likely: 'A thin night, but the ones who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Fewer bands and a long, loose night. The room was half full and warm.' },
-        { id: 'FILL', label: 'Scramble for fill-ins', likely: 'Costs a day of calls. Most of the bill holds.',
+          result: 'Fewer bands played a long, loose night in a room that was half full and warm.' },
+        { id: 'FILL', label: 'Scramble for fill-ins', likely: 'Costs a day of calls, but most of the bill holds.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two phone calls and a borrowed drummer. It held, and they will remember who called.' },
+          result: 'Two phone calls and a borrowed drummer held the bill together, and the bands know who called.' },
         { id: 'MOVE', label: 'Move it a week', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it. Not everyone could make the new one.' }
+          result: 'You moved it, and not everyone could make the new date.' }
       ] }
   ],
 

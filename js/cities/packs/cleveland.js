@@ -5,8 +5,8 @@ SB.Cities.register('cleveland', {
   banned: ['case western reserve university', 'cwru', 'cleveland state university', 'john carroll university', 'baldwin wallace', 'oberlin college', 'cleveland scene', 'scene magazine', 'the plain dealer', 'cleveland.com', 'cleveland browns', 'cleveland guardians', 'cleveland cavaliers', 'rock and roll hall of fame', 'rock hall', 'the cleveland clinic', 'university hospitals', 'cleveland orchestra', 'cleveland museum of art', 'great lakes brewing', 'cuyahoga county fair', 'cleveland national air show', 'cleveland marathon', 'tri-c', 'cleveland public library', 'progressive field', 'firstenergy stadium', 'rocket arena', 'playhouse square', 'wkyc', 'wews', 'wjw', 'wtam', 'wmms', 'jacobs field', 'burke lakefront airport', 'lake erie monsters', 'kent state', 'detroit-superior bridge', 'lorain-carnegie bridge', 'great lakes burning river fest', 'burning river fest', 'cleveland pride', 'pride in the cle', 'st. patrick\'s day parade', 'cleveland international film festival', 'cleveland boat show', 'lakewood chocolate walk', 'ideastream', 'signal cleveland', 'cleveland magazine', 'clevescene', 'buckeye flame', 'news5', 'news 5', 'axios cleveland', 'cool cleveland', 'warped tour', 'huber park', 'cleveland city council', 'cleveland police', 'rustbelt ripper fest', 'cle daily', 'case western observer'],
   blocklist: ['plain dealer*', 'cleveland clinic*', 'rock hall*', 'great lakes brew*', 'playhouse square*', 'cleveland scene*'],
 
-  blurb: ['Hardcore basements on the west side and warehouse shows in Midtown, with a rebuilt DIY crowd and long grey winters.',
-          'Parking lots and bridges fill in when the houses get shut down.'],
+  blurb: ['Hardcore basements on the west side and warehouse shows in Midtown, a rebuilt DIY crowd and long grey winters.',
+          'When the houses get shut down, parking lots and bridges fill in.'],
   hard: 'Venues vanish when neighbors complain, and lake snow kills turnout.',
   region: 'the Great Lakes',
   houseType: 'BASEMENT',
@@ -18,7 +18,7 @@ SB.Cities.register('cleveland', {
     { name: 'New York City', state: 'NY', lat: 40.71, lon: -74.01 }
   ],
   tilt: [
-    { fan: 'hardcore', band: 'hardcore', d: .08, reason: 'Post-pandemic DIY bills are built around hardcore.' }
+    { fan: 'hardcore', band: 'hardcore', d: .08, reason: 'Since the pandemic, DIY bills here have been built around hardcore.' }
   ],
 
   zones: [
@@ -119,51 +119,51 @@ SB.Cities.register('cleveland', {
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'The high bridges over the river valley have crews on them this week.',
       title: 'The bridge is closed',
-      body: 'A bridge over the valley is shut the night of your show, and it strands the west side from the east. The bands and the kids on the far bank have to go the long way around.',
+      body: 'A bridge over the valley is shut the night of your show, which cuts the west side off from the east. The bands and the kids on the far bank have to go the long way around.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'It never cleared. The ones on the far side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'It never cleared, and the people on the far side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads came together the long way. They will remember that.' }
+          result: 'Two carloads came together the long way around.' }
       ] },
 
     { id: 'CLEVELAND_LOT_GUARD', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
       telegraph: 'The hardcore night is on in a lit parking lot on the west side, and the guard has been seen walking the edge of it.',
       title: 'The guard comes round',
-      body: 'Halfway through the second band the lot guard walks up and says he will call the police on private property. The generator is running and the crowd is packed in tight.',
+      body: 'Halfway through the second band the lot guard walks up and says he will call the police because it\'s private property. The generator is running and the crowd is packed in tight.',
       options: [
-        { id: 'MOVE', label: 'Carry the gear to a basement and finish there', likely: 'Smaller and louder. The kids follow the vans.',
+        { id: 'MOVE', label: 'Carry the gear to a basement and finish there', likely: 'It\'s smaller and louder, and the kids follow the vans.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The bill finished in a basement across town. It was a better room than the lot.' },
-        { id: 'SHORT', label: 'Cut the bill short and clear the lot', likely: 'A short night, and nobody gets cited.',
+          result: 'The bill finished in a basement across town, which turned out to be a better room than the lot.' },
+        { id: 'SHORT', label: 'Cut the bill short and clear the lot', likely: 'It\'s a short night, and nobody gets cited.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands played and the rest packed out. The lot was empty before any squad car came.' },
+          result: 'Two bands played and the rest packed out, and the lot was empty before any squad car came.' },
         { id: 'ACCEPT', label: 'Argue and play on', likely: 'He might actually call.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The guard stood there with his phone out for two songs. Half the crowd left before he used it.' }
+          result: 'The guard stood there with his phone out for two songs, and half the crowd left before he used it.' }
       ] },
 
     { id: 'CLEVELAND_NEW_NEIGHBORS', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 4] },
       telegraph: 'New tenants have moved into the building next to the warehouse, and the landlord has stopped answering texts.',
       title: 'One text to the landlord',
-      body: 'The new neighbors next door to the Midtown warehouse sent one message to the landlord. Tonight\'s donation-only bill has lost its room.',
+      body: 'The new neighbors next door to the Midtown warehouse sent one message to the landlord, and tonight\'s donation-only bill has lost its room.',
       options: [
-        { id: 'BASEMENT', label: 'Move the bill to a basement on the west side', likely: 'Smaller and nearer the kids.',
+        { id: 'BASEMENT', label: 'Move the bill to a basement on the west side', likely: 'It\'s smaller, and nearer the kids.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement took the whole bill with an hour to spare, and the floor was packed.' },
-        { id: 'MOVEDAY', label: 'Hold the date and find a room for tomorrow', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVEDAY', label: 'Hold the date and find a room for tomorrow', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' },
-        { id: 'ACCEPT', label: 'Run it in the street out front', likely: 'A smaller crowd, and the neighbors watching.',
+          result: 'You moved it a day, and not everyone could make the new one.' },
+        { id: 'ACCEPT', label: 'Run it in the street out front', likely: 'You get a smaller crowd, and the neighbors watching.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The bill played on the curb under a streetlight. The neighbors watched from their windows.' }
+          result: 'The bill played on the curb under a streetlight while the neighbors watched from their windows.' }
       ] },
 
     { id: 'CLEVELAND_LAKE_SNOW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -172,15 +172,15 @@ SB.Cities.register('cleveland', {
       title: 'The snow shuts the high bridges',
       body: 'Snow has the high bridges closed on a Saturday. The west-side basement is full of kids who can walk there, and the east-side ballroom is half empty.',
       options: [
-        { id: 'WAIT', label: 'Hold doors and wait for the plows', likely: 'A late start. The crowd gets restless.',
+        { id: 'WAIT', label: 'Hold doors and wait for the plows', likely: 'It starts late, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The vans pulled in at ten. You started late and nobody left.' },
-        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'A thin night, but the ones who came are glad.',
+          result: 'The vans pulled in at ten, and you started late, but nobody left.' },
+        { id: 'SHORT', label: 'Run the short bill and play on', likely: 'It\'s a thin night, but the people who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a long, loose night. The room was half full and warm.' },
-        { id: 'MOVEDAY', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'Two bands played a long, loose night in a room that was half full and warm.' },
+        { id: 'MOVEDAY', label: 'Move it a day', likely: 'It breaks the date, and everybody trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] }
   ]
 });

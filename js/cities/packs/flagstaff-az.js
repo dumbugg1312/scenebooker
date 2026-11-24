@@ -110,34 +110,34 @@ SB.Cities.register('flagstaff-az', {
       if: { daysOut: [0, 3], months: [11, 12, 1, 2, 3] },
       telegraph: 'A heavy storm is stacking up over the peaks and the plows are already out.',
       title: 'The road to the east side is closed',
-      body: 'Two feet fell by afternoon. The pass to the interstate is shut, the east-side garage is buried and the bill is a local trio and whoever is already in town.',
+      body: 'Two feet fell by afternoon, the pass to the interstate is shut, the east-side garage is buried, and the bill is a local trio and whoever is already in town.',
       options: [
         { id: 'LOCALS', label: 'Run it with whoever can walk there', likely: 'A small, warm night with the regulars.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'Thirty people in wet boots and one loud local trio. Nobody left early.' },
+          result: 'Thirty people in wet boots watched one loud local trio, and nobody left early.' },
         { id: 'WAIT', label: 'Hold the doors until the plows come through', likely: 'Late, and the crowd thins.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The plow came at nine. You started at ten and the ones who stayed never forgot it.' },
+          result: 'The plow came at nine and you started at ten, and the people who stayed never forgot it.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'FLAGSTAFF_AZ_HOMECOMING_NOISE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'game' },
       telegraph: 'Homecoming weekend: the bars are full of alumni and the student rentals are loud.',
       title: 'Nine o\'clock noise call',
-      body: 'The town tightened its quiet hour and nobody told the house. A neighbor called at nine, and the police are on the porch.',
+      body: 'The town tightened its quiet hour and nobody told the house, so a neighbor called at nine, and now the police are on the porch.',
       options: [
-        { id: 'EARLY', label: 'Move the start up and finish before nine', likely: 'A short night. Most of them get in.',
+        { id: 'EARLY', label: 'Move the start up and finish before nine', likely: 'A short night, but most of them get in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done by nine. The ones who came got a short, tight set.' },
+          result: 'Doors opened early and you were done by nine, so the people who came got a short, tight set.' },
         { id: 'SUITE', label: 'Move the whole bill to a downtown suite', likely: 'Smaller, and nobody can call the neighbors.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A suite took the bill with an hour to spare. Crowded, dry and legal.' },
+          result: 'A suite took the bill with an hour to spare, and it was crowded, dry and legal.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The police may shut it mid-set.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The police stood on the porch through the last two bands. Half the floor left early.' }
+          result: 'The police stood on the porch through the last two bands, and half the floor left early.' }
       ] },
 
     { id: 'FLAGSTAFF_AZ_FILL_DATE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -146,15 +146,15 @@ SB.Cities.register('flagstaff-az', {
       title: 'A fill date and no beer',
       body: 'The tour needs gas money and a floor to sleep on. Your room is dry, so there is no bar to split and the whole night is the door.',
       options: [
-        { id: 'DOOR', label: 'Give them the whole door', likely: 'They are happy. You make nothing.',
+        { id: 'DOOR', label: 'Give them the whole door', likely: 'They are happy, and you make nothing.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: 1 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }],
-          result: 'The tour played loud and sold out of shirts. They left with a full tank and a good word about the town.' },
+          result: 'The tour played loud and sold out of shirts, and they left with a full tank and a good word about the town.' },
         { id: 'SHORT', label: 'Put them on a short bill with the locals', likely: 'A modest night for everyone.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Four bands and a tight night. Nobody got rich and everybody got home.' },
+          result: 'Four bands played a tight night, and nobody got rich but everybody got home.' },
         { id: 'PASS', label: 'Pass on it', likely: 'The room stays quiet.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'You passed. The night ran with the locals, and the tour found a basement in Winslow.' }
+          result: 'You passed, so the night ran with the locals, and the tour found a basement in Winslow.' }
       ] }
   ]
 });

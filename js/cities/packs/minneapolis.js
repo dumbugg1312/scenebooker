@@ -14,7 +14,7 @@ SB.Cities.register('minneapolis', {
   blocklist: ['minnesota state fair*', 'twin cities pride*', 'art-a-whirl*', 'first avenue*', 'jucy lucy*', 'city pages*', 'target center*'],
 
   blurb: ['Two cities on the Mississippi that act as one market. Basements full of people who have been going to shows for thirty years.',
-          'The winter is long, the landlords are watching, and the benefits never stop. The scene keeps starting over.'],
+          'The winter is long and the landlords are watching, and the benefits never stop, so the scene keeps starting over.'],
   hard: 'Landlord notices end houses, and winter and snow tows decide turnout.',
   region: 'the Upper Midwest',
   houseType: 'BASEMENT',
@@ -123,32 +123,32 @@ SB.Cities.register('minneapolis', {
       title: 'A snow emergency on show day',
       body: 'The snow emergency is on. Cars on the wrong side of the street get towed tomorrow, and the van and half your crowd are parked there.',
       options: [
-        { id: 'EARLY', label: 'Move doors earlier and tell everyone where to park', likely: 'Most of them move their cars first. The night starts thin.',
+        { id: 'EARLY', label: 'Move doors earlier and tell everyone where to park', likely: 'Most of them move their cars first, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors an hour early. The cars were on the right side, and the room smelled like wet wool.' },
+          result: 'You opened doors an hour early. The cars were on the right side, and the room smelled like wet wool.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'A lot of people stay home rather than risk a tow.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'The plows came through at ten. The ones who stayed in were the ones who walked.' },
-        { id: 'STAY', label: 'Let everyone sleep over', likely: 'Smaller crowd, and a floor full of bodies in the morning.',
+          result: 'The plows came through at ten, and the only people who stayed in were the ones who walked.' },
+        { id: 'STAY', label: 'Let everyone sleep over', likely: 'The crowd is smaller, and the floor is full of bodies in the morning.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'REGULARS', pct: .02 }, { op: 'STRESS', d: 1 }],
-          result: 'Nobody drove home. By morning the basement was one big pile of coats.' }
+          result: 'Nobody drove home, and by morning the basement was one big pile of coats.' }
       ] },
 
     { id: 'MINNEAPOLIS_FAIR_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'fair' },
       telegraph: 'The big fair opens and half of St. Paul is getting ready for it.',
       title: 'The fair has the city',
-      body: 'It is fair week. Every parking spot near the fairgrounds is gone, a sea of people eat things on sticks, and half your bill is working a food stand.',
+      body: 'It is fair week. Every parking spot near the fairgrounds is gone, the place is full of people eating things on sticks, and half your bill is working a food stand.',
       options: [
         { id: 'EARLY', label: 'Start early and cap the list', likely: 'The bill is short and the door is easy.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early. The ones off shift came straight in smelling of fried dough.' },
+          result: 'You opened doors early, and the ones off shift came straight in smelling of fried dough.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The people who can come are few.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Every street near you was parked solid. The room stayed thin.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Every street near you was parked solid, and the room stayed thin.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'MINNEAPOLIS_LANDLORD_NOTICE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -157,15 +157,15 @@ SB.Cities.register('minneapolis', {
       title: 'The landlord got a notice',
       body: 'The police have sent a nuisance notice to whoever holds the rental license, and the landlord wants the shows gone or the rent doubled. Everyone in the house is a little scared.',
       options: [
-        { id: 'MOVE', label: 'Move it to a hall', likely: 'A rental fee and a bigger room. The landlord stops calling.',
+        { id: 'MOVE', label: 'Move it to a hall', likely: 'It costs a rental fee and you need a bigger room, but the landlord stops calling.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'MONEY', amount: -60 }],
-          result: 'A hall took the bill. The house kept its license for another month.' },
-        { id: 'QUIET', label: 'Keep it small and quiet', likely: 'Acoustic set, a short list, and the neighbor stops calling.',
+          result: 'A hall took the bill, and the house kept its license for another month.' },
+        { id: 'QUIET', label: 'Keep it small and quiet', likely: 'It\'s an acoustic set and a short list, and the neighbor stops calling.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }, { op: 'ROOM_PRESSURE', d: -10 }],
-          result: 'Everyone sat on the floor. The neighbor never found out it was a show.' },
-        { id: 'RUN', label: 'Run it anyway', likely: 'A full room, and the landlord finds out.',
+          result: 'Everyone sat on the floor, and the neighbor never found out it was a show.' },
+        { id: 'RUN', label: 'Run it anyway', likely: 'You get a full room, and the landlord finds out.',
           effects: [{ op: 'ROOM_PRESSURE', d: 15 }, { op: 'STRESS', d: 2 }],
-          result: 'The room was packed. Someone left a note on the door in the morning.' }
+          result: 'The room was packed, and in the morning someone left a note on the door.' }
       ] },
 
     { id: 'MINNEAPOLIS_HALL_KITCHEN', when: 'NIGHT', tier: 'REAL', weight: 1, cooldown: 40, bind: ['show'],
@@ -173,32 +173,32 @@ SB.Cities.register('minneapolis', {
       title: 'The kitchen is a mess',
       body: 'The church hall let you in on one condition: the kitchen stays spotless. Someone ran the sink dry and left it. The hall manager walks in at the end of the night.',
       options: [
-        { id: 'CLEAN', label: 'Stay and scrub it yourself', likely: 'An hour of your night. The hall stays friendly.',
+        { id: 'CLEAN', label: 'Stay and scrub it yourself', likely: 'It costs an hour of your night, and the hall stays friendly.',
           effects: [{ op: 'HOURS', d: -1, when: 'TODAY' }, { op: 'ROOM_REL', d: 8 }],
-          result: 'You were still there with a mop at midnight. The manager noticed.' },
-        { id: 'PAY', label: 'Leave cash for a cleaner', likely: 'Costs twenty dollars. The hall is fine with it.',
+          result: 'You were still there with a mop at midnight, and the manager noticed.' },
+        { id: 'PAY', label: 'Leave cash for a cleaner', likely: 'It costs twenty dollars, and the hall is fine with it.',
           effects: [{ op: 'MONEY', amount: -20 }],
-          result: 'Twenty dollars in an envelope. The kitchen was clean by Monday.' },
-        { id: 'LEAVE', label: 'Leave it', likely: 'The hall remembers.',
+          result: 'You left twenty dollars in an envelope, and the kitchen was clean by Monday.' },
+        { id: 'LEAVE', label: 'Leave it', likely: 'The hall will remember it.',
           effects: [{ op: 'ROOM_REL', d: -12 }, { op: 'ROOM_PRESSURE', d: 8 }],
-          result: 'The manager sent a short note. The next date is not a sure thing.' }
+          result: 'The manager sent a short note, and the next date is not a sure thing.' }
       ] },
 
     { id: 'MINNEAPOLIS_CABIN_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], months: [5, 6, 7, 8, 9] },
       telegraph: 'The first nice Friday of the year is coming and everyone is talking about the cabin.',
       title: 'Half the scene went up north',
-      body: 'It is the first warm weekend, and everyone who has a lake cabin, or a friend with one, left on Thursday. Your show is the only thing in town.',
+      body: 'It is the first warm weekend, and everyone who has a lake cabin, or a friend with one, left on Thursday, so your show is the only thing in town.',
       options: [
-        { id: 'PLAY', label: 'Play it anyway', likely: 'A few people, and a quiet floor.',
+        { id: 'PLAY', label: 'Play it anyway', likely: 'You get a few people and a quiet floor.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
           result: 'Eleven people came, and every one of them knew every word.' },
-        { id: 'LATER', label: 'Move it a day, when they\'re back', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'LATER', label: 'Move it a day, when they\'re back', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The sunburned ones came straight from the road.' },
-        { id: 'POST', label: 'Post it as a backyard show', likely: 'Smaller but warmer. A few more neighbors show up.',
+          result: 'You moved it a day, and the sunburned ones came straight from the road.' },
+        { id: 'POST', label: 'Post it as a backyard show', likely: 'It\'s smaller but warmer, and a few more neighbors show up.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'REGULARS', pct: .02 }],
-          result: 'You put the amp on the back steps. The sunset was better than the sound.' }
+          result: 'You put the amp on the back steps, and the sunset was better than the sound.' }
       ] }
   ]
 });

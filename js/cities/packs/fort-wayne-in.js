@@ -123,13 +123,13 @@ SB.Cities.register('fort-wayne-in', {
       options: [
         { id: 'DOORS', label: 'Prop the doors and take the walk-ins', likely: 'A big crowd and a bigger risk.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }, { op: 'MONEY', amount: -25 }],
-          result: 'The street wandered in. The marshal counted heads twice and let it slide.' },
+          result: 'The street wandered in, and the marshal counted heads twice and let it slide.' },
         { id: 'EARLY', label: 'Start early and be done before the fireworks', likely: 'Most of your people get in first.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors early, out by dark. The ones who came heard every set.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Doors were early and you were out by dark, and the people who came heard every set.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The festival crowd went home and a few of yours came.' }
+          result: 'You moved it a day, and the festival crowd went home and a few of yours came.' }
       ] },
 
     { id: 'FORT_WAYNE_IN_NOISE_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -138,12 +138,12 @@ SB.Cities.register('fort-wayne-in', {
       title: 'One call to the non-emergency line',
       body: 'At ten the police are on the porch, and the same night they are sweeping for kids under curfew. Half the room is fifteen.',
       options: [
-        { id: 'CLOSE', label: 'End it on the spot and send everyone home', likely: 'Short night. No trouble, and the neighbors are quiet.',
+        { id: 'CLOSE', label: 'End it on the spot and send everyone home', likely: 'A short night with no trouble, and the neighbors are quiet.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'REGULARS', pct: .02 }],
-          result: 'The lights came on at ten. Nobody got a ride in a squad car.' },
+          result: 'The lights came on at ten, and nobody got a ride in a squad car.' },
         { id: 'QUIET', label: 'Switch to a quiet set and keep it going', likely: 'Half the room leaves anyway.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Two acoustic songs and a lot of whispering. They were gone by eleven.' },
+          result: 'It was two acoustic songs and a lot of whispering, and they were gone by eleven.' },
         { id: 'MOVE', label: 'Walk the bands to a yard across town', likely: 'A smaller crowd, a louder night, a risk.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A yard in the southwest took the bill, and it was packed until the first drops.' }
@@ -157,13 +157,13 @@ SB.Cities.register('fort-wayne-in', {
       options: [
         { id: 'GARAGE', label: 'Pull everything into the garage', likely: 'Smaller, louder, and wet.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Forty people in a two-car garage and the rain on the roof. It was the best set of the night.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was forty people in a two-car garage with the rain on the roof, and it was the best set of the night.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The storm blew over, and so did half the list.' },
+          result: 'You moved it a day, and the storm blew over, and so did half the list.' },
         { id: 'ACCEPT', label: 'Run it outside and take what you get', likely: 'A lot of people stay home under a storm.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The ones who came held the tarp. The amp survived.' }
+          result: 'The people who came held the tarp, and the amp survived.' }
       ] }
   ]
 });

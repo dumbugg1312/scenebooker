@@ -12,8 +12,8 @@ SB.Cities.register('richmond', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The 2004 flood is 'the storm of 2004' in game text. */
   blocklist: ['richmond folk festival*', 'richmond marathon*', 'style weekly*', 'rva magazine*', 'food not bombs*', 'waffle house*', 'nascar*'],
 
-  blurb: ['Houses come and go and the old heads keep the stories. Rent and shared rowhouse walls decide what lasts.',
-          'A long, proud hardcore and zine memory, a legal downtown room for the big nights, and a warehouse that is now a taproom.'],
+  blurb: ['Houses come and go and the old heads keep the stories, and rent and shared rowhouse walls decide what lasts.',
+          'It has a long, proud hardcore and zine memory, a legal downtown room for the big nights, and a warehouse that is now a taproom.'],
   hard: 'Cheap rooms vanish to rent and noise; the legal ones skip kids.',
   region: 'the I-95 corridor',
   houseType: 'ROWHOUSE',
@@ -136,51 +136,51 @@ SB.Cities.register('richmond', {
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'Road crews are working on the I-95 and I-64 overlap downtown this week.',
       title: 'The interstate is a parking lot',
-      body: 'A wreck at the I-95 and I-64 overlap has the whole spine backed up the night of your show. The bands and the kids from the north and the Southside are stuck.',
+      body: 'A wreck at the I-95 and I-64 overlap has the whole stretch backed up on the night of your show, and the bands and the kids from the north and the Southside are stuck.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross downtown.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross downtown.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The ones outside the city stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The backup never cleared, and the people outside the city stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the back roads together. They\'ll remember that.' }
+          result: 'Two carloads took the back roads together.' }
       ] },
 
     { id: 'RICHMOND_RACE_CLOSURES', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'race' },
       telegraph: 'The marathon closes half the north side on Saturday.',
       title: 'The marathon has the streets',
-      body: 'Marathon weekend closes Broad, the Boulevard and Monument Avenue. Nobody can get near the show, and the tow trucks are circling the permit zones.',
+      body: 'Marathon weekend closes Broad, the Boulevard and Monument Avenue, so nobody can get near the show, and the tow trucks are circling the permit zones.',
       options: [
-        { id: 'EARLY', label: 'Open early, tell everyone where to park', likely: 'Most get in before the barricades. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early, tell everyone where to park', likely: 'Most people get in before the barricades, but it\'s thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came parked a mile away and walked.' },
-        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
+          result: 'You opened doors an hour early, and the people who came parked a mile away and walked.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up because of the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The streets stayed shut. Half the list never found a place to leave the car.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The streets stayed shut, and half the list never found a place to leave the car.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'RICHMOND_BOTTOM_FLOODS', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [7, 8, 9, 10] },
       telegraph: 'The remnants of a tropical system are headed up the coast.',
       title: 'The Bottom is flooding',
-      body: 'A tropical remnant has dropped a foot of rain, and the low blocks of Shockoe Bottom are going under. Anywhere near the river is a bad bet tonight.',
+      body: 'A tropical remnant has dropped a foot of rain and the low blocks of Shockoe Bottom are going under, so anywhere near the river is a bad bet tonight.',
       options: [
-        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'Breaks the date. Costs trust with everyone.',
+        { id: 'MOVE', label: 'Move it a day, once the water goes down', likely: 'It breaks the date, and everybody loses some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'HILL', label: 'Move it to a house on high ground', likely: 'Smaller and louder, with a wall of neighbors on every side.',
+          result: 'You moved it a day, and the people who could make it came.' },
+        { id: 'HILL', label: 'Move it to a house on high ground', likely: 'It\'s smaller and louder, with neighbors on every side.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A rowhouse on the hill took the whole bill, and the floor was packed.' },
-        { id: 'SANDBAG', label: 'Sandbag the door and play on', likely: 'Costs forty dollars. The crowd stays home.',
+        { id: 'SANDBAG', label: 'Sandbag the door and play on', likely: 'It costs forty dollars, and the crowd stays home.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The water stayed on the street. The room was half full and wet to the ankle.' }
+          result: 'The water stayed on the street, and the room was half full and wet to the ankle.' }
       ] }
   ]
 });

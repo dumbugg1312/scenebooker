@@ -110,17 +110,17 @@ SB.Cities.register('canton-oh', {
       if: { daysOut: [0, 5], calendar: 'festival' },
       telegraph: 'The hotels are full and the downtown lots are closed for the big football week.',
       title: 'The festival week',
-      body: 'Every hotel is full and the downtown lots are closed for the parade. Your band is stuck behind the closures and the hall wants double for the night.',
+      body: 'Every hotel is full and the downtown lots are closed for the parade. Your band is stuck behind the closures, and the hall wants double for the night.',
       options: [
-        { id: 'PAY', label: 'Pay the hall its double', likely: 'Costs real money, but the room is yours.',
+        { id: 'PAY', label: 'Pay the hall its double', likely: 'It costs real money, but the room is yours.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'The hall got its double. The band showed an hour late and nobody left.' },
+          result: 'The hall got its double, and the band showed an hour late and nobody left.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' },
-        { id: 'ACCEPT', label: 'Run it and eat the closures', likely: 'Thin and late.',
+          result: 'You moved it a day, and not everyone could make the new one.' },
+        { id: 'ACCEPT', label: 'Run it and eat the closures', likely: 'It\'s thin and late.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'SHOW_MOD', key: 'lateMin', v: 60 }],
-          result: 'The gear went in the back way. A short crowd, a long wait.' }
+          result: 'The gear went in the back way, and it was a short crowd and a long wait.' }
       ] },
 
     { id: 'CANTON_OH_CURFEW_NIGHT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -129,9 +129,9 @@ SB.Cities.register('canton-oh', {
       title: 'The eleven o\'clock curfew',
       body: 'The curfew sends under-eighteen kids home mid-set, and the downtown drinking area enforces nine. The all-ages bill ends early or gets a ticket.',
       options: [
-        { id: 'EARLY', label: 'Move the start up and end by ten-thirty', likely: 'Short, loud and legal.',
+        { id: 'EARLY', label: 'Move the start up and end by ten-thirty', likely: 'It\'s short, loud and legal.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors at six. The kids were home before the curfew and nobody was cited.' },
+          result: 'Doors were at six, and the kids were home before the curfew and nobody was cited.' },
         { id: 'ACCEPT', label: 'Run it and watch the clock', likely: 'Some kids will have to leave.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'Half the room went home mid-set, and the last band played to the bar.' }
@@ -141,14 +141,14 @@ SB.Cities.register('canton-oh', {
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'A country show at the fairgrounds takes the whole teen crowd that same night.',
       title: 'The fairgrounds night',
-      body: 'A country concert at the fairgrounds has taken the teen crowd. Your room is going to get six locals and a few carpoolers from Akron.',
+      body: 'A country concert at the fairgrounds has taken the teen crowd, so your room is going to get six locals and a few carpoolers from Akron.',
       options: [
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'ACCEPT', label: 'Run it for the faithful', likely: 'A small night.',
+          result: 'You moved it a day, and the ones who could come, came.' },
+        { id: 'ACCEPT', label: 'Run it for the faithful', likely: 'It\'s a small night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'Six regulars and a car full from up the road. It was a good set anyway.' }
+          result: 'There were six regulars and a car full from up the road, and it was a good set anyway.' }
       ] }
   ]
 });

@@ -113,15 +113,15 @@ SB.Cities.register('rockford-il', {
       if: { daysOut: [0, 3], months: [12, 1, 2, 3] },
       telegraph: 'A blizzard is coming down from the north and the highway to the suburbs is already closed.',
       title: 'The blizzard shuts the north road',
-      body: 'The garage show up in the suburbs is dead, because nobody can get there. The west side basement says it will take the whole bill if you can get the gear across town.',
+      body: 'The garage show up in the suburbs is dead because nobody can get there. The west side basement says it will take the whole bill if you can get the gear across town.',
       options: [
-        { id: 'BASEMENT', label: 'Move the whole bill to the west side basement', likely: 'Smaller and packed. The donation jar turns into a heater fund.',
+        { id: 'BASEMENT', label: 'Move the whole bill to the west side basement', likely: 'It\'s smaller and packed, and the donation jar turns into a heater fund.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'The basement filled with people in coats, and the jar went round twice for the heater.' },
-        { id: 'WAIT', label: 'Wait for the plows and start late', likely: 'A late night. The crowd that comes is loyal.',
+        { id: 'WAIT', label: 'Wait for the plows and start late', likely: 'It\'s a late night, and the crowd that comes is loyal.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The plows came at nine. You started at ten and nobody left early.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The plows came at nine, and you started at ten and nobody left early.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
           result: 'You moved it a day. The snow stopped, and not everyone could make the new one.' }
       ] },
@@ -132,15 +132,15 @@ SB.Cities.register('rockford-il', {
       title: 'The fireworks shut the bridge',
       body: 'The bridge is closed for the Fourth of July fireworks, and the downtown storefront loses its load-in path. The crowd will walk over after the finale if you can wait.',
       options: [
-        { id: 'WAIT', label: 'Hold the doors until the finale', likely: 'A late start. The crowd comes over all at once.',
+        { id: 'WAIT', label: 'Hold the doors until the finale', likely: 'It starts late, and the crowd comes over all at once.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }],
-          result: 'The last rocket went off and half the riverbank walked in. Loud and happy.' },
-        { id: 'EARLY', label: 'Load in early and play before the fireworks', likely: 'A smaller early crowd.',
+          result: 'The last rocket went off and half the riverbank walked in, loud and happy.' },
+        { id: 'EARLY', label: 'Load in early and play before the fireworks', likely: 'The early crowd is smaller.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'You played to the early birds and were done by dark.' },
-        { id: 'ACCEPT', label: 'Run it as planned and hand-carry everything', likely: 'Sweaty and slow.',
+        { id: 'ACCEPT', label: 'Run it as planned and hand-carry everything', likely: 'It\'s sweaty and slow.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Every amp went around the long way. The show started on time, barely.' }
+          result: 'Every amp went around the long way, and the show started on time, barely.' }
       ] },
 
     { id: 'ROCKFORD_IL_DONATION_JAR', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
@@ -149,15 +149,15 @@ SB.Cities.register('rockford-il', {
       title: 'Is the jar a cover charge?',
       body: 'The show runs on donations to stay clear of zoning. A neighbor asks whether the canned food and extension cords add up to a cover charge, and says they will call it in.',
       options: [
-        { id: 'TALK', label: 'Go over and talk to the neighbor', likely: 'Costs an hour. Might keep the room.',
+        { id: 'TALK', label: 'Go over and talk to the neighbor', likely: 'It costs an hour, but it might keep the room.',
           effects: [{ op: 'HOURS', d: -1, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
           result: 'You stood on the porch for an hour and left with a promise to end by ten.' },
-        { id: 'SHORT', label: 'End the night early and keep the jar quiet', likely: 'A short night, a quiet street.',
+        { id: 'SHORT', label: 'End the night early and keep the jar quiet', likely: 'It\'s a short night on a quiet street.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Done by ten. The jar still came back with two heaters\' worth.' },
+          result: 'You were done by ten, and the jar still came back with two heaters\' worth.' },
         { id: 'ACCEPT', label: 'Ignore it and run the show', likely: 'The neighbor makes the call.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'A patrol car rolled by twice. Half the room left early.' }
+          result: 'A patrol car rolled by twice, and half the room left early.' }
       ] }
   ]
 });

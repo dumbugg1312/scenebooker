@@ -114,65 +114,65 @@ SB.Cities.register('olympia-wa', {
       if: { daysOut: [0, 5], calendar: 'festival' },
       telegraph: 'The summer lake festival has the park booked and the downtown streets marked for the parade.',
       title: 'The whole town is at the lake',
-      body: 'The lake festival has the parade route closed, the parking gone and half the city walking the other way toward the fireworks. Your show is on the wrong side of it.',
+      body: 'The lake festival has the parade route closed, the parking gone and half the city walking the other way toward the fireworks, and your show is on the wrong side of it.',
       options: [
-        { id: 'EARLY', label: 'Go on early, before the parade lets out', likely: 'Most get in before the barricades. The night starts thin.',
+        { id: 'EARLY', label: 'Go on early, before the parade lets out', likely: 'Most get in before the barricades, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came parked a mile away and walked.' },
+          result: 'You opened doors an hour early, and the ones who came parked a mile away and walked.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'The crowd goes to the fireworks.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'The fireworks started and the room emptied by half.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'OLYMPIA_WA_I5_CLOSED', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'A winter storm is closing roads north and south of town.',
       title: 'I-5 is shut at the river bottoms',
-      body: 'A crash and a rainstorm have closed I-5 near the Nisqually bottleneck on the night of your show. Everyone coming from Tacoma, Lakewood and the north is stuck on the shoulder.',
+      body: 'A crash and a rainstorm have closed I-5 near the Nisqually bottleneck on the night of your show, and everyone coming from Tacoma, Lakewood and the north is stuck on the shoulder.',
       options: [
-        { id: 'LATER', label: 'Push doors back and wait for them', likely: 'Most make it eventually. The night runs late.',
+        { id: 'LATER', label: 'Push doors back and wait for them', likely: 'Most make it eventually, but the night runs late.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: 60 }],
-          result: 'The bands got in at ten. The room filled slowly, then all at once.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the bottleneck.',
+          result: 'The bands got in at ten, and the room filled slowly, then all at once.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the bottleneck.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The road never opened. The ones from the north stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The road never opened, and the ones from the north stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the back roads together. They\'ll remember that.' }
+          result: 'Two carloads took the back roads together.' }
       ] },
 
     { id: 'OLYMPIA_WA_GALLERY_WALK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'arts' },
       telegraph: 'Downtown is filling with art and visitors for the gallery walk.',
       title: 'A gallery offers a room',
-      body: 'On gallery walk night downtown is full of strollers and a gallery owner offers you the back room for free. The catch is a polite hour, a polite volume and nowhere to park.',
+      body: 'On gallery walk night downtown is full of strollers, and a gallery owner offers you the back room for free. The catch is a polite hour, a polite volume and nowhere to park.',
       options: [
-        { id: 'TAKE', label: 'Take the room and keep it quiet', likely: 'A gentle crowd. Smaller, but you pay nothing.',
+        { id: 'TAKE', label: 'Take the room and keep it quiet', likely: 'You get a gentle crowd that is smaller, but you pay nothing.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'An acoustic bill, early and soft. The gallery owner was thrilled.' },
+          result: 'It was an acoustic bill, early and soft, and the gallery owner was thrilled.' },
         { id: 'SKIP', label: 'Pass and run your own room as planned', likely: 'Parking is a nightmare downtown.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The crowd had to circle for parking. Some gave up.' }
+          result: 'The crowd had to circle for parking, and some gave up.' }
       ] },
 
     { id: 'OLYMPIA_WA_YARD_RAIN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [6, 7, 8, 9, 10] },
       telegraph: 'A front is coming in off the Sound.',
       title: 'It is raining on the backyard show',
-      body: 'The one dry month turned out not to be. The rain has soaked the tarp, the generator is spitting, and the whole crowd is looking at the garage.',
+      body: 'The one dry month turned out not to be. The rain has soaked the tarp and the generator is spitting, and the whole crowd is looking at the garage.',
       options: [
-        { id: 'GARAGE', label: 'Move everyone into the garage', likely: 'Smaller and louder, with the neighbors listening.',
+        { id: 'GARAGE', label: 'Move everyone into the garage', likely: 'It\'s smaller and louder, with the neighbors listening.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'Everyone packed into the garage and stayed until the power went out.' },
-        { id: 'TARP', label: 'Buy more tarps and play on', likely: 'Costs twenty dollars. A few leave.',
+        { id: 'TARP', label: 'Buy more tarps and play on', likely: 'It costs twenty dollars, and a few people leave.',
           effects: [{ op: 'MONEY', amount: -20 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The tarps held, mostly. The front row got wet.' },
+          result: 'The tarps held, mostly, but the front row got wet.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The sky cleared, and not everyone could come.' }
+          result: 'You moved it a day. The sky cleared, but not everyone could come.' }
       ] }
   ]
 });

@@ -114,17 +114,17 @@ SB.Cities.register('grand-rapids', {
       if: { daysOut: [0, 3], weather: 'COLD', months: [11, 12, 1, 2, 3] },
       telegraph: 'A lake-effect band is parked over the west side all week.',
       title: 'A whiteout on show day',
-      body: 'The lake-effect snow has the van windows buried and the highway down to one lane. The host is still out shoveling the driveway for load-in.',
+      body: 'The lake-effect snow has the van windows buried and the highway down to one lane, and the host is still out shoveling the driveway for load-in.',
       options: [
-        { id: 'EARLY', label: 'Move doors earlier so people can beat the worst of it', likely: 'Most make it. The night starts thin.',
+        { id: 'EARLY', label: 'Move doors earlier so people can beat the worst of it', likely: 'Most make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors an hour early. Everyone who came was stamping snow off their boots.' },
+          result: 'You opened doors an hour early, and everyone who came was stamping snow off their boots.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'A lot of the lakeshore kids never make it in.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'The road never cleared. The room was the ones who could walk.' },
-        { id: 'STAY', label: 'Let everyone sleep over', likely: 'Smaller crowd, and a floor full of bodies in the morning.',
+          result: 'The road never cleared, so the room was the ones who could walk.' },
+        { id: 'STAY', label: 'Let everyone sleep over', likely: 'The crowd is smaller, and the floor is full of bodies in the morning.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'REGULARS', pct: .02 }, { op: 'STRESS', d: 1 }],
-          result: 'Nobody drove home. By morning the basement was one big pile of coats.' }
+          result: 'Nobody drove home, and by morning the basement was one big pile of coats.' }
       ] },
 
     { id: 'GRAND_RAPIDS_HALL_GONE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show'],
@@ -133,15 +133,15 @@ SB.Cities.register('grand-rapids', {
       title: 'The hall gave up its building',
       body: 'The one all-ages room is out of its space, and your show is on its calendar. You have a few days to find a basement before the kids find out the hard way.',
       options: [
-        { id: 'HOUSE', label: 'Move the bill to a basement on the west side', likely: 'Smaller and louder, with neighbors a wall away.',
+        { id: 'HOUSE', label: 'Move the bill to a basement on the west side', likely: 'It\'s smaller and louder, with neighbors a wall away.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement took the bill with a day to spare, and the floor was packed to the stairs.' },
         { id: 'WAIT', label: 'Hold the date and wait for a new room', likely: 'Half the kids give up and stay home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'The word went around late. The ones who found you were the ones who always do.' },
+          result: 'The word went around late, and the ones who found you were the ones who always do.' },
         { id: 'MOVE', label: 'Move the show a week', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 7, respect: false }],
-          result: 'You pushed it a week. A few bands could not make the new date.' }
+          result: 'You pushed it a week, and a few bands could not make the new date.' }
       ] },
 
     { id: 'GRAND_RAPIDS_PARADE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -150,15 +150,15 @@ SB.Cities.register('grand-rapids', {
       title: 'The parade closes the street',
       body: 'The whole west side is blocked off for the parade. Load-in means carrying amps four blocks, and the house next to the social hall is already getting calls about the noise.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the street reopens', likely: 'The crowd that wants a night out shows up. Later than planned.',
+        { id: 'LATE', label: 'Push doors back until the street reopens', likely: 'The crowd that wants a night out shows up, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The parade crowd drifted in, loud and happy.' },
-        { id: 'CARRY', label: 'Carry the gear in by hand and run it as planned', likely: 'Sore backs, a thin first hour.',
+          result: 'You opened doors an hour late, and the parade crowd drifted in, loud and happy.' },
+        { id: 'CARRY', label: 'Carry the gear in by hand and run it as planned', likely: 'You get sore backs and a thin first hour.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Four blocks with an amp on every shoulder. The show started late and went well.' },
+          result: 'You carried an amp on every shoulder for four blocks, and the show started late and went well.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

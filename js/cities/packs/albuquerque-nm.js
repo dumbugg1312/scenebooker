@@ -12,7 +12,7 @@ SB.Cities.register('albuquerque-nm', {
   /* The note's ban list is kept; "Route 66" is written only as "Central Avenue". */
   blocklist: ['unm*', 'albuquerque journal*', 'isotopes*', 'balloon fiesta*', 'kirtland*', 'sandia national*', 'launchpad albuquerque*', 'sister bar*', 'gathering of nations*', 'zozobra*'],
 
-  blurb: ['A high-desert city of yards, warehouses and bars with a house-show culture that goes back to the garage bands before the clubs booked punk. Small, tight and dependent on students who move away.',
+  blurb: ['A high-desert city of yards, warehouses and bars with a house-show culture that goes back to the garage bands before the clubs booked punk. It\'s small and tight, and it depends on students who move away.',
           'Touring bands skip it, so locals build their own network. Everything runs on a yard, an arts room or a larger room that does all-ages matinees.'],
   hard: 'Far from every other scene, and one neighbor\'s call can end a backyard show.',
   region: 'the Southwest',
@@ -112,15 +112,15 @@ SB.Cities.register('albuquerque-nm', {
       title: 'The backyard stage is a pond',
       body: 'A monsoon cell dumped an inch in twenty minutes. The yard is standing water and the arroyo behind the fence is running brown.',
       options: [
-        { id: 'GARAGE', label: 'Haul everything into the garage', likely: 'Tight and loud. A smaller crowd fits.',
+        { id: 'GARAGE', label: 'Haul everything into the garage', likely: 'It\'s tight and loud, and only a smaller crowd fits.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'Everyone crammed into one car bay. The thunder kept time on the roof.' },
+          result: 'Everyone crammed into one car bay, and the thunder kept time on the roof.' },
         { id: 'WAIT', label: 'Wait for it to drain and push doors late', likely: 'The ones who wanted to come stay.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The water drained by nine. The crowd stood in wet sandals and loved it.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The water drained by nine, and the crowd stood in wet sandals and loved it.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'ALBUQUERQUE_NM_NEIGHBOR_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -129,15 +129,15 @@ SB.Cities.register('albuquerque-nm', {
       title: 'A neighbor calls the city line',
       body: 'Someone called the city hotline about the noise, and a patrol car is idling at the end of the block. The backyard is full.',
       options: [
-        { id: 'QUIET', label: 'Drop the volume and move the loud bands inside', likely: 'The car leaves. The night loses its edge.',
+        { id: 'QUIET', label: 'Drop the volume and move the loud bands inside', likely: 'The car leaves, but the night loses its edge.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'The set turned acoustic until the patrol car rolled away.' },
         { id: 'TALK', label: 'Go next door and talk to them', likely: 'Costs an hour and a pizza.',
           effects: [{ op: 'MONEY', amount: -20 }, { op: 'HOURS', d: -1, when: 'TODAY' }, { op: 'REGULARS', pct: .01 }],
-          result: 'You brought a box of pizza over. The neighbor stayed for two songs.' },
-        { id: 'ACCEPT', label: 'Ignore it and keep going', likely: 'Risky. The room could get shut for good.',
+          result: 'You brought a box of pizza over, and the neighbor stayed for two songs.' },
+        { id: 'ACCEPT', label: 'Ignore it and keep going', likely: 'It\'s risky, and the room could get shut for good.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'STRESS', d: 1 }],
-          result: 'The car left. Everyone knew the next call would be the last.' }
+          result: 'The car left, and everyone knew the next call would be the last.' }
       ] },
 
     { id: 'ALBUQUERQUE_NM_BALLOON_VANS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 60, bind: ['show'],
@@ -146,9 +146,9 @@ SB.Cities.register('albuquerque-nm', {
       title: 'The motels are full',
       body: 'The balloon festival has the whole city booked. The touring band on your bill has nowhere to sleep and is asking if anyone has a spare floor.',
       options: [
-        { id: 'FLOORS', label: 'Split them across three houses', likely: 'Costs a morning of calls. They will not forget it.',
+        { id: 'FLOORS', label: 'Split them across three houses', likely: 'It costs a morning of calls, and they will not forget it.',
           effects: [{ op: 'HOURS', d: -1, when: 'TODAY' }, { op: 'REGULARS', pct: .01 }],
-          result: 'Three living rooms took them in. The band played like they owed everyone.' },
+          result: 'Three living rooms took them in, and the band played like they owed everyone.' },
         { id: 'MOTEL', label: 'Pay for one room out in the valley', likely: 'Sixty dollars and a long drive to doors.',
           effects: [{ op: 'MONEY', amount: -60 }, { op: 'SHOW_MOD', key: 'lateMin', v: 30 }],
           result: 'They found a room forty minutes out and made it to the stage just late.' },
@@ -166,7 +166,7 @@ SB.Cities.register('albuquerque-nm', {
         { id: 'LASTNIGHT', label: 'Make it a farewell night', likely: 'A bigger crowd and a sad one.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }, { op: 'REGULARS', pct: .02 }],
           result: 'Everyone who had ever played there came to stand in it one more time.' },
-        { id: 'MOVE', label: 'Move the bill to a garage', likely: 'Smaller and quieter. Nobody argues.',
+        { id: 'MOVE', label: 'Move the bill to a garage', likely: 'Smaller and quieter, and nobody argues.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A garage on the other side of the park took the bill and the speaker stacks.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The landlord may notice.',

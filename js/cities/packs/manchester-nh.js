@@ -107,32 +107,32 @@ SB.Cities.register('manchester-nh', {
       title: 'The bridge is closed',
       body: 'The downtown parade shuts Elm Street and the bridge at four. The bands from the west side are on the wrong side of the river at load-in.',
       options: [
-        { id: 'EARLY', label: 'Load in at noon, before the roads close', likely: 'Tiring, but everyone is in before the barriers go up.',
+        { id: 'EARLY', label: 'Load in at noon, before the roads close', likely: 'It\'s tiring, but everyone is in before the barriers go up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'You loaded in at noon and sat in the hall for four hours. Nobody was stuck.' },
-        { id: 'DETOUR', label: 'Send the vans the long way around', likely: 'The bands arrive, late and sour.',
+          result: 'You loaded in at noon and sat in the hall for four hours, and nobody was stuck.' },
+        { id: 'DETOUR', label: 'Send the vans the long way around', likely: 'The bands arrive late and sour.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'The vans came the long way. Doors an hour late, and the kids waited.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The vans came the long way. Doors were an hour late, and the kids waited.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'MANCHESTER_NH_CHURCH_LOT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The church food festival takes over the south side this weekend.',
       title: 'The street is full of cars',
-      body: 'The food festival takes every parking space on the south side, and your hall show is a few blocks away. The load-in has to go through the back lot.',
+      body: 'The food festival takes every parking space on the south side, and your hall show is a few blocks away, so the load-in has to go through the back lot.',
       options: [
-        { id: 'BACK', label: 'Load in through the back lot and tell everyone', likely: 'A slow, awkward load-in.',
+        { id: 'BACK', label: 'Load in through the back lot and tell everyone', likely: 'The load-in is slow and awkward.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 45 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.92 }],
-          result: 'The back lot worked. The first band went on forty-five minutes late.' },
-        { id: 'ACCEPT', label: 'Run it and hope people find a space', likely: 'The parking is bad and people notice.',
+          result: 'The back lot worked, and the first band went on forty-five minutes late.' },
+        { id: 'ACCEPT', label: 'Run it and hope people find a space', likely: 'The parking is bad, and people notice.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
           result: 'A lot of people circled the block twice and gave up.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] },
 
     { id: 'MANCHESTER_NH_NINE_PM', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -141,12 +141,12 @@ SB.Cities.register('manchester-nh', {
       title: 'The nine o clock rule',
       body: 'The curfew for kids under eighteen starts at nine, and the early all-ages show will not reach the headliner before then.',
       options: [
-        { id: 'SHORT', label: 'Cut the sets short and finish by nine', likely: 'Everybody gets a set. The headliner plays half of theirs.',
+        { id: 'SHORT', label: 'Cut the sets short and finish by nine', likely: 'Everybody gets a set, but the headliner plays half of theirs.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Short sets all night. The kids got home before the curfew, and the headliner was not happy.' },
+          result: 'The sets were short all night. The kids got home before the curfew, and the headliner was not happy.' },
         { id: 'PARENTS', label: 'Tell the parents to pick everyone up at nine', likely: 'Half the room leaves at once.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'Parents lined the curb at nine. The room was half empty for the last band.' },
+          result: 'Parents lined the curb at nine, and the room was half empty for the last band.' },
         { id: 'ACCEPT', label: 'Run the whole bill and hope for the best', likely: 'Some kids will risk it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
           result: 'The kids ran for the cars after the last song, and nobody got stopped.' }

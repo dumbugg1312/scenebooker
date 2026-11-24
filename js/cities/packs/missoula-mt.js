@@ -13,8 +13,8 @@ SB.Cities.register('missoula-mt', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['missoulian*', 'kbga*', 'kufm*', 'montana kaimin*', 'river city roots*', 'maggotfest*', 'washington-grizzly*', 'garden city brewfest*'],
 
-  blurb: ['A mountain-valley college town in a folk and roots country, with a punk thread running through it. Early all-ages taproom slots, then basements across the river.',
-          'Students fill the rooms from fall to spring and vanish by May. Summer means yards, smoke and long drives.'],
+  blurb: ['A mountain-valley college town in folk and roots country, with a punk thread running through it. There are early all-ages taproom slots, and then basements across the river.',
+          'Students fill the rooms from fall to spring and vanish by May, and summer means yards, smoke and long drives.'],
   hard: 'Tours skip the state, the crowd vanishes every May, and summer smoke cancels yards.',
   region: 'the northern Rockies',
   houseType: 'BASEMENT',
@@ -108,51 +108,51 @@ SB.Cities.register('missoula-mt', {
       if: { daysOut: [0, 5], calendar: 'festival' },
       telegraph: "The festival weekend is closing the downtown streets, and the barricades go up Friday.",
       title: "The streets are closed",
-      body: "The street festival has shut down the downtown streets. The kids are standing outside the all-ages room with no place to park and no way in.",
+      body: "The street festival has shut down the downtown streets, and the kids are standing outside the all-ages room with no place to park and no way in.",
       options: [
         { id: 'EARLY', label: "Open early and tell everyone where to park", likely: "Most get in before the barricades. Thinner than usual.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: "Doors an hour early. The ones who came walked in from across the river." },
-        { id: 'PORCH', label: "Move the show to a porch across the river", likely: "Smaller and louder, and nobody needs a parking spot.",
+          result: "You opened doors an hour early, and the people who came walked in from across the river." },
+        { id: 'PORCH', label: "Move the show to a porch across the river", likely: "It's smaller and louder, and nobody needs a parking spot.",
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: "A porch on the Northside took the whole bill. The street was packed." },
-        { id: 'ACCEPT', label: "Run it and take what you get", likely: "A lot of people give up on the closures.",
+          result: "A porch on the Northside took the whole bill, and the street was packed." },
+        { id: 'ACCEPT', label: "Run it and take what you get", likely: "A lot of people give up because of the closures.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: "The streets stayed shut. Half the list never got near the door." }
+          result: "The streets stayed shut, and half the list never got near the door." }
       ] },
 
     { id: 'MISSOULA_MT_PASS_LATE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [11, 12, 1, 2, 3] },
       telegraph: "Chains are required on the pass, and the touring band is somewhere on it.",
       title: "The band is late over the pass",
-      body: "The touring band is crawling over the mountain pass behind a plow. The arts room is filling, and the bar down the street has stolen the heavy fans.",
+      body: "The touring band is crawling over the mountain pass behind a plow. The arts room is filling, but the bar down the street has stolen the heavy fans.",
       options: [
-        { id: 'SHORT', label: "Start with the locals and play on", likely: "A thin start, but the crowd waits.",
+        { id: 'SHORT', label: "Start with the locals and play on", likely: "It's a thin start, but the crowd waits.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: "The locals played long and loose. The van showed up for the last hour." },
-        { id: 'WAIT', label: "Hold the doors and wait for them", likely: "A late start. The crowd gets restless.",
+          result: "The locals played long and loose, and the van showed up for the last hour." },
+        { id: 'WAIT', label: "Hold the doors and wait for them", likely: "It means a late start, and the crowd gets restless.",
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: "The van pulled in at ten. You started late and nobody left." },
-        { id: 'MOVE', label: "Move it a day", likely: "Breaks the date. Costs trust with the bands.",
+          result: "The van pulled in at ten, and you started late, but nobody left." },
+        { id: 'MOVE', label: "Move it a day", likely: "It breaks the date, and the bands lose some trust in you.",
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: "You moved it a day. Not everyone could make the new one." }
+          result: "You moved it a day, and not everyone could make the new one." }
       ] },
 
     { id: 'MISSOULA_MT_SMOKE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [7, 8, 9] },
-      telegraph: "The wildfire smoke is thick in the valley and the air quality is at the worst.",
+      telegraph: "The wildfire smoke is thick in the valley, and the air quality is at its worst.",
       title: "The smoke closes the outdoor show",
-      body: "The air is unsafe to breathe and the skatepark show is off. The band wants to load into the derby space downtown, and the derby team wants the floor at nine.",
+      body: "The air is unsafe to breathe, so the skatepark show is off. The band wants to load into the derby space downtown, and the derby team wants the floor at nine.",
       options: [
-        { id: 'INSIDE', label: "Load into the substance-free derby space", likely: "Smaller and cleaner, with a hard curfew at nine.",
+        { id: 'INSIDE', label: "Load into the substance-free derby space", likely: "It's smaller and cleaner, with a hard curfew at nine.",
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }, { op: 'SHOW_MOD', key: 'lateMin', v: -120 }],
           result: "The bands played an early, tight set and cleared the floor by nine." },
         { id: 'SHORT', label: "Play outside and take the cough", likely: "The kids with masks come.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.7 }],
-          result: "The haze was orange. Half the list stayed home and the rest wore masks." },
-        { id: 'MOVE', label: "Move it a day", likely: "Breaks the date. Costs trust with the bands.",
+          result: "The haze was orange, and half the list stayed home and the rest wore masks." },
+        { id: 'MOVE', label: "Move it a day", likely: "It breaks the date, and the bands lose some trust in you.",
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: "You moved it a day. Not everyone could make the new one." }
+          result: "You moved it a day, and not everyone could make the new one." }
       ] }
   ]
 });

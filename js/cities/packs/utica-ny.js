@@ -12,7 +12,7 @@ SB.Cities.register('utica-ny', {
   blocklist: ['observer-dispatch*', 'boilermaker*', 'utica club*', 'canal street annex*', 'colgate*', 'turning stone*'],
 
   blurb: ['A small old mill city on the Mohawk and the old canal, with cheap rent, tall wooden doubles with basements, and a bar or social club on every corner.',
-          'Half-empty downtown, long winters, and the young leave at eighteen for bigger towns an hour either way.'],
+          'The downtown is half empty, the winters are long, and the young leave at eighteen for bigger towns an hour either way.'],
   hard: 'Few all-ages rooms, and snow and bigger cities nearby thin the crowd.',
   region: 'the Mohawk Valley',
   houseType: 'BASEMENT',
@@ -114,7 +114,7 @@ SB.Cities.register('utica-ny', {
           result: 'You carried every rack to the back and left the place cleaner than you found it.' },
         { id: 'HALL', label: 'Move to the club hall', likely: 'Roomier, and nobody is watching a rack.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 1.4 }],
-          result: 'The hall took the bill. Bigger room, thinner crowd.' },
+          result: 'The hall took the bill, and it was a bigger room with a thinner crowd.' },
         { id: 'ACCEPT', label: 'Run it and keep people out of the stock', likely: 'Tight and nervous.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'You roped off the racks and kept the crowd to the middle of the floor.' }
@@ -128,13 +128,13 @@ SB.Cities.register('utica-ny', {
       options: [
         { id: 'LATE', label: 'Load in late, doors late', likely: 'The street opens up at seven.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors at nine. The parade crowd had drifted to the bars and the kids came in.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Doors were at nine, the parade crowd had drifted to the bars, and the kids came in.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' },
+          result: 'You moved it a day, and not everyone could make the new date.' },
         { id: 'ACCEPT', label: 'Carry the gear around the closure', likely: 'Slow, but the night holds.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 45 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The amps went the long way around. The doors were late and the crowd was thin.' }
+          result: 'The amps went the long way around, so the doors were late and the crowd was thin.' }
       ] },
 
     { id: 'UTICA_NY_RACE_PARKING', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -145,7 +145,7 @@ SB.Cities.register('utica-ny', {
       options: [
         { id: 'SHUTTLE', label: 'Ferry the gear in by hand', likely: 'Slow load-in, and the band is tired.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Four trips with the amps. The set was ragged but the room was warm.' },
+          result: 'It took four trips with the amps, and the set was ragged but the room was warm.' },
         { id: 'ACCEPT', label: 'Let the band find its own spot', likely: 'They get there when they get there.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
           result: 'The van turned up late and the crowd waited.' }
@@ -159,10 +159,10 @@ SB.Cities.register('utica-ny', {
       options: [
         { id: 'EARLY', label: 'Start early, finish by ten', likely: 'Short and loud, and everyone eats.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.05 }],
-          result: 'Doors at six. The bands played hard and tight, and the whole room ate after.' },
+          result: 'Doors were at six, the bands played hard and tight, and the whole room ate after.' },
         { id: 'ACCEPT', label: 'Run it as planned and watch the clock', likely: 'The neighbors may call.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }, { op: 'MONEY', amount: -25 }],
-          result: 'The bill ran past ten and someone called it in. You paid for the trouble.' }
+          result: 'The bill ran past ten and someone called it in, and you paid for the trouble.' }
       ] }
   ]
 });

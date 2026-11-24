@@ -13,8 +13,8 @@ SB.Cities.register('miami', {
            'miami-dade police'],
   blocklist: ['miami new times*', 'miami herald*', 'sun sentinel*', 'art basel*', 'ultra music*', 'sunpass*', 'brightline*', 'rolling loud*', 'miami hurricanes*'],
 
-  blurb: ['Warehouses, house shows and one long-running punk bar in a huge, spread-out metro.',
-          'Rooms open fast and close faster, and everybody drives an hour.'],
+  blurb: ['Warehouses, house shows and one long-running punk bar make up the scene in a huge, spread-out metro.',
+          'Rooms open fast and close faster, and everybody drives an hour to get anywhere.'],
   hard: 'Spaces keep getting shut or sold, and the audience is an hour of traffic away.',
   region: 'South Florida',
   houseType: 'GARAGE',
@@ -117,53 +117,53 @@ SB.Cities.register('miami', {
   events: [
     { id: 'MIAMI_STORM_FORECAST', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], months: [6, 7, 8, 9, 10, 11] },
-      telegraph: 'A named storm is drifting toward the coast, and the forecast cone is wide enough to take in the whole county.',
+      telegraph: 'A storm is drifting toward the coast, and the forecast cone is wide enough to take in the whole county.',
       title: 'The cone has your show in it',
       body: 'The storm is two days out and the low streets are already flooding with the tide. The show is set for the warehouse in Allapattah, and the roads may not be passable by Saturday.',
       options: [
-        { id: 'MOVE_UNIT', label: 'Move the whole bill to a unit in Hialeah, on higher ground', likely: 'Smaller, and a drive for everyone.',
+        { id: 'MOVE_UNIT', label: 'Move the whole bill to a unit in Hialeah, on higher ground', likely: 'It\'s smaller, and a drive for everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'A unit in Hialeah took the bill with the shutters half up. A smaller crowd, and the roads held.' },
-        { id: 'MOVE_DAY', label: 'Move it a day, once the water goes down', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A unit in Hialeah took the bill with the shutters half up, and the crowd was smaller, but the roads held.' },
+        { id: 'MOVE_DAY', label: 'Move it a day, once the water goes down', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the people who could make it came.' },
         { id: 'ACCEPT', label: 'Run it and watch the sky', likely: 'People stay home for the storm.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'Most of the list stayed home to tape windows. The ones who came, came wet.' }
+          result: 'Most of the list stayed home to tape windows, and the people who came showed up wet.' }
       ] },
 
     { id: 'MIAMI_ART_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'festival', months: [12] },
-      telegraph: 'The warehouse landlord has gone quiet. Art fair week has the whole district booked for galleries and parties.',
+      telegraph: 'The warehouse landlord has gone quiet, because art fair week has the whole district booked for galleries and parties.',
       title: 'The landlord is hosting a gallery',
-      body: 'During art fair week the roll-up door can be used for a party but not for a band, unless you pay what a gallery pays. Your date is the same weekend.',
+      body: 'During art fair week the roll-up door can be used for a party but not for a band, unless you pay what a gallery pays, and your date is the same weekend.',
       options: [
-        { id: 'PAY', label: 'Pay the gallery rate and keep the room', likely: 'Costs real money. Rents spike all week.',
+        { id: 'PAY', label: 'Pay the gallery rate and keep the room', likely: 'It costs real money, because rents spike all week.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'You paid what a gallery pays. The band played in front of a mural nobody asked for.' },
-        { id: 'UNIT', label: 'Move to a unit in Hialeah, away from the fair', likely: 'Smaller and farther, but the door is yours.',
+          result: 'You paid what a gallery pays, and the band played in front of a mural nobody asked for.' },
+        { id: 'UNIT', label: 'Move to a unit in Hialeah, away from the fair', likely: 'It\'s smaller and farther away, but the door is yours.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A Hialeah unit took the bill. No gallery, no party, and plenty of noise.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A Hialeah unit took the bill, with no gallery and no party and plenty of noise.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day, after the fair cleared. Not everyone could make the new one.' }
+          result: 'You moved it a day, to after the fair cleared, and not everyone could make the new one.' }
       ] },
 
     { id: 'MIAMI_MIDNIGHT_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [3, 4, 5, 6, 7, 8] },
       telegraph: 'Patrols are out for spring break and summer, and the curfew for kids under seventeen is being enforced again.',
       title: 'Midnight and the kids under seventeen',
-      body: 'Your Friday show runs past midnight and the patrols are watching the door. Anyone under seventeen has to be out or with an adult before twelve.',
+      body: 'Your Friday show runs past midnight and the patrols are watching the door, and anyone under seventeen has to be out or with an adult before twelve.',
       options: [
         { id: 'EARLY', label: 'Move the start up so the kids can leave in time', likely: 'Most of them make it home.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors early, done by eleven-thirty. The kids were out of the lot before the patrols turned the corner.' },
-        { id: 'ADULT', label: 'Run late and make the little kids leave at eleven', likely: 'A thinner room and some bad feelings.',
+          result: 'You opened doors early and finished by eleven-thirty, and the kids were out of the lot before the patrols turned the corner.' },
+        { id: 'ADULT', label: 'Run late and make the little kids leave at eleven', likely: 'It\'s a thinner room with some hard feelings.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The little kids went home at eleven, and the older crowd stayed. Nobody was happy about it.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Some will not risk it.',
+          result: 'The younger kids went home at eleven and the older crowd stayed, and nobody was happy about it.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Some people won\'t risk it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the young ones stayed home rather than risk a call to their parents.' }
+          result: 'Half the younger kids stayed home rather than risk a call to their parents.' }
       ] }
   ]
 });

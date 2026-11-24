@@ -91,34 +91,34 @@ SB.Cities.register('norwich-ct', {
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The downtown park is putting up a free stage this weekend, and the road is going to be shut.',
       title: 'The free stage across the street',
-      body: 'Local bands are playing the park for nothing, the road is closed, and your kids are standing outside watching them. Your door is empty.',
+      body: 'Local bands are playing the park for nothing, the road is closed, and your kids are standing outside watching them, so your door is empty.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the park shuts down', likely: 'The ones who want more come up the hill. Late.',
+        { id: 'LATE', label: 'Push doors back until the park shuts down', likely: 'The people who want more come up the hill, late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at nine. Half the park walked up the hill still carrying their drinks.' },
+          result: 'Doors were at nine, and half the park walked up the hill still carrying their drinks.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Free music wins the early crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The free stage took the kids. The hall had the regulars and a few strays.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The free stage took the kids, and the hall had the regulars and a few strays.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] },
 
     { id: 'NORWICH_CT_HILL_SNOW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [12, 1, 2, 3] },
       telegraph: 'A nor\'easter is coming up the coast, and the hill streets ice over first.',
       title: 'The van on the wrong hill',
-      body: 'The storm shut the steep road to the hillside house. The van is stuck two valleys away and the first band is walking.',
+      body: 'The storm shut the steep road to the hillside house. The van is stuck two valleys away, and the first band is walking.',
       options: [
-        { id: 'SHORT', label: 'Run the short bill with whoever got there', likely: 'A thin night, but a warm one.',
+        { id: 'SHORT', label: 'Run the short bill with whoever got there', likely: 'It\'s a thin night, but a warm one.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a long, loose night. The ones who could walk up came.' },
-        { id: 'WAIT', label: 'Hold the doors for the van', likely: 'A late start. Some will leave.',
+          result: 'It was two bands and a long, loose night, and the people who could walk up came.' },
+        { id: 'WAIT', label: 'Hold the doors for the van', likely: 'It\'s a late start, and some will leave.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van crawled in at ten with a plow behind it. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The van crawled in at ten with a plow behind it, so you started late, and nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] },
 
     { id: 'NORWICH_CT_RIVALRY_DAY', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 40, bind: ['show'],
@@ -127,12 +127,12 @@ SB.Cities.register('norwich-ct', {
       title: 'Thursday night, after dinner',
       body: 'The teenagers are at the game all morning, then at their grandmothers\' tables. A show that night only works if the doors wait until dinner is over.',
       options: [
-        { id: 'LATE', label: 'Hold the doors until after dinner', likely: 'A late start, but the kids show up fed.',
+        { id: 'LATE', label: 'Hold the doors until after dinner', likely: 'It\'s a late start, but the kids show up fed.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors at eight. The kids came in loud and full and stayed until the hall closed.' },
+          result: 'Doors were at eight, and the kids came in loud and full and stayed until the hall closed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Dinner wins.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'Half the list was still at the table. The bands played to the ones who ran away early.' }
+          result: 'Half the list was still at the table, and the bands played to the people who ran away early.' }
       ] }
   ]
 });

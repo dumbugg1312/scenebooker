@@ -93,15 +93,15 @@ SB.Cities.register('laredo-tx', {
       title: 'No parking, no kids',
       body: 'The parade closes the main street through the afternoon and the carnival has the kids every night. Your show is a few blocks away, and the out-of-town visitors are wandering the streets.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the crowds thin out', likely: 'The visitors wander in. A late start.',
+        { id: 'LATE', label: 'Push doors back until the crowds thin out', likely: 'The visitors wander in, and it\'s a late start.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. A few visitors wandered in off the street and stayed.' },
+          result: 'Doors went an hour late, and a few visitors wandered in off the street and stayed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Nobody can park and the kids are at the carnival.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The regulars walked in from a long way off. The room was thin.' },
+          result: 'The regulars walked in from a long way off, and the room was thin.' },
         { id: 'YARD', label: 'Move the bill to a yard away from downtown', likely: 'Smaller and easier to reach.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A backyard took the bill and the cousins came in by car. Loud and close.' }
+          result: 'A backyard took the bill and the cousins came in by car, and it was loud and close.' }
       ] },
 
     { id: 'LAREDO_TX_NORTHER', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -112,10 +112,10 @@ SB.Cities.register('laredo-tx', {
       options: [
         { id: 'HALL', label: 'Move inside to a rented hall', likely: 'Warm, but you pay and the hall has rules.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The hall took the bill. It was warm and the folding chairs stayed stacked.' },
+          result: 'The hall took the bill, and it was warm and the folding chairs stayed stacked.' },
         { id: 'ACCEPT', label: 'Run it in the carport and hand out blankets', likely: 'A thin night, but the ones who came are loud.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'Jackets and breath in the air. A smaller crowd, packed close together.' }
+          result: 'People wore jackets and their breath showed in the air, and the smaller crowd packed close together.' }
       ] },
 
     { id: 'LAREDO_TX_QUINCE_SEASON', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 60, bind: ['show'],
@@ -124,10 +124,10 @@ SB.Cities.register('laredo-tx', {
       title: 'Quinceanera season',
       body: 'Parties fill every hall in town on the weekends. The owner will only give you the room on a Thursday.',
       options: [
-        { id: 'THURSDAY', label: 'Take the Thursday', likely: 'A school night. Fewer kids, a calmer room.',
+        { id: 'THURSDAY', label: 'Take the Thursday', likely: 'It\'s a school night, so there are fewer kids and a calmer room.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'A Thursday in the party hall. The ones who could stay up late did.' },
-        { id: 'YARD', label: 'Keep the weekend and move it to a yard', likely: 'Smaller. The family will feed everyone.',
+          result: 'It was a Thursday in the party hall, and the ones who could stay up late did.' },
+        { id: 'YARD', label: 'Keep the weekend and move it to a yard', likely: 'Smaller, and the family will feed everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'A backyard, a cousin on the grill, and the weekend crowd.' }
       ] }

@@ -15,7 +15,7 @@ SB.Cities.register('honolulu-hi', {
   blocklist: ['star-advertiser*', 'honolulu weekly*', 'aloha stadium*', 'zippys*', 'merrie monarch*', 'hawaiian airlines*'],
 
   blurb: ['A tiny, tight scene on a rock in the middle of the Pacific.',
-          'Every visiting band is a miracle and every flight is a bill. Everyone has a day job, and shows start after shift.'],
+          'Every visiting band is a miracle and every flight is a bill. Everyone has a day job, so shows start after shift.'],
   hard: 'Everything comes by plane, and the humid air carries every amp to the neighbors.',
   region: 'the islands',
   houseType: 'LIVING_ROOM',
@@ -112,33 +112,33 @@ SB.Cities.register('honolulu-hi', {
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'Crews are working on the Pali this week, and a slide could close it.',
       title: 'The Pali is closed',
-      body: 'An accident and a slide have shut the road over the ridge. The windward kids and the drummer with the borrowed truck cannot get across.',
+      body: 'An accident and a slide have shut the road over the ridge, so the windward kids and the drummer with the borrowed truck cannot get across.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the closure', likely: 'Most make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the closure', likely: 'Most make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people on the other side of the ridge.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people on the other side of the ridge.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The road never reopened in time. The windward side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides the long way around', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The road never reopened in time, and the windward side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides the long way around', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads went the long way together. They will remember that.' }
+          result: 'Two carloads of people went the long way together.' }
       ] },
     { id: 'HONOLULU_HI_GEAR_HELD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 2] },
       telegraph: 'The visiting band says their amps are still at the airport.',
       title: 'The amps are held at the airport',
-      body: 'The visiting band\'s gear is stuck at the airport, and every amp on the island is borrowed already. You have until six to find something that plugs in.',
+      body: 'The visiting band\'s gear is stuck at the airport, and every amp on the island is already borrowed. You have until six to find something that plugs in.',
       options: [
-        { id: 'BORROW', label: 'Borrow amps from every local band', likely: 'Costs a little and an afternoon. The show happens.',
+        { id: 'BORROW', label: 'Borrow amps from every local band', likely: 'It costs a little and an afternoon, but the show happens.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'You went door to door in the rain. Three local bands lent you an amp each.' },
-        { id: 'SHORT', label: 'Run a short set on what is already there', likely: 'A thin night, but the ones who came are glad.',
+          result: 'You went door to door in the rain, and three local bands lent you an amp each.' },
+        { id: 'SHORT', label: 'Run a short set on what is already there', likely: 'It\'s a thin night, but the ones who come are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'One borrowed amp and a short, loose set. The room was half full and warm.' },
+          result: 'There was one borrowed amp and a short, loose set, and the room was half full and warm.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The gear showed up by then.' }
+          result: 'You moved it a day, and the gear showed up by then.' }
       ] },
 
     { id: 'HONOLULU_HI_PARADE_CLOSURE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -147,15 +147,15 @@ SB.Cities.register('honolulu-hi', {
       title: 'The parade has Hotel Street',
       body: 'A parade closes the street the same afternoon as your show, and the bar\'s load-in is a block-long walk through the drums.',
       options: [
-        { id: 'EARLY', label: 'Load in early, before the barricades', likely: 'Most get in. A thin start.',
+        { id: 'EARLY', label: 'Load in early, before the barricades', likely: 'Most get in, but the start is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'The amps were in before the first drum. Doors an hour early.' },
+          result: 'The amps were in before the first drum, and you opened doors an hour early.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people give up on the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The street stayed shut. Half the list never found a place to leave the car.' },
+          result: 'The street stayed shut, and half the list never found a place to leave the car.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'HONOLULU_HI_SHOWER_FLOOD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -164,15 +164,15 @@ SB.Cities.register('honolulu-hi', {
       title: 'The shower floods the generator',
       body: 'A shower has soaked the skatepark and the generator is drowning. The only dry room on the island is the back of a shop.',
       options: [
-        { id: 'SHOP', label: 'Move the bill to the shop back room', likely: 'Smaller, earlier and all ages.',
+        { id: 'SHOP', label: 'Move the bill to the shop back room', likely: 'It\'s smaller and earlier, and all ages.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'SHOP', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'The shop took the whole bill, and the floor was packed.' },
         { id: 'MOVE', label: 'Move it a day, when it dries', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'ACCEPT', label: 'Play on under a tarp', likely: 'A small, wet crowd.',
+          result: 'You moved it a day, and the ones who could come, came.' },
+        { id: 'ACCEPT', label: 'Play on under a tarp', likely: 'You get a small, wet crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'Under the tarp, wet to the ankle. The ones who stayed will not forget it.' }
+          result: 'They stood under the tarp, wet to the ankle, and the ones who stayed won\'t forget it.' }
       ] }
   ]
 });

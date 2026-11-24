@@ -127,13 +127,13 @@ SB.Cities.register('lexington-ky', {
       options: [
         { id: 'OPEN', label: 'Open the door wide and let the visitors in', likely: 'More heads, a few who do not know what they walked into.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'A lot of curious drinkers wandered in, and a few stayed to the end. Louder than the regulars liked.' },
-        { id: 'EARLY', label: 'Start early and finish before the traffic', likely: 'The locals make it. The visitors are at dinner.',
+          result: 'A lot of curious drinkers wandered in, and a few stayed to the end, though it was louder than the regulars liked.' },
+        { id: 'EARLY', label: 'Start early and finish before the traffic', likely: 'The locals make it, and the visitors are at dinner.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'Doors early. A tight night for the ones who know the room.' },
+          result: 'Doors were early, and it was a tight night for the people who know the room.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The roads and the lots take some of your list.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Half the usual crowd lost an hour in traffic. The ones who made it stayed late.' }
+          result: 'Half the usual crowd lost an hour in traffic, and the ones who made it stayed late.' }
       ] },
 
     { id: 'LEXINGTON_KY_FIRE_INSPECTOR', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show'],
@@ -144,13 +144,13 @@ SB.Cities.register('lexington-ky', {
       options: [
         { id: 'PAY', label: 'Pay for a quick second exit and a sprinkler quote', likely: 'Costs real money, and the room might stay open.',
           effects: [{ op: 'MONEY', amount: -60 }],
-          result: 'A cut-out door and a quote on paper. The inspector gave you thirty days.' },
+          result: 'You had a cut-out door and a quote on paper, and the inspector gave you thirty days.' },
         { id: 'HOUSE', label: 'Move the bill to a house for the week', likely: 'Smaller and louder, with neighbors on every side.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A side-street house took the bill, and the floor was packed.' },
-        { id: 'ACCEPT', label: 'Run it and hope', likely: 'Nervous kids. Some stay home.',
+        { id: 'ACCEPT', label: 'Run it and hope', likely: 'The kids are nervous, and some stay home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Nobody came to check. The word got around anyway and some stayed away.' }
+          result: 'Nobody came to check, but word got around anyway and some stayed away.' }
       ] },
 
     { id: 'LEXINGTON_KY_RIVALRY_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -159,15 +159,15 @@ SB.Cities.register('lexington-ky', {
       title: 'Parking but no audience',
       body: 'The tailgates have the campus streets, and the students are already on the highway home. A house show near campus has a place to park and nobody to play for.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the game is over', likely: 'The town crowd shows up. Later than planned.',
+        { id: 'LATE', label: 'Push doors back until the game is over', likely: 'The town crowd shows up, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The ones who stayed in town came in loud and happy.' },
+          result: 'Doors went an hour late, and the ones who stayed in town came in loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list is out of town.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Students gone, regulars only. A small night, a good one.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The students were gone and only the regulars came, and it was a small night but a good one.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

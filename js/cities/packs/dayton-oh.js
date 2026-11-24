@@ -108,32 +108,32 @@ SB.Cities.register('dayton-oh', {
       title: 'The basement is under water',
       body: 'The spring rain got into the house the week of the radio convention, and half your bill is stuck on the road with the visitors jamming the east side and I-675.',
       options: [
-        { id: 'PORCH', label: 'Move the show to the porch and the yard', likely: 'Smaller, wetter, and the neighbors will hear all of it.',
+        { id: 'PORCH', label: 'Move the show to the porch and the yard', likely: 'It\'s smaller and wetter, and the neighbors will hear all of it.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The bands played on the porch with the amps under a tarp. It was small and loud and nobody minded the damp.' },
-        { id: 'HOUSE', label: 'Move the whole bill to another house', likely: 'A bigger floor, if anyone still has a dry one.',
+          result: 'The bands played on the porch with the amps under a tarp. It was small and loud, and nobody minded the damp.' },
+        { id: 'HOUSE', label: 'Move the whole bill to another house', likely: 'You get a bigger floor, if anyone still has a dry one.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'A friend on the heights took the bill with a few hours to spare. The floor was dry and packed.' },
-        { id: 'WAIT', label: 'Wait for the road to clear', likely: 'A late start, and not everyone stays.',
+          result: 'A friend on the heights took the bill with a few hours to spare, and the floor was dry and packed.' },
+        { id: 'WAIT', label: 'Wait for the road to clear', likely: 'It starts late, and not everyone stays.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The van got in at ten. You started late and the ones who stayed were glad.' }
+          result: 'The van got in at ten, and you started late and the ones who stayed were glad.' }
       ] },
 
     { id: 'DAYTON_OH_LOT_SWEEP', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [5, 6, 7, 8, 9] },
       telegraph: 'The east-side skatepark lot is on the bill this weekend, and police are doing sweeps for kids out past curfew.',
       title: 'The eleven o\'clock sweep',
-      body: 'The lot show is going well until the voice rule and the under-eighteen curfew arrive together. Half the crowd has to be gone before the last band.',
+      body: 'The lot show is going well until the noise rule and the under-eighteen curfew arrive together. Half the crowd has to be gone before the last band.',
       options: [
-        { id: 'EARLY', label: 'Start early and finish before the curfew', likely: 'A short night, but the whole bill plays.',
+        { id: 'EARLY', label: 'Start early and finish before the curfew', likely: 'It\'s a short night, but the whole bill plays.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at four and done by ten. The kids got their set and got home.' },
-        { id: 'INSIDE', label: 'Move it into a house', likely: 'Smaller, and out of sight of the sweep.',
+          result: 'Doors were at four and you were done by ten, so the kids got their set and got home.' },
+        { id: 'INSIDE', label: 'Move it into a house', likely: 'It\'s smaller, and out of sight of the sweep.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The bill moved to a basement and the floor packed in. Nobody was cited.' },
+          result: 'The bill moved to a basement and the floor packed in, and nobody was cited.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The younger half of the crowd will be sent home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The curfew took the kids at eleven. The last band played to the grown-ups.' }
+          result: 'The curfew took the kids at eleven, and the last band played to the grown-ups.' }
       ] },
 
     { id: 'DAYTON_OH_AIR_SHOW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -142,15 +142,15 @@ SB.Cities.register('dayton-oh', {
       title: 'The air show takes the bands',
       body: 'Hotels and roads are full for the weekend. The Friday evening companion event has the whole city looking up, and the hall in Fairborn is the only room with an open night.',
       options: [
-        { id: 'FAIRBORN', label: 'Take the open night at the theater hall', likely: 'A big room, but the nonprofit has its rules.',
+        { id: 'FAIRBORN', label: 'Take the open night at the theater hall', likely: 'It\'s a big room, but the nonprofit has its rules.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'The hall took the bill and the seats filled with people who could not get a hotel room.' },
-        { id: 'SHORT', label: 'Run the short bill where you are', likely: 'Thin, but the ones who come are glad.',
+          result: 'The hall took the bill, and the seats filled with people who could not get a hotel room.' },
+        { id: 'SHORT', label: 'Run the short bill where you are', likely: 'It\'s thin, but the ones who come are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a loose, easy night. The planes were the only thing anyone talked about.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was two bands and a loose, easy night, and the planes were the only thing anyone talked about.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ],
 

@@ -109,8 +109,8 @@ SB.Cities.register('el-paso-tx', {
     "don haskins center*"
   ],
   "blurb": [
-    "Backyards behind cinderblock walls, and a Chicano, bilingual crowd that built it all itself. Heat sets the clock. The cops end the night.",
-    "Bands that get good leave for bigger cities, so the rooms and the stubbornness stay. Two circle pits run at once."
+    "The shows are in backyards behind cinderblock walls, with a Chicano, bilingual crowd that built it all itself. The heat sets the clock, and the cops end the night.",
+    "Bands that get good leave for bigger cities, so the rooms and the stubbornness stay, and two circle pits run at once."
   ],
   "hard": "Rooms keep closing, the nearest real city is hours away, and the cops come in force.",
   "region": "the Southwest",
@@ -417,12 +417,12 @@ SB.Cities.register('el-paso-tx', {
       },
       "telegraph": "A neighbor two doors down has been giving the yard dirty looks all week.",
       "title": "Helicopter over the yard",
-      "body": "Halfway through the second band a helicopter circles the block and squad cars line the street. The cinderblock wall hides the noise, but not the crowd.",
+      "body": "Halfway through the second band a helicopter circles the block and squad cars line the street, because the cinderblock wall hides the noise but not the crowd.",
       "options": [
         {
           "id": "SHUT",
           "label": "Kill the generator and clear the yard",
-          "likely": "The night ends early. Nobody gets cited.",
+          "likely": "The night ends early, and nobody gets cited.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -435,12 +435,12 @@ SB.Cities.register('el-paso-tx', {
               "v": -2
             }
           ],
-          "result": "The generator went quiet and the yard emptied through the side gate."
+          "result": "The generator went quiet, and the yard emptied through the side gate."
         },
         {
           "id": "TALK",
           "label": "Go out and talk to them",
-          "likely": "Costs a lot of nerve. They might leave.",
+          "likely": "It takes a lot of nerve, and they might leave.",
           "effects": [
             {
               "op": "REGULARS",
@@ -452,12 +452,12 @@ SB.Cities.register('el-paso-tx', {
               "when": "TODAY"
             }
           ],
-          "result": "You talked for twenty minutes. They left. The set went on, quieter."
+          "result": "You talked for twenty minutes and they left, and the set went on, quieter."
         },
         {
           "id": "MOVE",
           "label": "Move the rest to a mechanic shop",
-          "likely": "Smaller, with the bay doors down.",
+          "likely": "It's smaller, with the bay doors down.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -471,7 +471,7 @@ SB.Cities.register('el-paso-tx', {
               "v": 0.6
             }
           ],
-          "result": "The bay doors came down, the tools went against the wall, and the bill finished."
+          "result": "The bay doors came down and the tools went against the wall, and the bill finished."
         }
       ]
     },
@@ -498,12 +498,12 @@ SB.Cities.register('el-paso-tx', {
       },
       "telegraph": "The afternoon storms are rolling in off the mountains, and the arroyo is already running.",
       "title": "Monsoon night",
-      "body": "The storm flooded the arroyo behind the yard. The tarp stage holds if you move the amps under the carport.",
+      "body": "The storm flooded the arroyo behind the yard, and the tarp stage holds if you move the amps under the carport.",
       "options": [
         {
           "id": "CARPORT",
           "label": "Move the amps under the carport and run it tight",
-          "likely": "A smaller, wetter night.",
+          "likely": "It's a smaller, wetter night.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -516,12 +516,12 @@ SB.Cities.register('el-paso-tx', {
               "v": 0.9
             }
           ],
-          "result": "Everyone crowded under the carport and the set rang off the block wall."
+          "result": "Everyone crowded under the carport, and the set rang off the block wall."
         },
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with everyone.",
+          "likely": "It breaks the date, and everybody loses some trust in you.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -529,12 +529,12 @@ SB.Cities.register('el-paso-tx', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the people who could make it came."
         },
         {
           "id": "ACCEPT",
           "label": "Run it and see who shows",
-          "likely": "Roads flood and the list shrinks.",
+          "likely": "The roads flood and the list shrinks.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -542,7 +542,7 @@ SB.Cities.register('el-paso-tx', {
               "v": 0.65
             }
           ],
-          "result": "The roads flooded. Only the ones who lived close came."
+          "result": "The roads flooded, and only the people who lived close came."
         }
       ]
     },
@@ -567,7 +567,7 @@ SB.Cities.register('el-paso-tx', {
       },
       "telegraph": "The bowl game is coming and every hotel downtown is booked.",
       "title": "The bowl game takes downtown",
-      "body": "The fan parties and the game fill the blocks around a downtown storefront show. The parking is gone, though a few out-of-town fans wander in.",
+      "body": "The fan parties and the game fill the blocks around a downtown storefront show, and the parking is gone, though a few out-of-town fans wander in.",
       "options": [
         {
           "id": "LATE",
@@ -585,7 +585,7 @@ SB.Cities.register('el-paso-tx', {
               "v": 0.95
             }
           ],
-          "result": "Doors an hour late. A few lost fans wandered in with the kids."
+          "result": "Doors opened an hour late, and a few lost fans wandered in with the kids."
         },
         {
           "id": "ACCEPT",
@@ -598,12 +598,12 @@ SB.Cities.register('el-paso-tx', {
               "v": 0.8
             }
           ],
-          "result": "The parking was gone. The regulars walked in."
+          "result": "The parking was gone, and the regulars walked in."
         },
         {
           "id": "MOVE",
           "label": "Move it to a house",
-          "likely": "Smaller, and off the packed blocks.",
+          "likely": "It's smaller, and off the packed blocks.",
           "effects": [
             {
               "op": "MOVE_SHOW",

@@ -103,29 +103,29 @@ SB.Cities.register('gainesville-fl', {
       if: { daysOut: [0, 4] },
       telegraph: 'The new room is already looking for another space.',
       title: 'The new room moved again',
-      body: 'The DIY room that opened last month in a rented unit has moved to a new unit across town. The listings page still has the old address, and the person who keeps it is never wrong.',
+      body: 'The DIY room that opened last month in a rented unit has moved to a new unit across town, but the listings page still has the old address, and the person who keeps it is never wrong.',
       options: [
-        { id: 'SPREAD', label: 'Text everybody the new address yourself', likely: 'An hour of your day. Most of them find it.',
+        { id: 'SPREAD', label: 'Text everybody the new address yourself', likely: 'It takes an hour of your day, but most of them find it.',
           effects: [{ op: 'HOURS', d: -1, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Everyone got the new address. A few still drove to the old one first.' },
-        { id: 'TRUST', label: 'Trust the listings page to catch up', likely: 'A lot of people go to the wrong door.',
+          result: 'Everyone got the new address, though a few still drove to the old one first.' },
+        { id: 'TRUST', label: 'Trust the listings page to catch up', likely: 'A lot of people will go to the wrong door.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The page was fixed at nine. By then half the list had gone home.' }
+          result: 'The page was fixed at nine, but by then half the list had gone home.' }
       ] },
 
     { id: 'GAINESVILLE_FL_STORM_CARPORT', when: 'WEEK', tier: 'HARD', weight: 3, cooldown: 25, bind: ['show'],
       if: { daysOut: [0, 2], weather: 'RAIN', months: [6, 7, 8, 9] },
       telegraph: 'The afternoon sky has gone green again.',
       title: 'The yard is under water',
-      body: 'A thunderstorm has flooded the backyard slab an hour before doors, and the generator is sitting in a puddle. Everyone is going to have to fit under the carport.',
+      body: 'A thunderstorm has flooded the backyard slab an hour before doors and the generator is sitting in a puddle, so everyone is going to have to fit under the carport.',
       options: [
-        { id: 'CRAM', label: 'Cram everybody under the carport', likely: 'Smaller, louder and wetter. The ones who stay will not forget it.',
+        { id: 'CRAM', label: 'Cram everybody under the carport', likely: 'Smaller, louder and wetter, and the ones who stay will remember it.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Sixty people under a tin roof. The rain was louder than the drummer.' },
+          result: 'Sixty people stood under a tin roof, and the rain was louder than the drummer.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' },
-        { id: 'SKIP', label: 'Run it on the porch and take what comes', likely: 'A thin crowd and a wet floor.',
+          result: 'You moved it a day, and not everyone could make the new one.' },
+        { id: 'SKIP', label: 'Run it on the porch and take what comes', likely: 'You get a thin crowd and a wet floor.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'A handful sat on the steps and watched the water run down the street.' }
       ] },
@@ -134,17 +134,17 @@ SB.Cities.register('gainesville-fl', {
       if: { daysOut: [0, 4], calendar: 'game' },
       telegraph: 'Home football Saturday: 13th Street will be a parking lot by noon.',
       title: 'The whole town is at the game',
-      body: 'It is a home football Saturday, and the whole city is in orange and blue. Nobody can park near campus, and half of your list is deciding between the stadium and your show.',
+      body: 'It is a home football Saturday and the whole city is in orange and blue. Nobody can park near campus, and half of your list is deciding between the stadium and your show.',
       options: [
         { id: 'LATE', label: 'Push the doors back after the game', likely: 'The ones who come after the final whistle are loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at ten. The post-game crowd showed up in a good mood and a bad condition.' },
-        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Thin early, and parking is a fight.',
+          result: 'You moved doors to ten, and the post-game crowd showed up in a good mood and a bad condition.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'It starts thin, and parking is a fight.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'The opener played to the sound guy and a dog.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'GAINESVILLE_FL_FEST_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -153,29 +153,29 @@ SB.Cities.register('gainesville-fl', {
       title: 'The festival is in town',
       body: 'The big underground festival has dozens of bands playing every bar in town, and a touring band wants a day show at your place between their stage times.',
       options: [
-        { id: 'STACK', label: 'Stack the sets, one every hour', likely: 'A packed yard all afternoon. Everyone is worn out.',
+        { id: 'STACK', label: 'Stack the sets, one every hour', likely: 'You get a packed yard all afternoon, and everyone is worn out by the end.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.3 }, { op: 'HOURS', d: -3, when: 'TODAY' }],
-          result: 'Sets every hour from noon. The neighbors stopped counting around four.' },
-        { id: 'ONE', label: 'Just the one touring band, short and loud', likely: 'A solid crowd and no mess.',
+          result: 'There were sets every hour from noon, and the neighbors stopped counting around four.' },
+        { id: 'ONE', label: 'Just the one touring band, short and loud', likely: 'You get a solid crowd and no mess.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }],
-          result: 'Twenty minutes and a sweaty crowd. Then they were gone to the next one.' },
-        { id: 'PASS', label: 'Stay out of it', likely: 'Your regulars go to the bars. Quiet weekend.',
+          result: 'They played twenty minutes to a sweaty crowd and then left for the next one.' },
+        { id: 'PASS', label: 'Stay out of it', likely: 'Your regulars go to the bars, so it\'s a quiet weekend.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Your place stayed quiet. Everybody you know was somewhere else.' }
+          result: 'Your place stayed quiet, because everybody you know was somewhere else.' }
       ] },
 
     { id: 'GAINESVILLE_FL_LANDLORD_SELLS', when: 'WEEK', tier: 'HARD', weight: 1, cooldown: 80, bind: ['show'],
       if: { daysOut: [0, 6] },
       telegraph: 'There is a survey stake in the yard next door.',
       title: 'The lot has been sold',
-      body: 'The landlord has sold to a developer building student apartments, and the new owner wants the house empty by the end of the lease. This is the last good summer for this room.',
+      body: 'The landlord has sold to a developer building student apartments, and the new owner wants the house empty by the end of the lease. This is the last good summer for the room.',
       options: [
-        { id: 'LAST', label: 'Throw a last show and make it count', likely: 'A big, sentimental crowd.',
+        { id: 'LAST', label: 'Throw a last show and make it count', likely: 'You get a big, sentimental crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.2 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Everybody who ever played there came back. The floor held, just.' },
-        { id: 'QUIET', label: 'Keep it quiet and keep the date', likely: 'No change, no goodwill.',
+          result: 'Everybody who ever played there came back, and the floor held, just barely.' },
+        { id: 'QUIET', label: 'Keep it quiet and keep the date', likely: 'Nothing changes, and you earn no goodwill.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1 }],
-          result: 'A normal night in a house that was already gone.' }
+          result: 'It was a normal night in a house that was already gone.' }
       ] }
   ]
 });

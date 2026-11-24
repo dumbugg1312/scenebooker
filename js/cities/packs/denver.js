@@ -11,7 +11,7 @@ SB.Cities.register('denver', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Game text says "the big beer festival", "the stock show", "the foothills amphitheater", "the home team". */
   blocklist: ['westword*', 'denver post*', 'denverite*', 'kgnu*', 'great american beer*', 'colfax marathon*', 'denver pride*', 'red rocks*'],
 
-  blurb: ['Sober volunteer rooms and one-night pop-ups keep a hardcore revival alive after the warehouses went.',
+  blurb: ['Sober volunteer rooms and one-night pop-ups keep a hardcore revival alive now that the warehouses are gone.',
           'Benefit bills mix punk, metal and noise, and the old heads who reopen a room for the kids still talk about the fire.'],
   hard: 'Rooms are volunteer-run, and one noise call or rent hike ends them.',
   region: 'the Front Range',
@@ -130,68 +130,68 @@ SB.Cities.register('denver', {
       if: { daysOut: [0, 3], months: [3, 4] },
       telegraph: 'A spring storm is coming up from the south, with a foot of snow in the forecast.',
       title: 'A March blizzard',
-      body: 'The plows have closed the interstate and the town is buried. The touring band is stuck in Wyoming and half the crowd cannot find their cars.',
+      body: 'The plows have closed the interstate and the town is buried, so the touring band is stuck in Wyoming and half the crowd cannot find their cars.',
       options: [
-        { id: 'MOVE', label: 'Move it a day, once the plows come through', likely: 'Breaks the date. Snow in March melts in two days.',
+        { id: 'MOVE', label: 'Move it a day, once the plows come through', likely: 'It breaks the date, but snow in March melts in two days.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The sun came out and the street was dry by noon.' },
-        { id: 'LOCAL', label: 'Run it with the locals only', likely: 'A smaller crowd of people who walked.',
+          result: 'You moved it a day, and the sun came out and the street was dry by noon.' },
+        { id: 'LOCAL', label: 'Run it with the locals only', likely: 'It\'s a smaller crowd of people who walked.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }, { op: 'REGULARS', pct: .02 }],
-          result: 'The ones within walking distance showed up, and nobody forgot it.' },
-        { id: 'CANCEL', label: 'Cancel and eat the cost', likely: 'Costs thirty dollars and some trust.',
+          result: 'The people within walking distance showed up, and they still talk about it.' },
+        { id: 'CANCEL', label: 'Cancel and eat the cost', likely: 'It costs thirty dollars and some trust.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'MOVE_SHOW', dayShift: 7, respect: false }],
-          result: 'The show slid a week. The door money did not.' }
+          result: 'The show slid a week, and the money you\'d have made at the door did not slide with it.' }
       ] },
 
     { id: 'DENVER_FIRE_TIP', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show'],
       if: { daysOut: [0, 4] },
       telegraph: 'Someone has been asking neighbors about the warehouse on your block.',
       title: 'The fire department gets a tip',
-      body: 'Someone called in a warehouse show for an unpermitted crowd. A notice is on the door in the morning and the inspector says he will be back this week.',
+      body: 'Someone called in the warehouse show for an unpermitted crowd, and by morning there is a notice on the door and the inspector says he will be back this week.',
       options: [
-        { id: 'MOVE', label: 'Move the show to a house', likely: 'Smaller, louder and a lot of neighbors.',
+        { id: 'MOVE', label: 'Move the show to a house', likely: 'It\'s smaller and louder, and there are a lot of neighbors around.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement took the whole bill, and the floor was packed.' },
         { id: 'TRIM', label: 'Cut the crowd to a safe number and keep the show', likely: 'Fewer people through the door.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'You counted heads at the door and held the line. The night was tight.' },
-        { id: 'MOVEDAY', label: 'Lay low for a week', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You counted heads at the door and held the line, and the night was tight.' },
+        { id: 'MOVEDAY', label: 'Lay low for a week', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 7, respect: false }],
-          result: 'You went quiet and moved it a week. Not everyone could make the new one.' }
+          result: 'You went quiet and moved it a week, and not everyone could make the new date.' }
       ] },
 
     { id: 'DENVER_I70_CLOSED', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'Snow and a spinout are forecast for the interstates this week.',
       title: 'The interstate is closed',
-      body: 'A crash and blowing snow have shut the road in. The people coming in from the mountains and the south are stuck behind it.',
+      body: 'A crash and blowing snow have shut the road, and the people coming in from the mountains and the south are stuck behind it.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors an hour early. The ones who left work early made it.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people behind the closure.',
+          result: 'You opened doors an hour early, and the people who left work early made it.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people stuck behind the closure.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The closure never cleared. The ones outside the city stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The closure never cleared, and the people outside the city stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads came the long way around together. They will remember that.' }
+          result: 'Two carloads came the long way around together.' }
       ] },
 
     { id: 'DENVER_GAME_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'game' },
       telegraph: 'The home team plays this Sunday and the light rail will be full of orange.',
       title: 'Game day takes the parking',
-      body: 'The stadium west of downtown has filled every lot and the trains. Fans in team colors have taken every parking spot within a mile of your room.',
+      body: 'The stadium west of downtown has filled every lot and the trains, and fans in team colors have taken every parking spot within a mile of your room.',
       options: [
-        { id: 'EARLY', label: 'Open early and send people to a cheap lot', likely: 'Most get in before the crowds. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early and send people to a cheap lot', likely: 'Most people get in before the crowds, but it\'s thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came parked far and walked.' },
-        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the parking.',
+          result: 'You opened doors an hour early, and the people who came parked far away and walked.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on finding parking.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The lots stayed full. Half the list never found a place for the car.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The lots stayed full, and half the list never found a place for the car.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

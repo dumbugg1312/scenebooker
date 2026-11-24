@@ -16,8 +16,8 @@ SB.Cities.register('waco-tx', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['baylor*', 'magnolia market*', 'whataburger*', 'waco tribune*', 'hogsback*', 'sokol*', 'health camp*', 'buc-ee*'],
 
-  blurb: ['A Brazos River city halfway between Austin and Dallas on the interstate, a churchgoing city where punk is a side door and Austin and Dallas pull the best away.',
-          'Shows are open garages with a box fan going, lodge halls and church rooms, and the kids are mostly emo, pop-punk and metal.'],
+  blurb: ['A Brazos River city halfway between Austin and Dallas on the interstate, a churchgoing city where punk is a side door and Austin and Dallas pull the best bands away.',
+          'Shows are in open garages with a box fan going, lodge halls and church rooms, and the kids are mostly emo, pop-punk and metal.'],
   hard: 'Few rooms, a churchgoing town, and the big cities pull everyone away.',
   region: 'Central Texas',
   houseType: 'GARAGE',
@@ -116,51 +116,51 @@ SB.Cities.register('waco-tx', {
       if: { daysOut: [0, 4], calendar: 'parade' },
       telegraph: 'The parade route is posted, and Austin Avenue closes at dawn on Saturday.',
       title: 'Homecoming closes the street',
-      body: 'The parade shuts the downtown streets from before sunrise, and the lot behind your room is filling with alumni cars. The van cannot get within four blocks.',
+      body: 'The parade shuts the downtown streets from before sunrise, and the lot behind your room is filling with alumni cars. The van can\'t get within four blocks.',
       options: [
-        { id: 'EARLY', label: 'Load in Friday night, before the barricades', likely: 'Tight, but the gear is inside.',
+        { id: 'EARLY', label: 'Load in Friday night, before the barricades', likely: 'It\'s tight, but the gear is inside.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The gear was in by dark and the street closed around you. A short, loud night.' },
-        { id: 'CART', label: 'Hand-carry the amps from a lot across the river', likely: 'Slow. Everyone is tired.',
+          result: 'The gear was in by dark and the street closed around you, and it was a short, loud night.' },
+        { id: 'CART', label: 'Hand-carry the amps from a lot across the river', likely: 'It\'s slow, and everyone is tired.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'You walked amps across a bridge in a crowd of alumni. Doors went late.' },
-        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'The parade crowd is not your crowd.',
+          result: 'You walked amps across a bridge in a crowd of alumni, and doors went late.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'The parade crowd isn\'t your crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The bars took the crowd and the regulars made do.' }
+          result: 'The bars took the crowd, and the regulars made do.' }
       ] },
 
     { id: 'WACO_TX_SKATE_POWER', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
-      telegraph: 'The city has not confirmed the power for the skate park, and the office is closed until Monday.',
+      telegraph: 'The city hasn\'t confirmed the power for the skate park, and the office is closed until Monday.',
       title: 'The city shuts off the power',
-      body: 'Halfway through the second set the city cut the outlets at the skate park. The office will not answer until Monday, and there is a crowd and a generator in the truck.',
+      body: 'Halfway through the second set the city cut the outlets at the skate park. The office won\'t answer until Monday, and there\'s a crowd here and a generator in the truck.',
       options: [
-        { id: 'GEN', label: 'Rent a generator and run the night', likely: 'Costs a little. Loud, and the neighbors hear.',
+        { id: 'GEN', label: 'Rent a generator and run the night', likely: 'It costs a little, and it\'s loud enough that the neighbors hear.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'A generator coughed on and the set went on. The park rangers drove past twice.' },
-        { id: 'ACOUSTIC', label: 'Go acoustic and keep it short', likely: 'A strange, small night.',
+          result: 'A generator coughed on and the set went on, and the park rangers drove past twice.' },
+        { id: 'ACOUSTIC', label: 'Go acoustic and keep it short', likely: 'It\'s a strange, small night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Three bands played guitars and shouted. Nobody forgot it.' },
-        { id: 'GARAGE', label: 'Move the whole bill to a garage', likely: 'Smaller and louder. A garage has its own power.',
+          result: 'Three bands played unplugged guitars and shouted, and people still talk about it.' },
+        { id: 'GARAGE', label: 'Move the whole bill to a garage', likely: 'It\'s smaller and louder, and a garage has its own power.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A garage took the bill, and the floor was packed.' }
       ] },
 
     { id: 'WACO_TX_FAIR_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
-      telegraph: 'The carnival and the rodeo are in town and every kid is at the fairgrounds until late.',
+      telegraph: 'The carnival and the rodeo are in town, and every kid is at the fairgrounds until late.',
       title: 'The kids are at the rodeo',
-      body: 'Your all-ages bill is the same night as the rodeo and the carnival, and the kids will not be done until eleven. The room has to be quiet by ten.',
+      body: 'Your all-ages bill is the same night as the rodeo and the carnival, and the kids won\'t be done until eleven, but the room has to be quiet by ten.',
       options: [
-        { id: 'LATE', label: 'Push doors back to catch them after the rodeo', likely: 'A good crowd, a short set list.',
+        { id: 'LATE', label: 'Push doors back to catch them after the rodeo', likely: 'You get a good crowd and a short set list.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The kids came in smelling of funnel cake and played the room loud and short.' },
+          result: 'You opened doors an hour late, and the kids came in smelling of funnel cake and the bands played the room loud and short.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the fair.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The regulars came. Everyone else rode the Ferris wheel.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The regulars came, and everyone else rode the Ferris wheel.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

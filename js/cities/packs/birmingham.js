@@ -120,15 +120,15 @@ SB.Cities.register('birmingham', {
       title: 'The sirens are going',
       body: 'A tornado watch is up for the county on show night. Half the list is texting to ask if it is still on, and the room is a metal shed on a hill.',
       options: [
-        { id: 'EARLIER', label: 'Open early and finish before the line gets here', likely: 'Most of them make it. A short night.',
+        { id: 'EARLIER', label: 'Open early and finish before the line gets here', likely: 'Most of them make it, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors early, two short sets and out before the sky turned green.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You opened doors early, ran two short sets, and were out before the sky turned green.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The sirens went off right on time and nobody was there.' },
+          result: 'You moved it a day, and the sirens went off right on time and nobody was there.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people stay home under a watch.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The ones who came stayed inside and played anyway. It was a small, loud room.' }
+          result: 'The people who came stayed inside and played anyway, in a small, loud room.' }
       ] },
 
     { id: 'BIRMINGHAM_FEST_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -139,13 +139,13 @@ SB.Cities.register('birmingham', {
       options: [
         { id: 'LATE', label: 'Push doors back until the kids come off the grounds', likely: 'The ones who want one more set show up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at ten. A packed floor of sunburnt kids who were not done for the day.' },
-        { id: 'SHORT', label: 'Run it short, and play for who came', likely: 'A thin night, but the ones who came are glad.',
+          result: 'Doors were at ten, and the floor filled with sunburnt kids who were not done for the day.' },
+        { id: 'SHORT', label: 'Run it short, and play for who came', likely: 'A thin night, but the people who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a long loose set. The room was small and warm.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was two bands and a long loose set in a small, warm room.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The festival was over and the kids were tired.' }
+          result: 'You moved it a day, and the festival was over and the kids were tired.' }
       ] },
 
     { id: 'BIRMINGHAM_CLASSIC_PARADE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -154,15 +154,15 @@ SB.Cities.register('birmingham', {
       title: 'The parade has the street',
       body: 'The classic weekend closes the road to the loading dock you booked for Friday night. The band cannot get the van within two blocks.',
       options: [
-        { id: 'CARRY', label: 'Carry the gear in by hand', likely: 'Two hours of your day. The show goes on.',
+        { id: 'CARRY', label: 'Carry the gear in by hand', likely: 'It takes two hours of your day, but the show goes on.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Four people, a hand truck and a long walk. The drum kit survived.' },
-        { id: 'EARLY', label: 'Load in at dawn and open early', likely: 'Most get in before the barricades. A short night.',
+          result: 'It took four people, a hand truck and a long walk, but the drum kit survived.' },
+        { id: 'EARLY', label: 'Load in at dawn and open early', likely: 'Most get in before the barricades, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Loaded in before the barricades went up. A short, tight night.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You loaded in before the barricades went up, and it was a short, tight night.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The street was open and the band was glad.' }
+          result: 'You moved it a day, and the street was open and the band was glad.' }
       ] }
   ]
 });

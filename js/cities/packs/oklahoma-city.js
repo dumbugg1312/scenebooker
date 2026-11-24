@@ -93,7 +93,7 @@ SB.Cities.register('oklahoma-city', {
   ],
   "blurb": [
     "A sprawling plains city where DIY runs on collective spaces, karate schools and garages.",
-    "The crowd is small, mixed and freaky, and the tornado sirens test on Saturday noon."
+    "The crowd is small, mixed and freaky, and the tornado sirens test at noon on Saturdays."
   ],
   "hard": "Sprawl, tornado warnings, and a crowd of a few dozen.",
   "region": "the plains",
@@ -384,7 +384,7 @@ SB.Cities.register('oklahoma-city', {
       },
       "telegraph": "The sirens are going to be busy this week. Spring storms are lined up on the radar.",
       "title": "Tornado warning at doors",
-      "body": "A tornado warning has the whole metro in the hallway. The sirens are going and half the room is in somebody's storm cellar. Nobody knows whether the set will happen.",
+      "body": "A tornado warning has the whole metro in the hallway. The sirens are going, half the room is in somebody's storm cellar, and nobody knows whether the set will happen.",
       "options": [
         {
           "id": "MOVE",
@@ -397,12 +397,12 @@ SB.Cities.register('oklahoma-city', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come, came."
         },
         {
           "id": "EARLY",
           "label": "Start early and finish before the line gets here",
-          "likely": "Most make it. The night starts thin.",
+          "likely": "Most make it, but the night starts thin.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -415,7 +415,7 @@ SB.Cities.register('oklahoma-city', {
               "v": -60
             }
           ],
-          "result": "Doors early. You got through the set with the sirens warming up outside."
+          "result": "You opened doors early and got through the set with the sirens warming up outside."
         },
         {
           "id": "ACCEPT",
@@ -428,7 +428,7 @@ SB.Cities.register('oklahoma-city', {
               "v": 0.7
             }
           ],
-          "result": "The warning lasted two hours. Most people went home to their own cellars."
+          "result": "The warning lasted two hours, and most people went home to their own cellars."
         }
       ]
     },
@@ -449,12 +449,12 @@ SB.Cities.register('oklahoma-city', {
       },
       "telegraph": "A neighbor in Norman has been counting the cars outside the house, and the city has a counting rule of its own.",
       "title": "The third citation",
-      "body": "Your show runs long at the house in Norman, a neighbor calls it in, and it is the third citation this year. The city can shut off the water to a house that gets three.",
+      "body": "Your show runs long at the house in Norman and a neighbor calls it in. It is the third citation this year, and the city can shut off the water to a house that gets three.",
       "options": [
         {
           "id": "STOP",
           "label": "Stop at ten and send everyone home",
-          "likely": "The host is safe. A short night.",
+          "likely": "The host is safe, but it's a short night.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -486,7 +486,7 @@ SB.Cities.register('oklahoma-city', {
               "v": 1.2
             }
           ],
-          "result": "A building on the south side took the bill. The house kept its water."
+          "result": "A building on the south side took the bill, and the house kept its water."
         },
         {
           "id": "ACCEPT",
@@ -503,7 +503,7 @@ SB.Cities.register('oklahoma-city', {
               "amount": -40
             }
           ],
-          "result": "It went long again. The host paid the fine, and you paid half."
+          "result": "It went long again, so the host paid the fine and you paid half."
         }
       ]
     },
@@ -530,7 +530,7 @@ SB.Cities.register('oklahoma-city', {
         {
           "id": "LATE",
           "label": "Push doors back for the van",
-          "likely": "The crowd waits. A late start.",
+          "likely": "The crowd waits, and you start late.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -543,12 +543,12 @@ SB.Cities.register('oklahoma-city', {
               "v": 0.95
             }
           ],
-          "result": "Doors an hour late. The van finally crawled in with ten minutes to spare."
+          "result": "Doors opened an hour late, and the van finally crawled in with ten minutes to spare."
         },
         {
           "id": "EARLY",
           "label": "Start early and finish ahead of it",
-          "likely": "Most make it. The night starts thin.",
+          "likely": "Most make it, but the night starts thin.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -561,7 +561,7 @@ SB.Cities.register('oklahoma-city', {
               "v": -60
             }
           ],
-          "result": "Doors early, the van took the back roads and made it."
+          "result": "You opened doors early, and the van took the back roads and made it."
         },
         {
           "id": "ACCEPT",
@@ -574,7 +574,7 @@ SB.Cities.register('oklahoma-city', {
               "v": 0.8
             }
           ],
-          "result": "The kids were on the midway. The regulars came."
+          "result": "The kids were on the midway, but the regulars came."
         }
       ]
     },
@@ -602,12 +602,12 @@ SB.Cities.register('oklahoma-city', {
       },
       "telegraph": "The strip by the canal has an early curfew for kids under eighteen, and the bill is late.",
       "title": "Out by nine",
-      "body": "The outdoor show by the canal hits the nine o’clock curfew for unaccompanied minors. The kids have to leave before the headliner.",
+      "body": "The outdoor show by the canal hits the nine o’clock curfew for unaccompanied minors, so the kids have to leave before the headliner.",
       "options": [
         {
           "id": "SWAP",
           "label": "Flip the bill so the headliner goes first",
-          "likely": "The kids hear the best set. The rest is thin.",
+          "likely": "The kids hear the best set, and the rest of the night is thin.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -620,12 +620,12 @@ SB.Cities.register('oklahoma-city', {
               "v": -1
             }
           ],
-          "result": "The headliner played at eight to a full crowd. After nine it was a quiet patio."
+          "result": "The headliner played at eight to a full crowd, and after nine it was a quiet patio."
         },
         {
           "id": "EARLY",
           "label": "Start at five",
-          "likely": "Most make it. A long, hot afternoon.",
+          "likely": "Most make it, but it's a long, hot afternoon.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -638,7 +638,7 @@ SB.Cities.register('oklahoma-city', {
               "v": 0.85
             }
           ],
-          "result": "Doors at five. The kids heard everyone and were gone by nine."
+          "result": "Doors were at five, and the kids heard everyone and were gone by nine."
         },
         {
           "id": "ACCEPT",
@@ -651,7 +651,7 @@ SB.Cities.register('oklahoma-city', {
               "v": 0.7
             }
           ],
-          "result": "The kids were told to leave and did. The headliner played to the bar crowd."
+          "result": "The kids were told to leave and did, and the headliner played to the bar crowd."
         }
       ]
     }

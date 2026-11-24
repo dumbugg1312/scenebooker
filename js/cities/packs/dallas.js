@@ -400,7 +400,7 @@ SB.Cities.register('dallas', {
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with everyone.",
+          "likely": "It breaks the date and costs you some trust with everyone.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -408,12 +408,12 @@ SB.Cities.register('dallas', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the ones who could come, came."
         },
         {
           "id": "EARLY",
           "label": "Open early so the bands load in before the hail",
-          "likely": "Most make it. The night starts thin.",
+          "likely": "Most make it, but the night starts thin.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -426,7 +426,7 @@ SB.Cities.register('dallas', {
               "v": -60
             }
           ],
-          "result": "Doors early. Everyone was inside when the ice hit."
+          "result": "Doors were early, and everyone was inside when the ice hit."
         },
         {
           "id": "ACCEPT",
@@ -439,7 +439,7 @@ SB.Cities.register('dallas', {
               "v": 0.7
             }
           ],
-          "result": "The hail came through at load-in. Half the list waited it out at home."
+          "result": "The hail came through at load-in, and half the list waited it out at home."
         }
       ]
     },
@@ -461,7 +461,7 @@ SB.Cities.register('dallas', {
       },
       "telegraph": "The fairgrounds are jammed all month and the roads into South Dallas are one long line of brake lights.",
       "title": "The van is stuck behind the fair",
-      "body": "A show in South Dallas on a fair weekend. The roads in are packed and the first band is still on the freeway.",
+      "body": "Your show in South Dallas falls on a fair weekend, the roads in are packed, and the first band is still on the freeway.",
       "options": [
         {
           "id": "WAIT",
@@ -479,7 +479,7 @@ SB.Cities.register('dallas', {
               "v": 0.9
             }
           ],
-          "result": "The van got in at nine. You started late and most of them stayed."
+          "result": "The van got in at nine, and you started late but most of them stayed."
         },
         {
           "id": "SHORT",
@@ -497,12 +497,12 @@ SB.Cities.register('dallas', {
               "v": -1
             }
           ],
-          "result": "Two bands made it. The room was half full and it was fine."
+          "result": "Two bands made it, and the room was half full and it was fine."
         },
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with the bands.",
+          "likely": "It breaks the date and costs you some trust with the bands.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -510,7 +510,7 @@ SB.Cities.register('dallas', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. Not everyone could make the new one."
+          "result": "You moved it a day, and not everyone could make the new one."
         }
       ]
     },
@@ -540,7 +540,7 @@ SB.Cities.register('dallas', {
         {
           "id": "INSIDE",
           "label": "Move the whole bill to a house",
-          "likely": "Smaller and quieter. Nobody can close a lot at a house.",
+          "likely": "Smaller and quieter, since nobody can close a lot at a house.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -559,7 +559,7 @@ SB.Cities.register('dallas', {
         {
           "id": "EARLY",
           "label": "Start early and be out before the crowds",
-          "likely": "Most get in. A short night.",
+          "likely": "Most get in, but it's a short night.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -572,7 +572,7 @@ SB.Cities.register('dallas', {
               "v": 0.9
             }
           ],
-          "result": "Doors early, done before the patrols tightened."
+          "result": "Doors were early and you were done before the patrols tightened."
         },
         {
           "id": "ACCEPT",

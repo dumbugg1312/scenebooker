@@ -91,32 +91,32 @@ SB.Cities.register('kingsport-tn', {
       title: 'The neighbor at the property line',
       body: 'A woman is standing at the property line with her phone out. Whether the sheriff or the city police come depends on which side of the line she calls.',
       options: [
-        { id: 'QUIET', label: 'Turn it down and finish acoustic', likely: 'Everyone stays and the neighbor goes inside.',
+        { id: 'QUIET', label: 'Turn it down and finish acoustic', likely: 'Everyone stays, and the neighbor goes inside.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The last bands played quiet and the neighbor shut her door.' },
-        { id: 'END', label: 'End it early before anyone calls', likely: 'A short night. Nobody is hurt.',
+          result: 'The last bands played quiet, and the neighbor shut her door.' },
+        { id: 'END', label: 'End it early before anyone calls', likely: 'It\'s a short night, and nobody is hurt.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'The set list got cut and everyone was home before the lights came.' },
-        { id: 'ACCEPT', label: 'Play on', likely: 'Louder. Someone will call.',
+          result: 'You cut the set list, and everyone was home before it got late.' },
+        { id: 'ACCEPT', label: 'Play on', likely: 'It stays loud, and someone will call.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'MONEY', amount: -25 }],
-          result: 'The cruiser rolled up at the last song and the crowd scattered.' }
+          result: 'The cruiser rolled up at the last song, and the crowd scattered.' }
       ] },
 
     { id: 'KINGSPORT_TN_FESTIVAL_BARN', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The street festival has every downtown room blocked and a storm is on the radar.',
       title: 'The festival takes the hall',
-      body: 'The nine-day festival has taken every downtown block. A barn out past Bloomingdale has opened, with a thunderstorm forecast and one tarp.',
+      body: 'The nine-day festival has taken every downtown block. A barn out past Bloomingdale has opened up, but a thunderstorm is forecast and there\'s only one tarp.',
       options: [
-        { id: 'BARN', label: 'Move the bill to the barn', likely: 'No neighbors to hear it. The weather is a gamble.',
+        { id: 'BARN', label: 'Move the bill to the barn', likely: 'There are no neighbors to hear it, but the weather is a gamble.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'OUTDOOR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The bill fit under the barn roof and the storm held off until the last song.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The bill fit under the barn roof, and the storm held off until the last song.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The festival crowd had gone home.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A block-long walk past the barricades.',
+          result: 'You moved it a day, and the festival crowd had gone home.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'It\'s a block-long walk past the barricades.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Load-in was on foot and the crowd was whoever could park.' }
+          result: 'Load-in was on foot, and the crowd was whoever could park.' }
       ] },
 
     { id: 'KINGSPORT_TN_HOLIDAY_TRAIN', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -125,15 +125,15 @@ SB.Cities.register('kingsport-tn', {
       title: 'Behind the barricades',
       body: 'The hall you booked is a block inside the barricades for the holiday train. Load-in is on foot and the crowd will be families.',
       options: [
-        { id: 'CARRY', label: 'Carry the gear in on foot', likely: 'A long night for the van and the drummer.',
+        { id: 'CARRY', label: 'Carry the gear in on foot', likely: 'It\'s a long night for the van and the drummer.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Two hours of carrying amps past strollers. The show went fine.' },
-        { id: 'LATE', label: 'Push doors back until the crowds are gone', likely: 'A late start but a clear street.',
+          result: 'It took two hours of carrying amps past strollers, and the show went fine.' },
+        { id: 'LATE', label: 'Push doors back until the crowds are gone', likely: 'It starts late, but the street is clear.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The street was empty by then.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Doors were an hour late, and the street was empty by then.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

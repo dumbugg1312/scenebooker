@@ -12,7 +12,7 @@ SB.Cities.register('santa-barbara-ca', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['ucsb*', 'santa barbara independent*', 'news-press*', 'kcsb*', 'old spanish days*', 'vandenberg*'],
 
-  blurb: ['Students, surfers and skaters share the same backyards, and punk knows it is the counter-culture to a mellow, wealthy beach town.',
+  blurb: ['Students, surfers and skaters share the same backyards, and punk knows it is the counter-culture in a mellow, wealthy beach town.',
           'Shows end early because the neighbors have lawyers. A room lasts about three school years, then the people running it graduate.'],
   hard: 'Short-lived rooms, early curfews, and a town that empties each summer.',
   region: 'the Central Coast',
@@ -114,14 +114,14 @@ SB.Cities.register('santa-barbara-ca', {
       if: { daysOut: [0, 4], calendar: 'festival', months: [4] },
       telegraph: 'The county is posting the street-party notices again: seventy-two hours of noise rules and extra deputies.',
       title: 'The street party eats the weekend',
-      body: 'Thousands of people are in the streets by day and every house show is called off. Half your crowd is out there, and the rest is afraid of the deputies.',
+      body: 'Thousands of people are in the streets by day and every house show is called off. Half your crowd is out there, and the rest are afraid of the deputies.',
       options: [
-        { id: 'MOVE', label: 'Move the bill across town', likely: 'Out of the county\'s reach, and smaller.',
+        { id: 'MOVE', label: 'Move the bill across town', likely: 'It\'s smaller, but out of the county\'s reach.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A garage on the Eastside took the bill, and the deputies never came that far.' },
-        { id: 'LATE', label: 'Push doors back until the streets quiet', likely: 'A late start, and the tired ones show up.',
+        { id: 'LATE', label: 'Push doors back until the streets quiet', likely: 'You start late, and the tired ones show up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors at ten. They came in sunburned and loud.' },
+          result: 'Doors were at ten, and they came in sunburned and loud.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The street keeps most of them.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .5 }],
           result: 'Half the list was at the party and the other half stayed home.' }
@@ -133,15 +133,15 @@ SB.Cities.register('santa-barbara-ca', {
       title: 'A case in the van',
       body: 'The room is run dry or not at all. One of the bands pulls up with a case of beer, and the co-op is watching to see what you do.',
       options: [
-        { id: 'DRY', label: 'Keep it dry and tell them so', likely: 'Some grumbling, and the room stays yours.',
+        { id: 'DRY', label: 'Keep it dry and tell them so', likely: 'There\'s some grumbling, but the room stays yours.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'The case stayed in the van. The set was tighter for it, and the co-op noticed.' },
-        { id: 'MOVE', label: 'Take the bill to a backyard', likely: 'Breaks the date and costs the co-op\'s trust.',
+          result: 'The case stayed in the van, and the set was tighter for it, and the co-op noticed.' },
+        { id: 'MOVE', label: 'Take the bill to a backyard', likely: 'It breaks the date and costs the co-op\'s trust.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }],
-          result: 'A backyard took the bill. The co-op heard about it by morning.' },
-        { id: 'ACCEPT', label: 'Look away', likely: 'It is a gamble on the room.',
+          result: 'A backyard took the bill, and the co-op heard about it by morning.' },
+        { id: 'ACCEPT', label: 'Look away', likely: 'You\'re gambling with the room.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.05 }, { op: 'MONEY', amount: -30 }],
-          result: 'The beer came out. Somebody told, and it cost you the deposit and some goodwill.' }
+          result: 'The beer came out and somebody told, and it cost you the deposit and some goodwill.' }
       ] },
 
     { id: 'SANTA_BARBARA_CA_SUNDOWNER', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -150,9 +150,9 @@ SB.Cities.register('santa-barbara-ca', {
       title: 'The wind takes the tent',
       body: 'A sundowner wind knocks the power out and blows the tent over at the backyard show on the Mesa. The generator is still going, and the smoke is coming.',
       options: [
-        { id: 'GENERATOR', label: 'Run it on the generator', likely: 'Quieter and shorter, and the wind howls.',
+        { id: 'GENERATOR', label: 'Run it on the generator', likely: 'It\'s quieter and shorter, and the wind howls.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Short sets on a generator, with the wind through the fence. It was an odd, warm night.' },
+          result: 'The sets were short, on a generator, with the wind through the fence, and it was an odd, warm night.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
           result: 'You moved it a day. The ones who could come, came.' },

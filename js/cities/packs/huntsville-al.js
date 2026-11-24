@@ -123,13 +123,13 @@ SB.Cities.register('huntsville-al', {
       options: [
         { id: 'LATE', label: 'Push doors back until the game is over', likely: 'The ones who want a night out come late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. They came in from the bars, loud and happy.' },
+          result: 'Doors went an hour late, and they came in from the bars, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd stays home with the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed on the couch. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed on the couch, but the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'HUNTSVILLE_AL_SIREN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -138,15 +138,15 @@ SB.Cities.register('huntsville-al', {
       title: 'The siren goes off',
       body: 'A warning sounds in the middle of the second band. The whole room is crowded into the hall closet and the bathroom with the amp still on.',
       options: [
-        { id: 'WAIT', label: 'Wait it out and play on after', likely: 'A late start. Most of them stay.',
+        { id: 'WAIT', label: 'Wait it out and play on after', likely: 'A late start, and most of them stay.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'An hour in the hallway, then the lights came back and the band finished.' },
+          result: 'You spent an hour in the hallway, and then the lights came back and the band finished.' },
         { id: 'SHORT', label: 'Cut the bill short and send everyone home', likely: 'A thin night, and nobody on the road in it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'Two bands, a lot of nervous laughing, and everyone home before the hail.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] },
 
     { id: 'HUNTSVILLE_AL_FESTIVAL_PARKING', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -155,12 +155,12 @@ SB.Cities.register('huntsville-al', {
       title: 'The van is blocked in',
       body: 'The festival has taken every space within a mile of the room, and the band\'s van is boxed in behind the stage.',
       options: [
-        { id: 'EARLY', label: 'Move the show earlier and load out before the crowd', likely: 'A short night. Nobody boxed in.',
+        { id: 'EARLY', label: 'Move the show earlier and load out before the crowd', likely: 'A short night, and nobody is boxed in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early. The van was out before the street filled.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'Doors were early, and the van was out before the street filled.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads came in together from the edge of town. They\'ll remember that.' },
+          result: 'Two carloads came in together from the edge of town.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'People circle for an hour and give up.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'Half the list never found a place to park.' }

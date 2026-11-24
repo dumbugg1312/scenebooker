@@ -16,8 +16,8 @@ SB.Cities.register('spokane-wa', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Colleges, events and the weekly paper appear in game text only as generic words. */
   blocklist: ['gonzaga*', 'spokesman*', 'inlander*', 'hoopfest*', 'bloomsday*', 'lilac festival*', 'latah creek grange*', 'viaduct shop*'],
 
-  blurb: ['A long drive from anywhere. The good rooms are borrowed halls and basements, and nobody keeps a room for long.',
-          'All-ages rooms are scarce, the next big city is over the mountains, and a show feels like an event.'],
+  blurb: ['It\'s a long drive from anywhere. The good rooms are borrowed halls and basements, and nobody keeps a room for long.',
+          'All-ages rooms are scarce and the next big city is over the mountains, so a show feels like an event.'],
   hard: 'Few all-ages rooms, and the ones that exist keep disappearing.',
   region: 'the Inland Northwest',
   houseType: 'BASEMENT',
@@ -119,17 +119,17 @@ SB.Cities.register('spokane-wa', {
       if: { daysOut: [0, 3], calendar: 'parade' },
       telegraph: 'The parade is Saturday, and the city shuts the downtown streets at a quarter to eight.',
       title: 'No van within six blocks',
-      body: 'The parade has every downtown street closed by a quarter to eight. A band cannot get a van within six blocks of the room, and the load-in is a long walk.',
+      body: 'The parade has every downtown street closed by a quarter to eight. A band can\'t get a van within six blocks of the room, and the load-in is a long walk.',
       options: [
-        { id: 'EARLY', label: 'Load in before the streets close', likely: 'A scramble. The night starts thin.',
+        { id: 'EARLY', label: 'Load in before the streets close', likely: 'It\'s a scramble, and the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Everything was in by seven. The crowd came in on foot, a little late.' },
-        { id: 'CARRY', label: 'Carry the gear in by hand', likely: 'Slow. The bands will remember it.',
+          result: 'Everything was in by seven, and the crowd came in on foot, a little late.' },
+        { id: 'CARRY', label: 'Carry the gear in by hand', likely: 'It\'s slow, and the bands will remember it.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Six blocks of amps on foot. The set started late and loose.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You carried amps six blocks on foot, and the set started late and loose.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'SPOKANE_WA_PASS_SNOW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -138,32 +138,32 @@ SB.Cities.register('spokane-wa', {
       title: 'The pass is closed',
       body: 'A band booked from Missoula is stuck behind a pass closure, and the bill has to be rebuilt from locals before doors.',
       options: [
-        { id: 'LOCALS', label: 'Rebuild the bill from local bands', likely: 'A thinner night with a hometown feel.',
+        { id: 'LOCALS', label: 'Rebuild the bill from local bands', likely: 'It\'s a thinner night with a hometown feel.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Three local bands filled in. The room was half full and loud.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start. The crowd gets restless.',
+          result: 'Three local bands filled in, and the room was half full and loud.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'It starts late, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van made it at ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The van made it at ten, and you started late, but nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everybody trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] },
 
     { id: 'SPOKANE_WA_NEIGHBOR_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3] },
       telegraph: 'A neighbor on the block has already said the music carries across the fence.',
       title: 'The fifty-foot call',
-      body: 'A neighbor calls the sound rule on a north-side garage show. You can cut the set to unplugged or move the whole night into the practice room.',
+      body: 'A neighbor calls the sound rule on a north-side garage show, and you can cut the set to unplugged or move the whole night into the practice room.',
       options: [
-        { id: 'QUIET', label: 'Cut to unplugged', likely: 'Quiet, and not what they came for.',
+        { id: 'QUIET', label: 'Cut to unplugged', likely: 'It\'s quiet, and not what they came for.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'A soft, strange night under the porch light. The ones who stayed liked it.' },
-        { id: 'INSIDE', label: 'Move it into the practice room', likely: 'Smaller and louder, and out of earshot.',
+          result: 'It was a soft, strange night under the porch light, and the people who stayed liked it.' },
+        { id: 'INSIDE', label: 'Move it into the practice room', likely: 'It\'s smaller and louder, and out of earshot.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'You packed the practice room. Nobody outside could hear it.' },
+          result: 'You packed the practice room, and nobody outside could hear it.' },
         { id: 'ACCEPT', label: 'Run it and take the warning', likely: 'A second call ends it for good.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The officer came at ten. You finished the set with the amps turned down.' }
+          result: 'The officer came at ten, and you finished the set with the amps turned down.' }
       ] }
   ]
 });

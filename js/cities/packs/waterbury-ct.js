@@ -90,49 +90,49 @@ SB.Cities.register('waterbury-ct', {
       title: 'The procession blocks the loading door',
       body: 'The street is shut for the feast, parking is gone for blocks, and the procession passes the hall\'s loading door just as the first band shows up.',
       options: [
-        { id: 'LATE', label: 'Push the doors back until the street opens', likely: 'The bands get in. A late night.',
+        { id: 'LATE', label: 'Push the doors back until the street opens', likely: 'The bands get in, but it\'s a late night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
           result: 'The band hauled amps through the crowd and the doors opened an hour late.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd cannot park.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Nobody could park. The ones who walked from the hill came.' },
+          result: 'Nobody could park, and the people who walked from the hill came.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] },
 
     { id: 'WATERBURY_CT_FIRST_SNOW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [11, 12, 1, 2, 3] },
       telegraph: 'The first snow is coming, and the steep hill streets do not get plowed first.',
       title: 'The van does not make the hill',
-      body: 'The band from Southington made it up to Bunker Hill. The drummer\'s van is spinning at the bottom of the steep street.',
+      body: 'The band from Southington made it up to Bunker Hill, and the drummer\'s van is spinning at the bottom of the steep street.',
       options: [
-        { id: 'CARRY', label: 'Carry the drums up the hill by hand', likely: 'A late start. A story everyone tells.',
+        { id: 'CARRY', label: 'Carry the drums up the hill by hand', likely: 'A late start, and a story everyone tells.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 45 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'Six people carried the kit up the hill in the snow. The cellar was loud and warm.' },
+          result: 'Six people carried the kit up the hill in the snow, and the cellar was loud and warm.' },
         { id: 'SHORT', label: 'Run the short bill without them', likely: 'A thin night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands and a long, loose night. The ones who could walk came.' },
+          result: 'Two bands played a long, loose night for the people who could walk.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] },
 
     { id: 'WATERBURY_CT_THEATER_DATE', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 4] },
       telegraph: 'The big downtown theater just announced a touring hardcore date on your night.',
       title: 'The theater took your crowd',
-      body: 'A touring hardcore bill is at the downtown theater tonight. Every local kid wants on it, and the cellar crowd has gone downtown.',
+      body: 'A touring hardcore bill is at the downtown theater tonight, every local kid wants on it, and the cellar crowd has gone downtown.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the theater lets out', likely: 'The kids come up after, wired. Late.',
+        { id: 'LATE', label: 'Push doors back until the theater lets out', likely: 'The kids come up after, wired, and it\'s late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors at ten. A wave of kids with wristbands came down from the theater and the floor filled.' },
+          result: 'Doors were at ten, and a wave of kids with wristbands came down from the theater and the floor filled.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The cellar crowd is somewhere else.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'Everybody was downtown. The bands played to their own friends.' },
+          result: 'Everybody was downtown, so the bands played to their own friends.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] }
   ]
 });

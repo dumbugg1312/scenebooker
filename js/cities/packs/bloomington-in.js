@@ -114,29 +114,29 @@ SB.Cities.register('bloomington-in', {
       title: 'The lease turned over',
       body: 'The students who ran the house graduated, the new tenants have never heard of the bill, and half the street is empty for the summer. The host says the show might still happen if you carry the gear in yourself.',
       options: [
-        { id: 'HAUL', label: 'Carry it all in and run it yourself', likely: 'Two hours of your day. A small crowd that listens.',
+        { id: 'HAUL', label: 'Carry it all in and run it yourself', likely: 'It takes two hours of your day, and you get a small crowd that listens.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'You borrowed a cart and a porch couch. The few who stayed in town came and went quiet for the first song.' },
-        { id: 'PORCH', label: 'Move it to a porch with a neighbor you know', likely: 'Smaller and louder, with a clock on it.',
+          result: 'You borrowed a cart and a porch couch, and the few people who stayed in town came and went quiet for the first song.' },
+        { id: 'PORCH', label: 'Move it to a porch with a neighbor you know', likely: 'It\'s smaller and louder, with a clock on it.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A porch on the near west side took the bill. The neighbor kept one eye on the clock.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A porch on the near west side took the bill, and the neighbor kept one eye on the clock.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'BLOOMINGTON_IN_BIKE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 60, bind: ['show'],
       if: { daysOut: [0, 4], months: [4], calendar: 'race' },
       telegraph: 'It is the bike race weekend and every house on the edge of campus has a keg on the porch.',
       title: 'The whole campus edge is a party',
-      body: 'Thousands of visitors, every hotel sold out, and a neighbor leans over the fence to say they are not doing this tonight. A tiny all-ages room downtown could take the overflow.',
+      body: 'There are thousands of visitors and every hotel is sold out, and a neighbor leans over the fence to say they are not doing this tonight. A tiny all-ages room downtown could take the overflow.',
       options: [
-        { id: 'OVERFLOW', label: 'Move the bill to the all-ages room downtown', likely: 'Smaller, safer, and the crowd finds you.',
+        { id: 'OVERFLOW', label: 'Move the bill to the all-ages room downtown', likely: 'It\'s smaller and safer, and the crowd finds you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.05 }],
           result: 'The little room downtown was packed all night with people who wanted somewhere quiet to be loud.' },
-        { id: 'EARLY', label: 'Play early and shut down before the street fills', likely: 'A short night. The neighbor relaxes.',
+        { id: 'EARLY', label: 'Play early and shut down before the street fills', likely: 'It\'s a short night, and the neighbor relaxes.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Done by nine. The street was a sea of coolers by ten.' },
+          result: 'You were done by nine, and by ten the street was a sea of coolers.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The crowd is distracted and the police are close.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'Half the room kept wandering out to see what was going on in the street.' }
@@ -146,17 +146,17 @@ SB.Cities.register('bloomington-in', {
       if: { daysOut: [0, 4], months: [10], calendar: 'game' },
       telegraph: 'It is the big football weekend. The parties will be huge and the police have added cars.',
       title: 'The party houses go big',
-      body: 'A bigger crowd and more police than usual, and the town remembers what happened at a party on this weekend. The host wants to cancel or move the show.',
+      body: 'There\'s a bigger crowd and more police than usual, and the town remembers what happened at a party on this weekend. The host wants to cancel or move the show.',
       options: [
-        { id: 'MOVE_ROOM', label: 'Move the bill to a licensed room', likely: 'Safer, but nobody under 21 gets in.',
+        { id: 'MOVE_ROOM', label: 'Move the bill to a licensed room', likely: 'It\'s safer, but nobody under 21 gets in.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'BAR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The bar took the bill with an hour to spare. The kids were left on the porch.' },
-        { id: 'QUIET', label: 'Keep the house show, shorter and quieter', likely: 'Fewer people. Fewer problems.',
+          result: 'The bar took the bill with an hour to spare, and the kids were left on the porch.' },
+        { id: 'QUIET', label: 'Keep the house show, shorter and quieter', likely: 'You get fewer people and fewer problems.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'An acoustic-ish early set and a front door with two big friends on it. Nothing happened, which was the point.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was an acoustic-ish early set with two big friends on the front door, and nothing happened, which was the point.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

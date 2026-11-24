@@ -120,15 +120,15 @@ SB.Cities.register('tuscaloosa-al', {
       title: 'Game day swallows the Strip',
       body: 'A home game takes the Strip, the parking and every kid who owns a jersey. A show on a day like this has no audience unless you do something about it.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the game crowd goes home', likely: 'The ones who want a real night out show up late.',
+        { id: 'LATE', label: 'Push doors back until the game crowd goes home', likely: 'The people who want a real night out show up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors an hour and a half late. The crowd came in hoarse and happy.' },
+          result: 'You opened doors an hour and a half late, and the crowd came in hoarse and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The casual crowd stayed on the Strip. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed on the Strip, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'TUSCALOOSA_AL_CURFEW_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -137,15 +137,15 @@ SB.Cities.register('tuscaloosa-al', {
       title: 'The patrol before ten',
       body: 'Your show runs past ten on a weeknight, and a carful of under-18 kids is on the list. A patrol car has been circling the block twice an hour.',
       options: [
-        { id: 'EARLY', label: 'End the all-ages set early and send them home', likely: 'A short night. Nobody gets cited.',
+        { id: 'EARLY', label: 'End the all-ages set early and send them home', likely: 'It\'s a short night, and nobody gets cited.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'You cut the set short and the kids were home by ten. The headliner was not pleased.' },
+          result: 'You cut the set short and the kids were home by ten, but the headliner was not pleased.' },
         { id: 'ACCEPT', label: 'Run it as planned and take the risk', likely: 'The younger kids stay away.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the young ones never came. The patrol passed once and kept going.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Half the young ones never came, and the patrol passed once and kept going.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'TUSCALOOSA_AL_JULY_DEAD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -154,15 +154,15 @@ SB.Cities.register('tuscaloosa-al', {
       title: 'The July dead zone',
       body: 'The students have left, the big show on the river has the traffic, and a carport show in the heat looks likely to draw a dozen people and a dog.',
       options: [
-        { id: 'FANS', label: 'Run it as a loose, cheap night for whoever is left', likely: 'Small but warm. The ones who came are glad.',
+        { id: 'FANS', label: 'Run it as a loose, cheap night for whoever is left', likely: 'It\'s small but warm, and the people who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'REGULARS', pct: .02 }],
-          result: 'A dozen people, two fans and a dog in the heat. They are your regulars now.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A very thin night.',
+          result: 'It was a dozen people, two fans and a dog in the heat, and they are your regulars now.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'It\'s a very thin night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'The heat and the traffic took most of the list. The band played anyway.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The heat and the traffic took most of the list, and the band played anyway.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] }
   ]
 });

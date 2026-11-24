@@ -114,12 +114,12 @@ SB.Cities.register('duluth-mn', {
         { id: 'LOCALS', label: 'Run it with the local bands and play on', likely: 'A thin night, but the ones who walk over are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'Locals only, a long loose night and a warm room full of people who live nearby.' },
-        { id: 'WAIT', label: 'Hold the doors for the van', likely: 'A late start. The crowd gets restless.',
+        { id: 'WAIT', label: 'Hold the doors for the van', likely: 'The start is late, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van crawled in near ten. You started late and nobody left.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The van crawled in near ten, and you started late but nobody left.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everyone trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could make the new one, did.' }
+          result: 'You moved it a day, and the ones who could make the new date did.' }
       ] },
 
     { id: 'DULUTH_MN_MARATHON_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -128,13 +128,13 @@ SB.Cities.register('duluth-mn', {
       title: 'Marathon weekend',
       body: 'The shore road is shut, parking is gone and the downtown streets are full of visitors in race shirts. The scene kids are staying up the hill.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the streets clear', likely: 'The ones who live here show up. Later than planned.',
+        { id: 'LATE', label: 'Push doors back until the streets clear', likely: 'The ones who live here show up, but later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The crowd walked down the hill after the road reopened.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Tourists wander in. Not many of them stay.',
+          result: 'Doors opened an hour late, and the crowd walked down the hill after the road reopened.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Tourists wander in, but not many of them stay.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'A few visitors stuck their heads in and left. The regulars made it up from the hill.' },
-        { id: 'BASEMENT', label: 'Move the bill to a basement up the hill', likely: 'Smaller and louder. Nobody can tow a house.',
+          result: 'A few visitors stuck their heads in and left, and the regulars made it up from the hill.' },
+        { id: 'BASEMENT', label: 'Move the bill to a basement up the hill', likely: 'Smaller and louder, and nobody can tow a house.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement on the slope took the bill and the floor was full by nine.' }
       ] },
@@ -153,7 +153,7 @@ SB.Cities.register('duluth-mn', {
           result: 'Early doors, a short bright set and everyone off the sand before the patrol.' },
         { id: 'ACCEPT', label: 'Pack up and end it', likely: 'The night ends flat.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The fire went out early. People drifted off in the dark.' }
+          result: 'The fire went out early, and people drifted off in the dark.' }
       ] }
   ]
 });

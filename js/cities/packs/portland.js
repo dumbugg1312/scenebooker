@@ -14,7 +14,7 @@ SB.Cities.register('portland', {
   blocklist: ['rose festival*', 'pickathon*', 'portland timbers*', 'trail blazers*', 'portlandia*', 'willamette week*', 'trimet*', 'last thursday*'],
 
   blurb: ['A rainy river city of basements, garages and record stores, where kids have made their own rooms for forty years because nobody was stopping them.',
-          'A rainy, friendly crowd under tarps. The old all-ages rooms are mostly memories, so houses carry it, and the rent keeps pushing them outward.'],
+          'The crowd is rainy and friendly under tarps. The old all-ages rooms are mostly memories, so houses carry the scene, and the rent keeps pushing them outward.'],
   hard: 'All-ages rooms are scarce and rent keeps pushing houses outward.',
   region: 'the I-5 corridor',
   houseType: 'BASEMENT',
@@ -125,31 +125,31 @@ SB.Cities.register('portland', {
       if: { daysOut: [0, 4], months: [8, 9] },
       telegraph: 'The air has gone orange and the numbers are all red.',
       title: 'Smoke week',
-      body: 'Wildfire smoke has settled over the valley. Nobody wants to stand in a backyard, and the whole bill is asking for a room with a door.',
+      body: 'Wildfire smoke has settled over the valley, and nobody wants to stand in a backyard, so the whole bill is asking for a room with a door.',
       options: [
-        { id: 'INSIDE', label: 'Move it into a basement with a borrowed air purifier', likely: 'Smaller and sweatier, but they come.',
+        { id: 'INSIDE', label: 'Move it into a basement with a borrowed air purifier', likely: 'It\'s smaller and sweatier, but they come.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A basement took the whole bill. The purifier lost, but nobody left.' },
-        { id: 'MOVE', label: 'Move it a day, when the wind turns', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A basement took the whole bill, and the air purifier lost the fight, but nobody left.' },
+        { id: 'MOVE', label: 'Move it a day, when the wind turns', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The smoke cleared a little and so did the line.' },
+          result: 'You moved it a day, and the smoke cleared a little, and so did the line.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A lot of people stay in.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The room was half full and everyone coughed in tune.' }
+          result: 'The room was half full and everyone coughed through it.' }
       ] },
 
     { id: 'PORTLAND_GORGE_ICE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], chokepoint: true, months: [12, 1, 2] },
       telegraph: 'An ice storm is forecast for the Gorge this week.',
       title: 'The Gorge is closed',
-      body: 'Freezing rain has shut I-84 and the bridges. The bands and kids from outside the city cannot get through.',
+      body: 'Freezing rain has shut I-84 and the bridges, and the bands and kids from outside the city cannot get through.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the ice', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the ice', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the water.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the water.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The roads never opened. The ones from outside stayed home.' }
+          result: 'The roads never opened, and the people from outside stayed home.' }
       ] },
 
     { id: 'PORTLAND_PARADE_BRIDGES', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -158,12 +158,12 @@ SB.Cities.register('portland', {
       title: 'The parade has the bridges',
       body: 'The parade has closed the bridges and half of downtown on the night of your show, and the carnival has filled every parking space on the waterfront.',
       options: [
-        { id: 'EARLY', label: 'Open early and tell everyone to come by bike', likely: 'Most get in before the closures. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early and tell everyone to come by bike', likely: 'Most people get in before the closures, but it\'s thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came locked their bikes to every pole on the block.' },
-        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the closures.',
+          result: 'You opened doors an hour early, and the people who came locked their bikes to every pole on the block.' },
+        { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up because of the closures.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The bridges stayed shut. Half the list never found a way across.' }
+          result: 'The bridges stayed shut, and half the list never found a way across.' }
       ] },
 
     { id: 'PORTLAND_GAME_NIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -172,15 +172,15 @@ SB.Cities.register('portland', {
       title: 'Every parking spot is gone',
       body: 'A soccer match and a basketball game fall on one night, and every space within a mile of the show has a meter or a tow truck.',
       options: [
-        { id: 'EARLY', label: 'Open early, tell everyone where to leave the car', likely: 'Most get in before the lots fill. Thinner than usual.',
+        { id: 'EARLY', label: 'Open early, tell everyone where to leave the car', likely: 'Most people get in before the lots fill, but it\'s thinner than usual.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. Everyone walked in from the far side of the river.' },
-        { id: 'ACCEPT', label: 'Take what you get', likely: 'A lot of people circle and go home.',
+          result: 'You opened doors an hour early, and everyone walked in from the far side of the river.' },
+        { id: 'ACCEPT', label: 'Take what you get', likely: 'A lot of people circle the block and go home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The streets were a parking lot. Half the list never found a spot.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The streets were a parking lot, and half the list never found a spot.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

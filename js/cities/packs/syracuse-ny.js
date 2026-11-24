@@ -114,17 +114,17 @@ SB.Cities.register('syracuse-ny', {
       if: { daysOut: [0, 5], months: [8, 9, 10, 11, 2, 3, 4] },
       telegraph: 'One of the big landlords on the hill is sending a letter to all its tenants about parties.',
       title: 'The landlord ban',
-      body: 'An Eastside rental company has banned parties across all its houses, the same week your booked basement was meant to host. The tenants are scared and the insurance people are watching the block.',
+      body: 'An Eastside rental company has banned parties across all its houses, the same week your booked basement was meant to host. The tenants are scared, and the insurance people are watching the block.',
       options: [
-        { id: 'PORCH', label: 'Move it to a porch or a yard', likely: 'Smaller and in the open. The street is the limit.',
+        { id: 'PORCH', label: 'Move it to a porch or a yard', likely: 'It\'s smaller and in the open, and the street is the limit.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'OUTDOOR', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The bill went to a porch and the neighbors on both sides came out to listen.' },
-        { id: 'DAY', label: 'Turn it into a daytime bill', likely: 'Out by dark, and the landlord never sees it.',
+          result: 'The bill went to a porch, and the neighbors on both sides came out to listen.' },
+        { id: 'DAY', label: 'Turn it into a daytime bill', likely: 'You\'re out by dark, and the landlord never sees it.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -180 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors at two. Nobody got a letter and the sets were short and tight.' },
-        { id: 'ACCEPT', label: 'Run it in the basement anyway', likely: 'The tenants are nervous. So is everyone else.',
+          result: 'Doors were at two, and nobody got a letter, and the sets were short and tight.' },
+        { id: 'ACCEPT', label: 'Run it in the basement anyway', likely: 'The tenants are nervous, and so is everyone else.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The room was half empty and everybody watched the door.' }
+          result: 'The room was half empty, and everybody watched the door.' }
       ] },
 
     { id: 'SYRACUSE_NY_FAIR_FORTNIGHT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -133,12 +133,12 @@ SB.Cities.register('syracuse-ny', {
       title: 'The fair fortnight',
       body: 'The fair has emptied the west edge and taken half the kids for twelve days. The hall on the east edge still runs a free all-ages afternoon, and your night is right behind it.',
       options: [
-        { id: 'AFTERNOON', label: 'Take the afternoon slot at the east hall', likely: 'Free and early. The kids who stayed show up.',
+        { id: 'AFTERNOON', label: 'Take the afternoon slot at the east hall', likely: 'It\'s free and early, and the kids who stayed show up.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'lateMin', v: -240 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
           result: 'The afternoon bill filled the hall with the kids the fair did not take.' },
         { id: 'ACCEPT', label: 'Run it at night as planned', likely: 'A thin crowd, but the regulars come.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'A quiet night. The fair got the rest.' }
+          result: 'It was a quiet night, because the fair got the rest.' }
       ] },
 
     { id: 'SYRACUSE_NY_GREEN_SUNDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -149,13 +149,13 @@ SB.Cities.register('syracuse-ny', {
       options: [
         { id: 'LATE', label: 'Push doors to the evening', likely: 'The drunks go home and the kids come out.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors at eight. The street had emptied and the van got a spot.' },
+          result: 'Doors were at eight, and the street had emptied and the van got a spot.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' },
-        { id: 'ACCEPT', label: 'Run it and walk the gear in', likely: 'Slow load-in, and the crowd is thin.',
+          result: 'You moved it a day, and not everyone could make the new one.' },
+        { id: 'ACCEPT', label: 'Run it and walk the gear in', likely: 'Load-in is slow and the crowd is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'Gear carried six blocks, and a late start. The ones who found parking were glad.' }
+          result: 'You carried gear six blocks and started late, and the ones who found parking were glad.' }
       ] }
   ]
 });

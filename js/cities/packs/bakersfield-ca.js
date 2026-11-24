@@ -110,15 +110,15 @@ SB.Cities.register('bakersfield-ca', {
       title: 'Tule fog on the 99',
       body: 'The fog is so thick the highway crawls at thirty. The kids from the farm towns and the band are all on the road in it, and nobody can see a taillight.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier, before it settles in', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier, before it settles in', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors moved up an hour. Most beat the worst of it.' },
+          result: 'You moved doors up an hour, and most people beat the worst of it.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Anyone from the farm towns stays home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The fog never lifted. Only the ones who could walk came.' },
+          result: 'The fog never lifted, so only the ones who could walk came.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'BAKERSFIELD_CA_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -127,15 +127,15 @@ SB.Cities.register('bakersfield-ca', {
       title: 'Fair week on the east side',
       body: 'The motels are sold out, the parking is blocked, and a rodeo crowd is walking past the gym. The show nearby can pull the wrong audience, or a few of the right one.',
       options: [
-        { id: 'EARLY', label: 'Start early, before the crowd fills the street', likely: 'Your people get in. Short and loud.',
+        { id: 'EARLY', label: 'Start early, before the crowd fills the street', likely: 'Your people get in, and it\'s short and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors early. Your crowd was in before the streets closed.' },
-        { id: 'ACCEPT', label: 'Run it and see who wanders over', likely: 'Some rodeo kids come in. Some regulars cannot park.',
+          result: 'You opened doors early, and your crowd was in before the streets closed.' },
+        { id: 'ACCEPT', label: 'Run it and see who wanders over', likely: 'Some rodeo kids come in, and some regulars cannot park.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'REGULARS', pct: .02 }],
-          result: 'A few rodeo kids stayed past the first band. The regulars parked half a mile away.' },
+          result: 'A few rodeo kids stayed past the first band, and the regulars parked half a mile away.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'BAKERSFIELD_CA_HOME_BY_TEN', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -144,9 +144,9 @@ SB.Cities.register('bakersfield-ca', {
       title: 'Straight home',
       body: 'Anyone under eighteen who is still out after ten can be cited, and the parents can be cited too. The last band is going to play to half the room.',
       options: [
-        { id: 'EARLY', label: 'Start early so every band plays before ten', likely: 'The whole bill gets heard. An early night.',
+        { id: 'EARLY', label: 'Start early so every band plays before ten', likely: 'The whole bill gets heard, but it\'s an early night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors early. Every band played to a full room and the kids were home on time.' },
+          result: 'You opened doors early, and every band played to a full room and the kids were home on time.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The last band loses the younger half.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
           result: 'The kids drifted out at ten, and the headliner played to the older heads.' }

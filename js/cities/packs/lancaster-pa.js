@@ -119,30 +119,30 @@ SB.Cities.register('lancaster-pa', {
       options: [
         { id: 'LATE', label: 'Push doors back until the park empties out', likely: 'The crowd that wants more shows up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The park crowd drifted over and filled the hall.' },
+          result: 'You opened doors an hour late, and the park crowd drifted over and filled the hall.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd stays at the park.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The free band had the square. The ones who came were the committed.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The free band had the square, and the people who came were the committed ones.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'LANCASTER_PA_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'The fair is on in the farm towns, with a parade and a midway on Friday night.',
       title: 'The farm-town fair takes the kids',
-      body: 'A week of borough fairs has the farm-town teenagers on a midway and a parade route. Your show draws the three who skipped it.',
+      body: 'A week of borough fairs has the farm-town teenagers on a midway and a parade route, so your show draws the three who skipped it.',
       options: [
-        { id: 'SMALL', label: 'Run it small and call it a house night', likely: 'The ones who came get a good night.',
+        { id: 'SMALL', label: 'Run it small and call it a house night', likely: 'The people who came get a good night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'A thin room and a tight bill. The three who skipped the fair were glad.' },
+          result: 'It was a thin room and a tight bill, and the three who skipped the fair were glad.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The farm-town kids are at the parade.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The midway kept the farm towns busy. The room was half full.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The midway kept the farm towns busy, and the room was half full.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'LANCASTER_PA_NOISE_VARIANCE', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
@@ -151,15 +151,15 @@ SB.Cities.register('lancaster-pa', {
       title: 'The nine o\'clock rule',
       body: 'The noise board grants a one-night variance for a backyard show, but only if you ask before the nine o\'clock rule hits. Skip it and a neighbor will call the police line.',
       options: [
-        { id: 'ASK', label: 'Ask for the variance and pay the fee', likely: 'Costs twenty-five dollars. The night runs late.',
+        { id: 'ASK', label: 'Ask for the variance and pay the fee', likely: 'It costs twenty-five dollars, and the night runs late.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }],
-          result: 'Paperwork on the porch. The band played past nine and nobody called.' },
-        { id: 'SKIP', label: 'Skip the paperwork and keep it quiet', likely: 'Fewer people, less noise, no trouble.',
+          result: 'You did the paperwork on the porch, and the band played past nine and nobody called.' },
+        { id: 'SKIP', label: 'Skip the paperwork and keep it quiet', likely: 'You get fewer people and less noise, and no trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'You kept the amps low. The yard was half full and nobody complained.' },
-        { id: 'MOVE', label: 'Move the show to a hall', likely: 'Smaller and with chaperones.',
+          result: 'You kept the amps low, and the yard was half full and nobody complained.' },
+        { id: 'MOVE', label: 'Move the show to a hall', likely: 'It\'s smaller, and it has chaperones.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A church hall took the bill. The chaperones watched the door.' }
+          result: 'A church hall took the bill, and the chaperones watched the door.' }
       ] }
   ]
 });

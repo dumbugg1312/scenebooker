@@ -120,15 +120,15 @@ SB.Cities.register('los-angeles', {
       title: 'The ballpark has the freeway',
       body: 'A home game has let out, and the roads into Echo Park and Highland Park are solid brake lights. The headliner is stuck on the freeway while the opener is already on stage.',
       options: [
-        { id: 'LATE', label: 'Stretch the opener and push the headliner back', likely: 'Most wait it out. A long, thin start.',
+        { id: 'LATE', label: 'Stretch the opener and push the headliner back', likely: 'Most wait it out, but it\'s a long, thin start.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The opener played forty minutes and then forty more. The headliner walked in as the crowd gave up on the clock.' },
+          result: 'The opener played forty minutes and then forty more, and the headliner walked in as the crowd gave up on the clock.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Half the list never gets through.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The ones who made it parked six blocks away. The rest stayed in the traffic.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The ones who made it parked six blocks away, and the rest stayed in the traffic.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'LOS_ANGELES_ATMOSPHERIC_RIVER', when: 'WEEK', tier: 'HARD', weight: 3, cooldown: 30, bind: ['show'],
@@ -137,15 +137,15 @@ SB.Cities.register('los-angeles', {
       title: 'The backyard is a river',
       body: 'The atmospheric river has come early. The tarp has collapsed, the street is running like a creek and the band is standing in the garage with the amps on milk crates.',
       options: [
-        { id: 'GARAGE', label: 'Pack everybody into the garage', likely: 'Smaller, louder, soaked. They will remember it.',
+        { id: 'GARAGE', label: 'Pack everybody into the garage', likely: 'Smaller, louder and soaked, and people will remember it.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Fifty people in a two-car garage with the door half down. Nobody wanted to leave.' },
-        { id: 'MOVE', label: 'Move it a day, once the street drains', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'Fifty people packed into a two-car garage with the door half down, and nobody wanted to leave.' },
+        { id: 'MOVE', label: 'Move it a day, once the street drains', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'SANDBAG', label: 'Sandbag the drive and play on', likely: 'Costs forty dollars. The crowd stays home.',
+          result: 'You moved it a day, and the ones who could come, came.' },
+        { id: 'SANDBAG', label: 'Sandbag the drive and play on', likely: 'It costs forty dollars, and the crowd stays home.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The water stayed on the street. The room was half full and wet to the ankle.' }
+          result: 'The water stayed on the street, and the room was half full and wet to the ankle.' }
       ] },
 
     { id: 'LOS_ANGELES_FIRE_INSPECTOR', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show'],
@@ -156,13 +156,13 @@ SB.Cities.register('los-angeles', {
       options: [
         { id: 'FIX', label: 'Cut the chain, cut the crowd and fix it on the spot', likely: 'Costs sixty dollars and a smaller night.',
           effects: [{ op: 'MONEY', amount: -60 }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A new lock and a cap on the headcount. The inspector wrote a note and left.' },
+          result: 'You put on a new lock and a cap on the headcount, and the inspector wrote a note and left.' },
         { id: 'MOVE', label: 'Move the show to a house for the night', likely: 'Smaller and loud, with the neighbors all around.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A garage in the Valley took the whole bill, and the floor was packed.' },
         { id: 'CANCEL', label: 'Cancel and give everyone their money back', likely: 'Safe, and it costs the bands their night.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 7, respect: false }],
-          result: 'Called off. The bands went home, and the word got around that the room is on a list.' }
+          result: 'You called it off, the bands went home, and word got around that the room is on a list.' }
       ] },
 
     { id: 'LOS_ANGELES_SANTA_ANA', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -171,12 +171,12 @@ SB.Cities.register('los-angeles', {
       title: 'The wind is up',
       body: 'A Santa Ana wind has knocked the power out across the neighborhood, and there is smoke on the horizon. The show can run on a generator, but the air is not good.',
       options: [
-        { id: 'GEN', label: 'Run it on the generator', likely: 'Louder and rougher. Some stay home for the smoke.',
+        { id: 'GEN', label: 'Run it on the generator', likely: 'Louder and rougher, and some stay home for the smoke.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'REGULARS', pct: .01 }],
-          result: 'One light and a generator. The wind banged the garage door in time with the drummer.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'With one light and a generator, the wind banged the garage door in time with the drummer.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

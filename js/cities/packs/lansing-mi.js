@@ -126,13 +126,13 @@ SB.Cities.register('lansing-mi', {
       options: [
         { id: 'GO', label: 'Send the crowd to the hearing and start late', likely: 'A good cause and a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Forty kids spoke for three minutes each. The show started at ten and nobody minded.' },
+          result: 'Forty kids spoke for three minutes each, and the show started at ten and nobody minded.' },
         { id: 'ACCEPT', label: 'Run the show and skip the hearing', likely: 'A full room, and a petition without voices.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1 }],
-          result: 'The room was full. The board heard from the landlord and nobody else.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The room was full, and the board heard from the landlord and nobody else.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'LANSING_MI_THIRD_CITATION', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -143,13 +143,13 @@ SB.Cities.register('lansing-mi', {
       options: [
         { id: 'QUIET', label: 'Keep it short and quiet, and pay the host something', likely: 'A tight night and a small thank-you.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'MONEY', amount: -25 }],
-          result: 'Done by ten and the street was empty. The host slept for once.' },
+          result: 'You were done by ten and the street was empty, and the host slept for once.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A packed night and a bad risk.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1 }, { op: 'STRESS', d: 1 }],
-          result: 'The room was full and loud. Nobody called, this time.' },
+          result: 'The room was full and loud, and nobody called this time.' },
         { id: 'MOVE', label: 'Move it to a hall', likely: 'Safe, with a fee and a smaller room.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .8 }],
-          result: 'A hall took the bill. It was clean and legal and a little stiff.' }
+          result: 'A hall took the bill, and it was clean and legal and a little stiff.' }
       ] },
 
     { id: 'LANSING_MI_GAME_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -158,15 +158,15 @@ SB.Cities.register('lansing-mi', {
       title: 'The game-day squeeze',
       body: 'The stadium crowd takes every road on the east side, and your show is on the wrong side of it. After the game, the same crowd will be looking for a place to be loud.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the crowd clears', likely: 'The ones who want a night out come. Later than planned.',
+        { id: 'LATE', label: 'Push doors back until the crowd clears', likely: 'The ones who want a night out come, but later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors at nine. Strangers in jerseys wandered in with the regulars.' },
+          result: 'Doors were at nine, and strangers in jerseys wandered in with the regulars.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list is stuck in traffic.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The road never moved. The room was the ones who walked.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The road never moved, so the room was the ones who walked.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] }
   ]
 });

@@ -122,12 +122,12 @@ SB.Cities.register('portland-me', {
       title: 'The vans are getting towed',
       body: 'From ten the peninsula is a tow zone, and the side streets are where the touring vans always end up. The bill has three vans and one legal lot, by the waterfront.',
       options: [
-        { id: 'EARLY', label: 'Cut the night short and get everyone out by ten', likely: 'A tight bill. The late crowd misses it.',
+        { id: 'EARLY', label: 'Cut the night short and get everyone out by ten', likely: 'It\'s a tight bill, and the late crowd misses it.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors early and done by ten. The vans were out before the plows came.' },
+          result: 'Doors were early and you were done by ten, and the vans were out before the plows came.' },
         { id: 'LOT', label: 'Pay for the waterfront lot and play on', likely: 'Costs money, and the crowd shrinks a little.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Everybody parked down by the water and walked up through the snow. The room was warm and loud.' },
+          result: 'Everybody parked down by the water and walked up through the snow, and the room was warm and loud.' },
         { id: 'ACCEPT', label: 'Run it as planned and hope', likely: 'Nobody wants to lose a van.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'Half the list stayed home, and two bands left in the middle of the headliner to move their van.' }
@@ -137,17 +137,17 @@ SB.Cities.register('portland-me', {
       if: { daysOut: [0, 3], months: [6, 7, 8, 9] },
       telegraph: 'The island show is on, and the last boat back leaves at a quarter to nine.',
       title: 'The last boat',
-      body: 'The set times are set by the ferry, not by you. The headliner wants a full set, and the last boat does not wait for anyone.',
+      body: 'The ferry sets the set times, and the headliner wants a full set, but the last boat does not wait for anyone.',
       options: [
-        { id: 'CUT', label: 'Cut the bill short and make the boat', likely: 'Shorter sets. Everyone gets home.',
+        { id: 'CUT', label: 'Cut the bill short and make the boat', likely: 'Shorter sets, and everyone gets home.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The headliner cut two songs and everyone ran for the dock. The boat pulled out with the whole bill on the deck.' },
+          result: 'The headliner cut two songs and everyone ran for the dock, and the boat pulled out with the whole bill on the deck.' },
         { id: 'FLOOR', label: 'Let the bill sleep on the hall floor', likely: 'A full night, and a long morning.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
           result: 'The set ran as long as the bands wanted, and everyone slept on the hall floor with the tide outside.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could make the boat, made it.' }
+          result: 'You moved it a day, and the ones who could make the boat, made it.' }
       ] },
 
     { id: 'PORTLAND_ME_FIREWORKS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 60, bind: ['show'],
@@ -156,12 +156,12 @@ SB.Cities.register('portland-me', {
       title: 'The east end is closed',
       body: 'Streets are blocked from the hill to the Old Port. Anybody who loads in after dark cannot reach the door, and half the town is on the water.',
       options: [
-        { id: 'EARLY', label: 'Load in early and start before the fireworks', likely: 'A short, early night. The crowd comes after.',
+        { id: 'EARLY', label: 'Load in early and start before the fireworks', likely: 'It\'s a short, early night, and the crowd comes after.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
           result: 'Everything was loaded by six and the bill was done as the first rocket went up.' },
         { id: 'LATE', label: 'Push doors back until the crowds clear', likely: 'The ones who want a show come in after the crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors at ten. The room filled up with sunburned, loud people from the water.' },
+          result: 'Doors were at ten, and the room filled up with sunburned, loud people from the water.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Vans stuck behind the barricades.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'Two bands carried their gear in on foot, and the crowd went to the water instead.' }

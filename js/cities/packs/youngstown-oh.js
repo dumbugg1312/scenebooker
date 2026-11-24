@@ -105,51 +105,51 @@ SB.Cities.register('youngstown-oh', {
       if: { daysOut: [0, 3], weather: 'RAIN', months: [3, 4, 5, 6, 7, 8] },
       telegraph: 'It has rained all week and the bowling-alley room is taking on water.',
       title: 'The rock room is under water',
-      body: 'The flood shut the one room that holds the scene up, on show night. The bill has to land somewhere with a stage by dark.',
+      body: 'The flood shut the one room that holds the scene up, on show night, and the bill has to land somewhere with a stage by dark.',
       options: [
-        { id: 'STOREFRONT', label: 'Move the bill to a storefront', likely: 'Smaller, rougher, and on short notice.',
+        { id: 'STOREFRONT', label: 'Move the bill to a storefront', likely: 'It\'s smaller and rougher, and on short notice.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A storefront downtown took the bill. It was cramped and the floor held.' },
-        { id: 'BASEMENT', label: 'Move it to a basement', likely: 'Smaller and louder.',
+          result: 'A storefront downtown took the bill. It was cramped, and the floor held.' },
+        { id: 'BASEMENT', label: 'Move it to a basement', likely: 'It\'s smaller and louder.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .5 }],
-          result: 'A basement on the north side took the bill and packed in.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A basement on the north side took the bill, and everyone packed in.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] },
 
     { id: 'YOUNGSTOWN_OH_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'fair' },
       telegraph: 'Every kid in the south suburbs is at the fair this week, and the highways are jammed.',
       title: 'The valley is at the fair',
-      body: 'The fair has the whole valley on the roads, and your show is the same night. The only crowd left is the old heads who hate it.',
+      body: 'The fair has the whole valley on the roads, and your show is the same night, so the only crowd left is the old heads who hate it.',
       options: [
-        { id: 'OLDHEADS', label: 'Book it for the old heads', likely: 'Smaller, but the ones who come stay late.',
+        { id: 'OLDHEADS', label: 'Book it for the old heads', likely: 'It\'s smaller, but the people who come stay late.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
           result: 'The old heads filled the front and stayed to the last note.' },
         { id: 'LATE', label: 'Push doors back until the fair lets out', likely: 'The crowd arrives late and loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at ten. The fair crowd came in sunburned and ready.' },
+          result: 'Doors were at ten, and the fair crowd came in sunburned and ready.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list is at the fair.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The room was thin and the bands played to the ones who came.' }
+          result: 'The room was thin, and the bands played to the people who came.' }
       ] },
 
     { id: 'YOUNGSTOWN_OH_HALL_SHUT', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 4] },
       telegraph: 'The city is looking at the South Side hall again after a complaint.',
       title: 'The city shuts the hall',
-      body: 'The city closed the South Side hall by order after a complaint, and the booker has to find where the hall board\'s insurance lets the bill go.',
+      body: 'The city closed the South Side hall by order after a complaint, so the booker has to find where the hall board\'s insurance lets the bill go.',
       options: [
-        { id: 'OTHERHALL', label: 'Move to the other hall', likely: 'A different crowd, and a different rule list.',
+        { id: 'OTHERHALL', label: 'Move to the other hall', likely: 'You get a different crowd and a different rule list.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'The hill hall took the bill between a wedding and a fish fry.' },
-        { id: 'HOUSE', label: 'Move to a house', likely: 'Smaller, and nobody has to ask the board.',
+        { id: 'HOUSE', label: 'Move to a house', likely: 'It\'s smaller, and nobody has to ask the board.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A basement took the bill. The floor was packed.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A basement took the bill, and the floor was packed.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ],
 

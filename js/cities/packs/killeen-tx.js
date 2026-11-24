@@ -17,7 +17,7 @@ SB.Cities.register('killeen-tx', {
   blocklist: ['fort hood*', 'killeen daily herald*', 'whataburger*', 'waffle house*', 'dairy queen*', 'ironhorse*', 'central texas college*', 'baylor*'],
 
   blurb: ['An Army gate town in central Texas, all strip malls and tire shops, where the scene forms fast around whoever just arrived with a box of records.',
-          'Shows are hot garages and rented halls, and lineups change with every set of orders. Small, loyal and word of mouth.'],
+          'Shows are hot garages and rented halls, and lineups change with every set of orders. It\'s small and loyal and runs on word of mouth.'],
   hard: 'People rotate out on orders, and landlords and neighbors shut garages down.',
   region: 'Texas',
   houseType: 'GARAGE',

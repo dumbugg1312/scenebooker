@@ -16,7 +16,7 @@ SB.Cities.register('winston-salem-nc', {
   blocklist: ['wake forest*', 'texas pete*', 'cheerwine*', 'cook out*', 'biscuitville*', 'bojangles*', 'winston-salem journal*'],
 
   blurb: ['A quiet tobacco and textile city where old factories keep turning into labs and apartments. A few people hold the scene together, and a show feels like a regional get-together.',
-          'Garage and metal run old, folk-punk and indie run young. Everyone drives, and bands are known by people down the road.'],
+          'Garage and metal run old, folk-punk and indie run young, and everyone drives, so bands are known by people down the road.'],
   hard: 'Few rooms, patchy all-ages, and a college crowd that resets every semester.',
   region: 'the Piedmont',
   houseType: 'GARAGE',
@@ -108,14 +108,14 @@ SB.Cities.register('winston-salem-nc', {
       if: { daysOut: [0, 3], months: [6, 7, 8, 9, 10] },
       telegraph: 'The temporary teen curfew is on, and the all-ages club has been told the kids must be out by ten.',
       title: 'The kids have to be home by ten',
-      body: 'A Saturday all-ages bill, and everyone under eighteen must be off the street at ten. The headliners can go on at nine, or the last band can play to half a room.',
+      body: 'It\'s a Saturday all-ages bill, and everyone under eighteen must be off the street at ten. The headliners can go on at nine, or the last band can play to half a room.',
       options: [
-        { id: 'EARLY', label: 'Start early and put the headliners on at nine', likely: 'A short, tight night. The kids make it home.',
+        { id: 'EARLY', label: 'Start early and put the headliners on at nine', likely: 'It\'s a short, tight night, and the kids make it home.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Doors at five, the headliners on at nine, and the kids out the door by ten.' },
+          result: 'Doors were at five and the headliners went on at nine, and the kids were out the door by ten.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The last band plays to the grown-ups.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: 'By ten the room was half the size. The last band played to the older crowd and a bartender.' }
+          result: 'By ten the room was half the size, and the last band played to the older crowd and a bartender.' }
       ] },
 
     { id: 'WINSTON_SALEM_NC_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -126,24 +126,24 @@ SB.Cities.register('winston-salem-nc', {
       options: [
         { id: 'LATE', label: 'Push doors back until after dark', likely: 'The kids come when the midway closes.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Doors an hour late. The fair crowd drifted in smelling of funnel cake.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'An empty room early. A fuller one late.',
+          result: 'Doors opened an hour late, and the fair crowd drifted in smelling of funnel cake.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The room is empty early and fuller late.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'Quiet early and full by ten. The regulars were glad of the space.' }
+          result: 'It was quiet early and full by ten, and the regulars were glad of the space.' }
       ] },
 
     { id: 'WINSTON_SALEM_NC_RACE_NIGHT', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'race' },
       telegraph: 'The stock-car season is on and the Saturday race lets out at ten.',
       title: 'The race lets out at ten',
-      body: 'The stock-car crowd spills out at ten and some of them wander into the bar with a stage that is twenty-one and up. The younger punks watch from the sidewalk.',
+      body: 'The stock-car crowd spills out at ten and some of them wander into the bar with the stage, which is twenty-one and up, while the younger punks watch from the sidewalk.',
       options: [
-        { id: 'LATE', label: 'Push the set back an hour', likely: 'A bigger crowd late, and a tired band.',
+        { id: 'LATE', label: 'Push the set back an hour', likely: 'You get a bigger crowd late, and a tired band.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }],
-          result: 'Doors an hour late. A few racing fans stayed for the last band.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The under-twenty-ones stay outside.',
+          result: 'Doors opened an hour late, and a few racing fans stayed for the last band.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The people under twenty-one stay outside.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'The twenty-ones came in, the younger kids watched from the sidewalk.' }
+          result: 'The twenty-ones came in, and the younger kids watched from the sidewalk.' }
       ] }
   ]
 });

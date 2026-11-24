@@ -123,13 +123,13 @@ SB.Cities.register('fort-collins-co', {
       options: [
         { id: 'LATE', label: 'Push doors back until the tailgate dies down', likely: 'The ones who want a night out show up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The overflow came down the stairs loud and glad.' },
+          result: 'Doors went an hour late, and the overflow came down the stairs loud and glad.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed out in the lot. The regulars came.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed out in the lot, but the regulars came.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'FORT_COLLINS_CO_WYOMING_SNOW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -138,15 +138,15 @@ SB.Cities.register('fort-collins-co', {
       title: 'The snow is on the interstate',
       body: 'The interstate is closed from Wyoming and the touring band is crawling toward the east side garage, three hours late.',
       options: [
-        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start. The crowd gets restless.',
+        { id: 'WAIT', label: 'Hold the doors and wait for them', likely: 'A late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at ten. You started late and nobody left.' },
+          result: 'The van pulled in at ten, and you started late but nobody left.' },
         { id: 'SHORT', label: 'Run the locals and play on', likely: 'A thinner night, but a warm one.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The local bands played long and loose. The headliner got the last ten minutes.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The local bands played long and loose, and the headliner got the last ten minutes.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] },
 
     { id: 'FORT_COLLINS_CO_QUIET_HOUR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -157,13 +157,13 @@ SB.Cities.register('fort-collins-co', {
       options: [
         { id: 'EARLY', label: 'Start early and finish before the hour', likely: 'Short, loud and legal.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done before the hour. Everyone went home happy and a little deaf.' },
+          result: 'Doors were early and you were done before the hour, and everyone went home happy and a little deaf.' },
         { id: 'TALK', label: 'Talk to the neighbor yourself', likely: 'Takes the evening, but it earns something.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'You knocked on the door with a flyer. She said she would sit on the porch.' },
+          result: 'You knocked on the door with a flyer, and she said she would sit on the porch.' },
         { id: 'ACCEPT', label: 'Run it and hope', likely: 'The next call comes with a car.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Two more calls and the officer was in the driveway. You shut it at nine.' }
+          result: 'After two more calls the officer was in the driveway, and you shut it at nine.' }
       ] }
   ]
 });

@@ -11,7 +11,7 @@ SB.Cities.register('indianapolis', {
   blocklist: ['indystar*', 'indianapolis star*', 'nuvo*', 'gen con*', 'indy 500*', 'lucas oil*', 'brickyard 400*'],
 
   blurb: ['A flat, car-bound state capital wrapped in a ring road, with a young hardcore crowd that carries the all-ages rooms in the old brick strips.',
-          'Everyone drives in from the suburbs and leaves right after. Rooms open and close when the landlord sells the block, and the scene spreads thin across the neighborhoods.'],
+          'Everyone drives in from the suburbs and leaves right after the show. Rooms open and close when the landlord sells the block, so the scene spreads thin across the neighborhoods.'],
   hard: 'Kids need rides home to the suburbs, and halls vanish when buildings sell.',
   region: 'the Midwest',
   houseType: 'BASEMENT',
@@ -122,9 +122,9 @@ SB.Cities.register('indianapolis', {
       if: { daysOut: [0, 3], weather: 'RAIN', months: [4, 5, 6] },
       telegraph: 'A tornado watch is up for the whole county this week.',
       title: 'The sirens go off mid-set',
-      body: 'The tornado sirens start in the middle of the second band. Half the room is looking at their phones, and the host wants everyone in the basement now.',
+      body: 'The tornado sirens start in the middle of the second band. Half the room is looking at their phones, and the host wants everyone in the basement right now.',
       options: [
-        { id: 'BASEMENT', label: 'Move everyone down to the basement and keep playing', likely: 'Cramped and loud, and nobody leaves.',
+        { id: 'BASEMENT', label: 'Move everyone down to the basement and keep playing', likely: 'It\'s cramped and loud, and nobody leaves.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'REGULARS', pct: .02 }],
           result: 'The set finished by flashlight with the whole crowd packed between the pipes.' },
         { id: 'WAIT', label: 'Stop the show and wait it out', likely: 'The night loses its energy and a lot of kids leave early.',
@@ -132,21 +132,21 @@ SB.Cities.register('indianapolis', {
           result: 'The sirens ran an hour. By the time they stopped, most of the kids had gone home.' },
         { id: 'MOVE', label: 'Call it and move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'INDIANAPOLIS_KID_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [3, 4, 5, 6, 7, 8, 9, 10] },
       telegraph: 'Police are walking the strip around closing and checking the ages of kids on the street.',
       title: 'Off the street by eleven',
-      body: 'Half the weeknight bill is sixteen, and the city has started enforcing the curfew. The headliner is booked for ten forty-five.',
+      body: 'Half the weeknight bill is sixteen, and the city has started enforcing the curfew, but the headliner is booked for ten forty-five.',
       options: [
-        { id: 'EARLY', label: 'Move every set time up an hour', likely: 'The kids get home in time, and the early bands play to a thin floor.',
+        { id: 'EARLY', label: 'Move every set time up an hour', likely: 'The kids get home in time, but the early bands play to a thin floor.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at six and the last chord at ten. The headliner played to a floor that was still filling.' },
-        { id: 'MATINEE', label: 'Turn it into an afternoon bill', likely: 'A different crowd, and a lot less money at the bar.',
+          result: 'Doors were at six and the last chord at ten, and the headliner played to a floor that was still filling.' },
+        { id: 'MATINEE', label: 'Turn it into an afternoon bill', likely: 'You get a different crowd and a lot less money at the bar.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -180 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The bands played in daylight and every kid was home for dinner.' },
+          result: 'The bands played in daylight, and every kid was home for dinner.' },
         { id: 'ACCEPT', label: 'Run it as booked', likely: 'Parents are nervous and the older kids leave early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'The headliner started at a quarter to eleven to half a room.' }
@@ -158,12 +158,12 @@ SB.Cities.register('indianapolis', {
       title: 'Race weekend in May',
       body: 'The big race has the hotels full and the lots taken. The headliner cannot find a spot to load in, but a lot of strangers are wandering the strip.',
       options: [
-        { id: 'LEAN', label: 'Pitch the show to the visitors', likely: 'A looser crowd that has never heard the bands.',
+        { id: 'LEAN', label: 'Pitch the show to the visitors', likely: 'You get a looser crowd that has never heard the bands.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.1 }, { op: 'REGULARS', pct: .02 }],
           result: 'A hand-lettered sign on the sidewalk pulled in a dozen out-of-towners who stayed for the set.' },
         { id: 'LATE', label: 'Push doors back until the traffic breaks', likely: 'The locals come late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The ones who came were glad to be out of traffic.' },
+          result: 'Doors opened an hour late, and the ones who came were glad to be out of traffic.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The regulars skip it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'The regulars stayed away from the whole area.' }
@@ -173,17 +173,17 @@ SB.Cities.register('indianapolis', {
       if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
       telegraph: 'The last show on the porch left fireworks smoke over the block, and the neighbors noticed.',
       title: 'The porch neighbors call it in',
-      body: 'Police came to the house after the smoke and the shouting. The host has a choice between going quiet and cancelling the next three.',
+      body: 'Police came to the house after the smoke and the shouting. The host can go quiet or cancel the next three shows.',
       options: [
-        { id: 'QUIET', label: 'Stop posting the address and keep it small', likely: 'Fewer people, and the ones who come know the rules.',
+        { id: 'QUIET', label: 'Stop posting the address and keep it small', likely: 'You get fewer people, and the ones who come know the rules.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'The address went out by word of mouth only. The room was small, quiet and tight.' },
-        { id: 'MOVE', label: 'Move it to a room with a lease', likely: 'Costs money. Safer.',
+          result: 'The address went out by word of mouth only, and the room was small, quiet and tight.' },
+        { id: 'MOVE', label: 'Move it to a room with a lease', likely: 'It costs money, but it\'s safer.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'MONEY', amount: -40 }],
           result: 'A leased room took the bill. It cost forty dollars and nobody had to hide.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The block is watching.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'A cruiser idled at the corner the whole night and the bands played short.' }
+          result: 'A cruiser idled at the corner the whole night, and the bands played short sets.' }
       ] }
   ]
 });

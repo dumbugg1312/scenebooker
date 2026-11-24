@@ -105,17 +105,17 @@ SB.Cities.register('trenton-nj', {
       if: { daysOut: [0, 4], months: [4, 10] },
       telegraph: 'The big punk flea market takes the arena this weekend, and every kid on the list wants to be there.',
       title: 'Two places to be',
-      body: 'The flea market weekend packs the arena and the streets around it on the same Saturday as your basement show. Everyone wants both.',
+      body: 'The flea market weekend packs the arena and the streets around it on the same Saturday as your basement show, and everyone wants both.',
       options: [
         { id: 'LATE', label: 'Push doors back until the arena empties out', likely: 'The ones who want a night out come over late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Doors went late and the room filled after the arena let out.' },
+          result: 'Doors went late, and the room filled after the arena let out.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the arena.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'The casual crowd went to the arena. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd went to the arena, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'TRENTON_NJ_NINE_FIFTY_NINE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -124,15 +124,15 @@ SB.Cities.register('trenton-nj', {
       title: 'The run for the cars',
       body: 'A hall show for the under-eighteens has to end with a run to the cars at the curb before the cops roll by.',
       options: [
-        { id: 'SHORT', label: 'Finish by nine-thirty and get everyone out', likely: 'Short sets. A calm curb.',
+        { id: 'SHORT', label: 'Finish by nine-thirty and get everyone out', likely: 'The sets are short, and the curb stays calm.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'You finished early and the kids were in cars before the patrol came by.' },
+          result: 'You finished early, and the kids were in cars before the patrol came by.' },
         { id: 'PARENTS', label: 'Have the parents wait at the door at nine-forty-five', likely: 'Half the room leaves before the last band.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
-          result: 'Parents lined the door and the room thinned before the headliner.' },
+          result: 'Parents lined the door, and the room thinned before the headliner.' },
         { id: 'ACCEPT', label: 'Run it long and risk it', likely: 'Some kids will not make it home in time.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'The kids ran for the cars after the last song. Nobody got stopped.' }
+          result: 'The kids ran for the cars after the last song, and nobody got stopped.' }
       ] },
 
     { id: 'TRENTON_NJ_AIRLESS', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -141,15 +141,15 @@ SB.Cities.register('trenton-nj', {
       title: 'The basement is airless',
       body: 'The room under the bar has no air and the heat is climbing. A fan gets heat sick near the front, and the owner has to decide whether to open the street door.',
       options: [
-        { id: 'OPEN', label: 'Open the street door and let the noise out', likely: 'Cooler. Louder, to the neighbors.',
+        { id: 'OPEN', label: 'Open the street door and let the noise out', likely: 'It\'s cooler, but louder to the neighbors.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The street door stood open all night. The room cooled and the neighbors heard every song.' },
-        { id: 'WATER', label: 'Hand out water and run a short bill', likely: 'A short night, but nobody falls over.',
+          result: 'The street door stood open all night. The room cooled, and the neighbors heard every song.' },
+        { id: 'WATER', label: 'Hand out water and run a short bill', likely: 'It\'s a short night, but nobody falls over.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
-          result: 'You handed out water by the case and cut the bill short. Everyone stayed upright.' },
+          result: 'You handed out water by the case and cut the bill short, and everyone stayed upright.' },
         { id: 'ACCEPT', label: 'Run it hot and hope', likely: 'The kids who came will sweat through it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: 'It was brutal. The ones who stayed loved it and the rest went home.' }
+          result: 'It was brutal. The ones who stayed loved it, and the rest went home.' }
       ] }
   ]
 });

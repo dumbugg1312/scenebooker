@@ -12,7 +12,7 @@ SB.Cities.register('evansville-in', {
   blocklist: ['university of evansville*', 'courier & press*', 'courier and press*', 'nut club*', 'frog follies*', 'hydrofest*', 'drums on the ohio*', 'bosse field*'],
 
   blurb: ['A small river-city scene where metal and hardcore anchor the bill and a few organizers hold it together. Everyone has a day job and a long drive to anywhere.',
-          'There is no steady venue. Free outdoor days, a bookstore series and a rented-out mall space stand in for one.'],
+          'There is no steady venue, so free outdoor days, a bookstore series and a rented-out mall space stand in for one.'],
   hard: 'Few rooms, and the same few people book all of them.',
   region: 'the Ohio Valley',
   houseType: 'GARAGE',
@@ -120,10 +120,10 @@ SB.Cities.register('evansville-in', {
       options: [
         { id: 'CART', label: 'Load in by hand cart and run it anyway', likely: 'A slow load-in and a late start, but the crowd is already in the neighborhood.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The amps went in on dollies and shopping carts. Doors opened an hour late to a crowd in a good mood.' },
-        { id: 'EAST', label: 'Move the bill to the East Side', likely: 'Easy parking, a smaller and stranger crowd.',
+          result: 'The amps went in on dollies and shopping carts, and doors opened an hour late to a crowd in a good mood.' },
+        { id: 'EAST', label: 'Move the bill to the East Side', likely: 'Parking is easy, but the crowd is smaller and stranger.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'CLUB', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The bill ran on the east side with room to park. Fewer people made the drive.' },
+          result: 'The bill ran on the east side with room to park, but fewer people made the drive.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Nobody wants to fight the barricades.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'Most of the list stayed home rather than hunt for a spot.' }
@@ -135,7 +135,7 @@ SB.Cities.register('evansville-in', {
       title: 'The mall locks up before the headliner',
       body: 'The touring date in the old department-store wing has a late headliner, and the mall\'s closing time is coming first. Management is standing by the door with a ring of keys.',
       options: [
-        { id: 'EARLY', label: 'Cut the openers short and put the headliner on early', likely: 'A tight night. The locals feel it.',
+        { id: 'EARLY', label: 'Cut the openers short and put the headliner on early', likely: 'It\'s a tight night, and the locals feel it.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'Every local got fifteen minutes and the headliner played a full set before the lights came up.' },
         { id: 'PAY', label: 'Pay the mall to keep a guard and the doors open', likely: 'Costs money but saves the night.',
@@ -152,13 +152,13 @@ SB.Cities.register('evansville-in', {
       title: 'A storm warning at seven',
       body: 'The free day on the corner is in full swing when the warning comes through. The generator belongs to the label, and so does the tarp.',
       options: [
-        { id: 'TARP', label: 'Cover the gear and play through the first rain', likely: 'Wet and loud. The ones who stay will not forget it.',
+        { id: 'TARP', label: 'Cover the gear and play through the first rain', likely: 'It\'s wet and loud, and the ones who stay will not forget it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'REGULARS', pct: .02 }],
           result: 'The drummer played under a tarp and the crowd stood in the rain with their hands up.' },
         { id: 'STOP', label: 'Stop the show and wait for it to pass', likely: 'Most of the people leave and do not come back.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
           result: 'The storm took an hour and half the street had gone home by the time it passed.' },
-        { id: 'MOVE', label: 'Move the last bands indoors', likely: 'Breaks the free-for-all feel, costs trust.',
+        { id: 'MOVE', label: 'Move the last bands indoors', likely: 'It breaks the free-for-all feel and costs you some trust.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'CLUB', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .5 }],
           result: 'The last three bands finished indoors to a crowded, dripping room.' }
       ] },
@@ -169,15 +169,15 @@ SB.Cities.register('evansville-in', {
       title: 'The drummer is on the wrong side of the bridge',
       body: 'The bridge between Evansville and Henderson is a parking lot for the race weekend. Your drummer is on one side of it and the kit is on the other.',
       options: [
-        { id: 'WAIT', label: 'Hold the doors until the van gets across', likely: 'A late start. The crowd stays in the lot.',
+        { id: 'WAIT', label: 'Hold the doors until the van gets across', likely: 'The start is late, but the crowd stays in the lot.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van crossed at nine thirty. The show started late and nobody left.' },
+          result: 'The van crossed at nine thirty, and the show started late but nobody left.' },
         { id: 'BORROW', label: 'Borrow a kit and play on', likely: 'It sounds worse, but it happens.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'A borrowed kit and a loose set. The band made it work.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The band played a loose set on a borrowed kit and made it work.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] }
   ]
 });

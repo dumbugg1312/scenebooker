@@ -112,34 +112,34 @@ SB.Cities.register('burlington-vt', {
       if: { daysOut: [0, 3], calendar: 'graduation' },
       telegraph: 'The Hill is full of students and the neighbors are already complaining.',
       title: 'Ten o\'clock on the Hill',
-      body: 'It is move-in weekend and the cellar is packed with students. The neighbors call the noise line right at ten, and the house is on a quiet-hours warning.',
+      body: 'It is move-in weekend, and the cellar is packed with students. The neighbors call the noise line right at ten, and the house is on a quiet-hours warning.',
       options: [
         { id: 'EARLY', label: 'Start early and finish before ten', likely: 'The ones who came get a short, tight night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Done at ten sharp. The street was quiet when the car pulled up.' },
-        { id: 'MOVE', label: 'Move the bill to a hall', likely: 'Breaks the plan. Costs a little.',
+          result: 'You were done at ten sharp, and the street was quiet when the car pulled up.' },
+        { id: 'MOVE', label: 'Move the bill to a hall', likely: 'Breaks the plan, and costs a little.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The hall took it for a donation and a handshake. The crowd followed.' },
+          result: 'The hall took it for a donation and a handshake, and the crowd followed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The house takes the heat.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The call came at ten past. The room emptied before anyone came to the door.' }
+          result: 'The call came at ten past, and the room emptied before anyone came to the door.' }
       ] },
 
     { id: 'BURLINGTON_VT_PREMIUM', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], months: [6, 7, 8] },
       telegraph: 'The bar on the north end got a renewal letter from its insurer.',
       title: 'The premium triples',
-      body: 'The bar\'s insurer renewed its liquor liability at three times the price in the middle of summer. The owner will only offer an early all-ages Sunday.',
+      body: 'The bar\'s insurer renewed its liquor liability at three times the price in the middle of summer, and the owner will only offer an early all-ages Sunday.',
       options: [
-        { id: 'SUNDAY', label: 'Take the early Sunday', likely: 'Smaller, with no drinking.',
+        { id: 'SUNDAY', label: 'Take the early Sunday', likely: 'It\'s smaller, with no drinking.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'An early Sunday with the kids up front and nobody at the bar.' },
-        { id: 'CHIP', label: 'Chip in for the owner', likely: 'Costs forty dollars. The date stays.',
+          result: 'It was an early Sunday with the kids up front and nobody at the bar.' },
+        { id: 'CHIP', label: 'Chip in for the owner', likely: 'It costs forty dollars, and the date stays.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'REGULARS', pct: .02 }],
-          result: 'You passed the hat. The owner kept the date.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You passed the hat, and the owner kept the date.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'BURLINGTON_VT_SNOW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -148,12 +148,12 @@ SB.Cities.register('burlington-vt', {
       title: 'The interstate is shut',
       body: 'Snow has closed the interstate and the feeder towns cannot reach the show. The Winooski crowd walks across the river instead.',
       options: [
-        { id: 'SHORT', label: 'Run it with who can walk', likely: 'A thin night, but the ones who came are glad.',
+        { id: 'SHORT', label: 'Run it with who can walk', likely: 'It\'s a thin night, but the ones who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The valley never made it. The Winooski kids did.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The valley never made it, but the Winooski kids did.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ]
 });

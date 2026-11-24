@@ -120,17 +120,17 @@ SB.Cities.register('orlando', {
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'Crews are working on the interstate through the middle of town this week.',
       title: 'The interstate is a parking lot',
-      body: 'A wreck on I-4 has the whole corridor backed up the night of your show. The bands and the kids from the suburbs are stuck.',
+      body: 'A wreck on I-4 has the whole corridor backed up the night of your show, and the bands and the kids from the suburbs are stuck.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to use the interstate.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The ones outside the city stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The backup never cleared, so the people outside the city stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the toll roads together. They will remember that.' }
+          result: 'Two carloads took the toll roads together.' }
       ] },
 
     { id: 'ORLANDO_BOWL_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -141,13 +141,13 @@ SB.Cities.register('orlando', {
       options: [
         { id: 'LATE', label: 'Push doors back until the game crowd thins out', likely: 'A late start, but the regulars find a way in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The streets cleared and the room filled up.' },
+          result: 'Doors opened an hour late, and the streets cleared and the room filled up.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Nobody can park, and half the list gives up.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The lots were full by noon. The room was thin and sour.' },
+          result: 'The lots were full by noon, and the room was thin and sour.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'ORLANDO_SCARE_SHIFT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -158,10 +158,10 @@ SB.Cities.register('orlando', {
       options: [
         { id: 'LATE', label: 'Start late and wait for them', likely: 'A late night, but the whole band plays.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'They came straight from work in half their makeup. The set was loose and loud.' },
+          result: 'They came straight from work in half their makeup, and the set was loose and loud.' },
         { id: 'SHORT', label: 'Cut the set short and play on', likely: 'A thin night, but the ones who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'A short set with a fill-in drummer. The ones who came did not mind.' }
+          result: 'A short set with a fill-in drummer, and the people who came did not mind.' }
       ] }
   ]
 });

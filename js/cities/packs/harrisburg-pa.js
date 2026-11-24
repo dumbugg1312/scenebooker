@@ -12,7 +12,7 @@ SB.Cities.register('harrisburg-pa', {
   /* Dossier institutions and its unchecked invented venue names are banned: research, not content. */
   blocklist: ['pennlive*', 'sheetz*', 'wawa*', 'yuengling*', 'farm show*', 'kipona*', 'paxton street hall*', 'camelback room*'],
 
-  blurb: ['A capital whose downtown shuts at five, so the kids carry the scene out to basements and fire halls. Cheap rowhouse cellars, a car for everyone.',
+  blurb: ['A capital whose downtown shuts at five, so the kids carry the scene out to basements and fire halls. The rowhouse cellars are cheap, and everyone has a car.',
           'The river is the west edge, and the West Shore bands have to cross a bridge to play in town. Baltimore and Philadelphia keep pulling the ambitious ones away.'],
   hard: 'Tiny walkable core; most rooms are halls and houses far apart.',
   region: 'the Mid-Atlantic',
@@ -117,63 +117,63 @@ SB.Cities.register('harrisburg-pa', {
       title: 'The expo week eats the roads',
       body: 'Eight days of expo crowds have the north end at a crawl, and the van from Baltimore is stuck in it somewhere on the way to your show.',
       options: [
-        { id: 'EARLY', label: 'Move doors up an hour so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLY', label: 'Move doors up an hour so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came left work before the roads locked.' },
+          result: 'You opened doors an hour early, and the people who came left work before the roads locked up.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Most of the people who have to cross the north end stay home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The expo crowd had the roads. Half the list never made the trip.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The expo crowd had the roads, and half the list never made the trip.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'HARRISBURG_PA_RIVER_FEST', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival', months: [9] },
       telegraph: 'The riverfront is filling up for the holiday weekend, and every parking spot is spoken for.',
       title: 'The river is full',
-      body: 'The holiday weekend has the riverfront packed and the parking gone. Your show starts as the fireworks end, and the kids from the West Shore have to cross a bridge in all of it.',
+      body: 'The holiday weekend has the riverfront packed and the parking gone. Your show starts as the fireworks end, and the kids from the West Shore have to cross a bridge in the middle of all of it.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the fireworks are over', likely: 'The ones who want a night out come in late.',
+        { id: 'LATE', label: 'Push doors back until the fireworks are over', likely: 'The people who want a night out come in late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in off the riverfront, loud and happy.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the river.',
+          result: 'You opened doors an hour late, and the crowd came in off the riverfront, loud and happy.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is down at the river.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed on the riverbank. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed on the riverbank, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'HARRISBURG_PA_LICENSE_PULLED', when: 'WEEK', tier: 'HARD', weight: 1, cooldown: 60, bind: ['show'],
       if: { daysOut: [0, 3] },
       telegraph: 'A club across town just lost its license, and the other bookers are scrambling.',
       title: 'The club loses its license',
-      body: 'The room on your routing was shut by the city over a tax bill, with the bands already on the road. The show has to go somewhere within the week.',
+      body: 'The city shut the room on your routing over a tax bill with the bands already on the road, and the show has to go somewhere within the week.',
       options: [
-        { id: 'HOUSE', label: 'Move the whole bill to a house', likely: 'Smaller and louder. Nobody can pull a house license.',
+        { id: 'HOUSE', label: 'Move the whole bill to a house', likely: 'It\'s smaller and louder, and nobody can pull a house license.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement took the bill with a day to spare, and the floor was packed.' },
-        { id: 'HALL', label: 'Find a hall and eat the rent', likely: 'Costs forty dollars. The hall wants a say in the bill.',
+        { id: 'HALL', label: 'Find a hall and eat the rent', likely: 'It costs forty dollars, and the hall wants a say in the bill.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'A borough hall took the bill. The board watched from the kitchen.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'A borough hall took the bill, and the board watched from the kitchen.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everybody trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] },
 
     { id: 'HARRISBURG_PA_CURFEW_SWEEP', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 3], months: [9, 10, 11, 12, 1, 2, 3, 4, 5] },
-      telegraph: 'The city says it will reinforce the youth curfew, and police are returning kids to their parents.',
+      telegraph: 'The city says it will enforce the youth curfew, and police are returning kids to their parents.',
       title: 'The curfew is reinforced',
       body: 'Police are stopping anyone under 18 on the walk home after ten on a school night. Your all-ages show runs past that, and the kids know it.',
       options: [
-        { id: 'EARLY', label: 'End the show early so nobody walks home late', likely: 'A short night. The parents like it.',
+        { id: 'EARLY', label: 'End the show early so nobody walks home late', likely: 'It\'s a short night, and the parents like it.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Done by ten. The kids went home in time and the parents noticed.' },
+          result: 'The show was done by ten, the kids got home in time, and the parents noticed.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The younger kids leave early or stay home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The youngest left at nine-thirty. The floor thinned out by the last band.' }
+          result: 'The youngest left at nine-thirty, and the floor thinned out by the last band.' }
       ] }
   ]
 });

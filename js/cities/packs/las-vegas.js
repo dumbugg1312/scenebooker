@@ -121,29 +121,29 @@ SB.Cities.register('las-vegas', {
       title: 'The band gets off at two',
       body: 'The drummer and the bass player are both on the graveyard shift, and the late bill is a Tuesday for them. Nobody will have an amp in the room before the doors.',
       options: [
-        { id: 'LATE', label: 'Push the whole bill late and let them load in after the shift', likely: 'The room is full of people in work shirts. The neighbors are asleep.',
+        { id: 'LATE', label: 'Push the whole bill late and let them load in after the shift', likely: 'The room fills with people in work shirts, and the neighbors are asleep.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'REGULARS', pct: .01 }],
-          result: 'The doors opened at midnight. The crowd came off their shifts in vests and name tags.' },
+          result: 'The doors opened at midnight, and the crowd came straight off their shifts in vests and name tags.' },
         { id: 'SWAP', label: 'Swap them to the front and find a replacement headliner', likely: 'Costs an hour of phone calls.',
           effects: [{ op: 'HOURS', d: -1, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'A last-minute swap. The headliner was a friend with an amp and a day off.' },
+          result: 'It was a last-minute swap, and the new headliner was a friend with an amp and a day off.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A rough, tired set.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'They played on no sleep. It was loud and loose and over by eleven.' }
+          result: 'They played on no sleep, and it was loud and loose and over by eleven.' }
       ] },
 
     { id: 'LAS_VEGAS_FIVE_FIFTEEN', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 35, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'HEAT', months: [6, 7, 8, 9] },
       telegraph: 'The forecast says 115 all week.',
       title: 'It is 115 in the desert',
-      body: 'The desert show off the dirt road is an oven, and the generator keeps cutting out. The wind is only pushing hot air around.',
+      body: 'The desert show off the dirt road is an oven, and the generator keeps cutting out while the wind only pushes the hot air around.',
       options: [
-        { id: 'NIGHT', label: 'Start after dark, when the sun is down', likely: 'The ones who want to come do. A long wait in the heat.',
+        { id: 'NIGHT', label: 'Start after dark, when the sun is down', likely: 'The ones who want to come do, but it\'s a long wait in the heat.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'It cooled to a hundred by ten. The headlights lit the stage.' },
-        { id: 'ICE', label: 'Buy ice and water for everybody', likely: 'Costs forty dollars. People stay.',
+          result: 'It cooled to a hundred by ten, and the headlights lit the stage.' },
+        { id: 'ICE', label: 'Buy ice and water for everybody', likely: 'It costs forty dollars, and people stay.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Cases of cold water and electrolytes at the door. Nobody forgot it.' },
+          result: 'You put cases of cold water and electrolytes at the door.' },
         { id: 'ACCEPT', label: 'Run it as it is', likely: 'Half the crowd goes home early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'The ones who stayed were soaked and the generator died by eleven.' }
@@ -156,13 +156,13 @@ SB.Cities.register('las-vegas', {
       options: [
         { id: 'AFTER', label: 'Push doors until the class is over', likely: 'Late, but the room is yours after.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The last kid left at nine. The bands played in the empty ring\'s shadow.' },
-        { id: 'SHARE', label: 'Run both at once', likely: 'Loud and strange. The owner will remember.',
+          result: 'The last kid left at nine, and the bands played in the empty ring\'s shadow.' },
+        { id: 'SHARE', label: 'Run both at once', likely: 'It\'s loud and strange, and the owner will remember.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'REGULARS', pct: .01 }],
-          result: 'Kids in gloves watched the first band. Somebody sparred to the second.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Kids in gloves watched the first band, and somebody sparred to the second.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'LAS_VEGAS_ROAD_CLOSED', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show'],
@@ -173,13 +173,13 @@ SB.Cities.register('las-vegas', {
       options: [
         { id: 'CARRY', label: 'Carry the gear in by hand', likely: 'Costs an hour and a lot of sweat.',
           effects: [{ op: 'HOURS', d: -1, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'Eight people and a hand truck crossed three blocks of barricades. The set started late and loud.' },
+          result: 'Eight people and a hand truck crossed three blocks of barricades, and the set started late and loud.' },
         { id: 'LATE', label: 'Wait out the closures and start late', likely: 'The crowd trickles in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The road opened at ten. Everyone got in, tired and sunburned.' },
+          result: 'The road opened at ten, and everyone got in, tired and sunburned.' },
         { id: 'ACCEPT', label: 'Run what you can', likely: 'A short bill and a thin crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands made it. The rest watched the barriers from the van.' }
+          result: 'Two bands made it, and the rest watched the barriers from the van.' }
       ] }
   ]
 });

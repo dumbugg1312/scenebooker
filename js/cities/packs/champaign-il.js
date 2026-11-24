@@ -119,7 +119,7 @@ SB.Cities.register('champaign-il', {
         { id: 'LASTSHOW', label: 'Throw them a proper last show', likely: 'A packed night and a lot of goodbyes.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }, { op: 'REGULARS', pct: .02 }],
           result: 'The whole class came to see it out, and a few of the juniors took notes.' },
-        { id: 'NEXT', label: 'Take the keys and start the new crew early', likely: 'Smaller. The house stays alive.',
+        { id: 'NEXT', label: 'Take the keys and start the new crew early', likely: 'Smaller, but the house stays alive.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'REGULARS', pct: .01 }],
           result: 'A small night with the new crew learning where the breaker box is.' },
         { id: 'LET_GO', label: 'Let it go quiet for the summer', likely: 'Safe, but the address is lost.',
@@ -131,34 +131,34 @@ SB.Cities.register('champaign-il', {
       if: { daysOut: [0, 4], calendar: 'game' },
       telegraph: 'The near-campus blocks are walled with parked cars and police are posting at the intersections.',
       title: 'The football Saturday wall',
-      body: 'Traffic is stopped, the police are on every corner and the crowd is leaving for the stadium. Your show is in the middle of it.',
+      body: 'Traffic is stopped, the police are on every corner and the crowd is leaving for the stadium, and your show is in the middle of it.',
       options: [
-        { id: 'URBANA', label: 'Move it to the Urbana side', likely: 'Fewer cars and cops. A little less crowd.',
+        { id: 'URBANA', label: 'Move it to the Urbana side', likely: 'Fewer cars and cops, and a little less crowd.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
           result: 'A basement across the line was calm and full, and nobody fought the traffic to get there.' },
         { id: 'LATE', label: 'Start late, after the game lets out', likely: 'The crowd that wants a night out shows up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in loud and happy.' },
+          result: 'Doors opened an hour late, and the crowd came in loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed in the traffic. The regulars came.' }
+          result: 'The casual crowd stayed in the traffic, but the regulars came.' }
       ] },
 
     { id: 'CHAMPAIGN_IL_ZONING_LETTER', when: 'WEEK', tier: 'HARD', weight: 1, cooldown: 60, bind: ['show'],
       if: { daysOut: [0, 3] },
       telegraph: 'A neighbor has been counting cars, and somebody asked about the jar at the door.',
       title: 'The zoning inspector at the door',
-      body: 'The door money has grown, and so has the attention. An inspector and a neighbor are at the curb asking whether you are charging admission in a house.',
+      body: 'The door money has grown and so has the attention, and now an inspector and a neighbor are at the curb asking whether you are charging admission in a house.',
       options: [
-        { id: 'FREE', label: 'Drop the door money and run a free night', likely: 'Smaller pay. No letter.',
+        { id: 'FREE', label: 'Drop the door money and run a free night', likely: 'Smaller pay, but no letter.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'You emptied the jar and called it a party. The inspector left with a card and a look.' },
-        { id: 'HALL', label: 'Move the bill to a rented hall', likely: 'Costs money and the house crowd. Legal.',
+          result: 'You emptied the jar and called it a party, and the inspector left with a card and a look.' },
+        { id: 'HALL', label: 'Move the bill to a rented hall', likely: 'Costs money and the house crowd, but it\'s legal.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'MONEY', amount: -40 }],
-          result: 'A hall took the bill. It was clean and early and a little stiff.' },
-        { id: 'END', label: 'Call it before the second band', likely: 'The kids are angry. The house stays open.',
+          result: 'A hall took the bill, and it was clean and early and a little stiff.' },
+        { id: 'END', label: 'Call it before the second band', likely: 'The kids are angry, but the house stays open.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }, { op: 'REGULARS', pct: -.01 }],
-          result: 'You shut it down at the curb. The house kept its keys and the crowd kept its grudge.' }
+          result: 'You shut it down at the curb, and the house kept its keys while the crowd kept its grudge.' }
       ] }
   ]
 });

@@ -80,7 +80,7 @@ SB.Cities.register('bend-or', {
   ],
   "blurb": [
     "A few promoters keep punk and metal alive in bars, warehouses and backyards, and the same faces show up at every show.",
-    "Rents doubled, rooms vanish, and the cheap buildings keep turning into taprooms. Neighbors and landlords shut warehouses fast."
+    "Rents doubled, rooms vanish, and the cheap buildings keep turning into taprooms, and neighbors and landlords shut warehouses fast."
   ],
   "hard": "Few all-ages rooms, and neighbors and landlords shut warehouses fast.",
   "region": "the high desert",
@@ -748,7 +748,7 @@ SB.Cities.register('bend-or', {
               "v": 0.8
             }
           ],
-          "result": "A light-industrial unit took the bill. The landlord watched the lot all night."
+          "result": "A light-industrial unit took the bill, and the landlord watched the lot all night."
         },
         {
           "id": "MOVE",
@@ -761,7 +761,7 @@ SB.Cities.register('bend-or', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The smoke had not cleared."
+          "result": "You moved it a day, but the smoke had not cleared."
         },
         {
           "id": "ACCEPT",
@@ -802,7 +802,7 @@ SB.Cities.register('bend-or', {
       },
       "telegraph": "The pass is icing over and the ski weekend is filling every motel on the way.",
       "title": "The van is held at the pass",
-      "body": "A touring van is held at the pass by snow on a ski weekend. The bill is waiting, and the opener has already played two songs again.",
+      "body": "A touring van is held at the pass by snow on a ski weekend, the bill is waiting, and the opener has already played two songs again.",
       "options": [
         {
           "id": "SETS",
@@ -820,7 +820,7 @@ SB.Cities.register('bend-or', {
               "v": -1
             }
           ],
-          "result": "The opener played three sets. The room was warm and half full."
+          "result": "The opener played three sets, and the room was warm and half full."
         },
         {
           "id": "WAIT",
@@ -838,7 +838,7 @@ SB.Cities.register('bend-or', {
               "v": 0.9
             }
           ],
-          "result": "The van pulled in at ten. Nobody left."
+          "result": "The van pulled in at ten, and nobody left."
         },
         {
           "id": "MOVE",
@@ -851,7 +851,7 @@ SB.Cities.register('bend-or', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the people who could make it came."
         }
       ]
     },
@@ -897,7 +897,7 @@ SB.Cities.register('bend-or', {
               "v": 0.95
             }
           ],
-          "result": "Doors an hour late. The crowd came in loud from the park."
+          "result": "Doors opened an hour late, and the crowd came in loud from the park."
         },
         {
           "id": "ACCEPT",
@@ -910,7 +910,7 @@ SB.Cities.register('bend-or', {
               "v": 0.75
             }
           ],
-          "result": "The bar crowd stayed at the park. The regulars came."
+          "result": "The bar crowd stayed at the park, but the regulars came."
         },
         {
           "id": "MOVE",
@@ -923,7 +923,7 @@ SB.Cities.register('bend-or', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. A quieter night, and a smaller list."
+          "result": "You moved it a day, and it was a quieter night with a smaller list."
         }
       ]
     }

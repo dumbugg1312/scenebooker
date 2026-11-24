@@ -114,13 +114,13 @@ SB.Cities.register('san-luis-obispo-ca', {
       options: [
         { id: 'CUT', label: 'End the last band mid-set', likely: 'Nobody is happy, but the host keeps the house.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The last band stopped in the middle of a song. The kids filed out quietly and the host breathed again.' },
-        { id: 'MOVE', label: 'Move the bill to a garage down south', likely: 'A smaller crowd, and nobody to wake.',
+          result: 'The last band stopped in the middle of a song. The kids filed out quietly, and the host breathed again.' },
+        { id: 'MOVE', label: 'Move the bill to a garage down south', likely: 'The crowd is smaller, and there\'s nobody to wake.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'A bay by the airport took the bill with an hour to spare, and nobody called anybody.' },
         { id: 'ACCEPT', label: 'Play on and take the fine', likely: 'The host will remember who paid.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'MONEY', amount: -40 }],
-          result: 'They came back and wrote the ticket. It cost you, and the host noticed.' }
+          result: 'They came back and wrote the ticket, which cost you, and the host noticed.' }
       ] },
 
     { id: 'SAN_LUIS_OBISPO_CA_RIDGE_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -129,15 +129,15 @@ SB.Cities.register('san-luis-obispo-ca', {
       title: 'Half the crowd is on the ridge',
       body: 'The festival outside town has the scene for the day. Your show is in town, the same night, and nobody has said they are coming back down.',
       options: [
-        { id: 'LATE', label: 'Push doors back until they drive down', likely: 'A late start. The tired ones show up.',
+        { id: 'LATE', label: 'Push doors back until they drive down', likely: 'It starts late, and the tired ones show up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. They came down from the ridge dusty and loud.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'Thin, but the ones who skipped the ridge are the regulars.',
+          result: 'Doors were an hour late, and they came down from the ridge dusty and loud.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'It\'s thin, but the ones who skipped the ridge are the regulars.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The room was a third full. Everyone else was on the ridge.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The room was a third full, and everyone else was on the ridge.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'SAN_LUIS_OBISPO_CA_MARKET_NIGHT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -146,15 +146,15 @@ SB.Cities.register('san-luis-obispo-ca', {
       title: 'Six blocks with the amps',
       body: 'The street is shut for the market and the lot is full. The band has to carry its gear six blocks to the coffee shop.',
       options: [
-        { id: 'CARRY', label: 'Carry it and start late', likely: 'Sweaty, late and fine.',
+        { id: 'CARRY', label: 'Carry it and start late', likely: 'It\'s sweaty and late, and fine.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 45 }],
-          result: 'Six blocks with the amps, and a late start. The room was packed anyway.' },
-        { id: 'SHORT', label: 'Play a short acoustic bill', likely: 'Quieter, and fewer people.',
+          result: 'It was six blocks with the amps and a late start, and the room was packed anyway.' },
+        { id: 'SHORT', label: 'Play a short acoustic bill', likely: 'It\'s quieter, with fewer people.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands with no amps. The ones who came sat on the floor and liked it.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'Two bands played with no amps, and the ones who came sat on the floor and liked it.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ]
 });

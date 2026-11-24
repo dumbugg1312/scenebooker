@@ -14,7 +14,7 @@ SB.Cities.register('eugene-or', {
   blocklist: ['university of oregon*', 'eugene weekly*', 'oregon country fair*', 'register-guard*', 'track town*', 'emx*', 'klcc*', 'peacehealth*'],
 
   blurb: ['A college town where house shows are the engine and hosts knock on neighbors\' doors first. Punk is no longer the loudest sound in town, but the habit is old and stubborn, and hardcore and grind bills still fill yards and small rooms.',
-          'The police answer noise calls fast, and bars are 21 and over. The good nights are the quiet ones.'],
+          'The police answer noise calls fast and the bars are 21 and over, so the good nights are the quiet ones.'],
   hard: 'Noise complaints end house shows fast, and all-ages rooms are few.',
   region: 'the Northwest',
   houseType: 'GARAGE',
@@ -112,17 +112,17 @@ SB.Cities.register('eugene-or', {
       if: { daysOut: [0, 3], weather: 'RAIN', months: [10, 11, 12, 1, 2, 3, 4] },
       telegraph: 'A week of steady drizzle is settling over the valley.',
       title: 'The yard is a swamp',
-      body: 'The host planned the show for the backyard, and the backyard is mud. Wet months push everything under tarps or into the garage, and the neighbors are already watching.',
+      body: 'The host planned the show for the backyard, and the backyard is mud. In the wet months everything goes under tarps or into the garage, and the neighbors are already watching.',
       options: [
-        { id: 'TARPS', label: 'String tarps over the yard and play on', likely: 'Costs a little. Cold, damp and loud.',
+        { id: 'TARPS', label: 'String tarps over the yard and play on', likely: 'It costs a little, and it\'s cold, damp and loud.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The tarps held. The crowd stood in a steady drip and played along.' },
-        { id: 'GARAGE', label: 'Pack it into the garage', likely: 'Smaller and louder, with the neighbors a wall away.',
+          result: 'The tarps held, and the crowd stood in a steady drip and put up with it.' },
+        { id: 'GARAGE', label: 'Pack it into the garage', likely: 'It\'s smaller and louder, with the neighbors a wall away.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The garage took the bill. It was shoulder to shoulder and the door stayed shut.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The garage took the bill, and it was shoulder to shoulder with the door shut.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The sky cleared up and half the list had other plans.' }
+          result: 'You moved it a day, and the sky cleared up, but half the list had other plans.' }
       ] },
 
     { id: 'EUGENE_OR_NOISE_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -131,13 +131,13 @@ SB.Cities.register('eugene-or', {
       title: 'The call at twenty past nine',
       body: 'The host knocked on doors and left a note on the porch, but the neighbor on the left never got one. A police call comes in at 9:20 with the first band still on.',
       options: [
-        { id: 'KNOCK', label: 'Go knock on the door and apologize', likely: 'Costs a little and buys some goodwill. The crowd sees you leave.',
+        { id: 'KNOCK', label: 'Go knock on the door and apologize', likely: 'It costs a little and buys some goodwill, and the crowd sees you leave to do it.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }, { op: 'REGULARS', pct: .02 }],
-          result: 'The neighbor got a plate of cookies and a promise. The police car rolled on.' },
-        { id: 'SHORT', label: 'Cut the bill short and clear out', likely: 'Safe for the host. A thin, early night.',
+          result: 'The neighbor got a plate of cookies and a promise, and the police car rolled on.' },
+        { id: 'SHORT', label: 'Cut the bill short and clear out', likely: 'It\'s safe for the host, and it makes for a thin, early night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
-          result: 'You stopped after two bands. Nobody argued, and the host kept the house.' },
-        { id: 'ACCEPT', label: 'Keep playing and hope', likely: 'Risks a citation for the host.',
+          result: 'You stopped after two bands, nobody argued, and the host kept the house.' },
+        { id: 'ACCEPT', label: 'Keep playing and hope', likely: 'It risks a citation for the host.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
           result: 'The third band played to a quiet street, and the host got a warning in the morning.' }
       ] },
@@ -146,17 +146,17 @@ SB.Cities.register('eugene-or', {
       if: { daysOut: [0, 4], calendar: 'game' },
       telegraph: 'A home game is on Saturday, and cones are going up on the bridges.',
       title: 'Football Saturday',
-      body: 'Tens of thousands are coming into town for the game. No parking within a mile of campus, and half your usual crowd is stuck in the cone patterns on the bridges.',
+      body: 'Tens of thousands are coming into town for the game, there\'s no parking within a mile of campus, and half your usual crowd is stuck in the cone patterns on the bridges.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the traffic clears', likely: 'The crowd that gets through still wants a night out.',
+        { id: 'LATE', label: 'Push doors back until the traffic clears', likely: 'The people who get through still want a night out.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Doors an hour late. The ones who got across came in loud and tired.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is in traffic.',
+          result: 'You opened doors an hour late, and the people who got across came in loud and tired.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is stuck in traffic.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'The bridges stayed jammed. The regulars walked in.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The bridges stayed jammed, and the regulars walked in.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] }
   ]
 });

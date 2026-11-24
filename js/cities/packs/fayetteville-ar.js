@@ -15,7 +15,7 @@ SB.Cities.register('fayetteville-ar', {
   blocklist: ['razorback*', 'bikes blues*', 'walmart*', 'democrat-gazette*', 'fayetteville flyer*', 'arkansas traveler*'],
 
   blurb: ['A hill town that lost its main DIY room, so shows move from a veterans hall to a hilltop to a bar back room. Hardcore, doom and emo share bills for kids in a scene that is rebuilding.',
-          'A few small crews book under different names. Many nights are free or by donation, and often all ages.'],
+          'A few small crews book under different names, and many nights are free or by donation and often all ages.'],
   hard: 'No steady room; booking means piecing together borrowed halls and 21+ bars.',
   region: 'the Ozarks',
   houseType: 'BASEMENT',
@@ -128,13 +128,13 @@ SB.Cities.register('fayetteville-ar', {
       options: [
         { id: 'SOUTH', label: 'Move the whole bill to a south-side unit', likely: 'Smaller, but away from the traffic.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A unit on the south side took the bill. Smaller, loud, and nobody circled for parking.' },
+          result: 'A unit on the south side took the bill, and it was smaller and loud and nobody circled for parking.' },
         { id: 'LATE', label: 'Push doors back until the game crowd thins', likely: 'The ones who want a real night come late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors an hour and a half late. The kids came in once the streets cleared.' },
+          result: 'Doors opened an hour and a half late, and the kids came in once the streets cleared.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The casual crowd sat in traffic. The regulars found a place to park.' }
+          result: 'The casual crowd sat in traffic, but the regulars found a place to park.' }
       ] },
 
     { id: 'FAYETTEVILLE_AR_HILLTOP_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -143,15 +143,15 @@ SB.Cities.register('fayetteville-ar', {
       title: 'Thunder on the ridge',
       body: 'The day show is set in a clearing on the hill, and the forecast has a line of storms coming through at four. The generator is already up there.',
       options: [
-        { id: 'HALL', label: 'Move the bill to the veterans hall', likely: 'No beer and out by nine. Smaller, but dry.',
+        { id: 'HALL', label: 'Move the bill to the veterans hall', likely: 'No beer and out by nine, smaller but dry.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The post took the bill with a few hours to spare. Dry, close and over by nine.' },
+          result: 'The post took the bill with a few hours to spare, and it was dry, close and over by nine.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
+          result: 'You moved it a day, and the people who could make it came.' },
         { id: 'ACCEPT', label: 'Run it on the hill and hope', likely: 'A lot of people watch the sky and stay home.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'The line of storms broke early. Half the list had already given up.' }
+          result: 'The line of storms broke early, but half the list had already given up.' }
       ] },
 
     { id: 'FAYETTEVILLE_AR_ICE_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -162,13 +162,13 @@ SB.Cities.register('fayetteville-ar', {
       options: [
         { id: 'SHORT', label: 'Run the short bill and let the opener play long', likely: 'A thin night, but the ones who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The opener played twice and the room stayed warm. The van never made it.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'A late start. The crowd gets restless.',
+          result: 'The opener played twice and the room stayed warm, but the van never made it.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'A late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at ten, glazed with ice. You started late and nobody left.' },
+          result: 'The van pulled in at ten, glazed with ice, and you started late but nobody left.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] }
   ]
 });

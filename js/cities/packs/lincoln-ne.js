@@ -123,15 +123,15 @@ SB.Cities.register('lincoln-ne', {
       title: 'The parking is gone',
       body: 'Every lot downtown is sold out for the game and every bar is shoulder to shoulder. Your Saturday show is in the middle of it.',
       options: [
-        { id: 'SUNDAY', label: 'Move it to Sunday afternoon in a north-side basement', likely: 'Smaller, but the neighbors are at church.',
+        { id: 'SUNDAY', label: 'Move it to Sunday afternoon in a north-side basement', likely: 'It\'s smaller, but the neighbors are at church.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'A Sunday basement set. Small, loud, and nobody called.' },
+          result: 'It was a Sunday basement set, small and loud, and nobody called.' },
         { id: 'LATE', label: 'Push doors back until the game crowd clears', likely: 'The kids who want a real night still come.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The ones who came were loud and glad to be out of the crowd.' },
+          result: 'You opened doors an hour late, and the people who came were loud and glad to be out of the crowd.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd stays away.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The game ate the casual crowd. The regulars came on foot.' }
+          result: 'The game ate the casual crowd, and the regulars came on foot.' }
       ] },
 
     { id: 'LINCOLN_NE_HAIL_WARNING', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -140,15 +140,15 @@ SB.Cities.register('lincoln-ne', {
       title: 'The sirens go off mid-set',
       body: 'A hail warning comes through halfway into the set in the skatepark. The crowd has to shelter in a basement a few blocks off, with the amps.',
       options: [
-        { id: 'SHELTER', label: 'Move the rest of the set to the basement', likely: 'Packed and loud. The gear gets wet.',
+        { id: 'SHELTER', label: 'Move the rest of the set to the basement', likely: 'It\'s packed and loud, and the gear gets wet.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'The whole crowd crammed under a low ceiling and the second half was the best part of the night.' },
-        { id: 'WAIT', label: 'Hold the band and wait out the cell', likely: 'A late finish. Some of the kids have to leave.',
+          result: 'The whole crowd crammed under a low ceiling, and the second half was the best part of the night.' },
+        { id: 'WAIT', label: 'Hold the band and wait out the cell', likely: 'It\'s a late finish, and some of the kids have to leave.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'You waited out the storm. Half the crowd drifted home.' },
-        { id: 'END', label: 'Call it and send everyone home', likely: 'A short night, but nobody is hurt.',
+          result: 'You waited out the storm, and half the crowd drifted home.' },
+        { id: 'END', label: 'Call it and send everyone home', likely: 'It\'s a short night, but nobody is hurt.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'You called it early. A few stayed in the cars to listen to the hail.' }
+          result: 'You called it early, and a few people stayed in their cars to listen to the hail.' }
       ] },
 
     { id: 'LINCOLN_NE_LEASE_TURNOVER', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 60, bind: ['show'],
@@ -157,15 +157,15 @@ SB.Cities.register('lincoln-ne', {
       title: 'The house with the PA is empty',
       body: 'The people who ran the house are gone for the summer, and the PA is in a car trunk. You need a new yard before the move-in crowd comes back.',
       options: [
-        { id: 'YARD', label: 'Find a new yard and set it up yourself', likely: 'Hours of work. The new neighbors do not know you yet.',
+        { id: 'YARD', label: 'Find a new yard and set it up yourself', likely: 'It\'s hours of work, and the new neighbors do not know you yet.',
           effects: [{ op: 'HOURS', d: -3, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'A new yard, a borrowed PA, and a quiet street. It worked, barely.' },
-        { id: 'HALL', label: 'Move it to a rented hall', likely: 'Costs money and loses some of the feel.',
+          result: 'You found a new yard and borrowed a PA, and the street stayed quiet. It worked, barely.' },
+        { id: 'HALL', label: 'Move it to a rented hall', likely: 'It costs money and loses some of the feel.',
           effects: [{ op: 'MONEY', amount: -60 }, { op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }],
-          result: 'A hall took the bill. Plenty of chairs and no stage dive.' },
+          result: 'A hall took the bill, with plenty of chairs and no stage dives.' },
         { id: 'ACCEPT', label: 'Run a thin night with what is left', likely: 'The student crowd is gone.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'The student blocks were empty. The farm-town kids made the night.' }
+          result: 'The student blocks were empty, and the farm-town kids made the night.' }
       ] }
   ]
 });

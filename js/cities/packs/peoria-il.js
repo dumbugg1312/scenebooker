@@ -15,7 +15,7 @@ SB.Cities.register('peoria-il', {
   blocklist: ['journal star*', 'steamboat classic*', 'steak n shake*', 'caterpillar*', 'pumpkin festival*', 'santa claus parade*'],
 
   blurb: ['A river city of bluffs, hospitals and heavy machinery in the middle of Illinois, where kids from every farm town and suburb around come when they want to go out.',
-          'A room of regulars who all know who is playing and who is late. Basements, halls and bar back rooms carry the shows, and the ambitious ones leave for Chicago.'],
+          'The rooms are full of regulars who all know who is playing and who is late. Basements, halls and bar back rooms carry the shows, and the ambitious ones leave for Chicago.'],
   hard: 'A fill-date town: bands only come on slow weeknights.',
   region: 'the Midwest',
   houseType: 'BASEMENT',
@@ -112,16 +112,16 @@ SB.Cities.register('peoria-il', {
   events: [
     { id: 'PEORIA_IL_PARADE_LOADIN', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'parade' },
-      telegraph: 'There is a parade downtown the day your bill loads in, and the cones are already out.',
+      telegraph: 'There\'s a parade downtown the day your bill loads in, and the cones are already out.',
       title: 'The parade closes the street',
-      body: 'The streets below the bluff are shut for the parade, so the van has to park up on the hill and carry the gear down on foot. The bands are not happy about the stairs.',
+      body: 'The streets below the bluff are shut for the parade, so the van has to park up on the hill and carry the gear down on foot, and the bands are not happy about the stairs.',
       options: [
-        { id: 'CARRY', label: 'Carry it all down the hill', likely: 'Two hours of your day. The crowd comes out of the parade early.',
+        { id: 'CARRY', label: 'Carry it all down the hill', likely: 'It takes two hours of your day, and the crowd comes out of the parade early.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.05 }],
-          result: 'You and the drummer hauled the amps down in relays. The parade crowd drifted in as it let out.' },
-        { id: 'LATE', label: 'Push doors back until the street opens', likely: 'A late start, and the early crowd goes home.',
+          result: 'You and the drummer hauled the amps down in relays, and the parade crowd drifted in as it let out.' },
+        { id: 'LATE', label: 'Push doors back until the street opens', likely: 'It starts late, and the early crowd goes home.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The street reopened at dark. You started late and the ones who waited were loud about it.' },
+          result: 'The street reopened at dark, and you started late, and the people who waited were loud about it.' },
         { id: 'ACCEPT', label: 'Run it as planned and eat the mess', likely: 'Half the bill arrives sweaty and angry.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
           result: 'The first band went on twenty minutes late and played like they were still carrying the drums.' }
@@ -129,36 +129,36 @@ SB.Cities.register('peoria-il', {
 
     { id: 'PEORIA_IL_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
-      telegraph: 'It is fair week out on the edge of town and every kid you know has a ride ticket.',
+      telegraph: 'It\'s fair week out on the edge of town, and every kid you know has a ride ticket.',
       title: 'Fair week empties the bluff',
-      body: 'A mid-week house show in fair week, and the East Bluff kids are all out at the fairgrounds. You expected a full basement and you are looking at half of one.',
+      body: 'It\'s a mid-week house show in fair week, and the East Bluff kids are all out at the fairgrounds. You expected a full basement and you\'re looking at half of one.',
       options: [
-        { id: 'SMALL', label: 'Run it small and loose', likely: 'Half the crowd you wanted, and a good night for the ones who come.',
+        { id: 'SMALL', label: 'Run it small and loose', likely: 'You get half the crowd you wanted, and a good night for the people who come.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
           result: 'Twenty people in a basement built for sixty, and the best set of the month.' },
-        { id: 'LATER', label: 'Start late and catch them after the rides close', likely: 'A later night. Some of the fair comes by.',
+        { id: 'LATER', label: 'Start late and catch them after the rides close', likely: 'It\'s a later night, and some of the fair comes by.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'Doors an hour late. The kids came straight from the fair with their hands still sticky.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You opened doors an hour late, and the kids came straight from the fair with their hands still sticky.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'PEORIA_IL_RACE_FRIDAY', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 3], calendar: 'race' },
-      telegraph: 'The race weekend pre-party is Friday and the downtown bars are already taking reservations.',
+      telegraph: 'The race weekend pre-party is Friday, and the downtown bars are already taking reservations.',
       title: 'The pre-party crowd is not your crowd',
       body: 'The downtown bars are full of people in matching shirts who came for the race, and they are annoyed by a loud band in the corner. The owner is nervous about the complaints.',
       options: [
-        { id: 'EARLY', label: 'Move the loud part up before they get drunk', likely: 'A shorter night. The owner relaxes.',
+        { id: 'EARLY', label: 'Move the loud part up before they get drunk', likely: 'It\'s a shorter night, and the owner relaxes.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'You got the loud bands on before nine. The pre-party crowd barely noticed.' },
-        { id: 'PAY', label: 'Buy the bartender a round and keep the volume up', likely: 'Costs a little. The night goes ahead.',
+          result: 'You got the loud bands on before nine, and the pre-party crowd barely noticed.' },
+        { id: 'PAY', label: 'Buy the bartender a round and keep the volume up', likely: 'It costs a little, and the night goes ahead.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'REGULARS', pct: .02 }],
-          result: 'A round for the bar and a promise to turn it down at eleven. The punks and the racers shared a room.' },
+          result: 'You bought a round for the bar and promised to turn it down at eleven, and the punks and the racers shared a room.' },
         { id: 'ACCEPT', label: 'Run it and ignore the stares', likely: 'Some of them leave.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Two tables of racers left mid-song. The rest of the room got louder.' }
+          result: 'Two tables of racers left mid-song, and the rest of the room got louder.' }
       ] }
   ]
 });

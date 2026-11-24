@@ -90,15 +90,15 @@ SB.Cities.register('tyler-tx', {
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The festival weekend has every motel full and every lot near downtown roped off.',
       title: 'The van with nowhere to park',
-      body: 'The touring van is due Friday and the festival has taken every motel bed and parking space near downtown. They cannot cancel and they cannot park.',
+      body: 'The touring van is due Friday, and the festival has taken every motel bed and parking space near downtown. They cannot cancel and they cannot park.',
       options: [
-        { id: 'LOT', label: 'Park them in a church lot out on the Loop', likely: 'A long walk and a late load-in.',
+        { id: 'LOT', label: 'Park them in a church lot out on the Loop', likely: 'It\'s a long walk and a late load-in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van sat in a lot on the Loop and the gear came in on a borrowed truck. Doors went late.' },
-        { id: 'FLOOR', label: 'Put them up on a floor on the north side', likely: 'Free, and a better crowd for it.',
+          result: 'The van sat in a lot on the Loop and the gear came in on a borrowed truck, so doors went late.' },
+        { id: 'FLOOR', label: 'Put them up on a floor on the north side', likely: 'It\'s free, and the crowd is better for it.',
           effects: [{ op: 'REGULARS', pct: .02 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
           result: 'They slept on a living-room floor and played like they owed somebody.' },
-        { id: 'ACCEPT', label: 'Let them sort it out and run the night', likely: 'They get there. Tired.',
+        { id: 'ACCEPT', label: 'Let them sort it out and run the night', likely: 'They get there, tired.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'They found a spot six blocks off and played a flat set.' }
       ] },
@@ -107,17 +107,17 @@ SB.Cities.register('tyler-tx', {
       if: { daysOut: [0, 3], weather: 'RAIN', months: [3, 4, 5, 6] },
       telegraph: 'A tornado watch covers the whole county and the power company is warning about outages.',
       title: 'The power goes out mid-set',
-      body: 'A spring storm took the lines down halfway through the second band. The crowd is in the carport and somebody has a generator in the truck.',
+      body: 'A spring storm took the lines down halfway through the second band. The crowd is in the carport, and somebody has a generator in the truck.',
       options: [
-        { id: 'GEN', label: 'Run the rest of the set off the generator', likely: 'Loud, and the neighbor will call.',
+        { id: 'GEN', label: 'Run the rest of the set off the generator', likely: 'It\'s loud, and the neighbor will call.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'MONEY', amount: -25 }],
-          result: 'The generator coughed on and the set went on in the dark. The neighbor called at ten.' },
-        { id: 'SHORT', label: 'Cut it short and send everyone home', likely: 'Safe. A thin night.',
+          result: 'The generator coughed on and the set went on in the dark, and the neighbor called at ten.' },
+        { id: 'SHORT', label: 'Cut it short and send everyone home', likely: 'It\'s safe, but a thin night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'You called it with the sirens going. Half the bill never played.' },
+          result: 'You called it with the sirens going, and half the bill never played.' },
         { id: 'MOVE', label: 'Move the rest of the bill a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ]
 });

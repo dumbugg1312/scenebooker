@@ -98,17 +98,17 @@ SB.Cities.register('toledo-oh', {
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The downtown blocks outside the club are closing for the street festival.',
       title: 'The street is shut outside the club',
-      body: 'The festival has the blocks around the club barricaded, and parking is gone. The van has to wait for the street to reopen before it can load in.',
+      body: 'The festival has the blocks around the club barricaded and the parking is gone. The van has to wait for the street to reopen before it can load in.',
       options: [
-        { id: 'WAIT', label: 'Hold the load-in until the street reopens', likely: 'A late start. The crowd waits on the sidewalk.',
+        { id: 'WAIT', label: 'Hold the load-in until the street reopens', likely: 'You start late, and the crowd waits on the sidewalk.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
-          result: 'The barricades came down at nine. You started late and the festival crowd wandered in.' },
-        { id: 'CARRY', label: 'Carry the gear in by hand from three blocks away', likely: 'Tiring, but the doors open on time.',
+          result: 'The barricades came down at nine, and you started late as the festival crowd wandered in.' },
+        { id: 'CARRY', label: 'Carry the gear in by hand from three blocks away', likely: 'It\'s tiring, but the doors open on time.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 20 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Everyone hauled amps down the sidewalk. The set was ragged and the room was glad of it.' },
+          result: 'Everyone hauled amps down the sidewalk, and the set was ragged and the room was glad of it.' },
         { id: 'ACCEPT', label: 'Run it with whatever crowd the street lets through', likely: 'Parking is gone for most of them.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The ones who could not park went home. The regulars walked.' }
+          result: 'The ones who could not park went home, and the regulars walked.' }
       ] },
 
     { id: 'TOLEDO_OH_GAME_FEST', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -119,30 +119,30 @@ SB.Cities.register('toledo-oh', {
       options: [
         { id: 'LATE', label: 'Push doors back until the game lets out', likely: 'The crowd that wants a night out comes late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The crowd came in loud from the stadium.' },
+          result: 'Doors opened an hour late, and the crowd came in loud from the stadium.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed at the game. The regulars came.' },
+          result: 'The casual crowd stayed at the game, but the regulars came.' },
         { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'TOLEDO_OH_NINE_PM', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [5, 6, 7, 8, 9] },
       telegraph: 'The yard show by the bay is set for dusk, and the neighbors have complained before.',
       title: 'The nine o\'clock line arrives mid-set',
-      body: 'The quiet hour lands in the middle of the second band. A neighbor is already on the porch with a phone.',
+      body: 'The quiet hour lands in the middle of the second band, and a neighbor is already on the porch with a phone.',
       options: [
-        { id: 'UNPLUG', label: 'Finish unplugged', likely: 'Quieter and slower, but it keeps the night.',
+        { id: 'UNPLUG', label: 'Finish unplugged', likely: 'It\'s quieter and slower, but it keeps the night.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The last two bands played acoustic on the lawn. Nobody left.' },
-        { id: 'INSIDE', label: 'Move inside to a basement', likely: 'Smaller, and out of earshot.',
+          result: 'The last two bands played acoustic on the lawn, and nobody left.' },
+        { id: 'INSIDE', label: 'Move inside to a basement', likely: 'It\'s smaller, and out of earshot.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A basement took the bill. The floor was packed and the neighbors went to bed.' },
-        { id: 'ACCEPT', label: 'Keep playing and take the complaint', likely: 'Risks the yard for next summer.',
+          result: 'A basement took the bill, and the floor was packed and the neighbors went to bed.' },
+        { id: 'ACCEPT', label: 'Keep playing and take the complaint', likely: 'You risk the yard for next summer.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The police came at nine-thirty. The yard is not offered again.' }
+          result: 'The police came at nine-thirty, and the yard is not offered again.' }
       ] }
   ],
 

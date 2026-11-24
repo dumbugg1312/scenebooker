@@ -12,7 +12,7 @@ SB.Cities.register('detroit', {
   blocklist: ['metro times*', 'detroit free press*', 'motown*', 'little caesars*', 'greektown*', 'rocket mortgage*', 'dream cruise*', 'michigan chronicle*', 'deadline detroit*', 'arts beats and eats*'],
 
   blurb: ['A huge, shrunken factory city with blocks of empty lots between everything. Deep punk and hardcore roots run through the Hamtramck bars and the basements in the southwest.',
-          'Nobody lives close to anybody. Houses cost almost nothing and space is everywhere, so the scene runs on cars, old halls and a lot of nerve.'],
+          'Nobody lives close to anybody, but houses cost almost nothing and space is everywhere, so the scene runs on cars, old halls and a lot of nerve.'],
   hard: 'Everything is far apart, and bars hold the age rules so all-ages rooms are rare.',
   region: 'the Great Lakes',
   houseType: 'BASEMENT',
@@ -23,7 +23,7 @@ SB.Cities.register('detroit', {
   ],
 
   tilt: [
-    { fan: 'hardcore', band: 'hardcore', d: .08, reason: 'A hardcore legacy from the old basement-and-hall days, and the basements are still going.' }
+    { fan: 'hardcore', band: 'hardcore', d: .08, reason: 'The hardcore legacy comes from the old basement-and-hall days, and the basements are still going.' }
   ],
 
   zones: [
@@ -119,49 +119,49 @@ SB.Cities.register('detroit', {
       title: 'The basement is under water',
       body: 'The storm dumped hours of rain on the block, and the basement is standing in four inches of water. The host has a shop vac and not much hope.',
       options: [
-        { id: 'MOVE', label: 'Move it a day, once it drains', likely: 'Breaks the date. Costs trust with everyone.',
+        { id: 'MOVE', label: 'Move it a day, once it drains', likely: 'It breaks the date, and everybody trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'UP', label: 'Move it up to the first floor', likely: 'Smaller and louder, with the neighbors right there.',
+          result: 'You moved it a day, and the people who could make it came.' },
+        { id: 'UP', label: 'Move it up to the first floor', likely: 'It\'s smaller and louder, with the neighbors right there.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The whole bill played in a living room. People stood on the stairs.' },
-        { id: 'VAC', label: 'Pump it out and play on', likely: 'Costs forty dollars. Most of the crowd stays home.',
+          result: 'The whole bill played in a living room, and people stood on the stairs.' },
+        { id: 'VAC', label: 'Pump it out and play on', likely: 'It costs forty dollars, and most of the crowd stays home.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The water went down by eight. The floor was damp and the room was half full.' }
+          result: 'The water went down by eight, and the floor was damp and the room was half full.' }
       ] },
 
     { id: 'DETROIT_STREET_FESTIVAL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 60, bind: ['show'],
       if: { daysOut: [0, 4], months: [9], calendar: 'festival' },
       telegraph: 'The big street festival is on Labor Day weekend, and Joseph Campau is closed for a parade.',
       title: 'The parade is on the load-in',
-      body: 'Half a million people are on the main street, the bars are packed, and the van cannot get within four blocks of the back door. The show has to load in on foot, over the parade route.',
+      body: 'Half a million people are on the main street, the bars are packed, and the van can\'t get within four blocks of the back door, so the show has to load in on foot over the parade route.',
       options: [
-        { id: 'EARLY', label: 'Load in at dawn before the barricades go up', likely: 'A long day, but the gear is in.',
+        { id: 'EARLY', label: 'Load in at dawn before the barricades go up', likely: 'It\'s a long day, but the gear is in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'The gear was in by nine in the morning. Then you sat in the room all day and waited for the street to fill.' },
-        { id: 'CART', label: 'Hand-cart the gear in and play late', likely: 'A mess, and the crowd comes in drunk.',
+          result: 'The gear was in by nine in the morning, and then you sat in the room all day and waited for the street to fill.' },
+        { id: 'CART', label: 'Hand-cart the gear in and play late', likely: 'It\'s a mess, and the crowd comes in drunk.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }],
-          result: 'Amps went down the sidewalk on hand trucks. The room was packed and loud with festival people.' },
-        { id: 'MOVE', label: 'Move the bill to a house', likely: 'Smaller and quieter, and off the street.',
+          result: 'Amps went down the sidewalk on hand trucks, and the room was packed and loud with festival people.' },
+        { id: 'MOVE', label: 'Move the bill to a house', likely: 'It\'s smaller and quieter, and off the street.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement across town took the bill, and the crowd followed the van.' }
       ] },
 
     { id: 'DETROIT_YOUTH_CURFEW_EVE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 60, bind: ['show'],
       if: { daysOut: [0, 4], months: [10], calendar: 'holiday' },
-      telegraph: 'Police posted the Halloween-eve curfew: everyone under eighteen is off the street from six.',
+      telegraph: 'Police posted the Halloween-eve curfew, and everyone under eighteen is off the street from six.',
       title: 'Everyone under eighteen is home by six',
-      body: 'The curfew has taken the youngest half of your all-ages crowd before the first band. The older ones are still coming.',
+      body: 'The curfew has taken the youngest half of your all-ages crowd before the first band, but the older ones are still coming.',
       options: [
-        { id: 'LATE', label: 'Keep the full bill and let the older crowd fill it', likely: 'A smaller, older room.',
+        { id: 'LATE', label: 'Keep the full bill and let the older crowd fill it', likely: 'It\'s a smaller, older room.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The kids were home by six. The older heads filled the room anyway and stayed late.' },
-        { id: 'MATINEE', label: 'Start at four and finish before the curfew', likely: 'Short, early and tight.',
+          result: 'The kids were home by six, and the older heads filled the room anyway and stayed late.' },
+        { id: 'MATINEE', label: 'Start at four and finish before the curfew', likely: 'It\'s short, early and tight.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -150 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at four and done by half past five. The kids ran for their rides.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You opened doors at four and finished by half past five, and the kids ran for their rides.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] }
   ]
 });

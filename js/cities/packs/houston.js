@@ -395,12 +395,12 @@ SB.Cities.register('houston', {
       },
       "telegraph": "A tropical system is parked in the Gulf and the bayous are rising.",
       "title": "The bayou is in the yard",
-      "body": "The rain has not stopped and the bayou behind the house is over its bank. The underpasses on the way in are going under and the bands are an hour out in a minivan.",
+      "body": "The rain has not stopped and the bayou behind the house is over its bank. The underpasses on the way in are going under, and the bands are an hour out in a minivan.",
       "options": [
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with everyone.",
+          "likely": "It breaks the date and costs you some trust with everyone.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -408,12 +408,12 @@ SB.Cities.register('houston', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. The ones who could come, came."
+          "result": "You moved it a day, and the people who could come, came."
         },
         {
           "id": "EARLY",
           "label": "Move doors an hour earlier so they beat the water",
-          "likely": "Most make it. The night starts thin.",
+          "likely": "Most make it, but the night starts thin.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -426,7 +426,7 @@ SB.Cities.register('houston', {
               "v": -60
             }
           ],
-          "result": "Doors an hour early. The ones who came got in before the underpasses closed."
+          "result": "You opened doors an hour early, and the people who came got in before the underpasses closed."
         },
         {
           "id": "ACCEPT",
@@ -439,7 +439,7 @@ SB.Cities.register('houston', {
               "v": 0.7
             }
           ],
-          "result": "The freeways stayed backed up. The yard was a pond and the room was half empty."
+          "result": "The freeways stayed backed up, the yard was a pond, and the room was half empty."
         }
       ]
     },
@@ -483,12 +483,12 @@ SB.Cities.register('houston', {
               "v": 0.9
             }
           ],
-          "result": "The van got in at nine. You started late and most of them stayed."
+          "result": "The van got in at nine, so you started late, and most of them stayed."
         },
         {
           "id": "SHORT",
           "label": "Run a short bill with whoever is here",
-          "likely": "Thin but loose.",
+          "likely": "It's thin but loose.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -501,12 +501,12 @@ SB.Cities.register('houston', {
               "v": -1
             }
           ],
-          "result": "Two bands made it. The room was half full and it was fine."
+          "result": "Two bands made it, and the room was half full and it was fine."
         },
         {
           "id": "MOVE",
           "label": "Move it a day",
-          "likely": "Breaks the date. Costs trust with the bands.",
+          "likely": "It breaks the date and costs you some trust with the bands.",
           "effects": [
             {
               "op": "MOVE_SHOW",
@@ -514,7 +514,7 @@ SB.Cities.register('houston', {
               "respect": false
             }
           ],
-          "result": "You moved it a day. Not everyone could make the new one."
+          "result": "You moved it a day, and not everyone could make the new one."
         }
       ]
     },
@@ -535,12 +535,12 @@ SB.Cities.register('houston', {
       },
       "telegraph": "The house on the corner has a new neighbor, and the night limit drops at ten.",
       "title": "A call at ten o'clock",
-      "body": "A neighbor on the house street has the decibel limit memorized and the clock says ten. The set is not close to done.",
+      "body": "A neighbor on the house street has the decibel limit memorized, and the clock says ten, and the set is not close to done.",
       "options": [
         {
           "id": "QUIET",
           "label": "Cut the set and turn it down",
-          "likely": "The night ends early, nobody gets hurt.",
+          "likely": "The night ends early, but nobody gets hurt.",
           "effects": [
             {
               "op": "SHOW_MOD",
@@ -553,12 +553,12 @@ SB.Cities.register('houston', {
               "v": -1
             }
           ],
-          "result": "You turned it down and finished unplugged. Nobody minded much."
+          "result": "You turned it down and finished unplugged, and nobody minded much."
         },
         {
           "id": "MOVE",
           "label": "Move the last bands to another house",
-          "likely": "Breaks the flow. The ones who follow are the ones who care.",
+          "likely": "It breaks the flow, and the people who follow are the ones who care.",
           "effects": [
             {
               "op": "MOVE_SHOW",

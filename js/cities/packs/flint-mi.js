@@ -12,7 +12,7 @@ SB.Cities.register('flint-mi', {
   /* The dossier's twelve invented venue names are in banned: research, not content, unchecked. The water crisis is written only as 'the water'. */
   blocklist: ['general motors*', 'buick*', 'chevrolet*', 'ac spark plug*', 'back to the bricks*', 'faygo*', 'mlive*', 'kettering university*', 'vehicle city fest*', 'flintside*'],
 
-  blurb: ['A scene held together by one stubborn all-ages club that keeps changing buildings. The crowd is loyal and the pits are policed.',
+  blurb: ['The scene is held together by one stubborn all-ages club that keeps changing buildings, and the crowd is loyal and keeps an eye on its own pits.',
           'Reunion shows for old local bands draw more than any touring act, and benefit bills are a regular kind of night.'],
   hard: 'One strict all-ages room; the heavier bands have nowhere else to go',
   region: 'the Midwest',
@@ -112,34 +112,34 @@ SB.Cities.register('flint-mi', {
   events: [
     { id: 'FLINT_MI_BUILDING_MOVE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 60, bind: ['show'],
       if: { daysOut: [0, 5] },
-      telegraph: 'The all-ages club\'s building is torn up for repairs again, and nobody knows how long.',
+      telegraph: 'The all-ages club\'s building is torn up for repairs again, and nobody knows how long it will last.',
       title: 'The club is under renovation',
-      body: 'Contractors have the dry club\'s floor torn up, and the bill is booked for Saturday. The warehouse space and a rented hall are both open, and neither fits the whole night.',
+      body: 'Contractors have torn up the club\'s floor and the bill is booked for Saturday. The warehouse space and a rented hall are both open, but neither fits the whole night.',
       options: [
-        { id: 'SPLIT', label: 'Split the bill between the warehouse and the hall', likely: 'Two rooms, two door counts, and a lot of driving.',
+        { id: 'SPLIT', label: 'Split the bill between the warehouse and the hall', likely: 'It means two rooms, two door counts, and a lot of driving.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Half the bands played the warehouse and half played the hall. The crowd went back and forth in cars.' },
-        { id: 'BASEMENT', label: 'Move the whole bill to a basement', likely: 'Smaller and louder.',
+          result: 'Half the bands played the warehouse and half played the hall, and the crowd went back and forth in cars.' },
+        { id: 'BASEMENT', label: 'Move the whole bill to a basement', likely: 'It\'s smaller and louder.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A basement took the bill and the floor was packed to the stairs.' },
-        { id: 'MOVE', label: 'Move it a week', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A basement took the bill, and the floor was packed to the stairs.' },
+        { id: 'MOVE', label: 'Move it a week', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it. The ones who could come, came.' }
+          result: 'You moved it, and the people who could make it came.' }
       ] },
 
     { id: 'FLINT_MI_CAR_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 60, bind: ['show'],
       if: { daysOut: [0, 4], months: [8], calendar: 'festival' },
       telegraph: 'The classic-car weekend is on, and the police have posted a youth curfew zone from six.',
       title: 'The curfew zone starts at six',
-      body: 'Downtown is full of chrome and cruisers, and everyone under seventeen has to be out of the zone by six. The headliner goes on at nine.',
+      body: 'Downtown is full of chrome and cruisers, and everyone under seventeen has to be out of the zone by six, but the headliner goes on at nine.',
       options: [
-        { id: 'EARLY', label: 'Start at four and finish before six', likely: 'A short bill. The kids get a full night.',
+        { id: 'EARLY', label: 'Start at four and finish before six', likely: 'It\'s a short bill, but the kids get a full night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -150 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at four and done at half past five. The kids were out of the zone with minutes to spare.' },
-        { id: 'STRIP', label: 'Move to the strip on the east side', likely: 'Out of the zone, and older.',
+          result: 'Doors were at four and you were done by half past five, and the kids were out of the zone with minutes to spare.' },
+        { id: 'STRIP', label: 'Move to the strip on the east side', likely: 'You\'re out of the zone, and the crowd is older.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'The east side was out of the zone, and the older crowd was happy to come.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The young ones leave before the headliner.',
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The younger kids leave before the headliner.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'The younger half of the room walked out at six, and the bill played to the rest.' }
       ] },
@@ -148,17 +148,17 @@ SB.Cities.register('flint-mi', {
       if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
       telegraph: 'A neighbor of the west-side house was seen on the porch with a phone, listening.',
       title: 'The nine o\'clock call',
-      body: 'The bill runs past nine on a school night and the neighbors call about the noise rule. The host wants to argue about decibels at the property line. The police are on their way.',
+      body: 'The bill runs past nine on a school night and the neighbors call about the noise rule. The host wants to argue about decibels at the property line, and the police are on their way.',
       options: [
-        { id: 'ACOUSTIC', label: 'Go acoustic for the rest of the night', likely: 'Quiet, strange and a little funny.',
+        { id: 'ACOUSTIC', label: 'Go acoustic for the rest of the night', likely: 'It\'s quiet and strange and a little funny.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The headliner played the last set sitting on the stairs. Nobody called again.' },
-        { id: 'ARGUE', label: 'Let the host argue the decibel number', likely: 'It works, once.',
+          result: 'The headliner played the last set sitting on the stairs, and nobody called again.' },
+        { id: 'ARGUE', label: 'Let the host argue the decibel number', likely: 'It works once.',
           effects: [{ op: 'REGULARS', pct: -.02 }],
           result: 'The officer stood on the lawn and read the number twice, and the host lost the argument.' },
-        { id: 'END', label: 'End the night right there', likely: 'Short, and everyone goes home.',
+        { id: 'END', label: 'End the night right there', likely: 'It\'s short, and everyone goes home.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The last band played one song and everybody was gone by ten.' }
+          result: 'The last band played one song, and everybody was gone by ten.' }
       ] }
   ]
 });

@@ -16,7 +16,7 @@ SB.Cities.register('wilmington-nc', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The storm is written only as 'the storm' in game text. */
   blocklist: ['uncw*', 'starnews*', 'port city daily*', 'cucalorus*', 'azalea festival*', 'cook out*', 'marl pit*', 'pogie row*'],
 
-  blurb: ['A Cape Fear River port city squeezed between the river and the Atlantic beaches, where hardcore, indie, metal and folk-punk share bills because there is not enough of any one.',
+  blurb: ['A Cape Fear River port city squeezed between the river and the Atlantic beaches, where hardcore, indie, metal and folk-punk share bills because there aren\'t enough people for any one of them.',
           'Rooms rise and fall with the lease, the school year and the next named storm.'],
   hard: 'A two-hour detour, no basements, and a storm season.',
   region: 'the Carolina coast',
@@ -106,64 +106,64 @@ SB.Cities.register('wilmington-nc', {
   events: [
     { id: 'WILMINGTON_NC_FESTIVAL_BLOCK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
-      telegraph: 'A festival is closing the downtown streets and the load-in block is on the list.',
+      telegraph: 'A festival is closing the downtown streets, and the load-in block is on the list.',
       title: 'The streets are closed and the tourists are wandering in',
-      body: 'Downtown is shut to cars for the festival. Your load-in is on a blocked street and half the room is tourists who thought it was a bar.',
+      body: 'Downtown is shut to cars for the festival. Your load-in is on a blocked street, and half the room is tourists who thought it was a bar.',
       options: [
-        { id: 'EARLY', label: 'Load in early, before the barricades', likely: 'A tight scramble. The room fills with strangers anyway.',
+        { id: 'EARLY', label: 'Load in early, before the barricades', likely: 'It\'s a tight scramble, and the room fills with strangers anyway.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: 'Gear in by four, doors early. The strangers stayed for two songs and clapped.' },
+          result: 'You had the gear in by four and opened doors early, and the strangers stayed for two songs and clapped.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The locals avoid downtown on festival nights.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'The regulars fought the parking and made it. The rest of the street never found the door.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The regulars fought the parking and made it, but the rest of the street never found the door.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'WILMINGTON_NC_PATIO_CITATION', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], months: [4, 5, 6, 7, 8, 9, 10] },
-      telegraph: 'A taproom down the block got a citation for amplified sound on its patio, and the word is out.',
+      telegraph: 'A taproom down the block got a citation for amplified sound on its patio, and word has gotten around.',
       title: 'The patio set draws a zoning ticket',
-      body: 'The patio has no stage permit for amplified sound, and zoning and the police both enforce it. The band can go inside or play without the amps.',
+      body: 'The patio has no permit for amplified sound, and zoning and the police both enforce it, so the band can go inside or play without the amps.',
       options: [
-        { id: 'INSIDE', label: 'Move the bill into a house', likely: 'Smaller and louder. Nobody can cite a carport.',
+        { id: 'INSIDE', label: 'Move the bill into a house', likely: 'It\'s smaller and louder, and nobody can cite a carport.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A carport took the bill with an hour to spare, and the extension cord held.' },
-        { id: 'UNPLUGGED', label: 'Play it unplugged on the patio', likely: 'Quiet and strange. Some people love it.',
+        { id: 'UNPLUGGED', label: 'Play it unplugged on the patio', likely: 'It\'s quiet and strange, and some people love that.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Acoustic guitars and a cardboard kick drum. Quiet, odd and kind of great.' },
-        { id: 'RISK', label: 'Run it loud and pay if it comes', likely: 'A fine if someone calls.',
+          result: 'They played acoustic guitars and a cardboard kick drum, and it was quiet and odd and pretty great.' },
+        { id: 'RISK', label: 'Run it loud and pay if it comes', likely: 'There\'s a fine if someone calls.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'REGULARS', pct: .02 }],
-          result: 'The ticket came during the last song. The crowd thought it was worth it.' }
+          result: 'The ticket came during the last song, and the crowd thought it was worth it.' }
       ] },
 
     { id: 'WILMINGTON_NC_STORM_WEEK', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], months: [8, 9, 10] },
-      telegraph: 'The storm is out in the Atlantic and the whole coast is watching the forecast.',
+      telegraph: 'The storm is out in the Atlantic, and the whole coast is watching the forecast.',
       title: 'The storm turns toward the coast',
-      body: 'An evacuation order is coming and the touring van has already turned around. The bill is down to the locals who are staying put.',
+      body: 'An evacuation order is coming and the touring van has already turned around, so the bill is down to the locals who are staying put.',
       options: [
-        { id: 'SHORT', label: 'Run the short bill in a carport', likely: 'A thin, loud, close night.',
+        { id: 'SHORT', label: 'Run the short bill in a carport', likely: 'It\'s a thin, loud, close night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'A few locals and a generator. The wind picked up and nobody wanted to leave.' },
-        { id: 'MOVE', label: 'Move it a week', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'A few locals and a generator played while the wind picked up, and nobody wanted to leave.' },
+        { id: 'MOVE', label: 'Move it a week', likely: 'It breaks the date, and everybody trusts you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it. The ones who stayed in town came to the next one.' }
+          result: 'You moved it, and the people who stayed in town came to the next one.' }
       ] },
 
     { id: 'WILMINGTON_NC_MOVE_IN', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'graduation' },
-      telegraph: 'Move-in week is here and the road to campus is a parking lot.',
+      telegraph: 'It\'s move-in week, and the road to campus is a parking lot.',
       title: 'Every student is stuck on College Road',
-      body: 'The back room is empty because every student is in move-in traffic. The new freshmen will come next Friday, and they will not know the rules.',
+      body: 'The back room is empty because every student is stuck in move-in traffic. The new freshmen will come next Friday, and they won\'t know the rules.',
       options: [
-        { id: 'LATE', label: 'Hold doors until the traffic clears', likely: 'A late start. The ones who made it are glad.',
+        { id: 'LATE', label: 'Hold doors until the traffic clears', likely: 'It starts late, and the people who made it are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'Doors an hour late. The freshmen drifted in sunburned and asked who was playing.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'A thin night, and a few new faces.',
+          result: 'You opened doors an hour late, and the freshmen drifted in sunburned and asked who was playing.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'It\'s a thin night with a few new faces.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'Half the room, and three freshmen who asked how to get on the list.' }
+          result: 'The room was half full, and three freshmen asked how to get on the list.' }
       ] }
   ]
 });

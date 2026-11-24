@@ -16,7 +16,7 @@ SB.Cities.register('omaha', {
   blocklist: ['creighton*', 'offutt*', 'berkshire hathaway*', 'world-herald*', 'union pacific*', 'mutual of omaha*', 'omaha storm chasers*', 'cornhuskers*', 'flatwater free press*', 'omaha daily record*'],
 
   blurb: ['A Missouri River city with a tight hardcore core and a scene that rebuilt after the pandemic. Benson and Midtown carry the bars, North Omaha carries the barns and yards.',
-          'All-ages rooms keep closing, so houses and one mid-size room hold the teenagers. People leave for Chicago or Denver at twenty-five, and some come back for the reunion shows.'],
+          'All-ages rooms keep closing, so houses and one mid-size room hold the teenagers. People leave for Chicago or Denver at twenty-five, and some of them come back for the reunion shows.'],
   hard: 'All-ages rooms keep closing, and the best people move away at twenty-five.',
   region: 'the Plains',
   houseType: 'BASEMENT',
@@ -121,15 +121,15 @@ SB.Cities.register('omaha', {
       title: 'The trailer is stuck on the ice',
       body: 'Freezing rain glazed the street overnight. The band\'s trailer is sideways at the bottom of the hill, and the load-in ramp is a sheet of ice.',
       options: [
-        { id: 'SALT', label: 'Salt the ramp and push the trailer up by hand', likely: 'Costs a bag of salt and an hour. Doors open late.',
+        { id: 'SALT', label: 'Salt the ramp and push the trailer up by hand', likely: 'It costs a bag of salt and an hour, and doors open late.',
           effects: [{ op: 'MONEY', amount: -15 }, { op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'REGULARS', pct: .01 }],
-          result: 'Six people and a bag of salt. The band loaded in by dark and the crowd forgave the wait.' },
-        { id: 'EARLY', label: 'Move doors earlier so people beat the worst of it', likely: 'Most make it. The night starts thin.',
+          result: 'Six people and a bag of salt got the ramp clear, the band loaded in by dark, and the crowd forgave the wait.' },
+        { id: 'EARLY', label: 'Move doors earlier so people beat the worst of it', likely: 'Most make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors an hour early. Everyone came in stamping slush off their boots.' },
+          result: 'You opened doors an hour early, and everyone came in stamping slush off their boots.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'A lot of the suburban kids never make it in.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The side streets never cleared. The room was the ones who could walk.' }
+          result: 'The side streets never cleared, so the room was the people who could walk.' }
       ] },
 
     { id: 'OMAHA_BRIDGE_BACKUP', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -138,15 +138,15 @@ SB.Cities.register('omaha', {
       title: 'The bridge is down to one lane',
       body: 'A wreck on the river bridge has the interstate crawling. The band from across the water and the Iowa kids are stuck on the wrong bank.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
+          result: 'You moved doors up an hour, and the people who wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The Iowa side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides over the walking bridge', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The backup never cleared, and the Iowa side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides over the walking bridge', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'A carload walked the footbridge together with their amps. They will remember that.' }
+          result: 'A carload walked the footbridge together with their amps.' }
       ] },
 
     { id: 'OMAHA_BARN_QUIET_HOUR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -155,15 +155,15 @@ SB.Cities.register('omaha', {
       title: 'A call at ten',
       body: 'A Tuesday crowd of about a hundred has filled the street. At ten a neighbor calls in the quiet-hour complaint, and an officer is on the way.',
       options: [
-        { id: 'WRAP', label: 'Wrap the set up and clear the street', likely: 'Short. The host keeps the trust.',
+        { id: 'WRAP', label: 'Wrap the set up and clear the street', likely: 'The night is short, and the host keeps your trust.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'REGULARS', pct: .01 }],
           result: 'You cut the last band down and had the street empty before the car pulled up.' },
         { id: 'PLAY', label: 'Keep playing and hope', likely: 'If the officer comes, the whole thing ends.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The officer stood at the gate for two songs. The host was not happy.' },
-        { id: 'INDOOR', label: 'Pull the amps inside the barn and shut the doors', likely: 'Hot and loud, but quieter outside.',
+          result: 'The officer stood at the gate for two songs, and the host was not happy.' },
+        { id: 'INDOOR', label: 'Pull the amps inside the barn and shut the doors', likely: 'It gets hot and loud inside, but it\'s quieter outside.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'Doors shut and the crowd packed in. The last set shook the loft.' }
+          result: 'You shut the doors and the crowd packed in, and the last set shook the loft.' }
       ] },
 
     { id: 'OMAHA_TOURNEY_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -172,15 +172,15 @@ SB.Cities.register('omaha', {
       title: 'The bar cancels the bill',
       body: 'The bar with the back-room stage lost its parking to the tournament and has dropped your bill for the final weekend.',
       options: [
-        { id: 'HOUSE', label: 'Move the bill to a house', likely: 'Smaller and louder. Nobody has to park downtown.',
+        { id: 'HOUSE', label: 'Move the bill to a house', likely: 'It\'s smaller and louder, and nobody has to park downtown.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A house took the bill with a day to spare and the floor was packed.' },
-        { id: 'LATER', label: 'Push the show to the next weekend', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A house took the bill with a day to spare, and the floor was packed.' },
+        { id: 'LATER', label: 'Push the show to the next weekend', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 7, respect: false }],
-          result: 'You moved it a week. Most of the bands could make it.' },
-        { id: 'ACCEPT', label: 'Look for a smaller slot at another room', likely: 'Cheaper and thinner.',
+          result: 'You moved it a week, and most of the bands could make it.' },
+        { id: 'ACCEPT', label: 'Look for a smaller slot at another room', likely: 'It\'s cheaper and thinner.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'A smaller room took it for a thinner night.' }
+          result: 'A smaller room took the bill, and the night was thinner.' }
       ] }
   ]
 });

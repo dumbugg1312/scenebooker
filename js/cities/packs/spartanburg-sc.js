@@ -17,7 +17,7 @@ SB.Cities.register('spartanburg-sc', {
   blocklist: ['wofford*', 'converse*', 'hub city*', 'sparkle city*', 'waffle house*', 'cheerwine*', 'switchyard*', 'loom room*'],
 
   blurb: ['An Upstate mill town where the interstates cross and most bands keep driving to Greenville.',
-          'Shows are carports, garages, halls and whatever the mill left. Everyone knows everyone.'],
+          'Shows are in carports, garages, halls and whatever the mill left, and everyone knows everyone.'],
   hard: 'Bands skip it for Greenville, and the room costs a drive.',
   region: 'the Upstate',
   houseType: 'GARAGE',
@@ -121,13 +121,13 @@ SB.Cities.register('spartanburg-sc', {
       title: 'Someone\'s mother has to stay',
       body: 'The all-ages punk bill needs a grown-up in the room from doors to last chord. You have the bands and the PA but not a single chaperone.',
       options: [
-        { id: 'FIND', label: 'Call every parent you know', likely: 'Costs a day of favors and a few of them stay.',
+        { id: 'FIND', label: 'Call every parent you know', likely: 'It costs a day of favors, and a few of them stay.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 30 }, { op: 'REGULARS', pct: .01 }],
           result: 'A mother with a folding chair watched the whole bill and left with a free shirt.' },
-        { id: 'ADULTS', label: 'Make it 21 and up this once', likely: 'Easy. Locks out the kids.',
+        { id: 'ADULTS', label: 'Make it 21 and up this once', likely: 'It\'s easy, and it locks out the kids.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The kids waited out front and some of them went home.' },
-        { id: 'HOUSE', label: 'Take it to a garage', likely: 'Smaller, and no chaperone rule.',
+          result: 'The kids waited out front, and some of them went home.' },
+        { id: 'HOUSE', label: 'Take it to a garage', likely: 'It\'s smaller, and there\'s no chaperone rule.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A slab garage took the bill, extension cords and all.' }
       ] },
@@ -136,28 +136,28 @@ SB.Cities.register('spartanburg-sc', {
       if: { daysOut: [0, 4], calendar: 'parade', months: [11, 12] },
       telegraph: 'The tree lighting and parade close the downtown grid on the first weekend of December.',
       title: 'The grid is closed',
-      body: 'Tree lighting, market and parade have shut the streets around the hall. Parking is gone and half your crowd is walking in from the interstate.',
+      body: 'The tree lighting, market and parade have shut the streets around the hall. Parking is gone, and half your crowd is walking in from the interstate.',
       options: [
-        { id: 'EARLY', label: 'Start at five and finish early', likely: 'The parade crowd drifts in. A short bill.',
+        { id: 'EARLY', label: 'Start at five and finish early', likely: 'The parade crowd drifts in, and it\'s a short bill.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -120 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors at five. The parade crowd wandered in and stayed for two bands.' },
+          result: 'You opened doors at five, and the parade crowd wandered in and stayed for two bands.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list gives up on parking.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'The regulars walked a mile in the cold. Nobody else came.' }
+          result: 'The regulars walked a mile in the cold, and nobody else came.' }
       ] },
 
     { id: 'SPARTANBURG_SC_STORM_POWER', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], months: [6, 7, 8, 9] },
-      telegraph: 'A carport show is booked and the afternoon sky is turning green.',
+      telegraph: 'A carport show is booked, and the afternoon sky is turning green.',
       title: 'The power goes out',
       body: 'A summer thunderstorm took the power in the middle of the second set. The whole crowd is jammed into a neighbor\'s garage, and the amps are dead.',
       options: [
-        { id: 'GENERATOR', label: 'Run it off the generator', likely: 'Costs thirty dollars and an hour.',
+        { id: 'GENERATOR', label: 'Run it off the generator', likely: 'It costs thirty dollars and an hour.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'lateMin', v: 60 }],
-          result: 'The generator coughed and caught. The crowd cheered, and the neighbors did not.' },
-        { id: 'UNPLUGGED', label: 'Play it unplugged in the garage', likely: 'Quiet, small and strangely good.',
+          result: 'The generator coughed and caught, and the crowd cheered, though the neighbors didn\'t.' },
+        { id: 'UNPLUGGED', label: 'Play it unplugged in the garage', likely: 'It\'s quiet and small and strangely good.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'REGULARS', pct: .01 }],
-          result: 'Three bands played acoustic by flashlight and nobody wanted to leave.' }
+          result: 'Three bands played acoustic by flashlight, and nobody wanted to leave.' }
       ] }
   ]
 });

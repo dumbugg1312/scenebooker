@@ -15,7 +15,7 @@ SB.Cities.register('springfield-mo', {
   blocklist: ['bass pro*', 'o\'reilly*', 'missouri state*', 'drury*', 'ozark empire*', 'first friday*', 'springfield cardinals*', 'coxhealth*'],
 
   blurb: ['Old rentals on the hills, halls and church basements. The scene empties and refills with each new class of sixteen-year-olds.',
-          'Everyone drives. A show with no driver is a show nobody can leave.'],
+          'Everyone drives, and a show with no driver is one nobody can leave.'],
   hard: 'Few all-ages rooms, and everyone needs a ride home.',
   region: 'the Ozarks',
   whereGo: [
@@ -118,12 +118,12 @@ SB.Cities.register('springfield-mo', {
       title: 'The strip is a street party',
       body: 'A festival has closed the brick street for the weekend. The crowd is out in costumes and the parking is gone. Your show is two doors down from all of it.',
       options: [
-        { id: 'STEAL', label: 'Leave the door open and take the walk-ins', likely: 'Drunk and curious. Some of them stay.',
+        { id: 'STEAL', label: 'Leave the door open and take the walk-ins', likely: 'They\'re drunk and curious, and some of them stay.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Half the room was strangers in costumes. Loud, friendly and a little messy.' },
-        { id: 'EARLY', label: 'Start early and finish before the crowd peaks', likely: 'The regulars get in. A short night.',
+          result: 'Half the room was strangers in costumes, and it was loud, friendly and a little messy.' },
+        { id: 'EARLY', label: 'Start early and finish before the crowd peaks', likely: 'The regulars get in, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Done before the street filled. The regulars loaded out in peace.' },
+          result: 'You were done before the street filled, and the regulars loaded out in peace.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Nobody can park.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
           result: 'The lane was blocked and half the list gave up circling.' }
@@ -135,15 +135,15 @@ SB.Cities.register('springfield-mo', {
       title: 'Eleven oh four',
       body: 'The last band runs long in the midtown basement. The quiet hour is the city\'s, not the landlord\'s, and a neighbor has the police line on speed dial.',
       options: [
-        { id: 'CUT', label: 'Pull the plug at eleven', likely: 'A short last set. Everybody lives.',
+        { id: 'CUT', label: 'Pull the plug at eleven', likely: 'It\'s a short last set, and nobody gets in trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'The last band got half a set and a loud cheer for stopping.' },
         { id: 'ACOUSTIC', label: 'Unplug and finish quietly', likely: 'A strange, good ending.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
           result: 'They finished on one guitar and a floor tom with a towel on it.' },
-        { id: 'RISK', label: 'Keep going', likely: 'Maybe the cops come. Maybe not.',
+        { id: 'RISK', label: 'Keep going', likely: 'Maybe the cops come, and maybe they don\'t.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }, { op: 'MONEY', amount: -40 }],
-          result: 'Two cruisers at 11:04. A warning, a fine, and the host was not happy.' }
+          result: 'Two cruisers came at 11:04 and left a warning and a fine, and the host was not happy.' }
       ] },
 
     { id: 'SPRINGFIELD_MO_GAME_NIGHT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -154,13 +154,13 @@ SB.Cities.register('springfield-mo', {
       options: [
         { id: 'LATE', label: 'Push doors back until both are over', likely: 'The ones who want more come after.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The overflow from the big show found you.' },
+          result: 'Doors opened an hour late, and the overflow from the big show found you.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'A packed floor or a half-empty one.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The kids split. The locals who opened played to the ones who stayed.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The kids split, and the locals who opened played to the ones who stayed.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] }
   ]
 });

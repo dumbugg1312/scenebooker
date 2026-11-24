@@ -13,7 +13,7 @@ SB.Cities.register('columbia-mo', {
   blocklist: ['mizzou*', 'university of missouri*', 'true/false*', 'roots n blues*', 'columbia college*', 'stephens college*'],
 
   blurb: ['A Missouri university town about halfway between St. Louis and Kansas City, where football weekends and downtown bars run the calendar.',
-          'The art-gallery blocks and old rentals around campus are where anything else has to live.'],
+          'Anything else has to live in the art-gallery blocks and old rentals around campus.'],
   hard: 'Bars are the default room, students turn over, and downtown real estate keeps getting more valuable.',
   region: 'the Midwest',
   houseType: 'BASEMENT',
@@ -111,36 +111,36 @@ SB.Cities.register('columbia-mo', {
   events: [
     { id: 'COLUMBIA_MO_GAME_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'game' },
-      telegraph: 'A home game is Saturday and every bar downtown is already planning for it.',
+      telegraph: 'A home game is Saturday, and every bar downtown is already planning for it.',
       title: 'The town is stuffed',
-      body: 'Downtown is jammed with alumni and the lots are full. The east-side warehouse is the one place the crowd is not, but its address cannot be posted anywhere.',
+      body: 'Downtown is jammed with alumni and the lots are full. The east-side warehouse is the one place the crowd isn\'t, but its address can\'t be posted anywhere.',
       options: [
-        { id: 'WORD', label: 'Pass the address by word of mouth', likely: 'The regulars find it. Nobody new does.',
+        { id: 'WORD', label: 'Pass the address by word of mouth', likely: 'The regulars find it, and nobody new does.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
-          result: 'The ones who knew where to ask came. It was a tight, loud, unpublicized night.' },
-        { id: 'LATE', label: 'Push doors back until the game crowd thins', likely: 'The night people show up. Later than planned.',
+          result: 'The people who knew where to ask came, and it was a tight, loud, unpublicized night.' },
+        { id: 'LATE', label: 'Push doors back until the game crowd thins', likely: 'The night people show up, later than planned.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The ones who wanted something else drifted in from the bars.' },
+          result: 'You opened doors an hour late, and the people who wanted something else drifted in from the bars.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The casual crowd stayed downtown. The regulars came.' }
+          result: 'The casual crowd stayed downtown, and the regulars came.' }
       ] },
 
     { id: 'COLUMBIA_MO_ICE_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [12, 1, 2] },
-      telegraph: 'Freezing rain is forecast for Friday and the roads will be glass by dark.',
+      telegraph: 'Freezing rain is forecast for Friday, and the roads will be glass by dark.',
       title: 'Ice storm Friday',
       body: 'The roads are glazed and half the town has lost power. The bar is dark, so the bill is moving to a basement where the furnace and one overloaded extension cord are the whole plan.',
       options: [
-        { id: 'BASEMENT', label: 'Move the bill to a basement within walking distance', likely: 'Smaller and warmer. Watch the extension cord.',
+        { id: 'BASEMENT', label: 'Move the bill to a basement within walking distance', likely: 'It\'s smaller and warmer, but you\'ll have to watch the extension cord.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The bill squeezed into a basement. The furnace held and the cord did not melt.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The bill squeezed into a basement, and the furnace held and the cord didn\'t melt.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could make it, did.' },
+          result: 'You moved it a day, and the people who could make it came.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'Only the people who can walk come.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .6 }],
-          result: 'A handful of walkers and a cold room. It was a good story afterward.' }
+          result: 'A handful of walkers came to a cold room, and it made a good story afterward.' }
       ] }
   ]
 });

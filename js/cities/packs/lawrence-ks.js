@@ -109,15 +109,15 @@ SB.Cities.register('lawrence-ks', {
       title: 'The third call this year',
       body: 'A neighbor in an old house has called the police for the third time this year, and the landlord says the house will be declared a nuisance. This could be the last show there.',
       options: [
-        { id: 'MOVE_YARD', label: 'Move the show to a basement across town', likely: 'Smaller and louder. Nobody on that street knows you.',
+        { id: 'MOVE_YARD', label: 'Move the show to a basement across town', likely: 'It\'s smaller and louder, and nobody on that street knows you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: 0.6 }],
-          result: 'A basement across town took the bill. It was packed and nobody called anyone.' },
-        { id: 'EARLY', label: 'Start early and end by nine', likely: 'The neighbor sleeps. A short night.',
+          result: 'A basement across town took the bill. It was packed, and nobody called anyone.' },
+        { id: 'EARLY', label: 'Start early and end by nine', likely: 'The neighbor sleeps, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'Done by nine. The neighbor stayed quiet and so did the house.' },
+          result: 'You were done by nine, and the neighbor stayed quiet, and so did the house.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The neighbor has a phone.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }],
-          result: 'The police showed up at ten. The room emptied and the house was marked.' }
+          result: 'The police showed up at ten, the room emptied, and the house was marked.' }
       ] },
 
     { id: 'LAWRENCE_KS_STREET_FESTIVAL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -126,32 +126,32 @@ SB.Cities.register('lawrence-ks', {
       title: 'The street is closed',
       body: 'Massachusetts Street is full of a street festival, the blocks are closed and the van cannot load. The crowd is out there, just not coming to the show.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the street thins', likely: 'Late, but the crowd comes in off the street.',
+        { id: 'LATE', label: 'Push doors back until the street thins', likely: 'It\'s late, but the crowd comes in off the street.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 1.15 }],
-          result: 'Doors late and the street crowd drifted in. A loud, happy night.' },
+          result: 'You opened doors late and the street crowd drifted in, and it was a loud, happy night.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The van has to find a spot a mile away.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.85 }],
-          result: 'You carried the amps a mile. The ones who came were glad to be inside.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You carried the amps a mile, and the people who came were glad to be inside.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The street was empty and so was the room.' }
+          result: 'You moved it a day, and the street was empty and so was the room.' }
       ] },
 
     { id: 'LAWRENCE_KS_FLOOD_WATCH', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [4, 5, 6] },
       telegraph: 'Rain all week and the basement across the river has water on the floor.',
       title: 'Water on the basement floor',
-      body: 'The old schoolhouse basement floods in spring and the show has to go somewhere dry. Then a tornado watch rolls in and forty kids end up in a cellar.',
+      body: 'The old schoolhouse basement floods in spring, so the show has to go somewhere dry. Then a tornado watch rolls in and forty kids end up in a cellar.',
       options: [
-        { id: 'YARD', label: 'Move the bill to the yard behind it', likely: 'Dry, if the sky holds.',
+        { id: 'YARD', label: 'Move the bill to the yard behind it', likely: 'It\'s dry, if the sky holds.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: 0.8 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: 'The yard held until the watch came in. Everybody went to the cellar and finished the night there.' },
-        { id: 'SHORT', label: 'Cut the bill and run it upstairs', likely: 'A small room and a short night.',
+          result: 'The yard held until the watch came in, and then everybody went to the cellar and finished the night there.' },
+        { id: 'SHORT', label: 'Cut the bill and run it upstairs', likely: 'It\'s a small room and a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.7 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Two bands upstairs, shoulder to shoulder. Nobody minded.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'It was two bands upstairs, shoulder to shoulder, and nobody minded.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The water went down and some of them came back.' }
+          result: 'You moved it a day, and the water went down and some of them came back.' }
       ] }
   ]
 });

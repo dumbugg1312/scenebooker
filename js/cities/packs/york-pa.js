@@ -14,8 +14,8 @@ SB.Cities.register('york-pa', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['york daily record*', 'york dispatch*', 'rabbit transit*', 'penn state*', 'york college*', 'utz*'],
 
-  blurb: ['A small brick factory city ringed by richer townships, where county kids funnel in to fire halls and damp rowhouse basements. The noise clock runs out at nine.',
-          'Baltimore is an hour down the interstate, and the good bands are always one move from leaving for it.'],
+  blurb: ['A small brick factory city ringed by richer townships, where county kids funnel in to fire halls and damp rowhouse basements, and where the noise clock runs out at nine.',
+          'Baltimore is an hour down the interstate, and the good bands are always one move away from leaving for it.'],
   hard: 'An early curfew and a noise law cut shows short, and the crowd drives off.',
   region: 'the Mid-Atlantic',
   houseType: 'ROWHOUSE',
@@ -120,68 +120,68 @@ SB.Cities.register('york-pa', {
       if: { daysOut: [0, 3] },
       telegraph: 'A neighbor on the next block has been asking who is playing this week.',
       title: 'Audible across the property line',
-      body: 'The city noise rule says anything plainly audible past a property line after nine is a violation. In a rowhouse, that is the whole show. The under-18 crowd also has a curfew, and the headliner is on late.',
+      body: 'The city noise rule says anything plainly audible past a property line after nine is a violation, and in a rowhouse that means the whole show. The under-18 crowd also has a curfew, and the headliner is on late.',
       options: [
-        { id: 'EARLY', label: 'Start early and be done by nine', likely: 'Thin early crowd, nobody gets a ticket.',
+        { id: 'EARLY', label: 'Start early and be done by nine', likely: 'The early crowd is thin, but nobody gets a ticket.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Doors came up an hour. The kids with a ride made it before the set times.' },
-        { id: 'ACCEPT', label: 'Play it as planned and keep the volume down', likely: 'A quieter night than anyone wanted.',
+          result: 'You moved doors up an hour, and the kids with a ride made it before the set times.' },
+        { id: 'ACCEPT', label: 'Play it as planned and keep the volume down', likely: 'It\'s a quieter night than anyone wanted.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'The drummer played with brushes in the last set. People did not love it.' },
-        { id: 'HALL', label: 'Take it to a hall with a nonprofit host', likely: 'Costs a favor and a donation.',
+          result: 'The drummer played the last set with brushes, and people did not love it.' },
+        { id: 'HALL', label: 'Take it to a hall with a nonprofit host', likely: 'It costs you a favor and a donation.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'REGULARS', pct: .02 }],
-          result: 'The hall was fine with the noise, and the neighbors never knew. The hall will want a thank-you.' }
+          result: 'The hall was fine with the noise and the neighbors never knew, though the hall will want a thank-you.' }
       ] },
 
     { id: 'YORK_PA_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'The fair opens this week, and the west side is already jammed.',
       title: 'The grandstand takes the west side',
-      body: 'The midway and the grandstand concert fill the west side for ten days. A metal bill in a West York hall will play to the bartender and the kids who could not afford the fair.',
+      body: 'The midway and the grandstand concert fill the west side for ten days, so a metal bill in a West York hall will play to the bartender and the kids who could not afford the fair.',
       options: [
-        { id: 'EAST', label: 'Move the show across town', likely: 'Away from the fair traffic. Fewer of the usual crowd.',
+        { id: 'EAST', label: 'Move the show across town', likely: 'You get away from the fair traffic, but fewer of the usual crowd come.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The east side was quiet and easy to find. The ones who came got in without a lot.' },
-        { id: 'LATE', label: 'Push doors back until the grandstand lets out', likely: 'Later. The fair crowd drifts in.',
+          result: 'The east side was quiet and easy to find, and the people who came got in without a fight over parking.' },
+        { id: 'LATE', label: 'Push doors back until the grandstand lets out', likely: 'It starts later, and the fair crowd drifts in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. Half the fair came in smelling of fried dough.' },
-        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The fair has the crowd.',
+          result: 'Doors opened an hour late, and half the fair came in smelling of fried dough.' },
+        { id: 'ACCEPT', label: 'Run it as planned', likely: 'The fair has the crowd this week.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The room was thin. The kids who could not afford the fair made up for it.' }
+          result: 'The room was thin, but the kids who could not afford the fair made up for it.' }
       ] },
 
     { id: 'YORK_PA_TEN_THIRTY', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3] },
       telegraph: 'The headliner is on late, and the under-18 curfew is posted at the door.',
       title: 'The ten-thirty announcement',
-      body: 'The headliner is on at 10:25 on a Friday, and the owner is about to announce the curfew that sends the under-18s home. Half the room is under 18.',
+      body: 'The headliner is on at 10:25 on a Friday, and the owner is about to announce the curfew that sends the under-18s home, which means half the room.',
       options: [
-        { id: 'SHORT', label: 'Play short and finish before the announcement', likely: 'Everyone hears the whole set. A short one.',
+        { id: 'SHORT', label: 'Play short and finish before the announcement', likely: 'Everyone hears the whole set, but it\'s a short one.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The set was twenty minutes of nothing but the loud parts. Everyone stayed.' },
-        { id: 'WALK', label: 'Let the under-18s walk', likely: 'Half the room leaves. The ones who stay are loud.',
+          result: 'The set was twenty minutes of nothing but the loud parts, and everyone stayed.' },
+        { id: 'WALK', label: 'Let the under-18s walk', likely: 'Half the room leaves, and the people who stay are loud.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The kids filed out at 10:30 with their hands stamped. The back half of the set was for the grown-ups.' },
-        { id: 'MATINEE', label: 'Move the next one to an afternoon', likely: 'Costs you a night. Keeps the kids.',
+          result: 'The kids filed out at 10:30 with their hands stamped, and the back half of the set was for the grown-ups.' },
+        { id: 'MATINEE', label: 'Move the next one to an afternoon', likely: 'It costs you another night, but you keep the kids.',
           effects: [{ op: 'REGULARS', pct: .02 }, { op: 'HOURS', d: -1, when: 'TODAY' }],
-          result: 'You promised an afternoon next time. The kids heard it and cheered.' }
+          result: 'You promised an afternoon show next time, and the kids heard it and cheered.' }
       ] },
 
     { id: 'YORK_PA_ROD_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'race' },
       telegraph: 'Every hotel downtown is booked by old-car owners, and the engines have not stopped.',
       title: 'Every room is taken',
-      body: 'The old-car crowd has the hotels and the downtown blocks. The touring band sleeps on a floor in a Fairmount rowhouse, and the engine noise outlasts the noise law.',
+      body: 'The old-car crowd has the hotels and the downtown blocks, so the touring band sleeps on a floor in a Fairmount rowhouse, and the engine noise outlasts the noise law.',
       options: [
-        { id: 'FLOOR', label: 'Put them up on a rowhouse floor', likely: 'Costs a favor. A good story.',
+        { id: 'FLOOR', label: 'Put them up on a rowhouse floor', likely: 'It costs you a favor, but it makes a good story.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'REGULARS', pct: .02 }],
-          result: 'They slept on the floor and played like it was a hotel. The neighbors heard nothing over the engines.' },
-        { id: 'ACCEPT', label: 'Run it and let them find a room', likely: 'The band is tired.',
+          result: 'They slept on the floor and played like it was a hotel, and the neighbors heard nothing over the engines.' },
+        { id: 'ACCEPT', label: 'Run it and let them find a room', likely: 'The band will be tired.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'They found a couch an hour from town and got to the load-in with no sleep.' },
-        { id: 'SHIFT', label: 'Start early and send them home before dark', likely: 'A short night.',
+          result: 'They found a couch an hour from town and got to load-in without any sleep.' },
+        { id: 'SHIFT', label: 'Start early and send them home before dark', likely: 'It\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early, done by nine. The band drove home with the hot-rod crowd still circling.' }
+          result: 'You opened doors early and finished by nine, and the band drove home with the hot-rod crowd still circling.' }
       ] }
   ]
 });

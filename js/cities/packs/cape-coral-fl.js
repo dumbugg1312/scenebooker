@@ -13,7 +13,7 @@ SB.Cities.register('cape-coral-fl', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. The storms are written only as 'the storm' in game text. */
   blocklist: ['publix*', 'fgcu*', 'cape bike night*', 'red white and boom*', 'edison festival*', 'jetblue*', 'hurricane ian*'],
 
-  blurb: ['A small canal-suburb scene that built its room in a pizza place. The canals are quiet, the amps are not.',
+  blurb: ['A small canal-suburb scene that built its room in a pizza place, where the canals are quiet and the amps are not.',
           "Everyone knows everyone, hardcore and emo share the bill, and the next room might be somebody's backyard."],
   hard: 'Few all-ages rooms, and the big fest is 21 and up.',
   region: 'the Gulf',
@@ -127,10 +127,10 @@ SB.Cities.register('cape-coral-fl', {
       options: [
         { id: 'MOVE', label: 'Move it a day, once the weather passes', likely: 'Breaks the date. Costs trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'SHUT', label: 'Pull the door down and run it hot and loud', likely: 'Sweaty and cramped. The crowd thins out.',
+          result: 'You moved it a day, and the people who could make it came.' },
+        { id: 'SHUT', label: 'Pull the door down and run it hot and loud', likely: 'Sweaty and cramped, and the crowd thins out.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The door stayed down and the fans quit twice. The ones who stayed were dripping and happy.' },
+          result: 'The door stayed down and the fans quit twice, and the people who stayed were dripping and happy.' },
         { id: 'INDOORS', label: 'Move the whole bill to a friend\'s house on higher ground', likely: 'Smaller, with neighbors on every side.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A living room on the high side of the canal took the bill, and the floor was packed.' }
@@ -140,28 +140,28 @@ SB.Cities.register('cape-coral-fl', {
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'Bridge work has the approach down to one lane all week.',
       title: 'The bridge is down to one lane',
-      body: 'Construction on the big bridge has the Parkway approach at a crawl the night of your show. A van from across the river is sitting an hour in traffic, and the kids from the far side can\'t get over in time.',
+      body: 'Construction on the big bridge has the Parkway approach at a crawl the night of your show, a van from across the river is sitting an hour in traffic, and the kids from the far side can\'t get over in time.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the water.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The approach never cleared. The far side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The approach never cleared, so the far side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads sat in the jam together all the way across. They\'ll remember that.' }
+          result: 'Two carloads sat in the jam together all the way across.' }
       ] },
 
     { id: 'CAPE_CORAL_FL_BOAT_PARADE', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'parade' },
       telegraph: 'The Parkway end closes Saturday afternoon for the parade on the water.',
       title: 'The Parkway end is shut',
-      body: 'The parade has the Parkway end closed from four to nine, and the only room down there loads in after the lights go off. The crowd is on the water and parking is gone.',
+      body: 'The parade has the Parkway end closed from four to nine, and the only room down there loads in after the lights go off, and the crowd is on the water and parking is gone.',
       options: [
         { id: 'LATE', label: 'Push doors back until the street reopens', likely: 'A late start, but the parade crowd drifts in.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors at nine thirty. The crowd came in from the water, loud and happy.' },
+          result: 'Doors were at nine thirty, and the crowd came in from the water, loud and happy.' },
         { id: 'GARAGE', label: 'Move the whole bill to a garage inland', likely: 'Smaller and louder, away from the closures.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A garage away from the parade took the bill, and it filled.' },

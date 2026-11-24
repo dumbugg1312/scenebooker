@@ -25,8 +25,8 @@ SB.Cities.register('baton-rouge-la', {
   ],
 
   tilt: [
-    { fan: 'metal', band: 'hardcore', d: .10, reason: 'A heavy town. Hardcore and swamp metal are the live engine, and they share the same few rooms.' },
-    { fan: 'hardcore', band: 'metal', d: .10, reason: 'A heavy town. Hardcore and swamp metal are the live engine, and they share the same few rooms.' }
+    { fan: 'metal', band: 'hardcore', d: .10, reason: 'A heavy town where hardcore and swamp metal are the live engine, and they share the same few rooms.' },
+    { fan: 'hardcore', band: 'metal', d: .10, reason: 'A heavy town where hardcore and swamp metal are the live engine, and they share the same few rooms.' }
   ],
 
   zones: [
@@ -134,51 +134,51 @@ SB.Cities.register('baton-rouge-la', {
       if: { daysOut: [0, 5], calendar: 'game' },
       telegraph: 'Home game Saturday: traffic will be turned one way toward the stadium.',
       title: 'The stadium owns the roads',
-      body: 'A hundred thousand people are headed for the stadium. Police run the roads one way for ninety minutes before kickoff and your load-in is on the wrong side of it.',
+      body: 'A hundred thousand people are headed for the stadium. Police run the roads one way for ninety minutes before kickoff, and your load-in is on the wrong side of it.',
       options: [
-        { id: 'EARLY', label: 'Load in early, before the barricades', likely: 'Most get in. Thinner crowd after.',
+        { id: 'EARLY', label: 'Load in early, before the barricades', likely: 'Most get in, but the crowd is thinner after.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Gear in by noon. The ones who came parked far away and walked.' },
+          result: 'Gear was in by noon, and the ones who came parked far away and walked.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the parking.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
           result: 'The crowd that mattered was somewhere else.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'BATON_ROUGE_LA_CARPORT_STORM', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 35, bind: ['show'],
       if: { daysOut: [0, 3], weather: 'RAIN', months: [5, 6, 7, 8, 9, 10] },
       telegraph: 'Thunderstorms are lining up from the Gulf all week.',
       title: 'The storm sits on the carport',
-      body: 'A summer storm has parked overhead for three hours. The street is flooding and water is coming in at the open sides of the carport, with the amps ten feet away.',
+      body: 'A summer storm has parked overhead for three hours. The street is flooding, and water is coming in at the open sides of the carport with the amps ten feet away.',
       options: [
-        { id: 'WAIT', label: 'Wait it out and start late', likely: 'Some leave. The rest stay.',
+        { id: 'WAIT', label: 'Wait it out and start late', likely: 'Some leave, and the rest stay.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'It cleared around ten. The room was damp and the people who stayed were loud.' },
-        { id: 'TARPS', label: 'Hang tarps and play on', likely: 'Costs thirty dollars. The crowd shrinks.',
+          result: 'It cleared around ten, and the room was damp and the people who stayed were loud.' },
+        { id: 'TARPS', label: 'Hang tarps and play on', likely: 'It costs thirty dollars, and the crowd shrinks.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Blue tarps and a wet drum kit. It sounded like the end of the world.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'You hung blue tarps over a wet drum kit, and it sounded like the end of the world.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] },
 
     { id: 'BATON_ROUGE_LA_BRIDGE_JAM', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], chokepoint: true },
       telegraph: 'Lane closures are planned on the river bridge this week.',
       title: 'The bridge is backed up',
-      body: 'A wreck on the I-10 bridge over the river has traffic stopped. The kids and the band coming from across the water are stuck behind it.',
+      body: 'A wreck on the I-10 bridge over the river has traffic stopped, and the kids and the band coming from across the water are stuck behind it.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The ones across the river stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The backup never cleared, and the people across the river stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the long way around together. They will remember that.' }
+          result: 'Two carloads of kids took the long way around together.' }
       ] }
   ]
 });

@@ -15,7 +15,7 @@ SB.Cities.register('boise-id', {
   /* The dossier's invented venue names are banned too: research, not content, unchecked. The university appears only as 'the university'. */
   blocklist: ['boise state*', 'treefort*', 'idaho statesman*', 'boise weekly*', 'basque block*', 'sugar beet hall*', 'inversion room*'],
 
-  blurb: ['Idaho\'s capital in a high-desert river valley, with a small, stubborn underground where hardcore, grind and death metal share bills. Houses are the backbone; a big festival gets the spotlight.',
+  blurb: ['Idaho\'s capital in a high-desert river valley, with a small, stubborn underground where hardcore, grind and death metal share bills. Houses are the backbone, and one big festival gets the spotlight.',
           'Every band has a Portland or Seattle someday, and a show that runs past eleven brings the cops.'],
   hard: 'Almost nowhere is all-ages, and the cops come at eleven.',
   region: 'the Mountain West',
@@ -118,15 +118,15 @@ SB.Cities.register('boise-id', {
       title: 'The cops come at eleven',
       body: 'The noise rule bites after 11, and a patrol car has been idling at the end of the block since the second band. The headliner is not on yet.',
       options: [
-        { id: 'MOVEUP', label: 'Cut the changeovers and start the headliner now', likely: 'A rushed set. Everyone hears it before the lights come.',
+        { id: 'MOVEUP', label: 'Cut the changeovers and start the headliner now', likely: 'The set is rushed and everyone can tell.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -30 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The headliner went on early and short. The patrol car left at ten past eleven.' },
-        { id: 'TURNDOWN', label: 'Turn it down and keep going', likely: 'Quieter. A few leave.',
+          result: 'The headliner went on early and played short, and the patrol car left at ten past eleven.' },
+        { id: 'TURNDOWN', label: 'Turn it down and keep going', likely: 'It\'s quieter, and a few people leave.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The amps came down a notch. The room leaned in and the car stayed at the end of the block.' },
-        { id: 'END', label: 'Call it early and keep the peace', likely: 'The headliner is sore. The kids are angrier.',
+          result: 'The amps came down a notch and the room leaned in, and the car stayed at the end of the block.' },
+        { id: 'END', label: 'Call it early and keep the peace', likely: 'The headliner is sore and the kids are angrier.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }, { op: 'REGULARS', pct: -.01 }],
-          result: 'You shut it down at ten to eleven. The kids were angry for a week.' }
+          result: 'You shut it down at ten to eleven, and the kids were angry for a week.' }
       ] },
 
     { id: 'BOISE_ID_FEST_BUMP', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
@@ -135,32 +135,32 @@ SB.Cities.register('boise-id', {
       title: 'The festival bumps your bill',
       body: 'The room that was holding your all-ages night has given the date to a touring band for the festival. The only room with a floor and a power outlet that can hold half your crowd is a basement under a social club.',
       options: [
-        { id: 'BASEMENT', label: 'Take the basement under the club', likely: 'Half the room, twice the noise.',
+        { id: 'BASEMENT', label: 'Take the basement under the club', likely: 'You get half the room, and it\'s twice as loud.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'DIY', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .5 }],
           result: 'The basement held half of what the club would have, and every one of them stayed to the end.' },
-        { id: 'MOVE', label: 'Move it a day, after the festival', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move it a day, after the festival', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The festival crowd was gone and the locals came back.' },
+          result: 'You moved it a day, the festival crowd was gone, and the locals came back.' },
         { id: 'ACCEPT', label: 'Run it where it is and take what you get', likely: 'The festival takes the casual crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The festival ate the casual crowd. The die-hards came.' }
+          result: 'The festival ate the casual crowd, and the die-hards came.' }
       ] },
 
     { id: 'BOISE_ID_SMOKE_DAY', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3], months: [8, 9] },
-      telegraph: 'The sky has been orange since Tuesday and the app says the air is unhealthy.',
+      telegraph: 'The sky has been orange since Tuesday and your phone says the air is unhealthy.',
       title: 'Smoke over the river',
       body: 'Wildfire smoke has settled into the valley and the riverside show is not going to happen. The band asks about a garage in Nampa, twenty-five minutes away.',
       options: [
-        { id: 'NAMPA', label: 'Move it to the garage in Nampa', likely: 'Small and far, but indoors and loud.',
+        { id: 'NAMPA', label: 'Move it to the garage in Nampa', likely: 'It\'s small and far, but indoors and loud.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'Twenty-five minutes of highway and a hot garage with the door shut. It went well.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. The smoke may stay.',
+          result: 'It was twenty-five minutes of highway to a hot garage with the door shut, and it went well.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, and the smoke may stay anyway.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The smoke stayed, and some of the crowd stayed home.' },
+          result: 'You moved it a day, but the smoke stayed and some of the crowd stayed home.' },
         { id: 'ACCEPT', label: 'Run it anyway', likely: 'People stay inside.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
-          result: 'A thin crowd in masks. The band played to the ones who came.' }
+          result: 'A thin crowd in masks showed up, and the band played to the ones who came.' }
       ] },
 
     { id: 'BOISE_ID_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
@@ -171,13 +171,13 @@ SB.Cities.register('boise-id', {
       options: [
         { id: 'LATE', label: 'Push doors back until the grandstand lets out', likely: 'The crowd that wants more shows up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The fair crowd came in loud and not ready to go home.' },
-        { id: 'SMALL', label: 'Cap it small and keep the door clear', likely: 'Safer. Fewer people.',
+          result: 'Doors were an hour late, and the fair crowd came in loud and not ready to go home.' },
+        { id: 'SMALL', label: 'Cap it small and keep the door clear', likely: 'It\'s safer, with fewer people.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .6 }, { op: 'SHOW_MOD', key: 'qAdd', v: 1 }],
           result: 'You held the line at the door and the bay stayed breathable.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the fair.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed at the fair. The regulars came.' }
+          result: 'The casual crowd stayed at the fair, and the regulars came.' }
       ] }
   ]
 });

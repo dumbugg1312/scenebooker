@@ -125,15 +125,15 @@ SB.Cities.register('bellingham-wa', {
       title: 'The relay race has the town',
       body: 'Downtown and the village are jammed, nothing is open for parking within a mile, and half your crowd is working the course or at a team party.',
       options: [
-        { id: 'EARLY', label: 'Open early and send people the back way', likely: 'Most get in before the traffic. Thin to start.',
+        { id: 'EARLY', label: 'Open early and send people the back way', likely: 'Most get in before the traffic, but it starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came parked uphill and walked down.' },
-        { id: 'AFTER', label: 'Run it as planned for the after-party crowd', likely: 'Fewer regulars, a few strangers who want a party.',
+          result: 'Doors were an hour early, and the ones who came parked uphill and walked down.' },
+        { id: 'AFTER', label: 'Run it as planned for the after-party crowd', likely: 'You get fewer regulars and a few strangers who want a party.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'REGULARS', pct: .01 }],
-          result: 'A crowd of tired relay people drifted in around ten. They stayed.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'A crowd of tired relay people drifted in around ten, and they stayed.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'BELLINGHAM_WA_FAREWELL_SETS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 60, bind: ['show'],
@@ -142,15 +142,15 @@ SB.Cities.register('bellingham-wa', {
       title: 'Everybody is leaving',
       body: 'The year is over. Half the bands on your list are playing their last show before they graduate and move away, and the basement is about to lose its whole house.',
       options: [
-        { id: 'STACK', label: 'Stack the bill with farewell sets', likely: 'A packed floor and a lot of feeling. The list will be shorter by fall.',
+        { id: 'STACK', label: 'Stack the bill with farewell sets', likely: 'The floor is packed and a lot of people are feeling it, and the list will be shorter by fall.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.2 }, { op: 'REGULARS', pct: -.03 }],
-          result: 'The room was full of people saying goodbye. Half of them are gone by Monday.' },
-        { id: 'NORMAL', label: 'Keep the show as planned', likely: 'A fair night. The bands leave anyway.',
+          result: 'The room was full of people saying goodbye, and half of them are gone by Monday.' },
+        { id: 'NORMAL', label: 'Keep the show as planned', likely: 'It\'s a fair night, and the bands leave anyway.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 1.0 }],
-          result: 'A normal night in a week that was anything but.' },
-        { id: 'BENEFIT', label: 'Make it a send-off for the house', likely: 'Costs a little. The leavers remember you.',
+          result: 'It was a normal night in a week that was anything but.' },
+        { id: 'BENEFIT', label: 'Make it a send-off for the house', likely: 'It costs a little, and the leavers remember you.',
           effects: [{ op: 'MONEY', amount: -25 }, { op: 'REGULARS', pct: .02 }],
-          result: 'You covered the cups and the cake. The leavers will tell people about you in other cities.' }
+          result: 'You covered the cups and the cake, and the leavers will tell people about you in other cities.' }
       ] },
 
     { id: 'BELLINGHAM_WA_SMOKE_SEASON', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -159,15 +159,15 @@ SB.Cities.register('bellingham-wa', {
       title: 'The sky is orange',
       body: 'Smoke from fires across the border has turned the afternoon dark and the air thick. Nobody wants to stand in a yard tonight.',
       options: [
-        { id: 'INSIDE', label: 'Pack everyone into a basement', likely: 'Smaller and louder. The air indoors is not much better.',
+        { id: 'INSIDE', label: 'Pack everyone into a basement', likely: 'It\'s smaller and louder, and the air indoors is not much better.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'The whole bill fit in a basement with a box fan and a lot of coughing.' },
-        { id: 'MOVE', label: 'Move it a day, once the wind turns', likely: 'Breaks the date. Costs trust.',
+        { id: 'MOVE', label: 'Move it a day, once the wind turns', likely: 'Breaks the date, which costs you trust.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The smoke had thinned by then.' },
-        { id: 'MASKS', label: 'Hand out masks and play on', likely: 'Costs twenty dollars. The crowd thins.',
+          result: 'You moved it a day, and the smoke had thinned by then.' },
+        { id: 'MASKS', label: 'Hand out masks and play on', likely: 'It costs twenty dollars, and the crowd thins.',
           effects: [{ op: 'MONEY', amount: -20 }, { op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'A room of people in masks. The photos looked wild and the crowd was small.' }
+          result: 'It was a room of people in masks. The photos looked wild and the crowd was small.' }
       ] },
 
     { id: 'BELLINGHAM_WA_BAKER_CLOSED', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -178,13 +178,13 @@ SB.Cities.register('bellingham-wa', {
       options: [
         { id: 'ACCEPT', label: 'Run it without the upper valley', likely: 'You lose the mountain kids and keep the rest.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The road stayed closed. The mountain kids watched the show on a phone.' },
-        { id: 'EARLY', label: 'Move it an hour earlier so they can beat the plows', likely: 'Some make it. The night starts thin.',
+          result: 'The road stayed closed, and the mountain kids watched the show on a phone.' },
+        { id: 'EARLY', label: 'Move it an hour earlier so they can beat the plows', likely: 'Some make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .7, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
           result: 'A truck full of mountain kids pulled in right behind the plow.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The road was open and the snow was gone by then.' }
+          result: 'You moved it a day, and the road was open and the snow was gone by then.' }
       ] }
   ]
 });

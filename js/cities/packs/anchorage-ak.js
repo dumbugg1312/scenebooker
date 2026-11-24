@@ -11,7 +11,7 @@ SB.Cities.register('anchorage-ak', {
   blocklist: ['iditarod*', 'fur rondy*', 'fur rendezvous*', 'alaska pacific*', 'jber*', 'people mover*', 'xtratufs*'],
 
   blurb: ['A stretched-out city at the end of the road system, where metal heads and kids share the few all-ages doors that stay open.',
-          'Rooms come and go, so every show feels like one worth showing up for. Touring bands fly in and borrow a backline. The light is gone by four in winter.'],
+          'Rooms come and go, so every show feels like one worth showing up for. Touring bands fly in and borrow a backline, and in winter the light is gone by four.'],
   hard: 'Few all-ages rooms, long winters, and a flight to anywhere.',
   region: 'Alaska',
   missing: 'An all-ages room that pays its own rent.',
@@ -24,8 +24,8 @@ SB.Cities.register('anchorage-ak', {
   ],
 
   tilt: [
-    { fan: 'metal', band: 'hardcore', d: .10, reason: 'Metal is the old core here, and it shares the one room that will have punk.' },
-    { fan: 'hardcore', band: 'metal', d: .10, reason: 'Metal is the old core here, and it shares the one room that will have punk.' }
+    { fan: 'metal', band: 'hardcore', d: .10, reason: 'Metal is the old core here, and it shares a room with the one place that will have punk.' },
+    { fan: 'hardcore', band: 'metal', d: .10, reason: 'Metal is the old core here, and it shares a room with the one place that will have punk.' }
   ],
 
   zones: [
@@ -129,67 +129,67 @@ SB.Cities.register('anchorage-ak', {
   events: [
     { id: 'ANCHORAGE_AK_ROAD_CLOSED', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], chokepoint: true },
-      telegraph: 'There is slide and wreck weather on the highways this week.',
+      telegraph: 'The highways are bad this week, with slides and wrecks.',
       title: 'A road is closed',
       body: 'A wreck or a slide has closed {chokepoint} the night of your show. The kids from up the road can\'t get through, and the nearest way around is a day away.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can try to get through', likely: 'Some of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can try to get through', likely: 'Some of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people from outside town.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people from outside town.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The road stayed shut. The ones out of town stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The road stayed shut, and the people from out of town stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads waited out the closure together and came in when it opened. They\'ll remember that.' }
+          result: 'Two carloads waited out the closure together and came in when the road opened.' }
       ] },
 
     { id: 'ANCHORAGE_AK_SLED_START', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'race' },
-      telegraph: 'The sled-dog start is Saturday. Downtown will be solid.',
+      telegraph: 'The sled-dog start is Saturday, and downtown will be solid people.',
       title: 'The sled-dog start has downtown',
-      body: 'The ceremonial start has Fourth Avenue packed, the hotels full, and the parking gone. Half the city is downtown, and none of it is coming to your show.',
+      body: 'The ceremonial start has Fourth Avenue packed, the hotels full and the parking gone. Half the city is downtown, and none of it is coming to your show.',
       options: [
         { id: 'EARLY', label: 'Open early and tell everyone to park far away', likely: 'Most get in before the crowds.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }],
-          result: 'Doors an hour early. The ones who came parked a mile away and walked in the snow.' },
+          result: 'You opened doors an hour early, and the people who came parked a mile away and walked in the snow.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'A lot of people give up on the parking.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The streets stayed full. Half the list went to the parade instead.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The streets stayed full, and half the list went to the parade instead.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'ANCHORAGE_AK_LOST_BACKLINE', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show', 'touring'],
       if: { daysOut: [0, 2] },
-      telegraph: 'The touring band flew in. Their gear is another matter.',
+      telegraph: 'The touring band flew in, but their gear didn\'t.',
       title: 'The amps did not make the connection',
-      body: '{touring} flew in through Seattle, and their amps and cymbals did not. You have a few hours to borrow gear from three suburbs.',
+      body: '{touring} flew in through Seattle, but their amps and cymbals didn\'t. You have a few hours to borrow gear from three suburbs.',
       options: [
-        { id: 'BORROW', label: 'Borrow from the local bands', likely: 'It works. It sounds like it.',
+        { id: 'BORROW', label: 'Borrow from the local bands', likely: 'It works, and it sounds like borrowed gear.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -2 }, { op: 'TRUST', who: '$touring', d: -1 }],
-          result: 'Three amps from three garages. The sound was thin and everyone was kind.' },
-        { id: 'RENT', label: 'Rent a backline', likely: 'Costs eighty dollars. A good night.',
+          result: 'You got three amps from three garages, and the sound was thin, but everyone was kind about it.' },
+        { id: 'RENT', label: 'Rent a backline', likely: 'It costs eighty dollars, and you get a good night.',
           effects: [{ op: 'MONEY', amount: -80 }],
-          result: 'A van of rented amps showed up at five. The show went off without a hitch.' },
-        { id: 'SHORT', label: 'Run short and play on what is there', likely: 'A short set on borrowed drums.',
+          result: 'A van of rented amps showed up at five, and the show went off without a hitch.' },
+        { id: 'SHORT', label: 'Run short and play on what is there', likely: 'They play a short set on borrowed drums.',
           effects: [{ op: 'CUT_SET', who: '$touring', minutes: 10 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'A short set and a lot of apologies. The crowd forgave it.' }
+          result: 'It was a short set with a lot of apologies, and the crowd forgave it.' }
       ] },
 
     { id: 'ANCHORAGE_AK_BREAK_UP_FLOOD', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [4, 5], roomKind: ['HOUSE', 'DIY'] },
-      telegraph: 'It is break-up. The snow is going and the yards are lakes.',
+      telegraph: 'It\'s break-up, the snow is going, and the yards are lakes.',
       title: 'Break-up has the basement',
-      body: 'The meltwater is coming under the wall. The floor is an inch deep in mud and slush, two days before the show.',
+      body: 'The meltwater is coming under the wall, and two days before the show the floor is an inch deep in mud and slush.',
       options: [
-        { id: 'MOVE', label: 'Move the show to a hall', likely: 'A bigger room and a rental fee. Some of the crowd follows.',
+        { id: 'MOVE', label: 'Move the show to a hall', likely: 'You get a bigger room and a rental fee, and some of the crowd follows.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'MONEY', amount: -60 }],
-          result: 'A hall took the bill. It was dry, and a little bare.' },
-        { id: 'BAIL', label: 'Bail it out and play on', likely: 'Wet and loud. The crowd is thin.',
+          result: 'A hall took the bill, and it was dry and a little bare.' },
+        { id: 'BAIL', label: 'Bail it out and play on', likely: 'It\'s wet and loud, and the crowd is thin.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'STRESS', d: 3 }],
-          result: 'Everyone stood on pallets. The band played in rubber boots.' }
+          result: 'Everyone stood on pallets, and the band played in rubber boots.' }
       ] }
   ]
 });

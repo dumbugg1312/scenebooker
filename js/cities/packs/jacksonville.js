@@ -122,15 +122,15 @@ SB.Cities.register('jacksonville', {
       title: 'The bridge is up',
       body: 'A wreck and a ship have the river bridges tied up the night of your show. Everyone coming from the other bank is sitting in traffic.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross the river.',
+          result: 'You moved doors up an hour, and the people who wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to cross the river.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The bridge never cleared. The ones on the far bank stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The bridge never cleared, and the people on the far bank stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads went the long way round together. They will remember that.' }
+          result: 'Two carloads went the long way around together.' }
       ] },
 
     { id: 'JACKSONVILLE_INSPECTOR', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -139,15 +139,15 @@ SB.Cities.register('jacksonville', {
       title: 'The fire inspector walks in',
       body: 'Mid-set, a man with a clipboard and a flashlight is counting heads at the back of the room. The last time this happened the doors stayed shut for months.',
       options: [
-        { id: 'PORCH', label: 'Move the rest of the bill to a porch down the block', likely: 'Smaller and louder, and the ten o\'clock line is close.',
+        { id: 'PORCH', label: 'Move the rest of the bill to a porch down the block', likely: 'It\'s smaller and louder, and the ten o\'clock line is close.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'Twenty minutes later a porch took the bill. The street heard all of it, and nobody called.' },
-        { id: 'CLEAR', label: 'Clear the floor and cut the night short', likely: 'Nobody gets hurt. Everybody gets cheated.',
+        { id: 'CLEAR', label: 'Clear the floor and cut the night short', likely: 'Nobody gets hurt, but everybody gets cheated.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The floor was cleared and the inspector left. Nobody wrote a thing down, this time.' },
-        { id: 'ACCEPT', label: 'Argue the head count and play on', likely: 'It might work. It might be the last night.',
+          result: 'The floor was cleared and the inspector left, and this time nobody wrote a thing down.' },
+        { id: 'ACCEPT', label: 'Argue the head count and play on', likely: 'It might work, or it might be the last night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'MONEY', amount: -40 }],
-          result: 'You argued the count down and paid for the trouble. The set went on, a little tense.' }
+          result: 'You argued the count down and paid for the trouble, and the set went on a little tense.' }
       ] },
 
     { id: 'JACKSONVILLE_STORM_CUT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -156,15 +156,15 @@ SB.Cities.register('jacksonville', {
       title: 'The power is out at the skatepark',
       body: 'A storm took the power in the middle of the second band. The kids in the bowl offer to run the PA off a car battery, and the rain is not done.',
       options: [
-        { id: 'BATTERY', label: 'Run the PA off the car battery', likely: 'Thin, scrappy and a story they will tell.',
+        { id: 'BATTERY', label: 'Run the PA off the car battery', likely: 'It\'s thin and scrappy, and a story they will tell.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }, { op: 'REGULARS', pct: .02 }],
-          result: 'A car battery and a borrowed cord. It sounded awful and nobody left.' },
-        { id: 'WAIT', label: 'Wait out the storm', likely: 'A late start. The crowd gets restless.',
+          result: 'You used a car battery and a borrowed cord. It sounded awful, and nobody left.' },
+        { id: 'WAIT', label: 'Wait out the storm', likely: 'It\'s a late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The rain stopped near ten. You started late and lost half the little kids.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The rain stopped near ten, so you started late and lost half the little kids.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could come, came.' }
       ] }
   ]
 });

@@ -119,9 +119,9 @@ SB.Cities.register('savannah-ga', {
       title: 'A ghost tour finds the yard show',
       body: 'A tour group stops on the sidewalk outside the Starland yard and starts filming. The neighbor on the rental side comes out onto the stoop.',
       options: [
-        { id: 'QUIET', label: 'Turn it down and wave them along', likely: 'A quiet set. The neighbor goes back in.',
+        { id: 'QUIET', label: 'Turn it down and wave them along', likely: 'A quiet set, and the neighbor goes back in.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The tour moved on and the neighbor went back in. The set ran quiet.' },
+          result: 'The tour moved on and the neighbor went back in, and the set ran quiet.' },
         { id: 'INSIDE', label: 'Move the whole bill indoors', likely: 'Hotter and louder, but out of sight.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: 'A living room took the bill, and the floor was packed and wet with sweat.' },
@@ -136,15 +136,15 @@ SB.Cities.register('savannah-ga', {
       title: 'The highway is a parking lot',
       body: 'A big weekend has Highway 80 backed up for miles, and the beach-bar show is hours from starting. The bands are on the back road.',
       options: [
-        { id: 'LATE', label: 'Push doors back and wait for the van', likely: 'A late start. The crowd gets restless.',
+        { id: 'LATE', label: 'Push doors back and wait for the van', likely: 'A late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van came in by the back road at ten. You started late and nobody left.' },
+          result: 'The van came in by the back road at ten, and you started late but nobody left.' },
         { id: 'ACCEPT', label: 'Run what you have', likely: 'A thinner bill and a half-empty patio.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Two bands made it. The rest played to whoever stayed.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Two bands made it, and the rest played to whoever stayed.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date and costs you some trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'SAVANNAH_GA_STORM_BENEFIT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 45, bind: ['show'],
@@ -156,12 +156,12 @@ SB.Cities.register('savannah-ga', {
         { id: 'BENEFIT', label: 'Turn the date into a benefit at a hall', likely: 'Smaller and earlier, but people come to help.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
           result: 'The hall opened its doors and the money all went to the ones who lost the most.' },
-        { id: 'MOVE', label: 'Move it a day, once it blows over', likely: 'Breaks the date. Costs trust with everyone.',
+        { id: 'MOVE', label: 'Move it a day, once it blows over', likely: 'It breaks the date and costs you some trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' },
-        { id: 'SANDBAG', label: 'Sandbag the door and play on', likely: 'Costs forty dollars. The crowd stays home.',
+          result: 'You moved it a day, and the ones who could come, came.' },
+        { id: 'SANDBAG', label: 'Sandbag the door and play on', likely: 'It costs forty dollars, and the crowd stays home.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The rain held off. The room was half full and wet to the ankle.' }
+          result: 'The rain held off, and the room was half full and wet to the ankle.' }
       ] }
   ]
 });

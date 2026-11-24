@@ -117,13 +117,13 @@ SB.Cities.register('columbus', {
       options: [
         { id: 'LATE', label: 'Push doors back until the stadium crowd has cleared', likely: 'The ones who want a night out show up late.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The kids who walked in from the side streets were loud and glad.' },
+          result: 'Doors opened an hour late, and the kids who walked in from the side streets were loud and glad.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed home. The regulars came, and the dryers kept running.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed home, but the regulars came and the dryers kept running.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] },
 
     { id: 'COLUMBUS_TEEN_CURFEW', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -132,9 +132,9 @@ SB.Cities.register('columbus', {
       title: 'The door after ten',
       body: 'A fifteen-year-old shows up after ten and the new youth curfew is a real problem at the door. You can let the kid in, send the kid home, or call a parent.',
       options: [
-        { id: 'PARENT', label: 'Call a parent and wait with them', likely: 'A slow few minutes. The family remembers it.',
+        { id: 'PARENT', label: 'Call a parent and wait with them', likely: 'It takes a slow few minutes, and the family remembers it.',
           effects: [{ op: 'HOURS', d: -1, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'The parent came and picked the kid up and said thanks. It was the right call.' },
+          result: 'The parent came, picked the kid up and said thanks.' },
         { id: 'TURN', label: 'Turn them away at the door', likely: 'Safe, and the door gets quieter.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .92 }],
           result: 'You turned two more away before eleven. Nobody was happy, and nobody got cited.' },
@@ -149,15 +149,15 @@ SB.Cities.register('columbus', {
       title: 'The fire marshal is walking the block',
       body: 'A warehouse in another part of town had a wall collapse, and the inspectors are visiting every converted building on the west bank. Tonight\'s bill is in one of them.',
       options: [
-        { id: 'BASEMENT', label: 'Move the whole bill to a basement', likely: 'Smaller and louder. Nobody inspects a house.',
+        { id: 'BASEMENT', label: 'Move the whole bill to a basement', likely: 'Smaller and louder, and nobody inspects a house.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
           result: 'A basement took the bill with an hour to spare, and the floor was packed.' },
         { id: 'LIMIT', label: 'Cap the room and run it by the book', likely: 'A smaller crowd on the door, and a clean night.',
           effects: [{ op: 'SHOW_MOD', key: 'capMul', v: .7 }],
-          result: 'You counted heads at the door and stayed under the line. The marshal never came.' },
-        { id: 'MOVEDAY', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'You counted heads at the door and stayed under the line, and the marshal never came.' },
+        { id: 'MOVEDAY', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new date.' }
       ] }
   ]
 });

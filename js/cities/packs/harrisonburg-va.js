@@ -13,7 +13,7 @@ SB.Cities.register('harrisonburg-va', {
   /* Dossier institutions and its unchecked invented venue names are banned: research, not content. */
   blocklist: ['jmu*', 'james madison*', 'whsv*', 'wxjm*', 'scale house*', 'hatch house*', 'granary row*', 'switchyard hall*', 'macrock*', 'rocktown now*'],
 
-  blurb: ['Students, farm kids and a few lifers share the same basements. When the semester ends, half the scene drives home.',
+  blurb: ['Students, farm kids and a few lifers share the same basements, and when the semester ends, half the scene drives home.',
           'Shows live in rented houses and county halls, and the landlord is the real headliner.'],
   hard: 'Student turnover and strict landlords keep the good rooms short-lived.',
   region: 'the Valley',
@@ -104,53 +104,53 @@ SB.Cities.register('harrisonburg-va', {
   events: [
     { id: 'HARRISONBURG_VA_FIRE_MARSHAL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 3] },
-      telegraph: 'The fire department has been walking the downtown rooms, and the word is that one more is about to be shut.',
+      telegraph: 'The fire department has been walking the downtown rooms, and word is that one more is about to be shut.',
       title: 'The fire marshal comes by',
-      body: 'The building was only ever approved for manufacturing, not for a crowd. The marshal has looked at your room and your bill is in four days.',
+      body: 'The building was only ever approved for manufacturing, not for a crowd. The marshal has looked at your room, and your bill is in four days.',
       options: [
-        { id: 'COFFEE', label: 'Move the show to a coffeehouse at five', likely: 'Half the crowd and no amp. Safe.',
+        { id: 'COFFEE', label: 'Move the show to a coffeehouse at five', likely: 'You get half the crowd and no amps, but it\'s safe.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'SHOP', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .5 }],
-          result: 'A coffee shop took you at five. Acoustic sets, a full counter and no complaints.' },
-        { id: 'HOUSE', label: 'Move the bill to a basement', likely: 'Smaller and louder. Nobody is inspecting a house.',
+          result: 'A coffee shop took you at five, and it was acoustic sets, a full counter and no complaints.' },
+        { id: 'HOUSE', label: 'Move the bill to a basement', likely: 'It\'s smaller and louder, and nobody is inspecting a house.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A basement took the bill with a day to spare. The floor was packed.' },
+          result: 'A basement took the bill with a day to spare, and the floor was packed.' },
         { id: 'ACCEPT', label: 'Run it and hope', likely: 'Some of the list stays home, worried about the door.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'Nobody came to the door. A nervous night, and a thinner room than you wanted.' }
+          result: 'Nobody came to the door, but it was a nervous night, and the room was thinner than you wanted.' }
       ] },
 
     { id: 'HARRISONBURG_VA_GAME_DAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'game' },
       telegraph: 'A home game is on Saturday, and South Main will be shut.',
       title: 'The van cannot get through',
-      body: 'The first home game fills the east side and the streets around it. The band from Richmond is stuck behind the traffic, and the house is on the other side.',
+      body: 'The first home game fills the east side and the streets around it. The band from Richmond is stuck behind the traffic, and the house is on the other side of it.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the traffic breaks', likely: 'A late start. The crowd waits it out.',
+        { id: 'LATE', label: 'Push doors back until the traffic breaks', likely: 'It starts late, and the crowd waits it out.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The band walked the last mile with their amps.' },
+          result: 'You opened doors an hour late, and the band walked the last mile with their amps.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd is at the game.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The casual crowd stayed home. The regulars came.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The casual crowd stayed home, and the regulars came.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'HARRISONBURG_VA_NEIGHBOR_CALL', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 2] },
-      telegraph: 'The flyer says to call the number if the volume is a problem. Somebody has the number.',
+      telegraph: 'The flyer says to call the number if the volume is a problem, and somebody has the number.',
       title: 'The neighbor calls at 9:55',
       body: 'The host gave the block a phone number, and a neighbor took it literally. The host has one warning left, and the second band is just starting.',
       options: [
-        { id: 'TURN_DOWN', label: 'Turn it down and go acoustic', likely: 'A quieter, weirder set. Most stay.',
+        { id: 'TURN_DOWN', label: 'Turn it down and go acoustic', likely: 'It\'s a quieter, weirder set, and most people stay.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The drums went to brushes and the room leaned in. The neighbor stopped calling.' },
-        { id: 'END', label: 'End it early and take the bands out front', likely: 'A short night. Nobody gets in trouble.',
+          result: 'The drums went to brushes and the room leaned in, and the neighbor stopped calling.' },
+        { id: 'END', label: 'End it early and take the bands out front', likely: 'It\'s a short night, and nobody gets in trouble.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'You stopped at ten. The street stayed loud for another hour, quietly.' },
+          result: 'You stopped at ten, and the street stayed loud for another hour, though more quietly.' },
         { id: 'ACCEPT', label: 'Ignore the call', likely: 'The host burns the one warning.',
           effects: [{ op: 'MONEY', amount: -40 }],
-          result: 'Deputies came by, and the host was cited. The show went on, and the host will not forget.' }
+          result: 'Deputies came by and cited the host, and the show went on, but the host won\'t forget it.' }
       ] }
   ]
 

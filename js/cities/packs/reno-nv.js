@@ -12,7 +12,7 @@ SB.Cities.register('reno-nv', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. */
   blocklist: ['burning man*', 'hot august*', 'artown*', 'street vibrations*', 'wolf pack*', 'biggest little*', 'reno news & review', 'grand sierra resort', 'roadshows inc'],
 
-  blurb: ['Wind, dust and long drives shape a small valley scene held together by a few stubborn promoters, in garages, bays and bar rooms.',
+  blurb: ['Wind, dust and long drives shape a small valley scene, held together by a few stubborn promoters, in garages, bays and bar rooms.',
           'Rooms keep getting sold out from under the scene, and the next city is a long drive over the mountains or across the desert.'],
   hard: 'Rooms are scarce and sold off, and nobody lives close to anything.',
   region: 'the Great Basin',
@@ -107,49 +107,49 @@ SB.Cities.register('reno-nv', {
       if: { daysOut: [0, 4], months: [10] },
       telegraph: 'The big October music weekend is on every bar window in Midtown.',
       title: 'The only dry hub is booked solid',
-      body: 'The all-ages hub has given its weekend to the October festival, so your kid bill has nowhere to land. The coffee roaster says you can have the floor, but only until nine.',
+      body: 'The all-ages hub has given its weekend to the October festival, so your bill for the kids has nowhere to land. The coffee roaster says you can have the floor, but only until nine.',
       options: [
-        { id: 'ROASTER', label: 'Take the roaster floor and play early', likely: 'Smaller, earlier and closer.',
+        { id: 'ROASTER', label: 'Take the roaster floor and play early', likely: 'It\'s smaller, earlier and closer in.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'SHOP', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The roaster cleared the tables and the kids packed in. Out the door by nine, still buzzing.' },
-        { id: 'MOVE', label: 'Move it a week', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The roaster cleared the tables and the kids packed in, and they were out the door by nine, still buzzing.' },
+        { id: 'MOVE', label: 'Move it a week', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 7, respect: false }],
-          result: 'You moved it a week. A few bands could not make the new date.' },
-        { id: 'ACCEPT', label: 'Run it in a garage', likely: 'Rough and loud.',
+          result: 'You moved it a week, and a few bands could not make the new date.' },
+        { id: 'ACCEPT', label: 'Run it in a garage', likely: 'It\'s rough and loud.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .5 }],
-          result: 'A garage took the bill. The neighbors heard every note.' }
+          result: 'A garage took the bill, and the neighbors heard every note.' }
       ] },
 
     { id: 'RENO_NV_SMOKE_WIND', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [8, 9] },
       telegraph: 'The wind picked up and the sky has gone orange with wildfire smoke.',
       title: 'Smoke and a dawn load-out',
-      body: 'Smoke blew into the valley and the balloon crowd is filling the north end at dawn. The room needs the load-out done by two or the show is off.',
+      body: 'Smoke blew into the valley and the balloon crowd is filling the north end at dawn, so the room needs the load-out done by two or the show is off.',
       options: [
-        { id: 'EARLY', label: 'Start early and load out by two', likely: 'Tight, but the kids can sleep.',
+        { id: 'EARLY', label: 'Start early and load out by two', likely: 'It\'s tight, but the kids can sleep.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'Short sets and the gear out by two. Nobody complained about the quiet.' },
+          result: 'The sets were short and the gear was out by two, and nobody complained about the quiet.' },
         { id: 'ACCEPT', label: 'Run it and breathe through a bandana', likely: 'Half the list stays inside.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The smoke kept most of them home. The ones who came wore masks and played anyway.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date.',
+          result: 'The smoke kept most of them home, and the people who came wore masks and played anyway.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The smoke had cleared by then, mostly.' }
+          result: 'You moved it a day, and the smoke had mostly cleared by then.' }
       ] },
 
     { id: 'RENO_NV_NEIGHBOR_CALL', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3] },
       telegraph: 'A new infill house went up across the street from the show house.',
       title: 'A call from across the street',
-      body: 'The new neighbors across the street have called the police on the house show twice this month. Tonight the downtown curfew for minors starts at nine and the kids walk out early.',
+      body: 'The new neighbors across the street have called the police on the house show twice this month, and tonight the downtown curfew for minors starts at nine, so the kids walk out early.',
       options: [
-        { id: 'EARLY', label: 'Finish by nine and send the kids home', likely: 'Short and quiet.',
+        { id: 'EARLY', label: 'Finish by nine and send the kids home', likely: 'It\'s short and quiet.',
           effects: [{ op: 'SHOW_MOD', key: 'endEarly', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Done by nine, doors closed. The street stayed dark.' },
-        { id: 'MOVE', label: 'Move it to a hall', likely: 'Loses the house feel.',
+          result: 'You were done by nine with the doors closed, and the street stayed dark.' },
+        { id: 'MOVE', label: 'Move it to a hall', likely: 'You lose the feel of the house.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HALL', respect: false }],
-          result: 'A hall took the bill. It was cleaner and a little colder.' },
-        { id: 'ACCEPT', label: 'Run it and keep the volume down', likely: 'Quiet sets, tense night.',
+          result: 'A hall took the bill, and it was cleaner and a little colder.' },
+        { id: 'ACCEPT', label: 'Run it and keep the volume down', likely: 'The sets are quiet and the night is tense.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
           result: 'Everybody played quietly and watched the window.' }
       ] }

@@ -125,17 +125,17 @@ SB.Cities.register('hagerstown-md', {
       if: { daysOut: [0, 4], calendar: 'parade' },
       telegraph: 'The parade is Saturday night, and the streets around the square close at dusk.',
       title: 'The square is closed',
-      body: 'The streets are shut, the lots are full and everybody parks on the far side of the square. The main room\'s bill is competing with the parade crowd.',
+      body: 'The streets are shut, the lots are full, and everybody parks on the far side of the square. The main room\'s bill is competing with the parade crowd.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the parade is over', likely: 'The ones who care will find you. A later night.',
+        { id: 'LATE', label: 'Push doors back until the parade is over', likely: 'The ones who care will find you, but it\'s a later night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors went up late. The parade crowd drifted in with face paint still on.' },
+          result: 'Doors went up late, and the parade crowd drifted in with face paint still on.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids go to watch the parade.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The kids stayed on the curb. The regulars walked around the barricades.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The kids stayed on the curb, and the regulars walked around the barricades.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'HAGERSTOWN_MD_RACE_SATURDAY', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -146,13 +146,13 @@ SB.Cities.register('hagerstown-md', {
       options: [
         { id: 'LATE', label: 'Push doors back until the races end', likely: 'The race crowd wanders over, loud and dusty.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Doors an hour late. The track crowd came in smelling of fuel and stayed for two bands.' },
+          result: 'Doors were an hour late, and the track crowd came in smelling of fuel and stayed for two bands.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The kids and the grown-ups are somewhere else.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'A thin room, but the ones who came knew every word.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'It was a thin room, but the ones who came knew every word.' },
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] },
 
     { id: 'HAGERSTOWN_MD_HALL_CURFEW', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
@@ -163,11 +163,11 @@ SB.Cities.register('hagerstown-md', {
       options: [
         { id: 'EARLY', label: 'Move the start up and finish before the curfew', likely: 'Most of the kids see the whole bill.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors early and the last band finished with a half hour to spare.' },
+          result: 'Doors were early, and the last band finished with a half hour to spare.' },
         { id: 'ACCEPT', label: 'Run it and let them go', likely: 'The kids leave before the last bands.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The van left in the middle of the last set and the room went half empty.' },
-        { id: 'MOVE', label: 'Move the bill to the bar', likely: 'The older crowd stays late. The kids miss it.',
+          result: 'The van left in the middle of the last set, and the room went half empty.' },
+        { id: 'MOVE', label: 'Move the bill to the bar', likely: 'The older crowd stays late, and the kids miss it.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'BAR', respect: false }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
           result: 'The bar took the bill. The grown-ups stayed late and the kids stayed home.' }
       ] }

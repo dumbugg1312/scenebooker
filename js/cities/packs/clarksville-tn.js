@@ -10,7 +10,7 @@ SB.Cities.register('clarksville-tn', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Tornadoes are written only as 'the tornado'. */
   blocklist: ['fort campbell*', 'austin peay*', 'strawberry alley*', 'ringgold mill*', 'wilma rudolph*'],
 
-  blurb: ['A base-town scene of a few bands and no home room, always half-watching Nashville down the interstate. Shows live on bar stages, brewery patios and local-music days.',
+  blurb: ['A base-town scene of a few bands and no home room, always half-watching Nashville down the interstate, with shows on bar stages, brewery patios and local-music days.',
           'Every few years a new batch of soldiers and students arrives, and the ones who play move on just as fast.'],
   hard: 'No all-ages room, and members keep rotating out to move orders and Nashville.',
   region: 'the Cumberland',
@@ -100,48 +100,48 @@ SB.Cities.register('clarksville-tn', {
       if: { daysOut: [0, 3], months: [3, 4, 5], weather: 'RAIN' },
       telegraph: 'The weather service has the whole county under a tornado watch.',
       title: 'The tornado warning',
-      body: 'A tornado warning sweeps through while the bands are loading in at the barn-side backyard in St. Bethlehem. Everyone is sheltering in the barn.',
+      body: 'A tornado warning sweeps through while the bands are loading in at the barn-side backyard in St. Bethlehem, and everyone is sheltering in the barn.',
       options: [
-        { id: 'SHELTER', label: 'Wait it out in the barn and play after', likely: 'A late start. The crowd who stayed are loud.',
+        { id: 'SHELTER', label: 'Wait it out in the barn and play after', likely: 'It means a late start, and the crowd that stays is loud.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The warning passed at nine. You played late to a barn full of people who had nowhere to go.' },
-        { id: 'HOUSE', label: 'Move the bill to a basement room', likely: 'Smaller and safer.',
+          result: 'The warning passed at nine, and you played late to a barn full of people who had nowhere to go.' },
+        { id: 'HOUSE', label: 'Move the bill to a basement room', likely: 'It\'s smaller and safer.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'A cellar took the bill. It was packed and nobody minded.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'A cellar took the bill, and it was packed and nobody minded.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and everybody loses some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] },
 
     { id: 'CLARKSVILLE_TN_TWO_STAGES', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 45, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'festival' },
       telegraph: 'The river festival and the local-music day land on the same weekend.',
       title: 'Two free stages downtown',
-      body: 'There are two free stages downtown and your booked show is up against both of them. Nobody pays to get in when the music outside is free.',
+      body: 'There are two free stages downtown and your booked show is up against both of them, and nobody pays to get in when the music outside is free.',
       options: [
-        { id: 'LATE', label: 'Push doors back until the stages go quiet', likely: 'A late start. The leftovers show up.',
+        { id: 'LATE', label: 'Push doors back until the stages go quiet', likely: 'It means a late start, and only the leftover crowd shows up.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors late. The crowd drifted in from the free stages, loud and happy.' },
+          result: 'Doors opened late, and the crowd drifted in from the free stages, loud and happy.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'The casual crowd stays on the lawn.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The lawn kept the casual crowd. The regulars came.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The lawn kept the casual crowd, and the regulars came.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands lose some trust in you.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'CLARKSVILLE_TN_MOVE_ORDERS', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 4], months: [4, 5, 6, 7, 8, 9, 10] },
       telegraph: "One of the bands has a drummer waiting on his unit's next orders.",
       title: 'Move orders',
-      body: 'The drummer got orders the week before the downtown bar show. The only fill-in is a 16-year-old who has to be out by the curfew.',
+      body: 'The drummer got orders the week before the downtown bar show, and the only fill-in is a 16-year-old who has to be out by the curfew.',
       options: [
         { id: 'FILL', label: 'Let the kid play and send him home on time', likely: 'The set is short and rough.',
           effects: [{ op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The kid played half a set and left before the curfew. The band played the rest as a trio.' },
-        { id: 'DROP', label: 'Drop the band from the bill', likely: 'A thinner bill.',
+          result: 'The kid played half a set and left before the curfew, and the band played the rest as a trio.' },
+        { id: 'DROP', label: 'Drop the band from the bill', likely: 'It\'s a thinner bill.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'The bill ran short without them. The room was half full.' }
+          result: 'The bill ran short without them, and the room was half full.' }
       ] }
   ]
 });

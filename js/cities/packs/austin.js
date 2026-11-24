@@ -138,15 +138,15 @@ SB.Cities.register('austin', {
       title: 'The interstate is a parking lot',
       body: 'A wreck on I-35 has traffic stopped for miles. The bands and kids coming from the north and from San Marcos are stuck in their cars.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
-        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to use the highway.',
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
+        { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'You lose most of the people who have to use the highway.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'The backup never cleared. The ones out of town stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'The backup never cleared, and the people from out of town stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads took the back roads together. They will remember that.' }
+          result: 'Two carloads of kids took the back roads together.' }
       ] },
 
     { id: 'AUSTIN_SPRING_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -155,15 +155,15 @@ SB.Cities.register('austin', {
       title: 'A thousand free shows',
       body: 'The music conference has every band in the country in town, and a thousand free day parties against your one. The fire marshal is out looking for unpermitted rooms, and your locals are all at somebody else\'s show.',
       options: [
-        { id: 'TOURISTS', label: 'Book the out-of-town bands passing through', likely: 'Thinner local crowd, but you are the real thing.',
+        { id: 'TOURISTS', label: 'Book the out-of-town bands passing through', likely: 'The local crowd is thinner, but you are the real thing.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'REGULARS', pct: .02 }],
-          result: 'The strangers found you by word of mouth. The locals never showed.' },
+          result: 'The strangers found you by word of mouth, and the locals never showed.' },
         { id: 'ACCEPT', label: 'Run it as planned and take what you get', likely: 'Most of the town goes elsewhere.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .65 }],
           result: 'Every street was full and your room was not.' },
-        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date. Costs trust with the bands.',
+        { id: 'MOVE', label: 'Move the show a day', likely: 'Breaks the date, which costs you trust with the bands.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'AUSTIN_TRIPLE_DIGITS', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 35, bind: ['show'],
@@ -172,15 +172,15 @@ SB.Cities.register('austin', {
       title: 'The garage is an oven',
       body: 'It is a hundred and four in the shade and the garage has no air. The fans only push the heat around, and the band wants to know if anyone will last through the second set.',
       options: [
-        { id: 'LATE', label: 'Start after nine, when the sun is down', likely: 'The ones who want to come do. Late for the neighbors.',
+        { id: 'LATE', label: 'Start after nine, when the sun is down', likely: 'The ones who want to come do, though it runs late for the neighbors.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The heat broke a little after ten. The crowd was damp but happy.' },
-        { id: 'ICE', label: 'Buy ice and water for everybody', likely: 'Costs forty dollars. People stay.',
+          result: 'The heat broke a little after ten, and the crowd was damp but happy.' },
+        { id: 'ICE', label: 'Buy ice and water for everybody', likely: 'It costs forty dollars, and people stay.',
           effects: [{ op: 'MONEY', amount: -40 }, { op: 'REGULARS', pct: .02 }],
-          result: 'Cold water at the door. Nobody forgot it.' },
+          result: 'You handed out cold water at the door, and nobody forgot it.' },
         { id: 'ACCEPT', label: 'Run it as it is', likely: 'Half the crowd goes home early.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'The people who stayed were soaked and the room emptied by ten.' }
+          result: 'The people who stayed were soaked, and the room emptied by ten.' }
       ] },
 
     { id: 'AUSTIN_ICE_STORM', when: 'WEEK', tier: 'HARD', weight: 1, cooldown: 60, bind: ['show'],
@@ -189,12 +189,12 @@ SB.Cities.register('austin', {
       title: 'The lights go out citywide',
       body: 'An ice storm has taken the power across the city. You have a carport, a gas generator and a few candles, and a band that drove in anyway.',
       options: [
-        { id: 'GENERATOR', label: 'Run it off a generator in the carport', likely: 'Costs thirty dollars in gas. Loud, cold and memorable.',
+        { id: 'GENERATOR', label: 'Run it off a generator in the carport', likely: 'It costs thirty dollars in gas, and it\'s loud, cold and memorable.',
           effects: [{ op: 'MONEY', amount: -30 }, { op: 'SHOW_MOD', key: 'headsMul', v: .6 }, { op: 'REGULARS', pct: .03 }],
-          result: 'The generator droned and the band played in coats. The few who came will talk about it for years.' },
-        { id: 'MOVE', label: 'Move it a day, once the power is back', likely: 'Breaks the date. Costs trust with everyone.',
+          result: 'The generator droned and the band played in coats, and the few who came will talk about it for years.' },
+        { id: 'MOVE', label: 'Move it a day, once the power is back', likely: 'Breaks the date, which costs you trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the ones who could come, came.' }
       ] }
   ]
 });

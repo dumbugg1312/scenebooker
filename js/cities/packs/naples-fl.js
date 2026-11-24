@@ -16,7 +16,7 @@ SB.Cities.register('naples-fl', {
   /* The dossier's invented venue names are in banned: research, not content, unchecked. Storms are written only as 'the storm' in game text. */
   blocklist: ['naples daily news*', 'fgcu*', 'florida gulf coast*', 'publix*', 'waffle house*', 'estates annex*', 'cypress knee hall*', 'sawgrass room*'],
 
-  blurb: ['Garage doors and backyards in the heat, since nobody here has a basement.',
+  blurb: ['Shows are in garages and backyards in the heat, since nobody here has a basement.',
           'The neighbors are rich, retired and quick to call the sheriff, and the bus stops running before the last band does.'],
   hard: 'No basements, rich retiree neighbors, and nowhere to go after the bus stops.',
   region: 'the Gulf coast',
@@ -88,46 +88,46 @@ SB.Cities.register('naples-fl', {
       title: 'Storm on the extension cord',
       body: 'The yard show runs off a long cord from the shed, and the afternoon storm has soaked the whole run. Nobody wants to stand in a wet yard with a live amp.',
       options: [
-        { id: 'GARAGE', label: 'Roll it into the garage and open the door', likely: 'Smaller and louder, with a dry floor and the neighbors close.',
+        { id: 'GARAGE', label: 'Roll it into the garage and open the door', likely: 'It\'s smaller and louder, with a dry floor and the neighbors close.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'HOUSE', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .6 }],
-          result: 'The band played with the door up and the crowd stood in the driveway under the eaves.' },
+          result: 'The band played with the door up, and the crowd stood in the driveway under the eaves.' },
         { id: 'WAIT', label: 'Wait out the storm and start late', likely: 'Some of the kids give up and go home.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .8 }],
-          result: 'The rain stopped around ten. The ones who waited got the whole set.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'The rain stopped around ten, and the people who waited got the whole set.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'NAPLES_FL_SEASON_LOTS', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'race' },
       telegraph: 'The big week is on, and every hotel and parking lot in town has a sign out front.',
       title: 'No place to park on the strip',
-      body: 'The finale week has taken every lot on the industrial strip. A van of kids from up the coast circles for an hour and the bill is short on bodies.',
+      body: 'The finale week has taken every lot on the industrial strip. A van of kids from up the coast circles for an hour, and the bill is short on bodies.',
       options: [
-        { id: 'LATE', label: 'Hold doors until the lots clear out', likely: 'A late start, but the ones who come stay.',
+        { id: 'LATE', label: 'Hold doors until the lots clear out', likely: 'It starts late, but the people who come stay.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'Doors an hour late. The lots emptied out and the van finally got in.' },
+          result: 'You opened doors an hour late, and the lots emptied out and the van finally got in.' },
         { id: 'ACCEPT', label: 'Run it as planned', likely: 'Half the list gives up on parking.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'Half the list never found a spot. The room was thin and friendly.' },
-        { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with the bands.',
+          result: 'Half the list never found a spot, and the room was thin and friendly.' },
+        { id: 'MOVE', label: 'Move it a day', likely: 'It breaks the date, and the bands trust you a little less.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. Not everyone could make the new one.' }
+          result: 'You moved it a day, and not everyone could make the new one.' }
       ] },
 
     { id: 'NAPLES_FL_FAIR_WEEK', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
-      telegraph: 'The midway lights are up east of town and the kids are talking about nothing else.',
+      telegraph: 'The midway lights are up east of town, and the kids are talking about nothing else.',
       title: 'The midway takes the kids',
-      body: 'Fair week has pulled the east-side kids to the carnival rides, and the only other show in town is a bar night that is 21 and over.',
+      body: 'Fair week has pulled the east-side kids to the carnival rides, and the only other show in town is a bar night that\'s 21 and over.',
       options: [
         { id: 'LATE', label: 'Start late, after the midway closes', likely: 'The kids who still have energy come over.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 75 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The midway closed and a crowd drifted in smelling of fried dough.' },
+          result: 'The midway closed, and a crowd drifted in smelling of fried dough.' },
         { id: 'ACCEPT', label: 'Run it and take what you get', likely: 'The midway wins the night.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .7 }],
-          result: 'Most of the list was on the Ferris wheel. The ones who came got the floor to themselves.' }
+          result: 'Most of the list was on the Ferris wheel, and the people who came got the floor to themselves.' }
       ] }
   ]
 });

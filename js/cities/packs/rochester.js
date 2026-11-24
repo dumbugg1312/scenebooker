@@ -9,7 +9,7 @@ SB.Cities.register('rochester', {
   blocklist: ['wegmans*', 'kodak*', 'xerox*', 'genesee brew*', 'lilac fest*', 'democrat and chronicle*'],
 
   blurb: ['Rochester\'s DIY scene lives in church halls, studios and basements, with a strong hardcore and death-metal underground and tape labels.',
-          'The big rooms book covers, so bands hit a ceiling. The same old bands have played the same Saturday for ten years.'],
+          'The big rooms book covers, so bands hit a ceiling, and the same old bands have played the same Saturday for ten years.'],
   hard: 'The big rooms book cover bands, and the same bands keep playing.',
   region: 'the Great Lakes',
   houseType: 'BASEMENT',
@@ -118,32 +118,32 @@ SB.Cities.register('rochester', {
       title: 'The bridge is shut',
       body: 'A bridge over the river is closed the night of your show, and it splits downtown from the west side. The bands and the kids on the other bank have to go the long way around.',
       options: [
-        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it. The night starts thin.',
+        { id: 'EARLIER', label: 'Move the show an hour earlier so they can beat the traffic', likely: 'Most of them make it, but the night starts thin.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .8, beyond: true }, { op: 'SHOW_MOD', key: 'lateMin', v: -60 }, { op: 'SHOW_MOD', key: 'qAdd', v: -2 }],
-          result: 'Doors moved up an hour. The ones who wanted to come left work early.' },
+          result: 'You moved doors up an hour, and the people who really wanted to come left work early.' },
         { id: 'ACCEPT', label: 'Accept a smaller crowd', likely: 'Lose most of the people who have to cross.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .3, beyond: true }],
-          result: 'It never cleared. The ones on the far side stayed home.' },
-        { id: 'RIDES', label: 'Organize rides', likely: 'Two hours of your day. Most of them get there.',
+          result: 'It never cleared, so the people on the far side stayed home.' },
+        { id: 'RIDES', label: 'Organize rides', likely: 'It takes two hours of your day, but most of them get there.',
           effects: [{ op: 'SHOW_MOD', key: 'zoneMul', v: .9, beyond: true }, { op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'REGULARS', pct: .02 }],
-          result: 'Two carloads came together the long way. They will remember that.' }
+          result: 'Two carloads came together the long way around.' }
       ] },
 
     { id: 'ROCHESTER_LAKE_EFFECT', when: 'WEEK', tier: 'HARD', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 3], months: [11, 12, 1, 2, 3] },
       telegraph: 'A lake-effect band is parked over the Thruway an hour west, and nothing is moving.',
       title: 'The Thruway is shut',
-      body: 'The touring band is stuck behind a snow squall an hour west. The local opener is ready, the room is filling, and the headliner is nowhere.',
+      body: 'The touring band is stuck behind a snow squall an hour west, and the local opener is ready, the room is filling, and the headliner is nowhere.',
       options: [
-        { id: 'LONG', label: 'Let the local openers play long', likely: 'A loose night. The ones who came are glad.',
+        { id: 'LONG', label: 'Let the local openers play long', likely: 'A loose night, and the people who came are glad.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .85 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The locals stretched it to two hours. Nobody complained.' },
-        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'A late start. The crowd gets restless.',
+          result: 'The locals stretched it to two hours and nobody complained.' },
+        { id: 'WAIT', label: 'Hold the doors and wait for the van', likely: 'A late start, and the crowd gets restless.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .9 }],
-          result: 'The van pulled in at ten. You started late and nobody left.' },
+          result: 'The van pulled in at ten, and you started late but nobody left.' },
         { id: 'MOVE', label: 'Move it a day', likely: 'Breaks the date. Costs trust with everyone.',
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: 'You moved it a day. The ones who could come, came.' }
+          result: 'You moved it a day, and the people who could make it came.' }
       ] },
 
     { id: 'ROCHESTER_QUIET_HOUR', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
@@ -152,26 +152,26 @@ SB.Cities.register('rochester', {
       title: 'The ten o\'clock call',
       body: 'Someone in the rowhouse next door has the noise code open on their phone. At ten sharp the call goes in, and your show is the one it is about.',
       options: [
-        { id: 'ACOUSTIC', label: 'Go acoustic in the stairwell', likely: 'Quiet, close and strange. Most of them stay.',
+        { id: 'ACOUSTIC', label: 'Go acoustic in the stairwell', likely: 'Quiet, close and strange, and most of them stay.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .9 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: 'The last two bands played a stairwell set by candle. People remembered it.' },
-        { id: 'END', label: 'End it at ten and send them home', likely: 'No trouble. A short night.',
+          result: 'The last two bands played a stairwell set by candle, and people remembered it.' },
+        { id: 'END', label: 'End it at ten and send them home', likely: 'No trouble, but it\'s a short night.',
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: .85 }],
-          result: 'You pulled the plug at ten. The neighbors waved from their window.' }
+          result: 'You pulled the plug at ten, and the neighbors waved from their window.' }
       ] },
 
     { id: 'ROCHESTER_ART_STREET', when: 'WEEK', tier: 'REAL', weight: 1, cooldown: 50, bind: ['show'],
       if: { daysOut: [0, 4], calendar: 'fair' },
       telegraph: 'The street the first room sits on is closed for the weekend for an arts fair.',
       title: 'The street is closed',
-      body: 'The arts-district street is shut for the fair. The church hall cannot load in and the bands are parking six blocks away.',
+      body: 'The arts-district street is shut for the fair, so the church hall cannot load in and the bands are parking six blocks away.',
       options: [
         { id: 'CARRY', label: 'Carry the gear in by hand', likely: 'Two hours of your day. Most of them make it.',
           effects: [{ op: 'HOURS', d: -2, when: 'TODAY' }, { op: 'SHOW_MOD', key: 'headsMul', v: .95 }],
-          result: 'Everyone carried amps through the crowd. It was a strange, good start.' },
+          result: 'Everyone carried amps through the crowd, and it was a strange, good start.' },
         { id: 'ACCEPT', label: 'Run it small and take what you get', likely: 'The fair has the crowd.',
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: .75 }],
-          result: 'The fair took the crowd and the street. The regulars made it in.' }
+          result: 'The fair took the crowd and the street, but the regulars made it in.' }
       ] }
   ]
 });

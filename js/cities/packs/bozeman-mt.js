@@ -115,27 +115,27 @@ SB.Cities.register('bozeman-mt', {
       options: [
         { id: 'LATE', label: "Push doors back until the game crowd winds down", likely: "The ones who want a night out come late.",
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 60 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.95 }],
-          result: "Doors an hour late. The crowd drifted in from the bars loud and happy." },
+          result: "Doors opened an hour late, and the crowd drifted in from the bars loud and happy." },
         { id: 'ACCEPT', label: "Run it as planned", likely: "The casual crowd is at the game.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: "Half the town was at the game. The regulars came." },
+          result: "Half the town was at the game, but the regulars came." },
         { id: 'MOVE', label: "Move it a day", likely: "Breaks the date. Costs trust with the bands.",
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: "You moved it a day. Not everyone could make the new one." }
+          result: "You moved it a day, and not everyone could make the new date." }
       ] },
 
     { id: 'BOZEMAN_MT_ARTS_WEEKEND', when: 'WEEK', tier: 'REAL', weight: 2, cooldown: 40, bind: ['show'],
       if: { daysOut: [0, 5], calendar: 'festival' },
       telegraph: "A free three-day festival takes the park and the parking this weekend.",
       title: "A free show in the park",
-      body: "The festival has the park, the parking and every hotel room. Your show is up against a free three-day event with a crowd of thousands.",
+      body: "The festival has the park, the parking and every hotel room, and your show is up against a free three-day event with a crowd of thousands.",
       options: [
         { id: 'EARLY', label: "Play early, before the park lets out", likely: "A short set for the ones who skipped the lawn.",
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: -90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: "Doors early. The ones who came wanted something louder than the park." },
+          result: "Doors opened early, and the people who came wanted something louder than the park." },
         { id: 'ACCEPT', label: "Run it and take what you get", likely: "The park wins.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.75 }],
-          result: "The park won the night. A small, loyal room." },
+          result: "The park won the night, and the room was small and loyal." },
         { id: 'PARK', label: "Move it outdoors to a yard", likely: "Smaller and cheaper, with no one to answer to.",
           effects: [{ op: 'MOVE_SHOW', dayShift: 0, toKind: 'OUTDOOR', respect: false }, { op: 'SHOW_MOD', key: 'capMul', v: .7 }],
           result: "A yard out on the edge of town took the bill, and the festival kids found it." }
@@ -149,13 +149,13 @@ SB.Cities.register('bozeman-mt', {
       options: [
         { id: 'LOCAL', label: "Run it with local bands only", likely: "A thin night, but a warm one.",
           effects: [{ op: 'SHOW_MOD', key: 'headsMul', v: 0.8 }, { op: 'SHOW_MOD', key: 'qAdd', v: -1 }],
-          result: "Locals only and a long, loose night. The room was half full and warm." },
-        { id: 'WAIT', label: "Hold the doors and wait for the van", likely: "A late start. The crowd gets restless.",
+          result: "It was locals only and a long, loose night, in a room that was half full and warm." },
+        { id: 'WAIT', label: "Hold the doors and wait for the van", likely: "A late start, and the crowd gets restless.",
           effects: [{ op: 'SHOW_MOD', key: 'lateMin', v: 90 }, { op: 'SHOW_MOD', key: 'headsMul', v: 0.9 }],
-          result: "The van limped in at ten. You started late and nobody left." },
+          result: "The van limped in at ten, and you started late but nobody left." },
         { id: 'MOVE', label: "Move it a day", likely: "Breaks the date. Costs trust with the bands.",
           effects: [{ op: 'MOVE_SHOW', dayShift: 1, respect: false }],
-          result: "You moved it a day. Not everyone could make the new one." }
+          result: "You moved it a day, and not everyone could make the new date." }
       ] }
   ]
 });
