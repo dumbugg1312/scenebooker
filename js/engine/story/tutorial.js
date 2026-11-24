@@ -24,7 +24,7 @@ SB.module('Tutorial', function (SB) {
    * show is built on its card (design/spec/11-booking-pipeline.md): ANSWER is BOOK IT on the band's message, which
    * makes the show; until the show exists there is no clip, so the phone it is. A stage can also say `wait: true`
    * (HOLD:HELD with nothing left to get): then it is 'lamp' too, so nobody is sent to a row with nothing to press. */
-  var STAGE_TARGET = { WAIT: 'lamp', PLAY: 'lamp', OPEN: 'lamp' };
+  var STAGE_TARGET = { WAIT: 'lamp', PLAY: 'lamp', OPEN: 'lamp', EVE: 'lamp' };
   var RIG_DAYS = 2;
   var NUDGE_DAYS = 2, BILL_MIN = 3, PROMO_MIN = 2, LATE_FLYER_DAYS = 3;
 
@@ -160,6 +160,25 @@ SB.module('Tutorial', function (SB) {
     return { n: n, next: pick.fit || pick.any || null, fits: !!pick.fit };
   }
 
+  /* any open job of this show with hours that fits tonight (not only the telling ones): its id, or null. The mentor never
+   * says "call it a night" while one of these is waiting (fix-list 1.13). */
+  function openFits(state, s) {
+    var jobs = state.jobs || {}, ids = (s.jobs || []).slice(), i, v, r, best = null, due;
+    for (i = 0; i < ids.length; i++) {
+      if (!jobs[ids[i]]) continue;
+      try { v = SB.Jobs.get(state, ids[i]); } catch (e) { v = null; }
+      if (!v || v.status !== 'TODO' || v.planned || v.hidden || v.optional || v.mode !== 'HOURS' || !v.window ||
+          !(v.window.state === 'OPEN' || v.window.state === 'CLOSING' || v.window.state === 'LATE')) continue;
+      if (v.type === 'RUN_SHOW' || v.type === 'THANKS' || v.type === 'DEBRIEF') continue;
+      r = null;
+      try { r = SB.Week.canDoNow ? SB.Week.canDoNow(state, ids[i]) : { ok: true }; } catch (e2) { r = null; }
+      if (!r || r.ok === false) continue;
+      due = typeof v.due === 'number' ? v.due : 1e9;
+      if (!best || due < best.due) best = { id: ids[i], due: due };
+    }
+    return best ? best.id : null;
+  }
+
   /* a held night: is there anything the room still wants that the player can go and get? Second in line there is
    * not (the room ahead has to fall through); first in line with every need met there is not either (it is theirs in
    * the morning, SB.Rooms.firmUp). Only first in line with a need unmet is something to do. */
@@ -197,7 +216,8 @@ SB.module('Tutorial', function (SB) {
         o = s ? telling(state, s) : { n: 0, next: null, fits: false };
         if (!o.next || !(o.n < PROMO_MIN || state.jobs[o.next].type === 'MAKE_FLYER')) return { stage: 'WAIT' };
         return o.fits ? { stage: 'PLAN', jobId: o.next } : { stage: 'WAIT', jobId: o.next };
-      case 'WAIT': return { stage: 'PLAY' };
+      /* the last night before the show says so (fix-list 1.13); every other night it is one night at a time */
+      case 'WAIT': return { stage: s && s.day - today(state) === 1 ? 'EVE' : 'PLAY' };
       case 'DOOR': return { stage: s && s.night ? 'DOOR' : (s && today(state) >= s.day ? 'OPEN' : 'PLAY') };
       case 'SETTLE': return { stage: 'SETTLE' };
       case 'CLOSEOUT': return { stage: 'READ' };
@@ -291,6 +311,7 @@ SB.module('Tutorial', function (SB) {
     var t = tut(state);
     if (t.done !== null) return { ok: true, step: null };
     t.on = false; t.step = null; t.skipped = true;
+    if (state.settings) state.settings.ladder = false;     // "I've done this before": the whole desk, for good (0.2)
     return { ok: true, step: null };
   }
 
@@ -327,8 +348,15 @@ SB.module('Tutorial', function (SB) {
       /* the flyer is designed: making it (and the promo due soonest) is tonight's work when it fits */
       else { sg = stageOf(state, t, 'PROMO', s); if (sg.stage === 'PLAN' || sg.jobId) { step = 'PROMO'; g = sg; w = null; } }   // PLAN, or a job waiting for tomorrow's hours
     }
+    /* any other open job that fits tonight (before the room is confirmed, say) is tonight's work too: never "call it a night" over it */
+    if ((step === 'BILL' || step === 'SOUND') && g.stage === 'WAIT' && s) {
+      sg = openFits(state, s);
+      if (sg) { step = 'PROMO'; g = { stage: 'PLAN', jobId: sg }; w = null; }
+    }
     base = 'story.tutorial.steps.' + step;
-    tx = g.stage ? say(base + '.stages.' + g.stage, ctx) : '';
+    /* PLAN on the flyer's own job says to make the flyer first; on any other job it never mentions the flyer (fix-list 1.13) */
+    tx = g.stage ? ((g.stage === 'PLAN' && g.jobId && state.jobs[g.jobId] && state.jobs[g.jobId].type === 'MAKE_FLYER' && say(base + '.stages.PLAN_FLYER', ctx)) ||
+                    say(base + '.stages.' + g.stage, ctx)) : '';
     return { step: step, n: STEPS.indexOf(step) + 1, of: STEPS.length, target: (g.wait ? 'lamp' : STAGE_TARGET[g.stage]) || (TARGET[step] === 'clip' && !s ? 'phone' : TARGET[step]),
              stage: g.stage, bandId: g.bandId || null, slot: g.slot || null, personId: g.personId || null, jobId: g.jobId || null,
              showId: s ? s.id : null, requestId: (s && s.requestId) || t.requestId || null,

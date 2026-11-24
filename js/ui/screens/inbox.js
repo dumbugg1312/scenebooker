@@ -25,6 +25,14 @@
     unread: 'new',
     lapsed: 'This one has gone by.',
     replyBy: 'answer by {day}',
+    qAdvance: 'Nothing to answer here: your advance covers this. It goes out before the show with load-in, set times and the address.',
+    qDone: 'The advance you sent answers this.',
+    qRules: 'The host\'s rules in it: {rules}',
+    qPark: 'Park on the street.',
+    qNeighbor: 'The neighbors are close, so keep it down outside.',
+    qCurfew: 'Music stops at {t}.',
+    sayOther: 'say it another way',
+    passed: 'sent: a short no',
     back: 'back to messages',
     backShort: 'back',
     chat: 'chat',
@@ -36,6 +44,10 @@
     here: 'here',
     drive: '{h}h{m}',
     theAsk: 'what they ask',
+    askLine: '{band} want {deal}.',
+    doorAfter: 'That share comes out after the room and sound are paid.',
+    noRoomYet: 'Once you have a room and a night, this message says what you keep if people come.',
+    offerNums: 'The money, in words',
     lodging: 'a floor to sleep on',
     meal: 'a meal',
     members: '{n} of them',
@@ -77,8 +89,8 @@
     guarantee: 'guarantee',
     less: 'five less', more: 'five more',
     sendOffer: 'send the offer',
-    ifNobody: 'if nobody comes',
-    breakEven: 'break even',
+    ifNobody: 'if nobody comes you lose',
+    breakEven: 'you break even at',
     paidN: '{n} paid',
     tone: 'How',
     tones: { SHORT: 'short', REASON: 'with a reason', LEAD: 'with a lead' },
@@ -388,7 +400,27 @@
       pic(out, 34, 32), dood ? gpic(dood, 30, key) : null, h('span', { class: 'ph-tick-t', text: label })
     ]);
   }
-  function fringe(cls, label, kids, data) { return h('div', { class: 'ph-fringe' + (cls ? ' ' + cls : ''), role: 'group', aria: { label: label }, data: data || null }, kids); }
+  function fringe(cls, label, kids, data) {
+    var box = h('div', { class: 'ph-fringe' + (cls ? ' ' + cls : ''), role: 'group', aria: { label: label }, data: data || null }, kids);
+    if (cls && /--filters/.test(cls)) rove(box);
+    return box;
+  }
+  /* a row of toggles is one Tab stop; the arrow keys move along it (keyboard play, fix list 0.9) */
+  function rove(box) {
+    var bs = Array.prototype.slice.call(box.querySelectorAll('button')), at = null;
+    bs.forEach(function (b) { if (!at && b.classList.contains('is-on')) at = b; });
+    at = at || bs[0];
+    function set(b) { bs.forEach(function (x) { x.setAttribute('tabindex', x === b ? '0' : '-1'); }); }
+    set(at);
+    box.addEventListener('focusin', function (e) { if (bs.indexOf(e.target) >= 0) set(e.target); });
+    box.addEventListener('keydown', function (e) {
+      var i = bs.indexOf(e.target), j;
+      if (i < 0 || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' && e.key !== 'Home' && e.key !== 'End')) return;
+      e.preventDefault();
+      j = e.key === 'Home' ? 0 : e.key === 'End' ? bs.length - 1 : Math.max(0, Math.min(bs.length - 1, i + (e.key === 'ArrowRight' ? 1 : -1)));
+      bs[j].focus();
+    });
+  }
   function kicker(text) { return h('p', { class: 'ph-k', text: up(text) }); }
 
   /* ------------------------------------------------------------------ */
@@ -425,14 +457,15 @@
         if (!m.read) by[k].unread = true;
       });
       shown.forEach(function (m) { var k = keyOf(s, m); if (order.indexOf(k) < 0) order.push(k); });
-      return order.map(function (k) {
+      return order.map(function (k, i) {
         var c = by[k];
         c.last = c.msgs[0];
         c.msgs = c.msgs.slice().reverse();
         c.needs = c.req ? !!needIds[k] : c.msgs.some(function (m) { return m.needs; });
         c.gone = goneQ(c.req);
+        c.ord = i;
         return c;
-      });
+      }).sort(function (a, b) { return (b.needs ? 1 : 0) - (a.needs ? 1 : 0) || a.ord - b.ord; });   // the thread that needs an answer sits on top
     }
     function convOf(s, key) { return conversations(s, 'ALL').filter(function (c) { return c.key === key; })[0] || null; }
 
@@ -450,7 +483,9 @@
       return pic(K().sticker({ rect: [5, 5, size, size] }, K().cat(5 + size / 2, 7 + size / 2, size * 0.8, { seed: 'av' + c.key }), { seed: 'avs' + c.key, edge: 3 }), size + 16, size + 18, { cls: 'ph-markpic' });
     }
     function nameOf(s, c) {
-      var m = c.last || {}, b = bandFor(s, c);
+      var m = c.last || {}, b = bandFor(s, c), p = m.fromId != null && s.people ? s.people[m.fromId] : null;
+      /* one name per person, whatever the message was filed under (a host's text is not "THE FAIRFIELD CARPORT"): the first and last name */
+      if (p && p.first && !(c.req && b)) return p.first + (p.last ? ' ' + p.last : '');
       return m.fromName || (b ? b.name : '');
     }
 
@@ -667,6 +702,10 @@
       items.forEach(function (it) {
         if (it.day !== lastDay) { out.push(h('p', { class: 'ph-daystamp' }, h('span', { text: up(SB.time.fmt(it.day, 'short')) }))); lastDay = it.day; }
         out.push(it.who === 'them' ? theirBubble(s, it.m, rv, c) : myBubble(it.text, it.mark));
+        if (it.who === 'them' && it === items[items.length - 1] || it.who === 'them' && items.slice(items.indexOf(it) + 1).every(function (z) { return z.who !== 'them'; })) {
+          var qn = safe(function () { return questionNote(s, it.m, c); }, null);
+          if (qn) out.push(qn);
+        }
       });
       queuedFor(s, c).forEach(function (o) { out.push(myBubble(toWho(s, c, o) + (o.what || ''), 'queued')); });
       if (rv && rv.shortNotice) out.push(h('p', { class: 'ph-sys', text: rv.shortNotice }));
@@ -711,11 +750,40 @@
       return irlScrap(a && a.PASSED && a.PASSED.line, true);
     }
 
+    /* A band's practical question ("what time's load-in?", "where do we park?") with no reply button: the advance answers it.
+     * Say so, and say what the host's rules are, because that is what reaches the band when it goes out (fix-list 2.9). */
+    function questionNote(s, m, c) {
+      var body = String(m.body || m.text || ''), sid = (m.refs && m.refs.showId) || null, show, adv = false, f = null, bits = [], t, id;
+      if (m.needs || (m.kind !== 'BAND' && m.kind !== 'ROOM' && m.kind !== 'HELPER') || !/\?/.test(body) && !/\b(park|load-in|load in|where)\b/i.test(body)) return null;
+      if (!sid) { (c && c.msgs || []).forEach(function (x) { if (!sid && x.refs && x.refs.showId) sid = x.refs.showId; }); }
+      show = sid && s.shows ? s.shows[sid] : null;
+      if (!show) return null;
+      for (id in (s.jobs || {})) { var j = s.jobs[id]; if (j && j.showId === sid && j.type === 'ADVANCE' && j.status === 'DONE') adv = true; }
+      f = show.roomId ? safe(function () { return SB.Rooms.facts(s, show.roomId); }, null) : null;
+      if (f) {
+        if (f.parking === 'street') bits.push(L('qPark'));
+        if (f.neighbor === 'close') bits.push(L('qNeighbor'));
+        if (typeof f.curfew === 'number') bits.push(L('qCurfew', { t: SB.time.clock(f.curfew) }));
+      }
+      t = adv ? L('qDone') : L('qAdvance');
+      return h('p', { class: 'ph-sys ph-qnote', text: t + (bits.length ? ' ' + L('qRules', { rules: bits.join(' ') }) : '') });
+    }
+
+    /* the offer in three plain sentences, on the message itself (fix list 1.3): what they want, what 11 people paying means for each side, where you stop losing */
+    function offerBlock(s, c, rv) {
+      var q = c && c.req, sh = q ? showFor(s, q) : null, ask = rv && rv.ask, name = rv && rv.band ? rv.band.name : '', shape, lines;
+      if (!q || !ask || !name || goneQ(q) || truthOut(s, q)) return null;
+      shape = ask.shape || 'DOOR';
+      if (sh && sh.roomId && SB.UI.offerLines) lines = SB.UI.offerLines(s, sh.id, { band: name, shape: shape, guarantee: ask.guarantee || 0, pct: ask.pct == null ? 1 : ask.pct, says: rv.says });
+      if (!lines || !lines.length) lines = [L('askLine', { band: name, deal: dealWords(ask) }) + (shape === 'DOOR' ? ' ' + L('doorAfter') : ''), L('noRoomYet')];
+      return h('div', { class: 'ph-offerlines', role: 'note', aria: { label: L('offerNums') } }, lines.map(function (t) { return h('p', { class: 'ph-sys', text: t }); }));
+    }
     function theirBubble(s, m, rv, c) {
       var sig = rv && m.kind === 'REQUEST' && rv.signals ? rv.signals : [], hot = c && c.needs ? hotInk() : null;
       return h('div', { class: 'ph-bub ph-bub--them pz-paper' }, [
         m.subject && m.kind === 'REQUEST' ? h('p', { class: 'ph-bub-subj', text: m.subject }) : null,
         bodyText(s, m, c),
+        m.kind === 'REQUEST' ? safe(function () { return offerBlock(s, c, rv); }, null) : null,
         num(m.replyBy) ? h('p', { class: 'ph-replyby' + (hot ? ' is-hot' : ''), style: hot ? { '--hot': hot, '--hot-ink': lightInk(hot) ? T : W } : null, text: up(L('replyBy', { day: SB.time.fmt(m.replyBy, 'short') })) }) : null,
         sig.length ? h('ul', { class: 'ph-sigs', aria: { label: L('signals') } }, sig.map(function (g) {
           return h('li', { class: 'ph-sig' }, [h('b', { text: g.good === true ? '+' : (g.good === false ? '−' : '?') }), ' ', g.text || '']);
@@ -922,6 +990,8 @@
     /** the ways to find out more: tear-off coupons, each with its cost in hours as clock ticks */
     function vetting(s, q, rv) {
       var byAct = {};
+      /* show one has no research buttons: every hour on the first show goes to getting it on (fix list 1.20) */
+      if (SB.Rungs && SB.Rungs.shows && SB.Rungs.shows(s, 'vetButtons') === false) return null;
       (rv.vet || []).forEach(function (v) { byAct[v.action] = v; });
       return h('section', { class: 'ph-sec', aria: { label: L('findOut') } }, [
         kicker(L('findOut')),
@@ -1030,7 +1100,12 @@
         var sent = queued.indexOf('INTERESTED') >= 0 || !!(s.mail && s.mail.extended && s.mail.extended[q.id]);
         if (showFor(s, q) || sent) tabs.push(bookTab(s, q, sent, null, true));
         else (q.dates || []).slice(0, 3).forEach(function (d, i) { tabs.push(bookTab(s, q, sent, d, i === 0, (q.dates || []).length > 1)); });
-        tabs.push(tab('PASS', L('pass'), function () { view = 'pass'; draft.mode = 'PASS'; render(); }, { done: queued.indexOf('PASS') >= 0, tut: 'req-pass', ref: q.id }));
+        /* one press is a short, kind no, sent now; "say it another way" is the small link for a reason or a lead (fix-list 2.9) */
+        tabs.push(tab('PASS', L('pass'), function () {
+          var r = act(function (x) { return SB.Mail.reply(x, q.id, 'PASS', { tone: 'SHORT' }); });
+          if (r && r.ok !== false) { view = 'chat'; draft = {}; render(); }
+        }, { done: queued.indexOf('PASS') >= 0, tut: 'req-pass', ref: q.id, aria: L('pass') }));
+        tabs.push(tab('PASS-WAYS', L('sayOther'), function () { view = 'pass'; draft.mode = 'PASS'; render(); }, { done: false, cls: 'ph-tab--small', aria: L('sayOther') }));
       }
       return tabs.length ? h('div', { class: 'ph-fringe ph-dock', role: 'group', aria: { label: L('reply') } }, tabs) : null;
     }
@@ -1051,7 +1126,10 @@
       var show = showFor(s, q), need = !sent && !show, hours = need ? mailHours() : 0,
           dow = num(day) ? SB.time.fmt(day, many && sameDow(q) ? 'short' : 'dow') : '',
           fit = need ? (safe(function () { return SB.Week.fits(s, hours); }, null) || { ok: true }) : { ok: true }, ok = fit.ok !== false,
-          why = ok ? '' : ((SB.Clock && SB.Clock.why ? SB.Clock.why(fit) : fit.why) || '');
+          why = ok ? '' : ((SB.Clock && SB.Clock.why ? SB.Clock.why(fit) : fit.why) || ''),
+          guide = need ? safe(function () { return SB.Tutorial && SB.Tutorial.current ? SB.Tutorial.current(s) : null; }, null) : null;
+      /* the walkthrough builds the one show it names: another band's yes waits (fix-list 0.6) */
+      if (guide && guide.step === 'ANSWER' && guide.requestId && guide.requestId !== q.id) { ok = false; why = word('refuse.FIRST_SHOW', 'Do the first show first.'); }
       return tab(first ? 'BOOK' : 'BOOK-' + day, show ? L('toShow') : costTag(dow ? L('works', { dow: dow }) : L('book'), hours), function () {
         var r;
         if (!ok) return;
@@ -1079,7 +1157,7 @@
     function passView(s, c) {
       var q = c.req, text;
       if (!draft.tone) draft.tone = 'SHORT';
-      text = safe(function () { return SB.text.has('requests.pass.' + draft.tone) ? SB.text.line('requests.pass.' + draft.tone, {}, null) : SB.text.line('requests.compose.PASS', {}, null); }, '');
+      text = safe(function () { return SB.text.has('requests.pass.' + draft.tone) ? SB.text.line('requests.pass.' + draft.tone, SB.Mail.passSlots ? SB.Mail.passSlots(s, q.id) : {}, null) : SB.text.line('requests.compose.PASS', {}, null); }, '');
       return h('div', { class: 'ph-sheet' }, [
         h('section', { class: 'ph-sec', aria: { label: L('tone') } }, [kicker(L('tone')),
           fringe('ph-fringe--tones', L('tone'), Object.keys(SB.Enums.PASS_TONE).map(function (k) {

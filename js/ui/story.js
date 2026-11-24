@@ -24,7 +24,12 @@
     texts: 'Texts from {outgoing}',
     stripOpen: 'Text from {outgoing}: {text} Open the phone.',
     stripSay: 'Text from {outgoing}: {text}',
-    downFirst: 'First put this down (top right).',
+    downFirst: 'First close this, top right.',
+    closeCard: 'Close the {room} card first, top right.',
+    closeThing: 'Close {thing} first, top right.',
+    thing: { show: 'the show card', inbox: 'the phone', calendar: 'the calendar', week: 'the calendar', flyerdesk: 'the flyer desk', notebook: 'the notebook',
+             rooms: 'the room keys', room: 'the room page', people: 'the address book', money: 'the cash tin', town: 'the map', city: 'the map',
+             bands: 'the band stickers', band: 'the band page', files: 'the folder', shows: 'the show clips', jacket: 'the jacket', settings: 'the settings pad', close: 'the close-out' },
     leaveFirst: 'First go back to the desk.',
     dismiss: 'Put this away',
     skipLink: 'skip the walkthrough', skipAsk: 'Skip the walkthrough? {outgoing} stops texting steps.',
@@ -47,7 +52,8 @@
     week: 'week {n}',
     /* the standing reminder: what to do next once the guide has nothing to say (or its strip was put away) */
     nextFrom: 'next',
-    nxPhone: '{n} {things} on the phone {need} an answer. Pick up the phone.',
+    nxPhone: '{n} {things} on the phone {need} an answer{by}. Pick up the phone.',
+    nxBy: ', the soonest by {day}',
     nxThing: 'thing', nxThings: 'things',
     nxRoom: 'Your {date} show needs a room. Open its card and ask one.',
     nxBill: 'Your {date} show needs bands on the bill. Open its card.',
@@ -58,12 +64,22 @@
     nxNoFit: 'Nothing fits tonight. Call it a night.',
     nxWaitRoom: 'Waiting on {room} to answer. Call it a night.',
     nxWaitBands: 'Waiting on the bands. Call it a night.',
-    nxTonight: 'Your show is tonight at {room}. Call it a night to open the doors.',
+    nxTonight: 'Your show is tonight at {room}. Press GO TO THE SHOW on the clock, then open the doors.',
     nxReady: 'Your {date} show at {room} is set. Get the word out, or call it a night.',
-    nxBook: 'Nothing on the books. Book a show: check the phone for bands asking for a night.',
-    nxNight: 'Nothing else tonight. Call it a night on the clock.',
+    nxBook: 'Nothing on the books. Say yes to a band that has written you for a night, or start a show of your own on a date you pick.',
+    nxNight: 'Nothing left for the show tonight. Open TONIGHT on the desk if you want to do something with the rest of the night, or call it a night on the clock.',
     nxWeekDone: 'The week\'s done. Close the week on the clock.',
     nxAnswer: 'Answer the message on the phone.',
+    coachFlyerDesk: 'Shuffle the layout, type, ink and picture until you like it, then press Use this flyer.',
+    coachInbox: 'Press the button under their message that says the date works. That starts the show.',
+    wbHead: 'Welcome back', wbNight: 'It is {dow} night, week {n}.', wbSaved: 'Saved {ago}.', wbNoShows: 'No show is booked yet.', wbNoRoom: 'no room yet',
+    wbTonight: 'tonight', wbTomorrow: 'tomorrow', wbDays: '{n} days out', wbDone: 'Done: {list}.', wbTodo: 'Still to do: {list}.', wbNext: 'Next:', wbGo: 'back to it',
+    wbRoom: 'room', wbBands: 'bands ({yes} of {n} yes)', wbBandsNone: 'bands', wbSound: 'sound', wbFlyer: 'flyer', wbPromo: 'word out ({done} of {n})',
+    wbJustNow: 'just now', wbMin1: '1 minute ago', wbMin: '{n} minutes ago', wbHour1: '1 hour ago', wbHour: '{n} hours ago', wbDay1: 'yesterday', wbDay: '{n} days ago',
+    nxWeekAsks:'Waiting on you: {n} to answer, the soonest by {day}.',
+    nxWeekAsksNoDay: 'Waiting on you: {n} to answer.',
+    nxWeekLate: 'Running late: {jobs}. A late job still counts, but it reaches fewer people the longer it waits.',
+    nxAnswerHere:'Open the message at the top of the list and answer it.',
     nxShowOn: 'Your show is on tonight. Go to the night screen.',
     nxCalled: 'Night\'s called. Tomorrow opens soon.',
     hrsHalf: 'half an hour', hrsOne: 'an hour', hrsMany: '{n} hours'
@@ -102,13 +118,32 @@
      shows the one picked as a plain line) */
   function picked(s) {
     var set = (s && s.settings) || {}, t = (s && s.story && s.story.tutorial) || {};
-    return { bills: !!set.bills, fog: set.fog, windows: set.windows, walk: !t.skipped, name: (s && s.player && s.player.bookingName) || '' };
+    return { bills: !!set.bills, fog: set.fog, windows: set.windows, walk: !t.skipped, name: (s && s.player && s.player.bookingName) || '', band: (s && s.player && s.player.band) ? true : null };
   }
+  /* What the played show really was, as flags a recap line can ask about (fix-list 2.4): short (somebody was not paid in
+   * full), none (nobody came), flyered, floor (the band was put up), bills (the money is real). Reads only. */
+  function afterFlags(s) {
+    var best = null, k, x, st, night, out = { short: false, none: false, flyered: false, floor: false, bills: !!(s && s.settings && s.settings.bills) };
+    for (k in ((s && s.shows) || {})) {
+      x = s.shows[k];
+      if (x && x.status === 'PLAYED' && (!x.by || x.by === 'player') && (!best || x.day > best.day)) best = x;
+    }
+    if (!best) return out;
+    night = best.night || {}; st = night.settled || {};
+    /* a played show keeps its night in show.result; a night still running keeps it in show.night */
+    out.short = !!(st.short || (best.result && best.result.short));
+    out.none = !!((night.outcome && night.outcome.heads === 0) || (best.result && best.result.heads === 0));
+    out.flyered = !!(best.promo && best.promo.flyer);
+    out.floor = !!((best.crew && best.crew.lodging) || (best.deal && best.deal.lodging));
+    return out;
+  }
+  function withFlags(s, slots) { var f = afterFlags(s), k; for (k in f) if (slots[k] === undefined) slots[k] = f[k]; return slots; }
+
   function run(s, key, done) {
     var cs = cutscene(key), slots;
     if (!cs) { done({ key: key, skipped: true }); return false; }
-    slots = safe(function () { return SB.Chapters.slots(s, /^TUT_/.test(key) ? 'tutorial' : key); }, {}) || {};
-    try { SB.Cutscene.play(cs, slots, done, { answers: picked(s) }); }
+    slots = withFlags(s, safe(function () { return SB.Chapters.slots(s, /^TUT_/.test(key) ? 'tutorial' : key); }, {}) || {});
+    try { SB.Cutscene.play(cs, slots, done, { answers: picked(s), seen: seen(s, key) }); }
     catch (e) { SB.log('warn', 'SB.UI.story', 'cutscene ' + key + ': ' + (e && e.message)); done({ key: key, skipped: true }); return false; }
     return true;
   }
@@ -122,12 +157,30 @@
 
   /* the guided first show: the outgoing booker's call for what the guide asks right now (content story.coach,
    * 'TUT_' + step + '_' + stage, else 'TUT_' + step), once each. -> { key } or null */
-  function coachNext(s) {
-    var cur = safe(function () { return SB.Tutorial.current(s); }, null), key;
+  /* Only the first step's call and the door's play as cutscenes with a DONE; every other step's call is folded into the
+   * mentor's text on the strip (fix list 1.19: about 35 taps and 7 cutscenes passed before the first yes). */
+  var COACH_SCENES = { TUT_ANSWER_REPLY: 1, TUT_DOOR: 1 };
+  function coachKey(cur) {
+    var key;
     if (!cur || !cur.step) return null;
     key = 'TUT_' + cur.step + (cur.stage ? '_' + cur.stage : '');
     if (!(story().coach && story().coach[key])) key = 'TUT_' + cur.step;
-    return story().coach && story().coach[key] && !seen(s, key) ? { key: key } : null;
+    return story().coach && story().coach[key] ? key : null;
+  }
+  function coachNext(s) {
+    var cur = safe(function () { return SB.Tutorial.current(s); }, null), key = coachKey(cur);
+    return key && COACH_SCENES[key] && !seen(s, key) ? { key: key } : null;
+  }
+  /* the folded call: its lines, then the map of where you are, as one block of the mentor's text */
+  function coachText(s, cur, sl) {
+    var key = coachKey(cur), c = key && !COACH_SCENES[key] ? story().coach[key] : null, bits = [], cap = '';
+    if (!c) return '';
+    function fillIn(t) { return safe(function () { return SB.text.render(String(t), sl, null); }, String(t)); }
+    (c.frames || []).forEach(function (f) {
+      (f.lines || []).forEach(function (ln) { if (ln && ln.say) bits.push(fillIn(ln.say)); });
+      if (f.caption && !cap) cap = fillIn(f.caption);
+    });
+    return bits.join(' ') + (cap ? '  ' + cap : '');
   }
 
   /* the show's own night, before the doors open: the one call that belongs there (the show day goes straight to the
@@ -210,27 +263,57 @@
   /* the walkthrough: what the outgoing booker is saying now           */
   /* ---------------------------------------------------------------- */
 
+  /* the first new thing on the desk nobody has said a word about yet (fix list 4.8), one at a time -> { id, text } or null */
+  var DESK_ORDER = ['notebook', 'stickers', 'keys', 'tin', 'mug', 'map', 'book', 'flyers', 'jacket'];
+  function newOnDesk(s, sl) {
+    var i, id, tx;
+    if (!SB.Rungs || !SB.Rungs.isNew) return null;
+    for (i = 0; i < DESK_ORDER.length; i++) {
+      id = DESK_ORDER[i];
+      if (!safe(function () { return SB.Rungs.isNew(s, id); }, false) || seen(s, 'DESKNEW_' + id)) continue;
+      tx = say('story.deskNew.' + id, sl);
+      if (tx) return { id: id, text: tx };
+    }
+    return null;
+  }
+
   /* -> { key, from, list: [{ text, kind }], once: seen-key or null } or null */
   function messages(s) {
-    var t = s && s.story && s.story.tutorial, cur, sl, base, list = [], steps, i, prev, tx;
+    var t = s && s.story && s.story.tutorial, cur, sl, base, list = [], steps, i, prev, tx, day, lk;
     if (!t) return null;
     cur = safe(function () { return SB.Tutorial.current(s); }, null);
-    sl = safe(function () { return SB.Chapters.slots(s, 'tutorial'); }, {}) || {};
+    sl = withFlags(s, safe(function () { return SB.Chapters.slots(s, 'tutorial'); }, {}) || {});
     if (cur) {
       steps = SB.Tutorial.STEPS; i = steps.indexOf(cur.step); prev = i > 0 ? steps[i - 1] : null;
       base = 'story.tutorial.steps.';
       if (i === 0) { tx = say('story.tutorial.intro', sl); if (tx) list.push({ text: tx, kind: 'intro' }); }
       if (prev && t.wrong && t.wrong[prev]) { tx = say(base + prev + '.wrong', sl); if (tx) list.push({ text: tx, kind: 'wrong' }); }
+      tx = coachText(s, cur, sl);
+      if (tx) list.push({ text: tx, kind: 'intro' });
       tx = cur.text || say(base + cur.step + '.text', sl);
       if (tx) list.push({ text: tx, kind: 'text' });
       if (cur.more) list.push({ text: cur.more, kind: 'how' });
       if (cur.wrong) { tx = say(base + cur.step + '.wrong', sl) || cur.wrong; if (tx) list.push({ text: tx, kind: 'wrong' }); }
-      if (cur.nudge || mem.nudged === cur.step) { tx = say(base + cur.step + '.nudge', sl) || cur.nudge; if (tx) list.push({ text: tx, kind: 'nudge' }); }
+      /* the wait's nudge is about mail: once the phone is answered it goes, even if it was shown before (engine decides) */
+      if (cur.nudge || (mem.nudged === cur.step && cur.step !== 'WAIT')) { tx = say(base + cur.step + '.nudge', sl) || cur.nudge; if (tx) list.push({ text: tx, kind: 'nudge' }); }
+      /* the same line is never said on two nights in a row: the second night it is the nudge, in its own words (fix-list 1.13) */
+      day = s.clock && typeof s.clock.day === 'number' ? s.clock.day : 0;
+      lk = cur.step + ':' + (cur.stage || '');
+      if (!mem.line || mem.line.key !== lk) mem.line = { key: lk, day: day, said: false };
+      /* not on the wait: its nudge is about mail, and only the engine knows when mail is waiting (0.4 step 4) */
+      else if (day > mem.line.day && cur.step !== 'WAIT' && !list.some(function (x) { return x.kind === 'nudge'; })) {
+        tx = say(base + cur.step + '.nudge', sl) || cur.nudge;
+        if (tx) { list = list.filter(function (x) { return x.kind !== 'how'; }); list.push({ text: tx, kind: 'nudge' }); }
+      }
       return list.length ? { key: cur.step + (cur.stage ? ':' + cur.stage : ''), step: cur.step, cur: cur, from: sl.outgoing || '', list: list, once: null } : null;
     }
     if (t.skipped && !seen(s, 'TUTORIAL_SKIP')) { tx = say('story.tutorial.skip.line', sl); return tx ? { key: 'SKIP', from: sl.outgoing || '', list: [{ text: tx, kind: 'text' }], once: 'TUTORIAL_SKIP' } : null; }
-    if (t.done !== null && t.done !== undefined && !t.skipped && !t.lapsed && !seen(s, 'TUTORIAL_DONE')) { tx = say('story.tutorial.done', sl); return tx ? { key: 'DONE', from: sl.outgoing || '', list: [{ text: tx, kind: 'text' }], once: 'TUTORIAL_DONE' } : null; }
+    /* the walkthrough ended because its show fell through for good: it never ends silently (fix-list 0.6) */
+    if (t.lapsed && !t.skipped && !seen(s, 'TUTORIAL_LAPSED')) { tx = say('story.tutorial.lapsed', sl); if (tx) return { key: 'LAPSED', from: sl.outgoing || '', list: [{ text: tx, kind: 'text' }], once: 'TUTORIAL_LAPSED' }; }
+    if (t.done !== null && t.done !== undefined && !t.skipped && !t.lapsed && !seen(s, 'TUTORIAL_DONE')) { tx = say('story.tutorial.done', sl); return tx ? { key: 'DONE', from: sl.outgoing || '', list: [{ text: tx, kind: 'text' }, { text: say('story.tutorial.doneList', sl), kind: 'how' }], once: 'TUTORIAL_DONE' } : null; }
     if (t.on) return null;
+    tx = newOnDesk(s, sl);
+    if (tx) return { key: 'DESKNEW:' + tx.id, from: sl.outgoing || '', list: [{ text: tx.text, kind: 'text' }], once: 'DESKNEW_' + tx.id };
     tx = firsts(s, sl);
     if (tx) return { key: 'FIRST:' + tx.id, from: sl.outgoing || '', list: [{ text: tx.text, kind: 'text' }], once: tx.id };
     tx = stuck(s);
@@ -265,7 +348,7 @@
       sh = s.shows[k];
       if (!sh || (sh.by && sh.by !== 'player') || (sh.status !== 'DRAFT' && sh.status !== 'CONFIRMED') || sh.day < day || sh.day - day > 3) continue;
       miss = !sh.roomId ? 'has no room' : sh.status === 'DRAFT' ? 'isn\'t confirmed' : !(sh.bill && sh.bill.slots && sh.bill.slots.length) ? 'has no bands' : !(sh.promo && sh.promo.flyer) ? 'has no flyer' : '';
-      if (miss) offer('LATE', 'HELP_LATE_' + sh.id, { date: dateOf(sh.day), n: sh.day - day, missing: miss });
+      if (miss) offer('LATE', 'HELP_LATE_' + sh.id, { date: dateOf(sh.day), n: safe(function () { return SB.Week.daysTo(s, sh.day); }, sh.day - day), missing: miss });
     }
     /* the first night that lost money */
     for (k in (s.shows || {})) {
@@ -340,39 +423,63 @@
         date = safe(function () { return SB.time.fmt(sh.day, 'short'); }, ''), go = ['show', { showId: sh.id }],
         slots = (sh.bill && sh.bill.slots) || [], yes, a, jobs, fit, noHours;
     function wait(key, ctx) { return { t: L(key, ctx), go: null, act: false, idle: true }; }
-    function act(key, ctx) { return { t: L(key, ctx), go: go, act: true }; }
+    /* the line is the button: it opens the card at the row where the thing is done (fix-list 0.4) */
+    function act(key, ctx, row) { return { t: L(key, ctx), go: row ? ['show', { showId: sh.id, row: row }] : go, act: true }; }
     if (sh.status === 'CONFIRMED' && sh.day === day) return { t: L('nxTonight', { room: room || 'the room' }), go: null, act: true, idle: true };
     if (!sh.roomId || sh.status === 'DRAFT') {
       a = askOut(s, { ROOM_HOLD: true, ROOM_CONFIRM: true }, sh.id);
       if (a && (!sh.roomId || slots.length)) return wait('nxWaitRoom', { room: nameOf(s, a.toId) || room || 'the room' });
-      if (!sh.roomId) return act('nxRoom', { date: date });
+      if (!sh.roomId) return act('nxRoom', { date: date }, 'room');
     }
     yes = !!(sh.bill && sh.bill.locked) || slots.some(function (x) { return x.confirmed; });
     if (!slots.length || (sh.status === 'CONFIRMED' && !yes)) {
       if (askOut(s, { BAND_PLAY: true }, sh.id)) return wait('nxWaitBands');
-      return act('nxBill', { date: date });
+      return act('nxBill', { date: date }, 'bill');
     }
-    if (sh.status === 'DRAFT') return act('nxConfirm', { date: date, room: room });
-    if (!(sh.promo && sh.promo.flyer)) return act('nxFlyer', { date: date, room: room });
+    if (sh.status === 'DRAFT') return act('nxConfirm', { date: date, room: room }, 'room');
+    if (!(sh.promo && sh.promo.flyer)) return act('nxFlyer', { date: date, room: room }, 'flyer');
     /* jobs open now, soonest due first, then shortest; one that fits tonight first */
     jobs = (v && v.jobs ? v.jobs : []).filter(function (j) {
-      return j.status === 'TODO' && !j.optional && !j.hidden && !JOB_NOT[j.type] && j.window && JOB_OPEN[j.window.state];
+      return j.status === 'TODO' && !j.optional && !j.hidden && !j.more && !j.covered && !JOB_NOT[j.type] && j.window && JOB_OPEN[j.window.state];
     }).sort(function (x, y) {
       return ((x.due == null ? 1e9 : x.due) - (y.due == null ? 1e9 : y.due)) || ((x.hours || 0) - (y.hours || 0));
     });
     if (jobs.length) {
       noHours = !!tn && typeof tn.left === 'number' && tn.left <= 0 && !(tn.stay && tn.stay.left > 0);
+      /* only a job with hours that can be done tonight: AUTO and PROMISE jobs have no button, and a MESSAGE job is named
+         only when it is not already out or answered (fix-list 0.4) */
       fit = noHours ? null : jobs.filter(function (j) {
         var r = null;
-        if (j.mode !== 'HOURS' || !SB.Week.canDoNow) return j.mode !== 'HOURS';
+        if (j.mode !== 'HOURS') return false;
+        if (!SB.Week.canDoNow) return true;
         r = safe(function () { return SB.Week.canDoNow(s, j.id); }, null);
         return !!r && r.ok !== false;
       })[0];
       if (!fit) return wait('nxNoFit');
       return act(fit.due == null ? 'nxJobAny' : 'nxJob', { date: date, job: String(fit.label || '').toLowerCase(), hours: hrs(fit.hours),
-                                                         due: fit.due == null ? '' : safe(function () { return SB.time.fmt(fit.due, 'short'); }, '') });
+                                                         due: fit.due == null ? '' : safe(function () { return SB.time.fmt(fit.due, 'short'); }, '') },
+                 fit.group === 'TELLING' ? 'promo' : 'prep');
     }
     return { t: L('nxReady', { date: date, room: room }), go: go, act: false, idle: true };
+  }
+
+  /* "Open: 2 messages to answer, the soonest by Thu. Late: print flyers." The open asks with their answer-by dates, and the jobs
+   * already past their day; '' when there is nothing to say. Said only when it adds to the reminder: more than one thing, a
+   * date, or a late job. */
+  function weekLine(s, day, phoneSaid) {
+    var needs = safe(function () { return SB.Mail.needsYou(s); }, []) || [], by = null, late = [], k, sh, v, parts = [];
+    needs.forEach(function (x) { if (typeof x.by === 'number' && x.by >= day && (by === null || x.by < by)) by = x.by; });
+    for (k in (s.shows || {})) {
+      sh = s.shows[k];
+      if (!sh || (sh.by && sh.by !== 'player') || (sh.status !== 'DRAFT' && sh.status !== 'CONFIRMED') || sh.day < day) continue;
+      v = safe(function () { return SB.Shows.view(s, sh.id); }, null);
+      ((v && v.jobs) || []).forEach(function (j) {
+        if (j.status === 'TODO' && !j.optional && !j.hidden && !j.more && !j.covered && j.mode === 'HOURS' && j.window && j.window.state === 'LATE' && late.length < 2) late.push(String(j.label || '').toLowerCase());
+      });
+    }
+    if (!phoneSaid && (needs.length > 1 || (needs.length && by !== null))) parts.push(by !== null ? L('nxWeekAsks', { n: needs.length, day: SB.time.fmt(by, 'dow') }) : L('nxWeekAsksNoDay', { n: needs.length }));
+    if (late.length) parts.push(L('nxWeekLate', { jobs: late.join(', ') }));
+    return parts.join(' ');
   }
 
   /* the standing reminder: one line on what to do next, read off the game, whenever the walkthrough is quiet. Never
@@ -382,7 +489,8 @@
     var tn = safe(function () { return SB.Week.tonight(s); }, null), day = s.clock && typeof s.clock.day === 'number' ? s.clock.day : 0,
         n = safe(function () { return SB.Mail.needsYou(s).length; }, 0), shows, t, go = ['inbox'], pick = null, first = null, i, x, idle = false;
     if (tn && !tn.open) { x = closedLine(tn); t = x.t; go = x.go; idle = true; }
-    else if (n) t = L('nxPhone', { n: n, things: L(n === 1 ? 'nxThing' : 'nxThings'), need: n === 1 ? 'needs' : 'need' });
+    else if (n) t = L('nxPhone', { n: n, things: L(n === 1 ? 'nxThing' : 'nxThings'), need: n === 1 ? 'needs' : 'need',
+                                    by: safe(function () { var q = SB.Mail.needsYou(s)[0]; return q && typeof q.by === 'number' && q.by >= day ? L('nxBy', { day: SB.time.fmt(q.by, 'dow') }) : ''; }, '') });
     else {
       shows = safe(function () { return SB.Shows.list(s, { status: ['DRAFT', 'CONFIRMED'], fromDay: day }); }, []) || [];
       shows = shows.filter(function (y) { return !y.by || y.by === 'player'; });
@@ -398,6 +506,9 @@
       else if (pick) { t = pick.t; go = pick.go; idle = !!pick.idle; }
     }
     if (!t) { t = L('nxNight'); go = null; idle = true; }
+    /* the week's open things, with their dates, so nothing lapses unseen (fix-list 4.7) */
+    x = safe(function () { return weekLine(s, day, !!n); }, '');
+    if (x && !(tn && !tn.open)) t += ' ' + x;
     return { key: 'NEXT:' + t, from: L('nextFrom'), list: [{ text: t, kind: 'next' }], once: null, go: go, fixed: true, idle: idle };
   }
 
@@ -650,13 +761,24 @@
     if (m.once && SB.UI.game() === s) SB.UI.act(function (st) { SB.Chapters.markSeen(st, m.once); return { ok: true }; });
   }
 
+  /* "First put this down" says which thing: "Close the Carport's card first, top right." (fix-list 1.13) */
+  function closeFirst(m) {
+    var r = route(), s = SB.UI.game(), sid = (m && m.cur && m.cur.showId) || null, sh = s && sid && s.shows ? s.shows[sid] : null, room, thing;
+    if (r === 'show' || r === 'bill') {
+      room = sh && sh.roomId && s.rooms && s.rooms[sh.roomId] ? s.rooms[sh.roomId].name : '';
+      return room ? L('closeCard', { room: room }) : L('closeThing', { thing: L('thing.show') });
+    }
+    thing = SB.text.has('ui.story.thing.' + r) ? L('thing.' + r) : '';
+    return thing ? L('closeThing', { thing: thing }) : L('downFirst');
+  }
+
   /* what the strip says: the stage's line (what to press), after the step's own line when that is short enough to
    * read in passing (the why); with "put this down first" in front when the tape is on a close-up's put-down tag */
   function stripWords(m) {
     var last = m.list[m.list.length - 1], t = last.text, i, main = null;
     if (last.kind === 'how') for (i = m.list.length - 2; i >= 0; i--) if (m.list[i].kind === 'text') { main = m.list[i].text; break; }
     if (main && main.length <= 100) t = main + ' ' + t;
-    if (tapedEl && tapedEl.classList && tapedEl.classList.contains('cu-down')) t = L('downFirst') + ' ' + t;
+    if (tapedEl && tapedEl.classList && tapedEl.classList.contains('cu-down')) t = closeFirst(m) + ' ' + t;
     else if (tapedEl && tapedEl.getAttribute && tapedEl.getAttribute('data-fk') === 'leave' && route() === 'night') t = L('leaveFirst') + ' ' + t;
     return { text: t, kind: last.kind };
   }
@@ -737,8 +859,23 @@
   }
 
   /* the texts' strip on the desk and the tape on the thing to pick up next */
+  /* each close-up gets a coach line about that screen itself, not about the step (fix-list 1.13): on the flyer desk, how to
+   * finish the flyer; inside the phone, which button starts the show */
+  function screenCoach(m, r) {
+    var cur = m && m.cur, tx = '', out, list;
+    if (!cur || !m.list.length || m.list[m.list.length - 1].kind !== 'how') return m;
+    if (r === 'flyerdesk' && (cur.step === 'FLYER' || cur.stage === 'MAKE')) tx = L('coachFlyerDesk');
+    else if (r === 'inbox' && cur.stage === 'REPLY') tx = L('coachInbox', { dow: cur.dow || '' });
+    if (!tx) return m;
+    list = m.list.slice();
+    list[list.length - 1] = { text: tx, kind: 'how' };
+    out = {}; Object.keys(m).forEach(function (k) { out[k] = m[k]; });
+    out.list = list;
+    return out;
+  }
+
   function guide(s) {
-    var m = messages(s), r = route(), cur = m && m.cur, d = doc(),
+    var m = screenCoach(messages(s), route()), r = route(), cur = m && m.cur, d = doc(),
         /* the phone's list already shows the texts in full; inside a message it does not */
         dana = r === 'inbox' && d && d.querySelector ? d.querySelector('.sy-dana') : null,
         onPhone = !!(dana && safe(function () { var b = dana.getBoundingClientRect(); return b.height > 0 && b.bottom > 0 && b.top < ((typeof window !== 'undefined' && window.innerHeight) || 800); }, false));
@@ -767,6 +904,8 @@
     n = safe(function () { return reminder(s); }, null) || { key: 'NEXT:', from: L('nextFrom'), list: [{ text: L('nxNight'), kind: 'next' }], once: null, go: null, fixed: true, idle: true };
     /* on the card itself, "open its card" is already done */
     if (n && (r === 'show' || r === 'bill')) n.list[0].text = n.list[0].text.replace(/ Open its card( and [^.]*)?\./, function (m0, rest) { return rest ? ' ' + rest.slice(5, 6).toUpperCase() + rest.slice(6) + '.' : ''; });
+    /* already on the phone: "pick up the phone" and "answer the message on the phone" would only repeat the screen (fix-list 1.13) */
+    if (n && r === 'inbox') n.list[0].text = n.list[0].text.replace(/ Pick up the phone\./, '').replace(/^Answer the message on the phone\.$/, L('nxAnswerHere'));
     if (n) showStrip(s, n, r === 'desk'); else hideStrip();
   }
 
@@ -910,6 +1049,57 @@
   /* pump                                                              */
   /* ---------------------------------------------------------------- */
 
+  /* ---------------------------------------------------------------- */
+  /* welcome back: on Continue, where the game stands (fix-list 4.4)   */
+  /* ---------------------------------------------------------------- */
+
+  function agoWords(ms) {
+    var m, hr, dy;
+    if (typeof ms !== 'number' || !isFinite(ms)) return '';
+    m = Math.floor((Date.now() - ms) / 60000);
+    if (m < 1) return L('wbJustNow');
+    if (m < 60) return L(m === 1 ? 'wbMin1' : 'wbMin', { n: m });
+    hr = Math.floor(m / 60);
+    if (hr < 24) return L(hr === 1 ? 'wbHour1' : 'wbHour', { n: hr });
+    dy = Math.floor(hr / 24);
+    return L(dy === 1 ? 'wbDay1' : 'wbDay', { n: dy });
+  }
+  /* one show, in steps: what is done, what is not (the same seven steps the booking card walks: room, deal, bands, sound, flyer, word out, night) */
+  function stepsOf(s, sh) {
+    var slots = (sh.bill && sh.bill.slots) || [], yes = slots.filter(function (x) { return x.confirmed; }).length, done = [], todo = [], v, tel = 0, telN = 0;
+    (sh.roomId && sh.status === 'CONFIRMED' ? done : todo).push(L('wbRoom'));
+    (slots.length >= 2 && yes >= slots.length ? done : todo).push(slots.length ? L('wbBands', { yes: yes, n: slots.length }) : L('wbBandsNone'));
+    ((sh.crew && sh.crew.sound) ? done : todo).push(L('wbSound'));
+    ((sh.promo && sh.promo.flyer) ? done : todo).push(L('wbFlyer'));
+    v = safe(function () { return SB.Shows.view(s, sh.id); }, null);
+    ((v && v.jobs) || []).forEach(function (j) { if (j.group === 'TELLING' && j.type !== 'MAKE_FLYER' && j.mode === 'HOURS' && !j.optional && !j.hidden && !j.covered && !j.more) { telN++; if (j.status === 'DONE') tel++; } });
+    if (telN) (tel >= telN ? done : todo).push(L('wbPromo', { done: tel, n: telN }));
+    return { done: done, todo: todo };
+  }
+  function welcomeBack(s, savedAt) {
+    var day, list, kids = [], nx, close, st;
+    if (!s || !s.clock || !SB.UI.card || playingCut()) return false;
+    day = s.clock.day;
+    list = (safe(function () { return SB.Shows.list(s, { status: ['DRAFT', 'CONFIRMED'], fromDay: day }); }, []) || [])
+      .filter(function (x) { return !x.by || x.by === 'player'; }).sort(function (a, b) { return a.day - b.day; }).slice(0, 3);
+    kids.push(h('h2', { class: 'sy-wb-head', text: L('wbHead') }));
+    kids.push(h('p', { class: 'sy-wb-line', text: L('wbNight', { dow: SB.time.fmt(day, 'dow'), n: (s.clock.week || 0) + 1 }) + (agoWords(savedAt) ? ' ' + L('wbSaved', { ago: agoWords(savedAt) }) : '') }));
+    if (!list.length) kids.push(h('p', { class: 'sy-wb-line', text: L('wbNoShows') }));
+    list.forEach(function (sh) {
+      var room = sh.roomId && s.rooms && s.rooms[sh.roomId] ? s.rooms[sh.roomId].name : L('wbNoRoom'), out = safe(function () { return SB.Week.daysTo(s, sh.day); }, sh.day - day);
+      st = stepsOf(s, sh);
+      kids.push(h('p', { class: 'sy-wb-show' }, [
+        h('b', { text: SB.time.fmt(sh.day, 'short') + (sh.roomId && s.rooms && s.rooms[sh.roomId] ? ' at ' : ', ') + room + ', ' + (out <= 0 ? L('wbTonight') : out === 1 ? L('wbTomorrow') : L('wbDays', { n: out })) + '.' }),
+        h('span', { text: ' ' + (st.done.length ? L('wbDone', { list: st.done.join(', ') }) : '') + (st.todo.length ? ' ' + L('wbTodo', { list: st.todo.join(', ') }) : '') })
+      ]));
+    });
+    nx = safe(function () { return reminder(s); }, null);
+    if (nx && nx.list && nx.list[0] && nx.list[0].text) kids.push(h('p', { class: 'sy-wb-next' }, [h('b', { text: L('wbNext') + ' ' }), nx.list[0].text]));
+    kids.push(h('button', { type: 'button', class: 'sy-wb-go pz-paper pz-hl', text: L('wbGo'), on: { click: function () { if (close) close(); } } }));
+    close = SB.UI.card(h('div', { class: 'sy-wb' }, kids), { label: L('wbHead') });
+    return true;
+  }
+
   function clearAll() {
     dropTape(); hideStrip(); hideCard(); armNudge(null);
     mem.step = null; mem.key = null; mem.dismissed = null; mem.nudged = null; mem.stuck = null; mem.onPhone = null; mem.m = null;
@@ -926,7 +1116,8 @@
       blocked = busy || playingCut() || r === 'night' || !!(d && d.querySelector && d.querySelector('.sb-scrim'));
       if (!blocked && playNext(s)) return;
       if (r === 'night' && !busy && !playingCut() && !(d && d.querySelector && d.querySelector('.sb-scrim')) && playNext(s, true)) return;
-      if (r === 'night' || busy || playingCut()) hideCard(); else showCard(s);
+      /* the patch card waits while the close-out is up, so it never sits on START WEEK (fix-list 0.7) */
+      if (r === 'night' || r === 'close' || busy || playingCut()) hideCard(); else showCard(s);
       guide(s);
     } finally { pumping = false; }
   }
@@ -935,6 +1126,6 @@
 
   SB.UI.screen('jacket', { rail: null, title: 'ui.story.jacketTitle', mount: mountJacket });
 
-  SB.UI.extend({ story: { retape: soon, pump: pump, opening: opening, openingAsk: openingAsk, phone: phone, chapters: chapters, rewatch: rewatch, messages: messages, point: point,
+  SB.UI.extend({ story: { welcomeBack: welcomeBack, retape: soon, pump: pump, opening: opening, openingAsk: openingAsk, phone: phone, chapters: chapters, rewatch: rewatch, messages: messages, point: point,
                           busy: function () { return busy || playingCut(); } } });
 })(SB);

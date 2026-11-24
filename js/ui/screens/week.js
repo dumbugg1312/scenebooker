@@ -41,6 +41,10 @@
     soon: 'soon',
     later: 'later',
     ifYouWant: 'if you want',
+    tonightJobs: 'you can do these tonight',
+    wholePlan: 'See the whole plan ({n})',
+    tonightOnly: 'Just tonight\'s',
+    legend: '"late!!" is past its best day. "this week" is best done before Sunday. "soon" can wait a few days. "due thu" is the last good night for it.',
     free: 'people and shows',
     add: 'Add',
     firstWeek: 'do a job tonight, then call it a night',
@@ -110,7 +114,6 @@
     tired: 'tired',
     due: 'due',
     did: 'done',
-    likely: 'likely:',
     heroDays: 'days to go',
     heroDay: 'day to go',
     heroTonight: 'tonight',
@@ -199,7 +202,7 @@
   /** The choose sign: a tear-off tab. o: { label, cost, likely, why, note, disabled, on, n, hot, fk, id, say, tut, ref }
    *  cost is what it takes (money, or hours from SB.Clock.cost); why says why it is crossed out; note is a small line under it. */
   function tab(o) {
-    var say = (o.n ? o.n + '. ' : '') + (o.say || o.label) + (o.cost ? ', ' + o.cost : '') + (o.likely ? ', ' + L('likely') + ' ' + o.likely : '') + (o.note ? ', ' + o.note : '') + (o.disabled && o.why ? ', ' + o.why : '');
+    var say = (o.n ? o.n + '. ' : '') + (o.say || o.label) + (o.cost ? ', ' + o.cost : '') + (o.likely ? ', ' + o.likely : '') + (o.note ? ', ' + o.note : '') + (o.disabled && o.why ? ', ' + o.why : '');
     return h('button', { type: 'button', class: 'cc-tab pz-hl' + (o.hot ? ' is-hot' : '') + (o.on2 ? ' is-on' : '') + (o.cls ? ' ' + o.cls : ''), disabled: !!o.disabled,
                          role: o.role || null, data: { fk: o.fk || null, option: o.id || null, tut: o.tut || null, 'tut-ref': o.ref || null }, title: o.disabled && o.why ? o.why : null,
                          aria: { label: say, checked: o.role === 'radio' ? (o.on2 ? 'true' : 'false') : null },
@@ -208,7 +211,7 @@
       o.lead || null,
       h('span', { class: 'cc-tab-l', text: o.label }),
       o.cost ? h('span', { class: 'cc-tab-cost', text: o.cost }) : null,
-      o.likely ? h('span', { class: 'cc-tab-likely', text: L('likely') + ' ' + o.likely }) : null,
+      o.likely ? h('span', { class: 'cc-tab-likely', text: o.likely }) : null,
       o.note ? h('span', { class: 'cc-tab-likely', text: o.note }) : null,
       o.disabled && o.why ? h('span', { class: 'cc-tab-why', text: o.why }) : null,
       h('span', { class: 'cc-tab-foot', aria: { hidden: 'true' } }),
@@ -412,7 +415,8 @@
         if (!sh || sh.cancelled || sh.status === 'PLAYED' || sh.status === 'CANCELLED' || !num(sh.day) || sh.day < today) continue;
         if (!best || sh.day < best.day) best = sh;
       }
-      return best ? { show: best, days: best.day - today } : null;
+      /* the count is SB.Week.daysTo, the one every screen uses (fix-list 2.11) */
+      return best ? { show: best, days: (function () { try { return SB.Week.daysTo(s, best.day); } catch (e) { return best.day - today; } })() } : null;
     }
     /** The one loud thing: how many days to the next show, on a torn card stamped on the page. Pressing it opens the show. */
     function hero(s, nx) {
@@ -679,11 +683,25 @@
           first = s.clock.week === 0 && tn && tn.open && !(tn.spent > 0), groups = [], any = false, frozen = running || v.phase === 'CLOSE' || v.phase === 'OVER';
       function main(list) { return list.filter(function (j) { if (j.optional) { opt.push(j); return false; } return j.mode === 'HOURS' || !!j.showId; }); }
       var late = main(t.late || []), week = main(t.thisWeek || []), soon = main(t.soon || []), later = main(t.later || []);
-      if (late.length) groups.push(group('late', L('late'), late, 'goldenrod', 6, true));
-      if (week.length) groups.push(group('thisWeek', L('thisWeek'), week, 'goldenrod', 5));
-      if (soon.length) groups.push(group('soon', L('soon'), soon, 'bone', 1));
-      if (later.length) groups.push(group('later', L('later'), later, 'white', 0));
-      if (opt.length) groups.push(group('opt', L('ifYouWant'), opt, 'pink', 0));
+      /* the pad opens on tonight (fix-list 1.12 step 5): the 1 to 3 jobs that fit tonight, then "See the whole plan (n)" */
+      var all = late.concat(week, soon, later), canNow = !frozen && tn && tn.open ? all.filter(function (j) {
+            return j.mode === 'HOURS' && safe(function () { var c = SB.Week.canDoNow(s, j.id); return !!(c && c.ok !== false); }, false); }).slice(0, 3) : [],
+          total = all.length + opt.length, brief = !openFolds.__whole && canNow.length > 0 && total > canNow.length;
+      if (brief) {
+        groups.push(group('tonight', L('tonightJobs'), canNow, 'goldenrod', 3));
+        groups.push(h('button', { type: 'button', class: 'cc-whole pz-hl', data: { fk: 'whole-plan' }, aria: { expanded: 'false', label: L('wholePlan', { n: total }) },
+                                  on: { click: function () { openFolds.__whole = true; render(); } } }, strip(L('wholePlan', { n: total }))));
+      } else {
+        if (late.length) groups.push(group('late', L('late'), late, 'goldenrod', 6, true));
+        if (week.length) groups.push(group('thisWeek', L('thisWeek'), week, 'goldenrod', 5));
+        if (soon.length) groups.push(group('soon', L('soon'), soon, 'bone', 1));
+        if (later.length) groups.push(group('later', L('later'), later, 'white', 0));
+        if (opt.length) groups.push(group('opt', L('ifYouWant'), opt, 'pink', 0));
+        /* one line on the page for what the headings mean */
+        if (all.length) groups.push(h('p', { class: 'cc-legend', text: L('legend') }));
+        if (openFolds.__whole && canNow.length) groups.push(h('button', { type: 'button', class: 'cc-whole pz-hl', data: { fk: 'tonight-only' }, aria: { expanded: 'true', label: L('tonightOnly') },
+                                  on: { click: function () { openFolds.__whole = false; render(); } } }, strip(L('tonightOnly'))));
+      }
       any = groups.length > 0;
       var evOn = !!(tn && tn.open && SB.Evening && SB.UI.evening);
       free = safe(function () { return SB.Jobs.freeJobs(s); }, []);

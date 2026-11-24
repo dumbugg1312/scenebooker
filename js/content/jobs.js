@@ -20,7 +20,7 @@ SB.Content.jobs = {
     why: 'Bands build a route around whoever answers. A no in three days helps them more than a yes in three weeks.',
     ON_TIME: [
       'You wrote back the same week. {band} are holding the {date:ord} for you.',
-      'Answered inside a few days. {band}: "Thanks for getting back so fast, honestly. Nobody does."'
+      'Answered inside a few days. {band} wrote: "Thanks for getting back to us so fast, most places we write to never answer at all."'
     ],
     LATE: [
       'You answered {band} after they\'d already asked the next town over. They can still do it, but they sound less sure.',
@@ -28,7 +28,7 @@ SB.Content.jobs = {
     ],
     SKIPPED: [
       'No answer from you. {band} took another town.',
-      'You never wrote {band} back. They won\'t write again for a while. Bands talk to each other about who answers.'
+      'You never wrote {band} back, so they probably won\'t write again for a while, and bands do tell each other who answers.'
     ]
   },
 
@@ -42,7 +42,7 @@ SB.Content.jobs = {
       'An hour with {band}\'s songs. Now you know what you\'d be booking.'
     ],
     LATE: [
-      'You listened to {band} after you\'d already said yes. Good to know. Too late to use.',
+      'You listened to {band} after you\'d already said yes, so what you heard is good to know but too late to change anything.',
       'You put {band} on after confirming. What you heard can\'t change the bill now.'
     ],
     SKIPPED: [
@@ -62,7 +62,7 @@ SB.Content.jobs = {
     ],
     LATE: [
       'You watched {band}\'s clip after confirming. The bill\'s already built around a guess.',
-      'Watched it the week of. It told you who their crowd is. You\'d already picked the room.'
+      'You watched it the week of and it told you who their crowd is, but you\'d already picked the room.'
     ],
     SKIPPED: [
       'You never saw {band} play. How they work a room is a surprise for the night.',
@@ -81,7 +81,7 @@ SB.Content.jobs = {
     ],
     LATE: [
       'You looked {band} up after you said yes. What you found can\'t move the bill now.',
-      'Looked up their last tour the week of. Useful next time.'
+      'You looked up their last tour the week of, which will be useful next time but doesn\'t help this show.'
     ],
     SKIPPED: [
       'You never checked {band}\'s last tour. What they said they draw is the only number you have.',
@@ -119,7 +119,7 @@ SB.Content.jobs = {
     ],
     LATE: [
       'You asked around about {band} after confirming. If anybody had a warning, it came late.',
-      'Asked around the week of. It told you who\'s coming, not who to book.'
+      'You asked around the week of, and it told you who is coming, but it was too late to change who you booked.'
     ],
     SKIPPED: [
       'You didn\'t ask around. If people here knew {band}, you didn\'t find out from them.',
@@ -133,7 +133,7 @@ SB.Content.jobs = {
     card: 'Ask {room} for {dow} the {date:ord}. Their yes makes it yours, once they have what they ask for.',
     why: 'You can\'t offer a band a date you don\'t have. Check the town\'s calendar while you\'re at it.',
     ON_TIME: [
-      '{room} is held for {dow} the {date:ord}. Soft hold. They\'ll want a yes before long.',
+      '{room} is held for {dow} the {date:ord}. It\'s only a soft hold, so they\'ll want a yes from you before long.',
       'Held: {room}, {dow} the {date:ord}. (?house: {host} said fine, same rules as always.)'
     ],
     LATE: [
@@ -156,7 +156,7 @@ SB.Content.jobs = {
       'Deal\'s in writing with {band}. Nobody has to remember anything at settle-up.'
     ],
     LATE: [
-      'You settled the deal with {band} by message the week of. It\'s fine. It\'s not written anywhere they\'ll look.',
+      'You settled the deal with {band} by message the week of, which is fine, but it isn\'t written anywhere they\'ll look.',
       'Terms agreed {daysOut:words} days out. Their bassist may remember it differently at midnight.'
     ],
     SKIPPED: [
@@ -171,7 +171,7 @@ SB.Content.jobs = {
     card: 'Ask local bands to play, closer first. Their yes comes faster once a closer is on.',
     why: 'Locals are how the town finds out. A touring band alone draws only the people who already know it.',
     ON_TIME: [
-      'You asked the locals with weeks to spare. (?closer: {closer} said yes to closing, and the others answered fast after that.)',
+      'You asked the locals with {lead}. (?closer: {closer} said yes to closing, and the others answered fast after that.)',
       'Locals asked early. Everybody had time to say yes and keep the night free.'
     ],
     LATE: [
@@ -191,10 +191,10 @@ SB.Content.jobs = {
     why: 'Until it\'s locked, everybody wants to go last and the night runs half an hour late. A flyer made before the lock says "more TBA."',
     ON_TIME: [
       'Locked: {times}. Out by {curfew}.',
-      'Bill\'s locked with weeks to go. Everybody knows their slot. (?touring: The touring band is second to last, which is where they want to be.)'
+      'Bill\'s locked with {lead}. Everybody knows their slot. (?touring: The touring band is second to last, which is where they want to be.)'
     ],
     LATE: [
-      'You locked set times {daysOut:words} days out. Everybody wanted to go last. Nobody wanted to go first.',
+      'You locked set times {daysOut:words} days out, and by then everybody wanted to go last and nobody wanted to go first.',
       'The bill locked late. The flyer already went out saying "more TBA."'
     ],
     SKIPPED: [
@@ -202,7 +202,7 @@ SB.Content.jobs = {
       'The bill was never locked. Set times are whatever happens.'
     ],
     helper: [
-      '{helper} locked the bill the way you set it: {times}. "Now nobody argues about going last."',
+      '{helper} locked the bill the way you set it: {times}. "I sent everybody their slot, so nobody can fight me about going last."',
       '{helper} sent every band its slot and the set times. The bill\'s locked.'
     ]
   },
@@ -214,11 +214,11 @@ SB.Content.jobs = {
     why: 'A hold is a maybe. A booked night is a show, and the promotion clock starts.',
     ON_TIME: [
       'Confirmed: {room}, {dow} the {date:ord}. The show is real now.',
-      '{room} is yours for the {date:ord}. Confirmed. (?house: {host} wrote "ok" and nothing else, which is how you know.)'
+      '{room} is yours for the {date:ord}. Confirmed. (?house: {host} wrote back "ok" and nothing else, which for them means yes.)'
     ],
     LATE: [
       'You confirmed after the hold should have run out. {room} let it go this time.',
-      'Confirmed, late. The room had to hold the night longer than they wanted to.'
+      'You confirmed late, so the room had to hold the night longer than they wanted to.'
     ],
     SKIPPED: [
       '{room} never got what they asked for. They gave the {date:ord} to someone else.',
@@ -234,35 +234,35 @@ SB.Content.jobs = {
     card: 'Make the flyer. {hours} hours. Best done this week: a show without a flyer has not been announced.',
     why: 'Bands can\'t share it, shops can\'t hang it and nobody can pass it on until it exists.',
     ON_TIME: [
-      'Flyer\'s done. {bookingName} presents, {bands:words} bands, {priceLine}, {agesLine}. It looks like yours.',
-      'Flyer\'s done with weeks to go. {bookingName} presents, {agesLine}(?askAPunk: , ask a punk for the address). Everything else can start now.'
+      'Flyer\'s done. {bookingName} presents, {billLine}, {priceLine}, {agesLine}.{tbaNote} It looks like yours.',
+      'Flyer\'s done with {lead}. {bookingName} presents, {agesLine}(?askAPunk: , ask a punk for the address). Everything else can start now.'
     ],
     LATE: [
       'The flyer took you till {daysOut} days out. Everything that needs the flyer is behind now too: posters, the bands sharing it, the record store counter.',
-      'Flyer\'s done, {daysOut:words} days out. Old heads who plan a month ahead didn\'t see it in time.'
+      'The flyer was done {daysOut:words} days out, and the old heads who plan ahead didn\'t see it in time.'
     ],
     SKIPPED: [
       'No flyer. People heard about it from posts with no picture, which people scroll past.',
-      'There was never a flyer. Nothing on a wall, nothing for the bands to share. Old heads and kids both missed it.'
+      'There was never a flyer, so nothing went on a wall and the bands had nothing to share, and old heads and kids both missed it.'
     ],
     helper: [
-      '{helper} made the flyer. (?different: "Did it in my style, not yours. Trust me.")',
-      '{helper} sent the flyer over. (?different: "Changed the layout. The touring band\'s name was too small.") (?paid: You paid {amount:money}.)'
+      '{helper} made the flyer. (?different: "I did it my way instead of yours, but I think it looks better, so trust me on this.")',
+      '{helper} sent the flyer over. (?different: "I changed the layout because the touring band\'s name was too small to read from across the room.") (?paid: You paid {amount:money}.)'
     ]
   },
 
   ANNOUNCE: {
     label: 'Announce it',
     verb: 'Announce',
-    card: 'Post the date, the room and who\'s confirmed. The bill can be TBA. Old heads plan three weeks out.',
+    card: 'Post the date, the room and who\'s confirmed. The bill can be TBA. Old heads plan ahead, so say it early.',
     why: 'The people who plan ahead can only plan around what\'s been said. An announcement nobody repeats gets forgotten, so the week-of push matters too.',
     ON_TIME: [
       'Announced the day you confirmed, without the full bill. The old heads who plan ahead saw it.',
-      'Announced with weeks to go. A few people already have it on their calendar.'
+      'Announced with {lead}. A few people already have it on their calendar.'
     ],
     LATE: [
-      'You waited for the full bill and announced {daysOut:words} days out. People who plan three weeks ahead had already planned.',
-      'Announced late. The middle saw it in time. The old heads mostly didn\'t.'
+      'You waited for the full bill and announced {daysOut:words} days out. People who plan ahead had already planned.',
+      'You announced late, and the middle saw it in time but most of the old heads didn\'t.'
     ],
     SKIPPED: [
       'It was never announced. People found out from the flyer, if they found out.',
@@ -281,11 +281,11 @@ SB.Content.jobs = {
     card: 'The bands post the flyer to their own people. It happens once the flyer and the announcement exist.',
     why: 'Every band on the bill has followers you don\'t. The touring band\'s people here only hear if the band posts it.',
     ON_TIME: [
-      'All {bands:words} bands posted the flyer within a week. The touring band\'s post reached their people here.',
+      '{allBands} posted the flyer within a week. The touring band\'s post reached their people here.',
       'The bands shared it early. (?touring: {band} posted it with "see you there" and tagged everyone.)'
     ],
     LATE: [
-      'The bands shared it the week of. Two did. The touring band posted it from the road the night before.',
+      'Only two of the bands shared it the week of, and the touring band posted it from the road the night before.',
       'Shared late. Their friends saw it after making other plans.'
     ],
     SKIPPED: [
@@ -305,34 +305,35 @@ SB.Content.jobs = {
     ],
     LATE: [
       'You printed {daysOut:words} days out. The flyer runs will all be late now.',
-      'Printed late. Whatever goes up now goes up for the people who walk past it this week.'
+      'You printed late, so whatever goes up now only reaches the people who walk past it this week.'
     ],
     SKIPPED: [
-      'Nothing was printed. No posters went up anywhere. The over-30s didn\'t hear about it.',
-      'No paper. The flyer exists only on phones.'
+      'Nothing was printed, so no posters went up anywhere and the over-30s didn\'t hear about it.',
+      'There was no paper, so the flyer exists only on phones.'
     ],
     helper: [
       '{helper} printed {copies} flyers on the way home from work. "You can pay me back in beer."',
       '{helper} picked up the flyers from the copy place. {copies} of them, in a box by your door.'
     ],
     opts: {
-      SMALL: { label: '100 copies', says: 'Enough for two routes.' },
-      USUAL: { label: '250 copies', says: 'Every route in town.' },
-      BIG:   { label: '500 copies', says: 'The town and the towns next door, if someone drives them out there.' }
+      SMALL: { label: '100 copies, {cost:money}', says: 'Enough for two routes.' },
+      USUAL: { label: '250 copies, {cost:money}', says: 'Every route in town.' },
+      BIG:   { label: '500 copies, {cost:money}', says: 'The town and the towns next door, if someone drives them out there.' }
     }
   },
 
   FLYER_RUN: {
-    label: 'Put up flyers',
+    label: 'Put up flyers (?route:around {route})',
+    labelAgain: 'Put up flyers again (?route:around {route})',
     verb: 'Flyer run',
-    card: 'Put flyers up on {route}: {spots}. {hours} hours, daytime. Old heads read walls about four weeks out.',
+    card: 'Put flyers up on {route}: {spots}. {hours} hours, daytime. Old heads read walls, so earlier is better.',
     why: 'The old heads still read walls and counters. What goes up early gets covered, so early needs a second run.',
     ON_TIME: [
-      'Flyers up on {route}: {spots}. About four weeks out.',
-      'You did {route}. (?firstTime: The record store said you can use the board, just don\'t cover their sale sign.)'
+      'Flyers up on {route}: {spots}, with {lead}.',
+      'You did {route}, so the old heads who walk past {spots} will see the date. (?firstTime: The record store said you can use the board, just don\'t cover their sale sign.)'
     ],
     LATE: [
-      'Flyers went up on {route} {daysOut:words} days out. Up long enough for people who pass every day. Not for anybody else.',
+      'Flyers went up on {route} {daysOut:words} days out, which is long enough for people who pass every day but not for anybody else.',
       'You got to {route} late. The old heads who\'d have seen it had made plans.'
     ],
     SKIPPED: [
@@ -340,7 +341,7 @@ SB.Content.jobs = {
       'No flyers on {route}. The old heads who walk past there didn\'t know.'
     ],
     helper: [
-      '{helper} did {route}: {spots}. (?different: "Skipped a couple. Long story.") (?paid: {amount:money} and the list.)',
+      '{helper} did {route}: {spots}. (?different: "I skipped a couple of the spots because the owners were weird about it, I\'ll tell you later.") (?paid: {amount:money} and the list.)',
       '{helper} got flyers up on {route}. (?different: They did it a day later than you asked.)'
     ],
     stale: [
@@ -356,22 +357,22 @@ SB.Content.jobs = {
   LISTINGS: {
     label: 'Send the listings',
     verb: 'Listings',
-    card: 'Send the show to the weekly paper\'s free listings and the community calendars. {hours:words:cap} hour. Their deadline is about two weeks out.',
+    card: 'Send the show to the weekly paper\'s listings and the community calendars. {hours:words:cap} hour. Their deadlines run early.',
     why: 'Old heads still read the listings. Miss the deadline and the show isn\'t in that week\'s paper at all.',
     ON_TIME: [
       'Listings sent before the deadline. It\'ll be in the paper the week before.',
       'You\'re in the listings. Three lines in small type, read by exactly the people who don\'t look at posts.'
     ],
     LATE: [
-      'You sent the listings a day after the deadline. It made the online calendar, not the paper.',
+      'You sent the listings a day after the deadline, so the show made the online calendar but missed the paper.',
       'Listings went in late. The old heads who read the paper won\'t see it till it\'s over.'
     ],
     SKIPPED: [
       'No listings. The old heads who plan from the paper didn\'t know there was a show.',
-      'The show was never listed anywhere. The paper went out without it.'
+      'The show was never listed anywhere, so the paper went out without it.'
     ],
     helper: [
-      '{helper} sent the listings. (?different: "Put it in the community calendar too.")'
+      '{helper} sent the listings. (?different: "I put it in the community calendar too while I was at it.")'
     ]
   },
 
@@ -386,15 +387,15 @@ SB.Content.jobs = {
     ],
     LATE: [
       'The ad ran later than it should have. The paper was in recycling bins before most people saw it.',
-      'The spot aired the week of. Some people heard it.'
+      'The spot aired the week of and only some people heard it.'
     ],
     SKIPPED: [
       'No ad this time.',
       'You didn\'t buy an ad. Nobody expected one.'
     ],
     opts: {
-      PAPER: { label: 'The weekly paper', says: 'Old heads read it. In by {deadline} days before.' },
-      RADIO: { label: 'Community radio', says: 'A spot the week of. Old heads and the night-shift crowd.' }
+      PAPER: { label: 'The weekly paper, {cost:money}', says: 'Old heads read it. In by {deadline} days before.' },
+      RADIO: { label: 'Community radio, {cost:money}', says: 'A spot the week of. Old heads and the night-shift crowd.' }
     }
   },
 
@@ -405,18 +406,18 @@ SB.Content.jobs = {
     why: 'Your regulars are the one crowd you can count on, and only if you tell them.',
     ON_TIME: [
       'Your list got the show a week out. A couple of them wrote back "in."',
-      'Mailed the list. The regulars know.'
+      'You mailed the list, so the regulars know.'
     ],
     LATE: [
       'You mailed the list two days before. A few regulars already had plans.',
-      'The list got it late. "Wish I\'d known sooner," from two of them.'
+      'The list got it late, and two of them wrote back that they wished they\'d known sooner.'
     ],
     SKIPPED: [
-      'Your list never heard about it. Some regulars found out anyway. Some didn\'t.',
+      'Your list never heard about it, so some regulars found out anyway and some didn\'t.',
       'No mail to the list. The people who come because it\'s yours didn\'t know it was yours.'
     ],
     helper: [
-      '{helper} mailed the list for you. "They\'re my people too, for now."',
+      '{helper} mailed the list for you. "I figured they\'re my people too, at least for now."',
       '{helper} sent the show to the old list. A couple of them wrote back "in."'
     ]
   },
@@ -431,57 +432,58 @@ SB.Content.jobs = {
       'An evening handing out flyers. The people you talked to are the kind who come.'
     ],
     LATE: [
-      'You handed out flyers a few days before. A few took one.',
-      'Flyered at a show the week of. Most already had plans.'
+      'You handed out flyers a few days before, and only a few people took one.',
+      'You flyered at a show the week of, but most people already had plans.'
     ],
     SKIPPED: [
       'You didn\'t hand out flyers anywhere this time.',
-      'No flyering at other shows. It\'s extra; nobody counts it.'
+      'You didn\'t flyer at any other shows, and since it\'s extra, nobody counts it against you.'
     ]
   },
 
   INVITES: {
     label: 'Invite people directly',
+    labelAgain: 'Invite people again (closer to the night)',
     verb: 'Invite people',
     card: 'Message people who bring friends, one by one. {hours:words:cap} hour. Kids hear about shows from each other.',
     why: 'A message from you is the only promotion that feels like an invitation. The kids plan days ahead, but only if somebody tells them.',
     ON_TIME: [
       'You messaged people who bring friends. Most said they\'d come.',
-      'Invites sent with a week to go. A kid wrote back "you messaged my friend and she told like ten people."'
+      'Invites sent with a week to go. A kid wrote back "you messaged my friend and she ended up telling about ten people."'
     ],
     LATE: [
-      'You messaged people the day before. Four said "wish I\'d known."',
+      'You messaged people the day before, and four of them wrote back that they wished they\'d known sooner.',
       'Invites went out late. The kids had already made plans with each other.'
     ],
     SKIPPED: [
       'Nobody was invited. The kids who\'d have come never heard about it.',
-      'No invites. "Nobody told me," says a kid who would have come.'
+      'No invites went out, and a kid who would have come says nobody told them about it.'
     ],
     helper: [
-      '{helper} messaged their people about it. (?different: "Also told my whole group chat, sorry if that\'s too many.")'
+      '{helper} messaged their people about it. (?different: "I also told my whole group chat about it, so you might get more people than you planned for.")'
     ]
   },
 
   WEEK_PUSH: {
     label: 'The week-of push',
     verb: 'Week push',
-    card: 'Post every other day the week of: the flyer, a song from each band, the set times.',
+    card: 'Post in the days before the show: the flyer, a song from each band, the set times.',
     why: 'People who saw it weeks ago forget. The week-of posts are what turn "I saw that" into going.',
     ON_TIME: [
-      'Posted every other day the week of: the flyer, a song from each band, the set times.',
+      'You posted the flyer, a song from each band and the set times in the days before the show.',
       'The week-of push went out on time. The people who saw it early got reminded.'
     ],
     LATE: [
-      'Two posts the day before. Fine.',
-      'You pushed it late. Some people remembered. Some had already forgotten.'
+      'You put up two posts the day before, which was fine.',
+      'You pushed it late, so some people remembered and some had already forgotten.'
     ],
     SKIPPED: [
       'No posts the week of. People who saw it early forgot it was this week.',
-      'Nothing the week of. "Totally forgot it was this week," says someone who meant to come.'
+      'Nothing went up the week of, and someone who meant to come says they completely forgot it was this week.'
     ],
     helper: [
-      '{helper} posted it every other day the week of: the flyer, a song from each band, the set times.',
-      '{helper} did the week-of posts. "People forget. You remind them. That\'s the whole trick."'
+      '{helper} posted the flyer, a song from each band and the set times in the days before the show.',
+      '{helper} did the week-of posts. "People saw it a month ago and forgot, so I posted again to remind them."'
     ],
     opts: {
       LOW:  { label: 'Put {cost:money} behind the post', says: 'A few more people in their twenties see it this week.' },
@@ -502,7 +504,7 @@ SB.Content.jobs = {
       'Two posts on the day. The door says a few people mentioned it.'
     ],
     LATE: [
-      'Posted after doors opened.',
+      'You posted after doors opened.',
       'One post, late in the afternoon. It caught a few people.'
     ],
     SKIPPED: [
@@ -540,16 +542,16 @@ SB.Content.jobs = {
     tick: 'Sort out who shares what',
     unticked: 'Unticked: every changeover runs ten minutes longer.',
     ON_TIME: [
-      '(?closer: {closer} brings the kit.) Everybody brings their own snare and cymbals. Five-minute changeovers.',
+      '(?closer: {closer} brings the kit.) Everybody brings their own snare and cymbals, so changeovers take five minutes.',
       'Gear\'s sorted: one kit, two bass cabs, everyone\'s own breakables.'
     ],
     LATE: [
       'You sorted the gear the day before. Most of it worked out.',
-      'Gear sorted late. One band brought a whole kit anyway.'
+      'You sorted the gear late, and one band brought a whole kit anyway.'
     ],
     SKIPPED: [
-      'Nobody sorted the gear. Three drum kits, one room. Changeovers ran long.',
-      'No gear plan. Every changeover was a negotiation.'
+      'Nobody sorted the gear, so three drum kits ended up in one room and changeovers ran long.',
+      'There was no gear plan, so every changeover turned into a negotiation.'
     ]
   },
 
@@ -569,12 +571,12 @@ SB.Content.jobs = {
       'Rules made it into the posts, not onto the flyer.'
     ],
     SKIPPED: [
-      'No rules anywhere. Nobody knew who to tell when something felt off.',
-      'Nobody wrote the rules down. People parked on the grass.'
+      'There were no rules anywhere, so nobody knew who to tell when something felt off.',
+      'Nobody wrote the rules down, and people parked on the grass.'
     ],
     helper: [
       '{helper} put the house rules on the flyer, the same ones they always used.',
-      '{helper} wrote the rules down. "Copy these. Change them when you know why."'
+      '{helper} wrote the rules down. "Copy these for now, and when you find one that doesn\'t work for your house, change it."'
     ]
   },
 
@@ -584,19 +586,19 @@ SB.Content.jobs = {
     card: 'Knock on the neighbors\' doors with the date and when it ends. {hours:words:cap} hour, daytime, a day or two before.',
     why: 'A neighbor told in advance puts up with a lot. A neighbor never told calls.',
     ON_TIME: [
-      'You knocked on both neighbors\' doors with the date and when it ends. "If it\'s done by {curfew}, I\'m fine."',
-      'Neighbors told. One of them asked if they could come.'
+      'You knocked on both neighbors\' doors with the date and when it ends. "As long as it\'s all over by {curfew}, I don\'t mind."',
+      'You told the neighbors, and one of them asked if they could come.'
     ],
     LATE: [
-      'You told the neighbors the day of. One said fine. One said nothing, which isn\'t the same.',
+      'You told the neighbors the day of. One said fine, and the other said nothing, which isn\'t the same thing.',
       'Neighbors heard about it an hour before doors.'
     ],
     SKIPPED: [
       'Nobody told the neighbors.',
-      'No knock on any door. The neighbors find out from the cars.'
+      'You didn\'t knock on any door, so the neighbors find out from the cars.'
     ],
     helper: [
-      '{helper} knocked on the neighbors\' doors. They know {helper}. They said fine.',
+      '{helper} knocked on the neighbors\' doors, and since they already know {helper}, they said fine.',
       '{helper} told the neighbors the date and when it ends.'
     ]
   },
@@ -611,15 +613,15 @@ SB.Content.jobs = {
       'The advance went out ten days before. The touring band answered within the hour: "got it."'
     ],
     LATE: [
-      'The touring band got the address at noon the day of. They found it.',
-      'You advanced the bands late. Load-in was a series of phone calls.'
+      'The touring band got the address at noon the day of, and they did find it.',
+      'You advanced the bands late, so load-in turned into a series of phone calls.'
     ],
     SKIPPED: [
-      'Nobody was advanced. The touring band was at a gas station at 5 not knowing the address. {sound|Sound} didn\'t know there were {bands:words} bands.',
-      'No advance. Everybody showed up with a different idea of the night.'
+      'Nobody was advanced, so the touring band was at a gas station at 5 not knowing the address, and {sound|Sound} didn\'t know there were {bandCount}.',
+      'You sent no advance, and everybody showed up with a different idea of the night.'
     ],
     helper: [
-      '{helper} sent the advance to every band. (?different: "Told them load-in at 6 instead of 6:30. Earlier is better.")'
+      '{helper} sent the advance to every band. (?different: "I told them load-in was at 6 instead of 6:30, since it\'s easier to get everybody there early.")'
     ]
   },
 
@@ -629,8 +631,8 @@ SB.Content.jobs = {
     card: 'Ask someone to put the touring band up. {n:words:cap} people. A message; answers come fast from friends.',
     why: 'A floor is worth more to a band on the road than the door. Where they sleep is what they remember.',
     ON_TIME: [
-      '{host|A friend} has the floor for {n:words}. Towels, even.',
-      'Lodging sorted a week out. The band knows where they\'re sleeping.'
+      '{host|A friend} has a floor for {n:words}, and even put out towels.',
+      'You found the band a floor ahead of time, so they know where they\'re sleeping.'
     ],
     LATE: [
       'You found them a floor the day of. They\'d already looked up a motel.',
@@ -638,7 +640,7 @@ SB.Content.jobs = {
     ],
     SKIPPED: [
       'Nobody found the band a place to stay. They slept in the van, or paid for a motel out of the door.',
-      'No floor. They drove on after the show.'
+      'There was no floor, so they drove on after the show.'
     ]
   },
 
@@ -655,7 +657,7 @@ SB.Content.jobs = {
     ],
     LATE: [
       'You checked in the morning of. Everybody answered by noon.',
-      'Day-before texts went out late. One band answered at 4.'
+      'The day-before texts went out late, and one band didn\'t answer until 4.'
     ],
     SKIPPED: [
       'Nobody was checked on the day before.',
@@ -666,22 +668,26 @@ SB.Content.jobs = {
   FOOD: {
     label: 'Feed the touring band',
     verb: 'Food',
-    card: 'Feed the touring band. A pot of something, or {cost:money} at the place down the street.',
+    card: 'Feed the touring band: a pot at home for {homeCost:money}, or dinner out for {outCost:money}.',
     why: 'A band on the road eats gas station food for weeks. A real meal is what they tell the next town about.',
     tick: 'Feed the touring band',
     unticked: 'Unticked: the band eats whatever the gas station has.',
     ON_TIME: [
-      'The touring band ate before load-in. They talked about it all night.',
-      'Dinner for the band. {cost:money}. They asked for the recipe.'
+      '(?home:You made a pot of rice for {band}. -{amount:money}.)(?out:You took {band} out for dinner. -{amount:money}.) They ate before load-in and talked about it all night.',
+      '(?home:You cooked at home for {band}. -{amount:money}.)(?out:You got {band} dinner at the place down the street. -{amount:money}.) Somebody asked for seconds.'
     ],
     LATE: [
       'Food showed up after their set.',
-      'The band ate at 11. Better than nothing.'
+      'The band didn\'t eat until 11, which was better than nothing.'
     ],
     SKIPPED: [
       'Nobody fed the touring band.',
-      'No food. The band split a bag of chips.'
-    ]
+      'There was no food, and the band split a bag of chips.'
+    ],
+    opts: {
+      HOME: { label: 'Cook for them at home, {cost:money}', says: 'A pot of rice and beans in your kitchen. It costs little and bands remember it.' },
+      OUT:  { label: 'Take them out, {cost:money}', says: 'Dinner at the place down the street, on you.' }
+    }
   },
 
   /* ------------------------------------------------------------ the night and after */
@@ -709,21 +715,21 @@ SB.Content.jobs = {
     label: 'Say thanks',
     verb: 'Thank people',
     card: 'Thank the host, the crew and every band within two days. Ask the touring band when they\'re back.',
-    why: 'Nobody remembers being thanked. Everybody remembers not being thanked.',
+    why: 'People rarely remember being thanked, but they remember for a long time when nobody thanked them.',
     ON_TIME: [
       'You sent thanks to {host|the room}, {sound|sound}, (?security: {security},) and every band the next day.',
-      'Thanks went out within two days. The touring band wrote back: "telling our friends about you."'
+      'Thanks went out within two days. The touring band wrote back: "Thank you, we\'re telling our friends about you."'
     ],
     LATE: [
-      'Thanks a week later. Fine. Smaller.',
+      'You thanked people a week later, which is fine but means less than it would have.',
       'You thanked everybody late. They noticed, a little.'
     ],
     SKIPPED: [
       'Nobody got a thank-you.',
-      'No thanks went out. It won\'t come up now. It\'ll come up later.'
+      'No thanks went out, and nobody will mention it now, but it will come up later.'
     ],
     helper: [
-      '{helper} sent thanks to everybody from the booking name. "Next time you do this one. It matters."',
+      '{helper} sent thanks to everybody from the booking name. "You should do this one yourself next time, because people notice when it comes from you."',
       '{helper} thanked the room, the crew and the bands for you.'
     ]
   },
@@ -735,11 +741,11 @@ SB.Content.jobs = {
     why: 'The people who were there saw things you didn\'t. Asking turns a guess in your notebook into something you know.',
     ON_TIME: [
       'You asked {sound|sound} and one of the bands how it went, and wrote down your own door count next to it. Your notebook is longer.',
-      'An hour of asking. Two things you thought you knew, you now actually know.'
+      'You spent an hour asking, and two things you only thought you knew are now things you actually know.'
     ],
     LATE: [
-      'You asked a week later. People remembered most of it.',
-      'Debrief, late. The details were already getting fuzzy.'
+      'You asked a week later, and people remembered most of it.',
+      'You did the debrief late, and the details were already getting fuzzy.'
     ],
     SKIPPED: [
       'No debrief this time.',
@@ -759,12 +765,12 @@ SB.Content.jobs = {
       'A night at someone else\'s show. You talked to three people you\'d only messaged before.'
     ],
     LATE: [
-      'You got there for the last band. Saw some of it.',
+      'You got there for the last band and saw some of it.',
       'You went late. The room was already thinning out.'
     ],
     SKIPPED: [
-      'You meant to go out. You didn\'t.',
-      'Stayed in.'
+      'You meant to go out but didn\'t.',
+      'You stayed in.'
     ]
   },
 
@@ -778,8 +784,8 @@ SB.Content.jobs = {
       'A visit instead of a message. They remembered you came.'
     ],
     LATE: [
-      'You stopped by later than you said. They waited.',
-      'Got there late. They were on their way out.'
+      'You stopped by later than you said, but they waited.',
+      'You got there late and they were on their way out.'
     ],
     SKIPPED: [
       'You never went by.',
@@ -794,11 +800,11 @@ SB.Content.jobs = {
     why: 'Shows don\'t pay rent. The day job does.',
     ON_TIME: [
       'You worked the extra shift. It\'ll be on the next check.',
-      'Extra shift, done. Your feet hurt.'
+      'You finished the extra shift and your feet hurt.'
     ],
     LATE: [
       'You picked up the shift late in the week.',
-      'Covered somebody\'s shift. Came in late, stayed late.'
+      'You covered somebody\'s shift, coming in late and staying late.'
     ],
     SKIPPED: [
       'You didn\'t pick up the shift.',
@@ -876,12 +882,12 @@ SB.Content.jobs = {
       'The tour advance went out. {band} has a sheet with every night on it.'
     ],
     LATE: [
-      'You advanced the tour after they\'d left. They got the addresses one town at a time.',
+      'You advanced the tour after they\'d left, so they got the addresses one town at a time.',
       'The advance caught up with the van on the second day.'
     ],
     SKIPPED: [
       'Nobody advanced the tour. {band} found each town on their own.',
-      'No tour advance. They called you from every gas station.'
+      'There was no tour advance, and they called you from every gas station.'
     ]
   },
 
@@ -902,25 +908,25 @@ SB.Content.jobs = {
     ],
     BAND: [
       '{band} shared it before you asked.',
-      '{band} don\'t need a day-before text anymore. They\'re always there.'
+      '{band} don\'t need a day-before text anymore because they always show up.'
     ]
   },
 
   slips: {
     WRONG_DATE: [
-      'You wrote {wrongDow} on the flyer. It\'s {dow}. You caught it. An hour to fix.',
-      'The flyer said the {date:ord} under the wrong weekday. Someone pointed it out. An hour to redo it.'
+      'You wrote {wrongDow} on the flyer when the show is {dow}, and it took an hour to catch it and fix it.',
+      'The flyer said the {date:ord} under the wrong weekday, and someone pointed it out, so redoing it took an hour.'
     ],
     WRONG_LOADIN: [
       'You told one band load-in at 5 and the others at 6:30. Somebody\'s going to stand in a driveway for an hour.',
-      'The load-in time in your message was last show\'s. You sent a correction. An hour of back and forth.'
+      'The load-in time in your message was last show\'s, so you sent a correction and spent an hour going back and forth.'
     ],
     CREW_UNCONFIRMED: [
-      'You thought {sound|sound} said yes. Reading back, they said "probably." You asked again.',
-      'Security was never actually confirmed. Another message, another wait.'
+      'You thought {sound|sound} said yes, but reading it back they only said "probably," so you asked again.',
+      'Security was never actually confirmed, so you sent another message and waited again.'
     ],
     DOUBLE_BOOKED: [
-      'You put two bands in the same slot. Nobody noticed till you read it back.',
+      'You put two bands in the same slot, and nobody noticed until you read it back.',
       'You promised the {date:ord} to two people. One of them has to hear it from you.'
     ],
     SHORT_ANSWER: [
@@ -928,8 +934,8 @@ SB.Content.jobs = {
       'Your answer was shorter than you meant. They took it the wrong way.'
     ],
     SHOP_SHUT: [
-      'The copy place closed at 5. You got there at 5:10.',
-      'The copy machine was down. Come back tomorrow, they said.'
+      'The copy place closed at 5 and you got there at 5:10.',
+      'The copy machine was down, and they told you to come back tomorrow.'
     ]
   },
 
@@ -944,8 +950,29 @@ SB.Content.jobs = {
     INSURANCE: 'event insurance, {insurance:money}, bought when it confirms'
   },
 
+  /* 1.12: what a greyed job waits on (by name), and what each one buys, in words */
+  blocker: {
+    HOLD_ROOM: 'After a room is holding the night.', CONFIRM_ROOM: 'After the room says yes.', MAKE_FLYER: 'Make the flyer first.',
+    ANNOUNCE: 'After you announce it.', PRINT: 'After you print the flyers.', ASK_LOCALS: 'After a local band is asked.',
+    LOCK_BILL: 'After the bill is locked.', BANDS: 'After a band says yes.', AGREE_TERMS: 'After you agree the terms.'
+  },
+  reach: {
+    MAKE_FLYER: 'Everything else that spreads the word starts from it.',
+    ANNOUNCE: 'The old heads who plan ahead, and anyone who follows the room.',
+    BANDS_SHARE: 'Each band\'s own friends, once they post it.',
+    PRINT: 'Paper for the walls. Nothing goes up without it.',
+    FLYER_RUN: 'The old heads and the people who walk past that route, a handful at a time.',
+    LISTINGS: 'The middle crowd, who still read the weekly paper.',
+    LOCAL_AD: 'Old heads and the night-shift crowd.',
+    MAILING_LIST: 'People who already like your shows.',
+    HAND_OUT: 'People at another show that sounds like yours.',
+    INVITES: 'Kids and friends, who come when somebody asks them. A few each time.',
+    WEEK_PUSH: 'The people who meant to come and forgot.'
+  },
+
   /* a room changes your night: phone messages (slots: room, date) */
   notice: {
+    noFit: 'needs {need}, you have {left}',
     needBands: 'A band has to say yes first.',
     moved: 'Your show moved to {date} at {room}. Check the bands can still play.',
     roomGone: '{room} can\'t do your show anymore. Find another room or call it off.',

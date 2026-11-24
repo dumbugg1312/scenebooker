@@ -116,12 +116,37 @@ module.exports = function (t) {
     const at = d.split.at, band = Math.round(0.7 * (at * 10 - 285));
     t.eq(d.split.offTop, 285, 'door deal: the hall and sound off the top');
     t.eq(d.split.band, band + 80, 'door deal: the band\'s 70 percent and the locals at the middle of the guess');
-    t.eq(d.split.you, at * 10 - 285 - band - 80, 'door deal: the rest is yours');
+    t.eq(d.split.you, at * 10 - 285 - band - 80 - 56, 'door deal: the rest is yours, after what you spent already');
     t.eq(d.owed, 285 + 80 + 56, 'door deal: nothing is promised to the touring band');
     t.eq(SB.Forecast.breakEven(st, 's1', { shape: 'DOOR', share: 70 }).split.band, d.split.band, 'a share may be given as a percent');
     const h = SB.Forecast.breakEven(st, 's1', { shape: 'HAT' });
     t.eq([h.hat, h.even], [true, null], 'a hat has no even number');
     t.eq(JSON.stringify(st), before, 'breakEven changes nothing');
+  });
+
+  H.section(t, 'deal options never ask the band to take less (fix list 1.4)', () => {
+    const f = golden.build(SB, { notebook: true }), st = f.state, ask = { shape: 'DOOR', guarantee: 0, pct: 0.68 };
+    const before = JSON.stringify(st), opts = SB.Forecast.dealOptions(st, 's1', ask);
+    t.eq(opts[0].shape, 'DOOR', 'the first option is what they asked for');
+    t.ok(opts[0].asked, 'and it is marked as the ask');
+    t.ok(opts.every(o => o.band >= opts[0].band), 'every option pays them at least what the ask pays at the middle of the guess');
+    t.ok(opts.length > 1, 'from show two there are other kinds of deals');
+    t.eq(new Set(opts.map(o => o.shape)).size, opts.length, 'each kind once');
+    const g = opts.filter(o => o.shape === 'GUARANTEE')[0];
+    t.ok(g && g.nobody < 0, 'a guarantee says what you lose if nobody comes');
+    t.eq(JSON.stringify(st), before, 'dealOptions changes nothing');
+  });
+
+  H.section(t, 'break-even counts what is still to come (fix list 1.5)', () => {
+    const f = golden.build(SB, { notebook: true }), st = f.state;
+    const a = SB.Forecast.breakEven(st, 's1', { shape: 'GUARANTEE' });
+    st.shows.s1.crew.sound = null;
+    st.rooms[st.shows.s1.roomId].soundFee = 0;
+    const b = SB.Forecast.breakEven(st, 's1', { shape: 'GUARANTEE' });
+    t.ok(b.extras.some(x => x.k === 'SOUND' && x.guess), 'with nobody on sound the usual sound person is counted, and said to be a guess');
+    t.ok(b.even >= a.even - 20 && b.even > 0, 'the break-even is still a number');
+    const m = SB.Forecast.breakEven(st, 's1', { shape: 'GUARANTEE', meal: true });
+    t.ok(m.owed > b.owed, 'a promised meal is in what is owed');
   });
 
   H.section(t, 'tell spans', () => {

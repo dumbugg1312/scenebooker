@@ -211,6 +211,9 @@
 .cc-freewrap { display: flex; flex-direction: column; gap: calc(var(--p) * 10); }
 .cc-pile { display: flex; flex-direction: column; gap: calc(var(--p) * 10); }
 .cc-pile-top { position: relative; display: block; align-self: stretch; width: 100%; padding: 0 0 calc(var(--p) * 12); text-align: left; }
+/* the pad opens on tonight; the whole plan is one press (fix-list 1.12) */
+.cc-whole { all: unset; box-sizing: border-box; cursor: pointer; display: block; align-self: stretch; padding: calc(var(--p) * 6) 0; }
+.cc-legend { margin: calc(var(--p) * 6) 0 0; font: 400 calc(var(--fs) * 12)/1.35 var(--f-type); color: var(--pp-bond); }
 .cc-pile-stack { display: block; position: relative; width: calc(100% - calc(var(--p) * 10)); height: calc(var(--p) * 46); margin: calc(var(--p) * 4) 0 0 calc(var(--p) * 2); filter: drop-shadow(var(--sh-s) 0 rgba(0, 0, 0, .6)); }
 .cc-pile-stack .cc-paper:nth-child(1) { transform: rotate(3.5deg) translate(calc(var(--p) * 5), calc(var(--p) * 4)); filter: brightness(.78); }
 .cc-pile-stack .cc-paper:nth-child(2) { transform: rotate(-2deg) translate(calc(var(--p) * 1), calc(var(--p) * 2)); filter: brightness(.9); }

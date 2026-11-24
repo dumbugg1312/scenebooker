@@ -81,7 +81,7 @@ SB.Content.irl = {
       story: null
     },
     PROMO_SHARES: {
-      line: 'Send every band the flyer the day you announce and ask them to post it. Their friends hear it from them, not from you.',
+      line: 'Send every band the flyer the day you announce and ask them to post it, because most of their friends will hear about the show from them.',
       whatIf: 'Every band sharing the flyer when you announced: about {n} more people(?gen:, mostly {gen}) (?money:(about {money:money})).',
       unknown: 'You couldn\'t have known: whether these bands actually post their shows. They mostly didn\'t, and it cost about {n} people.',
       story: null
@@ -99,7 +99,7 @@ SB.Content.irl = {
       story: null
     },
     PROMO_EXIT: {
-      line: 'Hand out flyers at the shows in the three weeks before yours, the ones with a crowd like yours. Those are people who already go out.',
+      line: 'Hand out flyers at the shows in the three weeks before yours, the ones with a crowd like yours, because those people already go out.',
       whatIf: 'Flyers handed out at a show like this one: about {n} more people(?gen:, mostly {gen}) (?money:(about {money:money})).',
       unknown: 'You couldn\'t have known: how many of the people you handed flyers to would come. It came up about {n} short.',
       story: null
@@ -129,7 +129,7 @@ SB.Content.irl = {
       story: null
     },
     TOWN_EVENT: {
-      line: 'Look at the town calendar before you hold the room: festivals, game days, the week before payday. A show up against the town\'s big weekend loses.',
+      line: 'Look at the town calendar before you hold the room: festivals, game days, the week before payday. If your show lands on the town\'s big weekend, most people will be at that instead.',
       whatIf: 'A night clear of the town\'s calendar: about {n} more people(?gen:, mostly {gen}) (?money:(about {money:money})).',
       unknown: 'You couldn\'t have known: the town had something on that night. It took about {n} people.',
       story: null
@@ -143,7 +143,7 @@ SB.Content.irl = {
     DRAW_AWAY: {
       line: 'A touring band draws a fraction of their home number the first time through. Ask a booker in the last town what they really drew, and plan for that.',
       whatIf: 'A local band with friends in town added to the bill: about {n} more people(?gen:, mostly {gen}) (?money:(about {money:money})).',
-      unknown: 'You couldn\'t have known: the touring band drew about {n} fewer here than you\'d guessed. What a band draws at home isn\'t what they draw on the road.',
+      unknown: 'You couldn\'t have known: the touring band drew about {n} fewer here than you\'d guessed, because what a band draws at home usually doesn\'t carry over to a town that doesn\'t know them yet.',
       story: null
     },
     LOCAL_DRAW: {
@@ -179,7 +179,7 @@ SB.Content.irl = {
     PAY: {
       line: 'Pay every band at the very end of the night, with the math written down where they can see it. A band that feels shorted tells everyone on their route.',
       whatIf: 'Paying what you promised, on the night: they\'d have told the next towns you\'re good for it.',
-      unknown: 'You couldn\'t have known the door would come in short of what you promised. That\'s the risk of a guarantee.',
+      unknown: 'You couldn\'t have known the door would come in short of what you promised, and with a guarantee you owe the band that number either way.',
       story: null
     },
     ADVANCE: {
@@ -213,7 +213,7 @@ SB.Content.irl = {
       story: null
     },
     LOCALS_GIVE: {
-      line: 'Local bands will often give up their cut for a touring band that drove a long way. Let them offer; don\'t lean on them.',
+      line: 'Local bands will often give up their cut for a touring band that drove a long way, but let them be the ones to offer it.',
       story: null
     },
     HAT: {
@@ -225,7 +225,7 @@ SB.Content.irl = {
       story: null
     },
     OFF_RENT: {
-      line: 'You can ask the room to take less rent, but the owner remembers it and a hall may keep your deposit. Do it once, if ever.',
+      line: 'You can ask the room to take less rent, but the owner remembers it and a hall may keep your deposit, so don\'t ask more than once.',
       story: null
     }
   },

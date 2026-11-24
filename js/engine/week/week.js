@@ -498,8 +498,29 @@ SB.module('Week', function (SB) {
     var c = state.clock;
     if (c.phase === E.PHASE.OVER) return no(E.REFUSE.OVER);
     if (!c.stop || c.stop.kind !== E.STOP.EVENING) return no(E.REFUSE.PHASE);
+    var settled = settleShowNight(state, c.day != null ? c.day : dayOf(state, todayIdx(state)));
     c.stop = null;
-    return U.yes();
+    return U.yes({ settled: settled });
+  }
+
+  /* On a show's own night the press always plays the night (0.11): whatever is unfinished is settled on the spot. The bill
+   * locks with whoever said yes, and a job still open is marked missed (its own line says what that costs). -> [text] */
+  function settleShowNight(state, day) {
+    var out = [], shows = myShowsOn(state, day), i, s, id, j, t;
+    for (i = 0; i < shows.length; i++) {
+      s = shows[i];
+      if (!s || s.status !== 'CONFIRMED') continue;
+      if (s.bill && !s.bill.locked) { try { SB.Shows.lock(state, s.id, day); } catch (e) { /* the bill stays as it is */ } }
+      for (id in (state.jobs || {})) {
+        j = state.jobs[id];
+        if (!j || j.showId !== s.id || j.type === 'RUN_SHOW' || j.type === 'GO_TO_SHOW') continue;
+        if (j.status !== 'TODO' && j.status !== 'PLANNED' && j.status !== 'PROMISED') continue;
+        if ((C.JOBS[j.type] || {}).optional || j.type === 'THANKS' || j.type === 'DEBRIEF') continue;   // those come after the night
+        t = SB.Jobs.skip(state, id, day);
+        if (t) out.push(t);
+      }
+    }
+    return out;
   }
 
   /* ---- what is due when, and whether the hours are there ---- */
@@ -541,6 +562,9 @@ SB.module('Week', function (SB) {
        * last day it still does any good, so a late flyer is not "twelve hours due tonight" */
       d = v.window.idealUntil >= today ? v.window.idealUntil :
           (typeof v.window.missedAt === 'number' ? Math.max(today, v.window.missedAt - 1) : today);
+      /* booked short, its on-time day is only the grace (Jobs: never late before it could be done): it is really due
+       * by the last day it still does any good, or a show a week out reads as all its work due in two days */
+      if (v.window.graced && typeof v.window.missedAt === 'number') d = Math.max(d, v.window.missedAt - 1);
       if (d > until) continue;
       (due[d] = due[d] || []).push(v);
     }
@@ -558,6 +582,63 @@ SB.module('Week', function (SB) {
    * uncovered, non-optional work due by that day (`need`) against the hours free from tonight through it (`have`).
    * -> [{ day, need, have, short, jobs: [jobId] }], soonest first; empty when everything fits. A view. */
   function crunch(state) { return crunchOf(state, dueViews(state)); }
+
+  /* The one days-to-show count (2.11): the desk, the show card, the close page and the NEXT strip all read this. A show on `day`
+   * is that many days from tonight; on the close page, from the last night of the week being closed (not the next week's
+   * Monday). 0 is tonight. A view. */
+  function daysTo(state, day) {
+    var c = state.clock, rep = state.week && state.week.report, base;
+    if (c.phase === E.PHASE.CLOSE && rep && typeof rep.week === 'number') base = rep.week * 7 + 6;
+    else base = typeof c.day === 'number' ? c.day : dayOf(state, todayIdx(state));
+    return day - base;
+  }
+
+  /* an ask of one of these kinds for the show is out and not answered yet */
+  function pendingAsk(state, showId, kinds) {
+    var k, a;
+    for (k in (state.asks || {})) {
+      a = state.asks[k];
+      if (a && a.showId === showId && kinds[a.kind] && (a.status === 'QUEUED' || a.status === 'SENT')) return true;
+    }
+    return false;
+  }
+
+  /* Waiting nights (2.1). At an evening with nothing the player can do before the next known thing (a show, a reply that
+   * is on its way), the day that thing lands: { day, nights } or null. Nothing open means no job of the player's own is
+   * inside its window, and nothing waits on an answer from them. A view. */
+  function quiet(state) {
+    var c = state.clock, today, views, i, v, w, next = null, k, a, x, d;
+    if (!c || c.phase !== E.PHASE.PLAY || !c.stop || c.stop.kind !== E.STOP.EVENING) return null;
+    today = dayOf(state, todayIdx(state));
+    views = dueViews(state);
+    for (i = 0; i < views.length; i++) {
+      v = views[i];
+      if (!v || v.mode !== 'HOURS' || v.optional || v.hidden || v.covered || v.status !== 'TODO' || v.planned) continue;
+      w = v.window;
+      if (w && (w.state === 'OPEN' || w.state === 'CLOSING' || w.state === 'LATE')) return null;
+    }
+    try { if ((SB.Mail.needsYou(state) || []).length) return null; } catch (e) { /* no phone: nothing waits */ }
+    /* booking work is work too: a show of yours with no room asked for, or a bill with nobody asked, is not a quiet night */
+    for (k in (state.shows || {})) {
+      x = state.shows[k];
+      if (!x || (x.by && x.by !== 'player') || (x.status !== 'DRAFT' && x.status !== 'CONFIRMED') || x.day <= today) continue;
+      if (x.status === 'DRAFT' && !pendingAsk(state, x.id, { ROOM_HOLD: 1, ROOM_CONFIRM: 1 })) return null;
+      if (x.status === 'CONFIRMED' && x.bill && !x.bill.locked && (x.bill.slots || []).length < 2 && !pendingAsk(state, x.id, { BAND_PLAY: 1 })) return null;
+    }
+    for (k in (state.shows || {})) {
+      x = state.shows[k];
+      if (x && (x.status === 'CONFIRMED' || x.status === 'DRAFT') && x.day > today && (next === null || x.day < next)) next = x.day;
+    }
+    for (k in (state.asks || {})) {
+      a = state.asks[k];
+      d = a && a.answer && a.answer.day;
+      /* an ask still out with no answer day yet: the answer can come overnight, so the next thing is tomorrow */
+      if (typeof d !== 'number' && a && (a.status === 'QUEUED' || a.status === 'SENT')) d = today + 1;
+      if (typeof d === 'number' && d > today && a.status !== 'WITHDRAWN' && (next === null || d < next)) next = d;
+    }
+    if (next === null || next - today < 2) return null;
+    return { day: next, nights: next - today };
+  }
 
   /* ------------------------------------------------------------------ */
   /* planning (the old calendar: kept until the interface stops calling it) */
@@ -1315,7 +1396,7 @@ SB.module('Week', function (SB) {
     var c = state.clock, W = state.week, refuse = phaseNo(state, [E.PHASE.PLAY]), usage, records = [], rg = weekRange(state),
         i, d, unspent = 0, daysOff = 0, inFlight = 0, wentOut = 0, id, s, j, inbox = 0, from = state.player.stress, mIn = 0, mOut = 0,
         l, owed, learned = [], people = [], news = [], bills = null, year = null, next = { open: 0, late: 0, repliesDue: 0 }, w, report,
-        shows, sv, r, req, nextMon = rg.to + 1, allLog;
+        shows, sv, r, req, nextMon = rg.to + 1, allLog, inBy = {}, outBy = {}, inLines = [], outLines = [];
     if (refuse) return refuse;
     if (!c.stop || c.stop.kind !== E.STOP.END_OF_WEEK) return no(E.REFUSE.PHASE);
     shows = playedThisWeek(state);
@@ -1340,8 +1421,10 @@ SB.module('Week', function (SB) {
     for (i = 0; i < state.money.ledger.length; i++) {
       l = state.money.ledger[i];
       if (l.day < rg.from || l.day > rg.to || l.cat === E.MONEY.MOVE) continue;
-      if (l.amount > 0) mIn += l.amount; else mOut -= l.amount;
+      if (l.amount > 0) { mIn += l.amount; inBy[l.cat] = (inBy[l.cat] || 0) + l.amount; } else { mOut -= l.amount; outBy[l.cat] = (outBy[l.cat] || 0) - l.amount; }
     }
+    for (id in inBy) inLines.push({ cat: id, amount: inBy[id] });         // where the money came from and went (1.16): one line each
+    for (id in outBy) outLines.push({ cat: id, amount: outBy[id] });
     owed = SB.Money.owedAhead(state);
     allLog = W.log.concat(records);
     for (i = 0; i < allLog.length; i++) {
@@ -1357,10 +1440,13 @@ SB.module('Week', function (SB) {
     for (id in (state.jobs || {})) {
       j = state.jobs[id];
       if (!j || j.status === 'DONE' || j.status === 'SKIPPED' || j.status === 'MOOT' || (C.JOBS[j.type] && C.JOBS[j.type].optional)) continue;
+      /* only jobs the player can do count (0.4): not the automatic ones, not one a friend covers, not one folded away on show one */
+      if (C.JOBS[j.type] && C.JOBS[j.type].mode && C.JOBS[j.type].mode !== 'HOURS') continue;
+      try { var jv = SB.Jobs.get(state, id); if (jv && (jv.mode !== 'HOURS' || jv.more || jv.covered || jv.hidden)) continue; } catch (e) { /* counted */ }
       try { w = SB.Jobs.window(state, id, nextMon); } catch (e) { w = null; }
       if (!w) continue;
       if (w.state === 'OPEN' || w.state === 'CLOSING') next.open++;
-      else if (w.state === 'LATE') next.late++;
+      else if (w.state === 'LATE') { next.late++; (next.lateJobs = next.lateJobs || []).push(id); }
     }
     for (id in (state.requests || {})) {
       req = state.requests[id];
@@ -1370,7 +1456,7 @@ SB.module('Week', function (SB) {
     sv = SB.Stress.view(state);
     report = {
       week: c.week, shows: shows,
-      money: { in: mIn, out: mOut, net: mIn - mOut, fund: state.money.fund, bank: state.money.bank, owedAhead: owed },
+      money: { in: mIn, out: mOut, inLines: inLines, outLines: outLines, net: mIn - mOut, fund: state.money.fund, bank: state.money.bank, owedAhead: owed },
       learned: learned, people: people,
       stress: { from: Math.round(from), to: Math.round(state.player.stress), zone: SB.Stress.zone(state), causes: sv.causes },
       news: news, bills: bills, year: year, next: next
@@ -1441,7 +1527,7 @@ SB.module('Week', function (SB) {
     setDayJob: setDayJob, phoneOff: phoneOff, check: check, startPlay: startPlay, step: step, decide: decide, close: close,
     payBills: payBills, nextWeek: nextWeek, log: log, raise: raise,
     /* the night clock (spec 10) */
-    tonight: tonight, canDoNow: canDoNow, doNow: doNow, endNight: endNight, crunch: crunch,
+    tonight: tonight, canDoNow: canDoNow, doNow: doNow, endNight: endNight, crunch: crunch, quiet: quiet, daysTo: daysTo,
     /* not in the manifest: E1a's own helpers, used by Game; fits / spend / refund are the clock as SB.Mail charges it */
     blankWeek: blankWeek, refreshHours: refreshHours, resetShape: resetShape, recap: recap,
     fits: fits, spend: spend, refund: refund, eveningOpen: eveningOpen, rest: rest

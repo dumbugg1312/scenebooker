@@ -8,7 +8,7 @@ SB.module('Director', function (SB) {
   'use strict';
   var E = SB.Enums, C = SB.Config, U = SB.util, D = C.DIRECTOR;
   var AT_ORDER = ['DOORS', 'SET:1', 'CHANGEOVER', 'SET:PEAK', 'LATE', 'SETTLE'];
-  var RAISED_ELSEWHERE = { DOORS: 1, COUNT: 1, DEAL_DISPUTE: 1, HOLD_CHALLENGED: 1, TOUR_CANCELLED: 1 };
+  var RAISED_ELSEWHERE = { DOORS: 1, DOORS_FULL: 1, COUNT: 1, DEAL_DISPUTE: 1, HOLD_CHALLENGED: 1, TOUR_CANCELLED: 1 };
   var TIER_RANK = { GENTLE: 0, REAL: 1, HARD: 2 };
   // SPEC?: a night event with no `risk` has no chance in 03-content 8.1; it comes up with this chance times its weight.
   var NIGHT_P_NO_RISK = 0.1;
@@ -17,7 +17,7 @@ SB.module('Director', function (SB) {
 
   /* The scripted first month of 03-content 10, used when SB.Content.legacy.opening.script is absent. */
   var DEFAULT_SCRIPT = [
-    { week: 0, day: 0, post: 'REQUEST', template: 'CAREFUL', first: true, from: 'PEER', dates: [31, 32], guided: [11, 12], ask: 'DOOR' },
+    { week: 0, day: 0, post: 'REQUEST', template: 'CAREFUL', first: true, from: 'PEER', dates: [18, 19], guided: [11, 12], ask: 'DOOR' },
     { week: 0, day: 0, post: 'LOCAL', path: 'people.band.FIRST_ASK', band: 'CLOSER' },
     { week: 0, day: 0, post: 'REQUEST', template: 'MASS' },
     { week: 0, day: 0, post: 'OWNER', path: 'people.owner.HOST.HELLO' },
@@ -402,6 +402,8 @@ SB.module('Director', function (SB) {
         if (e.guided && guidedStart(state)) {
           spec.dates = e.guided.slice();
           spec.replyBy = Math.max(1, e.guided[0] - (e.week * 7 + (e.day || 0)) - 1);
+        } else {
+          spec.replyBy = 7;          // L.10/L.12: a first show two and a half weeks out; this band gives a new booker a week to answer
         }
       } else if (e.template === 'SWAP') {
         spec.kind = E.REQ_KIND.SWAP;
@@ -553,6 +555,39 @@ SB.module('Director', function (SB) {
       takenDays[day + half] = true;
       d.queue.push({ id: U.newId(state, 'd'), eventId: pick.ev.id, day: day, half: half, bind: pick.bound.bind, showId: pick.bound.showId });
     }
+    guaranteePersonEvent(state, w, start, end, takenDays);
+  }
+
+  /* A guided game's waiting weeks (the first show, and the second) each get at least one mid-week person event: somebody texts, three
+   * costed choices, a reply after. If the random draw gave this week none, one gentle event bound to a person is added. */
+  var PERSON_BINDS = ['person', 'touring', 'band', 'opener', 'closer'];
+  function guaranteePersonEvent(state, w, start, end, takenDays) {
+    var d = dir(state), r = rng(state), played = 0, wait, all, pool = [], weights = [], pick, day, half, hasOne;
+    if (!guidedStart(state)) return;
+    Object.keys(state.shows || {}).forEach(function (id) { if (state.shows[id] && state.shows[id].status === E.SHOW.PLAYED) played++; });
+    if (played >= 2) return;
+    wait = liveShows(state).filter(function (s) { return s.day >= start && s.day <= end + 7; })[0];
+    if (!wait) return;
+    function personBound(ev) { return (ev.bind || []).some(function (b) { return PERSON_BINDS.indexOf(b) >= 0; }); }
+    hasOne = d.queue.some(function (q) {
+      var ev = q.day >= start && q.day <= end ? eventById(state, q.eventId) : null;
+      return ev && (ev.when === 'WEEK' || ev.when === 'EITHER') && personBound(ev);
+    });
+    if (hasOne) return;
+    all = events(state);
+    all.general.concat(all.city).forEach(function (ev) {
+      if (!personBound(ev) || !eligibleWeek(state, ev, w, ['GENTLE'])) return;
+      var bound = bindEvent(state, ev, {});
+      if (!bound || !engineGate(state, ev, bound)) return;
+      pool.push({ ev: ev, bound: bound }); weights.push(ev.weight === undefined ? 1 : ev.weight);
+    });
+    pick = pool.length ? r.weighted(pool, weights) : null;
+    if (!pick) return;
+    day = placeDay(state, pick.ev, pick.bound, start, end, takenDays);
+    if (day === null) return;
+    half = r.chance(.5) ? 'DAY' : 'NIGHT';
+    takenDays[day + half] = true;
+    d.queue.push({ id: U.newId(state, 'd'), eventId: pick.ev.id, day: day, half: half, bind: pick.bound.bind, showId: pick.bound.showId });
   }
 
   function placeDay(state, ev, bound, start, end, taken) {
@@ -723,6 +758,12 @@ SB.module('Director', function (SB) {
       var ev = pair[1] ? eventById(state, pair[0]) : null;
       if (ev) add({ ev: ev, bound: { bind: refsFromShow(state, show), showId: show.id }, p: 1, forced: pair[0] });
     });
+    /* the first show that fills the room always meets one gentle stop at the door (a guided first show has no bad-luck turn, so without
+     * this nothing could ever slide onto the table) */
+    var fullCap = room && typeof room.cap === 'number' ? room.cap : 0, fullQ = firstShow(state, show) && out && fullCap > 0 && (out.turnedAway > 0 || out.heads > fullCap);
+    var fullEv = fullQ ? eventById(state, 'DOORS_FULL') : null;
+    if (fullEv) add({ ev: fullEv, bound: { bind: refsFromShow(state, show), showId: show.id }, p: 1, forced: 'DOORS_FULL',
+                      extra: { cap: Math.round(fullCap), gate: Math.max(5, Math.round(Math.max(out.turnedAway || 0, out.heads - fullCap))) } });
     drawFrom(fired.filter(function (f) { return f.hit && !f.incident; }));
     if (!picks.length && !firstShow(state, show)) {
       var gentle = fired.filter(function (f) { return (f.ev.tier || 'GENTLE') === 'GENTLE'; });
@@ -730,11 +771,12 @@ SB.module('Director', function (SB) {
       if (gentle.length) add(gentle[0]);
     }
     var decisions = picks.map(function (it) {
-      var at = it.forced === 'DOORS' ? 'DOORS' : (it.forced === 'COUNT' ? 'SETTLE' : (it.ev.at || 'SET:PEAK'));
+      var at = it.forced === 'DOORS' ? 'DOORS' : (it.forced === 'COUNT' ? 'SETTLE' : (it.forced === 'DOORS_FULL' ? 'SET:1' : (it.ev.at || 'SET:PEAK')));
       var kind = it.forced === 'DOORS' ? E.DECISION.DOORS : (it.forced === 'COUNT' ? E.DECISION.COUNT : E.DECISION.NIGHT_STOP);
       /* the doors question comes when the first band is tuned and waiting, with the count the clicker shows at that minute */
       var mins = it.forced === 'DOORS' && out && out.sets && out.sets[0] && typeof out.sets[0].start === 'number' ? out.sets[0].start - 1 : atMinutes(show, at);
-      var dec = buildDecision(state, it.ev, it.bound, kind, mins, show.day, 'NIGHT', it.forced === 'DOORS' ? { heads: doorsCount(out, present) } : null);
+      if (it.forced === 'DOORS_FULL' && out && out.sets && out.sets[0] && typeof out.sets[0].start === 'number') mins = out.sets[0].start + 10;
+      var dec = buildDecision(state, it.ev, it.bound, kind, mins, show.day, 'NIGHT', it.forced === 'DOORS' ? { heads: doorsCount(out, present) } : (it.extra || null));
       dec.atKey = at;
       d.used[it.ev.id] = w;
       return dec;

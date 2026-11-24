@@ -198,7 +198,7 @@ SB.module('Money', function (SB) {
   function exposure(state, showId) {
     var show = getShow(state, showId, 'Money.exposure'), lines = [], t = roomTerms(state, show), kind = roomKind(state, show),
         deal = show.deal || {}, slots = (show.bill && show.bill.slots) || [], crew = show.crew || {}, door = show.door || {},
-        paidDeposit = false, i, l, total = 0, plan, job, price, comps, sound;
+        paidDeposit = false, i, l, total = 0, plan, job, price, comps, sound, planPrint = 0;
     function add(cat, amount, lbl, back) {
       amount = Math.round(amount || 0);
       if (amount > 0) lines.push(back ? { cat: cat, amount: amount, label: lbl || label('money.' + cat), back: true } : { cat: cat, amount: amount, label: lbl || label('money.' + cat) });
@@ -230,13 +230,30 @@ SB.module('Money', function (SB) {
     for (i = 0; i < plan.length; i++) {
       job = state.jobs && state.jobs[plan[i].jobId];
       if (!job || job.showId !== showId || job.status === 'DONE') continue;
-      if (plan[i].opt) add(C.JOBS[job.type] && C.JOBS[job.type].opt === 'PRINT_RUN' ? E.MONEY.PRINT : E.MONEY.PROMO, optCost(state, job.type, plan[i].opt));
+      if (plan[i].opt) { if (C.JOBS[job.type] && C.JOBS[job.type].opt === 'PRINT_RUN') planPrint += optCost(state, job.type, plan[i].opt); add(C.JOBS[job.type] && C.JOBS[job.type].opt === 'PRINT_RUN' ? E.MONEY.PRINT : E.MONEY.PROMO, optCost(state, job.type, plan[i].opt)); }
       if (plan[i].pay && plan[i].pay.kind === 'CASH') add(E.MONEY.HELPER, plan[i].pay.amount || 0);
+    }
+    /* fix list 1.5: what the settle will still count that the lines above cannot see (the usual sound person when nobody is hired,
+     * the usual print run, a meal promised to the touring band): Forecast.plannedCosts, less what was already counted above */
+    if (SB.Forecast && typeof SB.Forecast.plannedCosts === 'function' && show.status !== 'PLAYED' && show.status !== 'CANCELLED') {
+      try {
+        SB.Forecast.plannedCosts(state, show, null).list.forEach(function (x) {
+          if (x.k === 'SOUND' && !sound) add(E.MONEY.SOUND, x.amount);
+          else if (x.k === 'FOOD') add(E.MONEY.FOOD, x.amount);
+          else if (x.k === 'PRINT' && x.amount > planPrint) add(E.MONEY.PRINT, x.amount - planPrint);
+        });
+      } catch (e) { /* the forecast cannot read this show yet: the lines stand */ }
     }
     for (i = 0; i < lines.length; i++) if (!lines[i].back) total += lines[i].amount;
     price = door.price || 0; comps = door.comps || 0;
-    return { total: total, lines: lines,
-             breakEven: (door.donation || price <= 0) ? null : Math.ceil(total / price) + comps };
+    /* fix list 1.5: the break-even is the one the settle holds to (Forecast.breakEven, paying people, every cost counted); the plain
+     * total over price (plus comps) is only the fallback when the forecast cannot read the show yet */
+    var be = (door.donation || price <= 0) ? null : Math.ceil(total / price) + comps, fb = null;
+    if (be !== null && SB.Forecast && typeof SB.Forecast.breakEven === 'function') {
+      try { fb = SB.Forecast.breakEven(state, showId); } catch (e) { fb = null; }
+      if (fb && !fb.hat && typeof fb.even === 'number') be = fb.even;
+    }
+    return { total: total, lines: lines, breakEven: be };
   }
 
   function liveShows(state) {
@@ -348,6 +365,15 @@ SB.module('Money', function (SB) {
   /* ------------------------------------------------------------------ */
   /* the bills                                                           */
   /* ------------------------------------------------------------------ */
+
+  /* What the day job pays for a week of shifts, as the weekly close pays it (a view; 1.17: the player can read it on the money page). */
+  function weekPay(state) {
+    var p = pack(state), W = state.week || {}, P = state.player || {}, pay, n = 0, i;
+    if (!billsOn(state) || P.dayJob === 'NONE') return 0;
+    pay = (p && p.money && typeof p.money.shiftPay === 'number') ? p.money.shiftPay : Math.round(C.CITY.SHIFT_PAY * priceIndex(state));
+    for (i = 0; i < 7; i++) if (W.shifts && W.shifts[i] && (W.dropped || []).indexOf(i) < 0) n++;
+    return n * pay;
+  }
 
   function wagesThisMonth(state) {
     var w = state.clock.week, mm = SB.time.date(w * 7 + 6), i, l, t = 0, d;
@@ -528,7 +554,7 @@ SB.module('Money', function (SB) {
   }
 
   return {
-    spend: spend, earn: earn, move: move, canCover: canCover, exposure: exposure, owedAhead: owedAhead,
+    weekPay: weekPay, spend: spend, earn: earn, move: move, canCover: canCover, exposure: exposure, owedAhead: owedAhead,
     showAccounts: showAccounts, ledger: ledger, billsView: billsView, payBills: payBills, weekly: weekly,
     /* not in the manifest: used by Week.nextWeek and Week.close */
     billsSettled: billsSettled, billsTotal: billsTotalOf

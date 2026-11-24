@@ -339,7 +339,7 @@ SB.module('Requests', function (SB) {
       tourDays: req.route && req.route.stops ? req.route.stops.length + d.length - 1 : d.length,
       setLen: b && hidOf(b).tier >= 3 ? 40 : 30,
       draw: typeof req.statedDraw === 'number' ? req.statedDraw : '',
-      bigNumber: typeof req.statedDraw === 'number' ? Math.max(100, Math.ceil(req.statedDraw * 1.5 / 50) * 50) : '',
+      bigNumber: typeof req.statedDraw === 'number' ? Math.max(100, Math.ceil(req.statedDraw * 1.5 / 50) * 50) : 100,
       peerCity: peers.length ? peers[0].name : (req.route && req.route.prev ? req.route.prev.name : ''),
       weekday: SB.time.fmt(first + 1, 'dow'),
       local: flags.hasLocal ? localBandName(state, b ? b.genre : 'hardcore') : '',
@@ -583,7 +583,7 @@ SB.module('Requests', function (SB) {
     delete route.nextPoint;
     if (route.stops) route.stops.sort(function (a, c) { return a.day - c.day; });
 
-    var short = firstDay - arrival < C.JOBS.ANNOUNCE.ideal || spec.shortNotice === true;
+    var short = firstDay - arrival < (C.SHORT_NOTICE_DAYS || C.JOBS.ANNOUNCE.ideal) || spec.shortNotice === true;   // 1.11: only inside about three weeks
     var replyBy = short ? Math.min(firstDay - 1, arrival + r.int(1, 2)) : Math.min(firstDay - 1, arrival + r.int(Q.REPLY_BY[0], Q.REPLY_BY[1]));
     if (typeof spec.replyBy === 'number') replyBy = Math.min(firstDay - 1, arrival + spec.replyBy);
     if (replyBy < arrival) replyBy = arrival;
@@ -612,6 +612,7 @@ SB.module('Requests', function (SB) {
     else shape = r.chance(0.25) ? 'GUARANTEE' : 'DOOR';
     if (pre === 'OVERSELL' && spec.ask === 'GUARANTEE') shape = 'GUARANTEE';
     if (shape !== 'DOOR' && askAmt < 50) askAmt = Math.max(askAmt, round10(50 + 50 * tier));
+    if (shape !== 'DOOR' && askAmt > Q.GUARANTEE_MAX) askAmt = Q.GUARANTEE_MAX;
     var pct = U.round(r.range(C.DOOR_DEAL_PCT[0], C.DOOR_DEAL_PCT[1]), 2);
     var ask = { shape: shape, guarantee: shape === 'DOOR' ? 0 : askAmt, pct: shape === 'GUARANTEE' ? 0 : pct,
                 lodging: kind !== 'LOCAL_ASK' && wantsFloor, meal: kind !== 'LOCAL_ASK' && wantsMeal, members: members };
@@ -923,9 +924,20 @@ SB.module('Requests', function (SB) {
     var days = p.inPerson ? 0 : r.range(w.days[0], w.days[1]);
     if (!OPEN[q.status] && q.status !== 'NEGOTIATING') return { days: days, will: 'NO', counter: null };
     if (q.hid && typeof q.hid.gone === 'number' && q.hid.gone <= t) return { days: days, will: 'NO', counter: null };
-    if (!p.inPerson && r.chance(w.silent)) return { days: days, will: 'SILENT', counter: null };
+    /* a touring band with an offer out always answers (yes, no or a counter) inside its 1 to 3 days (fix-list 0.5):
+     * the old silent chance left the offer "asked" for a month while the show ran on two locals */
     var dateOk = (q.dates || []).indexOf(p.date) >= 0;
     var value = valueOf(state, q, deal, show), floor = floorFor(state, q, deal);
+    /* a band does not take less than it asked for without a word (fix list 2.16): an offer under their guarantee that still
+     * clears their floor comes back at what they asked, so the player sees it and says yes to it */
+    if (dateOk && !meetsAsk(q, deal) && (q.ask && (q.ask.guarantee || 0) > (deal.guarantee || 0)) && value >= floor && q.offers.length < Q.NEGOTIATE_MAX) {
+      var back = U.copy(deal);
+      back.shape = q.ask.shape && q.ask.shape !== 'DOOR' && q.ask.shape !== 'HAT' ? q.ask.shape : 'GUARANTEE';
+      back.guarantee = q.ask.guarantee; back.pct = typeof q.ask.pct === 'number' ? q.ask.pct : back.pct;
+      if (q.ask.lodging) back.lodging = true;
+      if (q.ask.meal) back.meal = true;
+      return { days: days, will: 'COUNTER', counter: { requestId: q.id, showId: p.showId || null, date: p.date, deal: back } };
+    }
     if (dateOk && (value >= floor || meetsAsk(q, deal))) {
       if (heldOn(state, p.showId, p.date) || r.chance(0.5)) return { days: days, will: 'YES', counter: null };
       /* SPEC?: without a held room YES comes only half the time; the other half is read as "not yet: find a room"
@@ -1046,6 +1058,41 @@ SB.module('Requests', function (SB) {
     return (p.scene.traffic || 0) * Q.SEASON[m - 1] * (Q.STOP.base + Q.STOP.perWord * word(state) / 100);
   }
 
+  /* "Forty messages by Thursday": after a first show that drew at or above what the town expected, six asks arrive over
+   * the next three days: two touring bands, a local who wants something, a room's offer, a band that looks the other
+   * way ("a date fell out"), and one mass email that is easy to pass on. Once per game; nothing for a first show that
+   * did not do the town's usual. */
+  var RUSH = [
+    [1, { kind: 'COLD', template: 'CAREFUL' }], [1, { kind: 'LOCAL_ASK', localAsk: 'FIRST_SHOW' }],
+    [2, { kind: 'COLD', template: 'KIDS_TOUR' }], [2, { kind: 'LOCAL_ASK', localAsk: 'EMPTY_NIGHT' }],
+    [3, { kind: 'COLD', template: 'TERSE' }], [3, { kind: 'COLD', template: 'MASS' }]
+  ];
+  function rush(state, day) {
+    var d = state.director, out = [], first = null, k, x, nf, good, i, res, st;
+    if (!d || d.rush === true) return out;
+    for (k in (state.shows || {})) {
+      x = state.shows[k];
+      if (x && x.status === 'PLAYED' && (!x.by || x.by === 'player') && (!first || x.day < first.day)) first = x;
+    }
+    if (!first || day <= first.day) return out;
+    if (!d.rush) {
+      /* a played show keeps what happened in show.result (heads against the town's par) */
+      nf = first.result;
+      good = !!(nf && nf.par && typeof nf.heads === 'number' && nf.heads >= nf.par.heads);
+      if (!good) { d.rush = true; return out; }
+      d.rush = { day: first.day, sent: 0 };
+    }
+    st = d.rush;
+    for (i = st.sent; i < RUSH.length; i++) {
+      if (day < st.day + RUSH[i][0]) break;
+      res = create(state, Object.assign({ day: day }, RUSH[i][1]));
+      (res.records || []).forEach(function (r0) { out.push(r0); });
+      st.sent = i + 1;
+    }
+    if (st.sent >= RUSH.length) d.rush = true;
+    return out;
+  }
+
   function daily(state, day) {
     if (typeof day !== 'number') SB.fail('Requests.daily', 'day must be a number');
     var records = [], r = rq(state);
@@ -1068,7 +1115,8 @@ SB.module('Requests', function (SB) {
         q.status = never ? 'IGNORED' : 'LAPSED'; q.closedDay = day;
         records.push(rec(state, 'REQUEST_GONE', { requestId: id, why: gone ? 'TOOK_OTHER' : 'LAPSED' }, ''));
         if (never && q.kind !== 'LOCAL_ASK') records.push(SB.Territory.adjustWord(state, C.PASS.never.word, 'NEVER_ANSWERED'));
-        if (q.kind !== 'LOCAL_ASK' && (!never || r.chance(0.5))) {
+        /* with an offer out the band's answer to it says they took another date: one message, not two */
+        if (q.kind !== 'LOCAL_ASK' && !termsOut(state, id) && (!never || r.chance(0.5))) {
           var m = postReply(state, q, 'requests.replies.' + (never ? 'TOOK_OTHER_SLOW' : 'TOOK_OTHER'), replySlots(state, q, 0));
           if (m) records.push(m);
         }
@@ -1084,6 +1132,8 @@ SB.module('Requests', function (SB) {
         }
       }
     });
+    /* the word gets round after a good first show (fix-list 2.8) */
+    records = records.concat(rush(state, day));
     /* rescues: a band whose date fell through, at short notice */
     var stage = (state.player && state.player.stage) || 1;
     if (!(stage === 1 && week(state) < Q.STAGE1.fromWeek)) {

@@ -16,15 +16,69 @@
   'use strict';
 
   SB.Content.ui.nightclock = {
-    region: 'Tonight', callNight: 'call it a night',
+    region: 'Tonight', callNight: 'call it a night', toShow: 'go to the show',
+    toShowSay: 'Go to the show: tonight is your show night, the doors are next',
     callNightSay: 'Call it a night: the night plays out, answers come overnight, and the next evening is yours',
     playOn: 'play on', playOnSay: 'Play on: let the days run to the next evening', pause: 'pause', pauseSay: 'Pause the days running',
-    closeWeek: 'close the week', closeWeekSay: 'Close the week: see how it went and start the next one',
+    closeWeek: 'close the week', toClose: 'the week is done', toCloseSay: 'The week is done: back to its page, where the next week starts', closeWeekSay: 'Close the week: see how it went and start the next one',
     overnight: 'Overnight', gotIt: 'got it', quiet: 'Nobody has answered yet. They answer when they answer.',
-    still: 'Quiet night. Nothing changed.', onClock: 'Call it a night is on the clock.',
+    stayUp: 'stay up 1 hr', stayUpSay: 'Stay up one more hour: you can do more tonight, and tomorrow starts a little more tired',
+    stayUpHint: 'a little more tired', things: 'Open the list of things to do tonight',
+    skip: 'Skip to {day}: nothing\'s due until then', skipSay: 'Skip ahead to {day}: nothing is due until then, and the nights in between play out right now',
+    callNightTip: 'Call it a night: you are done for today. Answers to your texts come in overnight and the next evening is yours.',
+    skipped: 'Skipped to {day}.', weekDay: '{day}',
+    still: 'Quiet night.', quietPools: 'quiet', flyerFilled: 'The bill is full, so you wrote the bands in on the flyer where it said TBA. Anything you print from now on has them.', onClock: 'Call it a night is on the clock.',
     YES: '{who} said yes.', NO: '{who} said no.', COUNTER: '{who} wrote back with a change. Answer them on the phone.',
-    gone: '{who}\'s request is gone. They booked somewhere else.', confirmed: '{date} at {room} is confirmed. The show is real.',
+    said: '{who}: “{text}”',
+    gone: 'The request from {who} is gone. They booked somewhere else.', confirmed: '{date} at {room} is confirmed. The show is real.',
     more: '+{n} more on the phone'
+  };
+
+  /* What a quiet night says instead of "nothing changed" (2.1): somebody you know, in their own words. Who is named in {who}:
+   * the mentor, a room, or a band from this town. Twelve for each. */
+  SB.Content.ui.nightclock.quietLines = {
+    mentor: [
+      '{who} texted: "A slow week is normal. My first month of booking I mostly sat around watching my phone not ring."',
+      '{who} texted: "Go eat something that did not come out of a vending machine. The flyers will still be there tomorrow."',
+      '{who} sent a photo of an old flyer taped inside their closet door and wrote: "I kept the flyer from every show I ever booked, and the first ones went up on nights when nothing was happening."',
+      '{who} texted: "I always did my best thinking on the bus home from work. Anything you want to rework before tomorrow?"',
+      '{who} texted: "Nobody\'s written back yet? They\'re probably just busy, so I\'d give it a day or two before you follow up."',
+      '{who} wrote: "I\'m at practice, so if you text me I won\'t see it until eleven. You\'re doing fine."',
+      '{who} texted: "My first show had nine people and one of them was the sound guy, and I still wanted to do another."',
+      '{who} wrote: "Put a pen next to your phone. Half of what I\'ve learned about booking I wrote on the back of a receipt."',
+      '{who} texted: "Listen to a band you have not booked yet tonight. Pick one that has an actual recording out."',
+      '{who} texted: "If a night is quiet, check that your flyer is hanging somewhere people actually walk past."',
+      '{who} wrote: "Tuesdays are slow for everybody, so I always used mine to answer the messages I\'d been putting off."',
+      '{who} texted: "Quick tip from my van days: always have a phone charger in the glove box. Other than that, I got nothing tonight."'
+    ],
+    host: [
+      '{who} left a note on the door: "Took the trash out and swept up. The room is in decent shape if you need it."',
+      '{who} sent a picture of the stage, freshly mopped, with no caption.',
+      '{who} texted: "We had a band here last night who left their cables behind, so now we have a spare set if you need one."',
+      '{who} posted that the heat is finally fixed, so the room will not be freezing for the next show.',
+      '{who} wrote: "The neighbor stopped by to say hi, and it was a nice talk. No complaints so far."',
+      '{who} texted: "Somebody dropped off a box of stickers for the merch table. They are actually kind of good."',
+      '{who} left word at the bar: "Tell the booker we are not doing anything this weekend, so call if you want to ask about dates."',
+      '{who} sent a text: "Got the new lock installed, so I will have a spare key cut for you this week."',
+      '{who} wrote: "Quiet in here tonight. I fixed the loose wire on the PA while it was empty."',
+      '{who} texted a thumbs up and a picture of the lights they replaced.',
+      '{who} wrote: "Rain has been coming in by the back door, so I put down a rug and some buckets."',
+      '{who} texted: "Slow night. Come by sometime and I will show you where the extension cords live."'
+    ],
+    band: [
+      '{who} posted a clip from practice. The bass is way too loud in it, and they seem happy about that.',
+      '{who} sent a text: "Sorry, the van is making a noise again. We are getting it looked at on Friday."',
+      '{who} sent a photo of their new merch shirts, which are green and a little crooked.',
+      '{who} wrote: "We wrote a new song on the porch tonight. It has three chords and a lot of yelling."',
+      '{who} texted: "We have a day off from our jobs on Thursday, in case you hear about a spot."',
+      '{who} posted a picture of the setlist, scratched out and rewritten twice.',
+      '{who} sent a voice memo of someone laughing and a drum fill, and no explanation.',
+      '{who} wrote: "Our singer lost their voice, so practice was mostly pizza."',
+      '{who} texted: "Got the demo back from our friend. It sounds like a band, which is a relief."',
+      '{who} sent a text: "Thanks for keeping us in mind. We are around if anything opens up."',
+      '{who} wrote: "Somebody gave us a free amp and now we cannot get it up the stairs."',
+      '{who} posted a photo from the thrift store. Somebody in the band bought a tambourine and nothing else.'
+    ]
   };
 
   var el = null, key = null, info0 = {}, pv = { hours: 0, el: null }, nudging = null, sayEl = null, saying = null;
@@ -69,18 +123,29 @@
     snap = { seed: s.seed, day: s.clock.day, shows: shows,
              waiting: Object.keys(s.asks || {}).some(function (k) { var a = s.asks[k]; return !a.answer && a.status !== 'WITHDRAWN'; }) };
   }
+  /* "Sierra: \"Sure, park on the street.\"": the first two sentences of what they wrote, at most 150 characters; '' when nothing was written */
+  function quoteOf(who, text) {
+    var t = String(text || '').replace(/\s+/g, ' ').trim(), m;
+    if (!t || /^\(/.test(t)) return '';
+    m = t.match(/^(.+?[.!?])(\s+.+?[.!?])?(\s|$)/);
+    t = m ? (m[1] + (m[2] || '')).trim() : t;
+    if (t.length > 150) t = t.slice(0, 147).replace(/\s+\S*$/, '') + '...';
+    return L('said', { who: who, text: t });
+  }
   function overnightLines(s, sn) {
     var out = [];
     Object.keys(s.asks || {}).forEach(function (k) {
       var a = s.asks[k], st = a.answer && a.answer.status, who;
       if (!a.answer || a.answer.day == null || a.answer.day <= sn.day || !(st === 'YES' || st === 'NO' || st === 'COUNTER')) return;
       who = nameOf(s, a.toId);
-      if (who) out.push({ t: L(st, { who: who }), hot: st !== 'YES' });
+      /* the answer in the sender's own words, one or two sentences (fix-list 2.5); "X said yes." only when they wrote nothing */
+      if (who) out.push({ t: quoteOf(who, a.answer.text) || L(st, { who: who }), hot: st !== 'YES' });
     });
     Object.keys(s.shows || {}).forEach(function (k) {
       var x = s.shows[k];
       if (x.status === 'CONFIRMED' && sn.shows[k] !== 'CONFIRMED')
         out.push({ t: L('confirmed', { date: SB.time.fmt(x.day, 'short'), room: nameOf(s, x.roomId) || '?' }) });
+      if (x.promo && x.promo.flyer && x.promo.flyer.filledDay != null && x.promo.flyer.filledDay > sn.day) out.push({ t: L('flyerFilled') });
     });
     Object.keys(s.requests || {}).forEach(function (k) {
       var q = s.requests[k], who;
@@ -103,14 +168,48 @@
       h('ul', { class: 'on-list' }, list),
       h('button', { type: 'button', class: 'on-ok pz-hl', text: L('gotIt').toUpperCase(), on: { click: dropSlip } })
     ]);
-    d.body.appendChild(slipEl);
+    if (d.body.firstChild) d.body.insertBefore(slipEl, d.body.firstChild); else d.body.appendChild(slipEl);   // first in the Tab order, not after the whole page (keyboard play, 0.9)
+    /* a morning card, not a DONE to press (fix-list 1.19): the first press anywhere else puts it away and still does its own thing */
+    (function (el) {
+      function away(e) {
+        if (slipEl !== el) { d.removeEventListener('pointerdown', away, true); return; }
+        if (e && e.target && el.contains && el.contains(e.target)) return;
+        d.removeEventListener('pointerdown', away, true);
+        dropSlip();
+      }
+      if (d.addEventListener) d.addEventListener('pointerdown', away, true);
+      /* Escape puts the card away first, before it opens the quick menu */
+      function esc(e) {
+        if (slipEl !== el) { d.removeEventListener('keydown', esc, true); return; }
+        if (e.key !== 'Escape') return;
+        d.removeEventListener('keydown', esc, true);
+        e.preventDefault(); e.stopPropagation(); dropSlip();
+      }
+      if (d.addEventListener) d.addEventListener('keydown', esc, true);
+    })(slipEl);
   }
   function checkSlip(s, t) {
     if (snap && s && snap.seed !== s.seed) snap = null;
     if (!snap || !t || !s || !s.clock || s.clock.day <= snap.day || lampKey() !== 'night') return;
     var sn = snap; snap = null;
     var lines = safe(function () { return overnightLines(s, sn); }, []) || [];
-    showSlip(lines, sn.waiting);                         // nothing came back: one line says so
+    if (!lines.length) { sayOn(quietLine(s)); return; }  // nothing came back: one line on the clock, no card to click through (2.1)
+    showSlip(lines, sn.waiting);
+  }
+
+  /* a quiet night: one line from the mentor, a room or a band from this town, picked by the seed and the day */
+  function quietLine(s) {
+    var pools = SB.Content.ui.nightclock.quietLines || {}, r = SB.rng.make('quiet:' + s.seed + ':' + s.clock.day), roles = [], who, k, list, men;
+    men = safe(function () { return SB.Rungs.mentor(s); }, null);
+    if (men && s.people && s.people[men] && s.people[men].first) roles.push(['mentor', s.people[men].first]);
+    k = Object.keys(s.rooms || {}).filter(function (i) { return s.rooms[i] && s.rooms[i].name; });
+    if (k.length) roles.push(['host', s.rooms[k[r.int(0, k.length - 1)]].name]);
+    k = safe(function () { return SB.Bands.list(s, { local: true, active: true }); }, []) || [];
+    if (k.length) { who = nameOf(s, typeof k[0] === 'string' ? k[r.int(0, k.length - 1)] : k[r.int(0, k.length - 1)].id); if (who) roles.push(['band', who]); }
+    if (!roles.length) return L('still');
+    k = roles[r.int(0, roles.length - 1)];
+    list = pools[k[0]] || [];
+    return list.length ? list[r.int(0, list.length - 1)].replace(/\{who\}/g, k[1]) : L('still');
   }
 
   function call() {
@@ -122,12 +221,89 @@
     SB.UI.fire('sb-callnight', { at: 'after' });
   }
 
+  function showTonight() {
+    return safe(function () {
+      var s = SB.UI.game(), k, sh;
+      if (!s || !s.shows || !s.clock) return false;
+      for (k in s.shows) { sh = s.shows[k]; if (sh && sh.status === 'CONFIRMED' && sh.day === s.clock.day) return true; }
+      return false;
+    }, false);
+  }
   function button(t) {
     /* the week is over: the same corner holds the way on, so nobody has to hunt the tape deck for it */
+    /* the week is closed but its page was put away: the clock leads back to it, where the next week starts */
+    if (lampKey() === 'next') return h('button', { type: 'button', class: 'ck-call pz-hl is-hot', data: { fk: 'toclose' },
+                         aria: { label: L('toCloseSay') }, text: L('toClose').toUpperCase(), on: { click: function () { dropSlip(); SB.UI.go('close'); } } });
     if (lampKey() === 'close') return h('button', { type: 'button', class: 'ck-call pz-hl is-hot', data: { fk: 'closeweek', tut: 'night' },
                          aria: { label: L('closeWeekSay') }, text: L('closeWeek').toUpperCase(), on: { click: function () { dropSlip(); SB.UI.lamp.pull(); } } });
-    return h('button', { type: 'button', class: 'ck-call pz-hl' + (t.left <= 0 ? ' is-hot' : ''), data: { fk: 'callnight', tut: 'night' },
-                         aria: { label: L('callNightSay') }, text: L('callNight').toUpperCase(), on: { click: call } });
+    /* on a show's own night the same press heads to the door (the night plays to the show), so it says so */
+    var show = showTonight();
+    return h('button', { type: 'button', class: 'ck-call pz-hl' + (t.left <= 0 || show ? ' is-hot' : ''), data: { fk: 'callnight', tut: 'night' },
+                         title: show ? L('toShowSay') : L('callNightTip'),
+                         aria: { label: L(show ? 'toShowSay' : 'callNightSay') }, text: L(show ? 'toShow' : 'callNight').toUpperCase(), on: { click: call } });
+  }
+
+  /* the extras beside the one press (0.8, 2.1, 2.6): STAY UP 1 HR, SKIP TO <day>, and on an open night the top two things to do.
+   * Each acts on the spot; CALL IT A NIGHT stays one press and is always the first button. */
+  /* what the stay-up hour costs, in the one sentence strings.stay.cost keeps (1.22 step 5) */
+  function stayCost() {
+    return safe(function () { return SB.text.label('stay.cost', { n: SB.Config.STRESS.UP.OVERTIME }); }, L('stayUpSay'));
+  }
+  function group(t) {
+    var main = button(t), extra = [], s, q, st, qk;
+    if (lampKey() !== 'night' || !t) return main;
+    s = safe(function () { return SB.UI.game(); }, null);
+    st = t.stay || {};
+    if (!showTonight()) {
+      if (t.left <= 0 && st.left > 0 && SB.UI.evening)
+        extra.push(h('button', { type: 'button', class: 'ck-call ck-stay pz-hl', data: { fk: 'stayup' }, aria: { label: L('stayUpSay') + '. ' + stayCost() },
+                                 title: stayCost(), text: L('stayUp').toUpperCase() + ', ' + L('stayUpHint'),
+                                 on: { click: function () { SB.UI.evening.open(); } } }));
+      q = s ? safe(function () { return SB.Week.quiet(s); }, null) : null;
+      if (q) {
+        qk = SB.time.fmt(q.day, 'dow');
+        extra.push(h('button', { type: 'button', class: 'ck-call ck-skip pz-hl', data: { fk: 'skip' }, aria: { label: L('skipSay', { day: qk }) },
+                                 text: L('skip', { day: qk }).toUpperCase(), on: { click: function () { skipTo(q.day); } } }));
+      }
+      if (t.left >= 3 && SB.UI.evening && SB.UI.evening.quick) {
+        SB.UI.evening.quick(2).forEach(function (v) {
+          extra.push(h('button', { type: 'button', class: 'ck-call ck-act pz-hl', data: { fk: 'act-' + v.id },
+                                   aria: { label: v.label + ', ' + SB.Clock.cost(v.hours) + '. ' + (v.benefit || '') },
+                                   text: v.label + ', ' + SB.Clock.cost(v.hours).toLowerCase(),
+                                   on: { click: function () { SB.UI.evening.press(v); } } }));
+        });
+      }
+    }
+    if (!extra.length) return main;
+    return h('div', { class: 'ck-group', style: { display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'stretch' } }, [main].concat(extra));
+  }
+
+  /* SKIP TO <day>: the nights between play out right now, up to the day the next thing lands or the next thing that
+   * needs the player; one morning card says what happened (2.1). Never routes to the calendar. */
+  function skipTo(day) {
+    var s = safe(function () { return SB.UI.game(); }, null), g = 0, n, c, r;
+    if (!s) return;
+    dropSlip();
+    takeSnap(s);
+    SB.UI.fire('sb-callnight', { at: 'before' });
+    while (g++ < 21) {
+      c = s.clock;
+      if (!c.stop || c.stop.kind !== 'EVENING' || c.day >= day) break;
+      /* after the first night: stop on the evening something lands (a reply that needs you, a job whose window opens) */
+      if (g > 1 && !safe(function () { return SB.Week.quiet(s); }, null)) break;
+      r = SB.UI.act(function (x) { return SB.Week.endNight(x); });
+      if (!r || r.ok === false) break;
+      n = 0;                                               // the night's own steps, counted apart from the nights
+      while (n++ < 60 && s.clock.phase === 'PLAY' && !s.clock.stop) {
+        r = SB.UI.act(function (x) { return SB.Week.step(x); });
+        if (!r || r.ok === false) break;
+      }
+    }
+    SB.UI.fire('sb-callnight', { at: 'after' });
+    SB.UI.toast(L('skipped', { day: SB.time.fmt(s.clock.day, 'short') }), 'info');
+    /* a stop that needs the player (a reply, a decision, the doors) is the play loop's to open */
+    if (s.clock.stop && s.clock.stop.kind !== 'EVENING') SB.UI.fire('sb-play', { cmd: 'resume' });
+    render(s, info0);
   }
   /* the rest of tonight (js/ui/evening.js): beside CALL IT A NIGHT while the evening is up */
   /* (the THINGS TO DO button came off the clock 2026-11-22: the to-do list on the desk opens them, js/desk/scene.js) */
@@ -157,7 +333,10 @@
     if (d && d.body && d.body.classList) d.body.classList.toggle('nc-on', !!t);
     if (!t) {
       /* no evening to show, but the week is playing: the clock is just its PLAY ON / PAUSE button */
-      var pb = s && s.clock && s.clock.phase === 'PLAY' && !info0.full ? playButton() : null;
+      /* or, once the evenings are over, CLOSE THE WEEK (and after that, the way back to the week's page): with no evening
+         left these used to be drawn nowhere, so the NEXT strip pointed at a button that was not there (playtests 2 and 4) */
+      var lk = lampKey(), pb = s && s.clock && (s.clock.phase === 'PLAY' || s.clock.phase === 'CLOSE') && !info0.full
+        ? (playButton() || (lk === 'close' || (lk === 'next' && safe(function () { return SB.UI.route(); }, '') !== 'close') ? button(null) : null)) : null;
       if (pb) {
         e.hidden = false;
         if (d && d.body && d.body.classList) d.body.classList.add('nc-on');
@@ -175,13 +354,13 @@
     if (pv.el && gone(pv.el)) pv = { hours: 0, el: null };
     cr = safe(function () { return SB.Week.crunch(s); }, []) || [];
     ink = SB.Clock.hot(s);
-    btnOn = lampKey() === 'night' || lampKey() === 'close' || lampKey() === 'resume' || lampKey() === 'pause';
-    k = JSON.stringify([t, cr.slice(0, 1), ink, btnOn && lampKey(), pv.hours]);
+    btnOn = lampKey() === 'night' || lampKey() === 'close' || lampKey() === 'next' || lampKey() === 'resume' || lampKey() === 'pause';
+    k = JSON.stringify([t, cr.slice(0, 1), ink, btnOn && lampKey(), pv.hours, safe(function () { return SB.Week.quiet(s); }, null)]);
     if (k === key) return;
     key = k;
     SB.UI.clear(e);
     void things;
-    e.appendChild(SB.Clock.slip(s, { tonight: t, list: cr, crunch: 1, short: true, hot: ink, extra: pv.hours, cls: 'nc-slip', foot: btnOn ? (playButton() || button(t)) : null }));
+    e.appendChild(SB.Clock.slip(s, { tonight: t, list: cr, crunch: 1, short: true, hot: ink, extra: pv.hours, cls: 'nc-slip', foot: btnOn ? (playButton() || group(t)) : null }));
     if (sayEl) e.appendChild(sayEl);                             // a redraw keeps the line that is up
     retape();
   }

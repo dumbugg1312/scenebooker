@@ -27,8 +27,8 @@ module.exports = function (t) {
   H.section(t, 'a guided start', () => {
     const s = guided('rungs-on');
     t.ok(s.settings.ladder && R.rung(s) === 0, 'guided: on, at rung 0');
-    ['calendar', 'lamp', 'paper', 'clips', 'clip0', 'phone', 'drawer'].forEach(id => t.ok(R.onDesk(s, id), id + ' is out'));
-    Object.keys(R.DESK).forEach(id => t.ok(!R.onDesk(s, id), id + ' waits'));
+    ['calendar', 'lamp', 'paper', 'clips', 'clip0', 'phone', 'drawer', 'tin'].forEach(id => t.ok(R.onDesk(s, id), id + ' is out'));
+    Object.keys(R.DESK).filter(id => id !== 'tin').forEach(id => t.ok(!R.onDesk(s, id), id + ' waits'));   // the tin is out from night one (1.17): the bank figure
     t.ok(R.mentor(s), 'the friend who handed it over is there');
     t.ok(!R.covers(s, 'PRINT') && !R.covers(s, 'FLYER_RUN') && !R.covers(s, 'LISTINGS') && !R.covers(s, 'MAKE_FLYER') && !R.covers(s, 'ANNOUNCE'), 'getting the word out is yours from the first show');
     t.ok(R.covers(s, 'ADVANCE') && R.covers(s, 'HOUSE_RULES') && R.covers(s, 'NEIGHBORS') && R.covers(s, 'THANKS'), 'the friend covers the running-the-night chores');

@@ -28,8 +28,6 @@ SB.Content.cutsceneAudio = {
 
   MOOD: {
     GOING_AWAY_open: 'warm',
-    GOING_AWAY_close: 'sad',
-    DOORS_AT_8_open: 'quiet',
     DOORS_AT_8_close: 'warm',
     ANSWER_EVERYONE_open: 'tense',
     OUT_OF_STATE_open: 'road',
@@ -125,7 +123,6 @@ SB.Content.cutsceneAudio = {
   },
 
   FRAMES: {
-    DOORS_AT_8_open:    { 2: { amb: 'street' } },                              /* the carport in daylight */
     OUT_OF_STATE_close: { 1: { amb: 'street' } },                              /* swept in the morning */
     ANSWER_EVERYONE_open: { 2: { hit: null } },                                /* one buzz is enough */
     LAST_CALL_close:    { 0: { hit: 'cs.doorSlam' } },

@@ -37,7 +37,7 @@
 .cs-k-scene .cs-cap { margin-bottom: calc(var(--p) * 6); }
 .cs-k-scene .cs-say { align-self: flex-start; }
 .cs-k-scene .cs-say.cs-right { align-self: flex-end; }
-.cs-k-scene .cs-cap { font-size: clamp(calc(var(--fs) * 16), calc(var(--fs) * 20.48), calc(var(--fs) * 22)); max-width: 34em; }
+.cs-k-scene .cs-cap { font-size: calc(var(--fs) * 24); max-width: 34em; }
 
 /* ---------- typed captions: strips of copy paper, pasted ---------- */
 .cs-cap { --paper: var(--cs-paper); --edge: var(--edge-cut-1); --ring: calc(var(--p) * 1.5); --drop: calc(var(--p) * 3);
@@ -52,10 +52,10 @@
 .cs-say-crowd .cs-balloon-shape { fill: var(--hl-solid); }
 .cs-say-you .cs-balloon-shape { stroke-dasharray: 7 4; }
 .cs-who {
-  font: 400 calc(var(--fs) * 13)/1.2 var(--f-gothic); text-transform: uppercase; letter-spacing: .08em; background: var(--cs-ink); color: var(--cs-paper);
-  padding: calc(var(--p) * 1) calc(var(--p) * 6); margin: 0 0 calc(var(--p) * -3) calc(var(--p) * 10); position: relative; z-index: 1; transform: rotate(-2deg); clip-path: var(--edge-cut-3);
+  font: 400 calc(var(--fs) * 19)/1.2 var(--f-gothic); text-transform: uppercase; letter-spacing: .08em; background: var(--cs-ink); color: var(--cs-paper);
+  padding: calc(var(--p) * 2) calc(var(--p) * 8); margin: 0 0 calc(var(--p) * 2) calc(var(--p) * 10); position: relative; z-index: 1; transform: rotate(-2deg); clip-path: var(--edge-cut-3);
 }
-.cs-say.cs-right .cs-who { margin: 0 calc(var(--p) * 10) calc(var(--p) * -3) 0; transform: rotate(1.5deg); }
+.cs-say.cs-right .cs-who { margin: 0 calc(var(--p) * 10) calc(var(--p) * 2) 0; transform: rotate(1.5deg); }
 .cs-letter-fallback { font: 400 calc(var(--fs) * 17) var(--f-gothic); fill: currentColor; }
 
 /* ---------- title on masking tape ---------- */
@@ -69,8 +69,8 @@
 .cs-bar { position: absolute; right: calc(var(--p) * 20); bottom: calc(var(--p) * 18); z-index: 4; display: flex; align-items: center; gap: calc(var(--p) * 14); }
 .cs-strip { --paper: var(--cs-paper); --edge: var(--edge-cut-2); --ring: calc(var(--p) * 1.5); --drop: calc(var(--p) * 3);
   display: inline-flex; align-items: center; gap: calc(var(--p) * 12); padding: calc(var(--p) * 6) calc(var(--p) * 12) calc(var(--p) * 5); transform: rotate(.8deg); }
-.cs-count { font: 400 calc(var(--fs) * 13)/1 var(--f-mono); color: var(--toner); }
-.cs-hint { font: 400 calc(var(--fs) * 12.5)/1 var(--f-type); letter-spacing: .06em; color: var(--toner-mid); text-transform: uppercase; }
+.cs-count { font: 400 calc(var(--fs) * 16)/1 var(--f-mono); color: var(--toner); }
+.cs-hint { font: 400 calc(var(--fs) * 15)/1 var(--f-type); letter-spacing: .06em; color: var(--toner-mid); text-transform: uppercase; }
 .cs-btn {
   font: 400 calc(var(--fs) * 15) var(--cs-type); text-transform: uppercase; letter-spacing: .08em; color: var(--cs-ink); background: var(--cs-tape);
   border: 0; padding: calc(var(--p) * 9) calc(var(--p) * 16) calc(var(--p) * 8); min-height: calc(var(--p) * 40); transform: rotate(-1deg);
@@ -81,12 +81,14 @@
 
 /* ---------- PANELS and DROP: on the desk ---------- */
 /* fully opaque: nothing of the page behind may show through the desk */
+/* the desk runs out to the window's edges, past the stage: no black bars (user 2026-11-23) */
+.cs-root.cs-k-panels, .cs-root.cs-k-drop { background-color: var(--toner); }
 .cs-box.cs-k-panels, .cs-box.cs-k-drop {
   background-color: var(--toner);
   background-image: radial-gradient(ellipse at 50% 40%, rgba(255, 250, 235, .06), rgba(0, 0, 0, 0) 70%);
 }
 .cs-spread {
-  position: absolute; inset: calc(var(--p) * 70) calc(var(--p) * 16) calc(var(--p) * 80); display: flex; align-items: center; justify-content: center; gap: calc(var(--p) * 28); flex-wrap: wrap;
+  position: absolute; inset: calc(var(--p) * 84) calc(var(--p) * 16) calc(var(--p) * 80); display: flex; align-items: center; justify-content: center; gap: calc(var(--p) * 28); flex-wrap: wrap;
 }
 .cs-panel {
   margin: 0; position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0;
@@ -102,8 +104,8 @@
 .cs-says .cs-say.cs-right { align-self: flex-end; }
 .cs-says:empty { display: none; }
 /* the caption is pasted under the picture, clear of the balloons that hang over its top */
-.cs-cap-panel { position: relative; z-index: 4; margin: calc(var(--p) * 10) 0 0 calc(var(--p) * -6); font-size: calc(var(--fs) * 14); max-width: 100%; }
-.cs-cap-panel span { font-size: calc(var(--fs) * 14); }
+.cs-cap-panel { position: relative; z-index: 4; margin: calc(var(--p) * 10) 0 0 calc(var(--p) * -6); font-size: calc(var(--fs) * 19); max-width: 100%; }
+.cs-cap-panel span { font-size: calc(var(--fs) * 19); }
 
 .cs-box .cs-obj {
   position: absolute; left: 50%; top: 50%; transform: translate(calc(-50% + var(--dx, 0)), calc(-50% + var(--dy, 0))) rotate(var(--tilt, 0deg));
@@ -113,18 +115,19 @@
 .cs-obj-postcard, .cs-obj-flyer { --paper: var(--pp-white); --edge: var(--edge-cut-2); padding: calc(var(--p) * 8); }
 .cs-obj-polaroid { --paper: var(--pp-white); --edge: var(--edge-cut-3); padding: calc(var(--p) * 14) calc(var(--p) * 14) calc(var(--p) * 64); }
 .cs-obj-polaroid .cs-scrawl { position: absolute; left: calc(var(--p) * 16); right: calc(var(--p) * 16); bottom: calc(var(--p) * 12); }
-.cs-obj-postcard .cs-scrawl { position: absolute; right: calc(var(--p) * -24); bottom: calc(var(--p) * -30); background: var(--pp-white); padding: calc(var(--p) * 8) calc(var(--p) * 10); transform: rotate(3deg); clip-path: var(--edge-cut-1); }
+.cs-obj-postcard .cs-scrawl { position: absolute; left: calc(100% - var(--p) * 70); top: 38%; background: var(--pp-white); padding: calc(var(--p) * 8) calc(var(--p) * 10); transform: rotate(3deg); clip-path: var(--edge-cut-1); }
 .cs-obj-tape { background: var(--toner); padding: calc(var(--p) * 18); display: flex; gap: calc(var(--p) * 12); align-items: center; box-shadow: var(--sh-m) 0 var(--pitch); }
 .cs-obj-tape .cs-scrawl { background: var(--pp-white); padding: calc(var(--p) * 6) calc(var(--p) * 8); clip-path: var(--edge-cut-2); }
 .cs-obj-note {
   --paper: repeating-linear-gradient(transparent 0 calc(var(--p) * 29), var(--pp-blue) calc(var(--p) * 29) calc(var(--p) * 30)), var(--pp-white); --edge: var(--edge-torn-b);
   padding: calc(var(--p) * 26) calc(var(--p) * 26) calc(var(--p) * 30) calc(var(--p) * 44);
 }
-.cs-obj-text { background: var(--toner-mid); padding: calc(var(--p) * 18) calc(var(--p) * 14); width: calc(var(--p) * 320); border: calc(var(--p) * 3) solid var(--pitch); box-shadow: var(--sh-m) 0 var(--pitch); }
-.cs-phone { display: flex; flex-direction: column; gap: calc(var(--p) * 8); font: calc(var(--fs) * 15)/1.35 var(--f-type); }
+.cs-obj-text { background: var(--toner-mid); padding: calc(var(--p) * 18) calc(var(--p) * 14); width: calc(var(--p) * 380); border: calc(var(--p) * 3) solid var(--pitch); box-shadow: var(--sh-m) 0 var(--pitch); }
+.cs-phone { display: flex; flex-direction: column; gap: calc(var(--p) * 8); font: calc(var(--fs) * 19)/1.35 var(--f-type); }
 .cs-msg { margin: 0; padding: calc(var(--p) * 8) calc(var(--p) * 11); background: var(--toner); color: var(--pp-bond); align-self: flex-start; max-width: 85%; clip-path: var(--edge-cut-1); }
 .cs-msg-you { background: var(--pp-bond); color: var(--toner); align-self: flex-end; clip-path: var(--edge-cut-2); }
-.cs-cap-drop { position: absolute; left: calc(var(--p) * -16); top: calc(var(--p) * -26); font-size: calc(var(--fs) * 13); white-space: nowrap; }
+/* the caption is pasted under the thing, not hung off its corner (user 2026-11-23) */
+.cs-cap-drop { position: absolute; left: calc(var(--p) * -10); top: calc(100% + var(--p) * 12); font-size: calc(var(--fs) * 19); width: max-content; max-width: calc(var(--p) * 560); }
 
 /* ---------- people that move (js/ui/cutscene.js pieces(), SB.Scenes.layered) ----------
  * The room is one canvas (.cs-room) in a box that takes the picture's place (and its pan, in a scene); each person is a
@@ -199,6 +202,6 @@
 .cs-step.is-here { font-size: calc(var(--fs) * 34); background: var(--hl-solid); border-width: calc(var(--p) * 3);
   padding: calc(var(--p) * 5) calc(var(--p) * 12) calc(var(--p) * 3); transform: rotate(-2deg);
   box-shadow: calc(var(--p) * 3) calc(var(--p) * 4) 0 var(--cs-ink); }
-.cs-cap-panel .cs-step, .cs-cap-drop .cs-step { font-size: calc(var(--fs) * 12); }
-.cs-cap-panel .cs-step.is-here, .cs-cap-drop .cs-step.is-here { font-size: calc(var(--fs) * 16); }
+.cs-cap-panel .cs-step, .cs-cap-drop .cs-step { font-size: calc(var(--fs) * 15); }
+.cs-cap-panel .cs-step.is-here, .cs-cap-drop .cs-step.is-here { font-size: calc(var(--fs) * 21); }
 .cs-cap-drop.cs-cap-map { white-space: normal; }

@@ -257,7 +257,9 @@ SB.module('People', function (SB) {
     else if (ask.kind === 'LODGING') path = 'people.helper.LODGING.' + yn;
     else if (ask.kind === 'HELPER_JOB') { role = helperRoleFor(state, p, job ? job.type : null); path = 'people.helper.' + role + '.' + yn; }
     else path = 'people.borrow.' + yn;   // SPEC?: 03-content 9 names no BORROW lines; used only when C2 adds them.
-    text = say(state, path, slotsFor(state, p, show, { amount: pl.amount || null, role: pl.role || '' }), p.id);
+    /* a crew ask always carries the person's rate: the payload amount, the pay on the payload, or what they charge */
+    var amt = pl.amount || (pl.pay && pl.pay.amount) || p.rate || 0;
+    text = say(state, path, slotsFor(state, p, show, { amount: amt || null, role: pl.role || '' }), p.id);
     return { status: status, text: text, counter: null, records: [] };
   }
 

@@ -54,7 +54,7 @@ module.exports = function (t) {
     t.eq(C.MAIL.hours, 0.5, 'a message is half an hour'); t.eq(C.MAIL.freePerDay, 0, 'and none is free');
     t.eq(C.FLYER.HOURS, { ROUGH: 1, STANDARD: 2, SHARP: 4 }, 'a flyer is 1 / 2 / 4 hours');
     t.eq([C.JOBS.PRINT.hours, C.JOBS.FLYER_RUN.hours, C.JOBS.LISTINGS.hours, C.JOBS.ANNOUNCE.hours, C.JOBS.WEEK_PUSH.hours, C.JOBS.LOCAL_AD.hours, C.JOBS.ADVANCE.hours],
-         [1, 2, 0.5, 1, 1, 1, 1], 'printing 1, a poster run 2, listings a half, a promo post 1, the advance 1');
+         [1, 1.5, 0.5, 1, 1, 1, 1], 'printing 1, a poster run 1.5, listings a half, a promo post 1, the advance 1');
     const state = H.newGame(SB, { seed: 'clock-1', tutorial: false });
     t.eq(state.clock.phase, 'PLAY', 'a new game is in play from day 0: nobody sits in PLAN');
     const n = tonight(state);

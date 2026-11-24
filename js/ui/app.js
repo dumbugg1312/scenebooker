@@ -27,6 +27,8 @@
     hours: '{used} of {cap} hours',
     hoursOver: '{n} over',
     stress: 'Stress',
+    openAsk: 'Open this game instead? The game you are in is saved first.', openYes: 'Open it',
+    leaveAsk: 'Your game is saved. Go back to the title?', leaveYes: 'Go to the title', leaveNo: 'Stay at the desk',
     callNight: 'Call it a night',
     pause: 'Pause',
     resume: 'Play on',
@@ -113,7 +115,13 @@
       } else if (scrim.parentNode) scrim.parentNode.removeChild(scrim);
       i = cards.indexOf(rec); if (i >= 0) cards.splice(i, 1);
       if (!cards.length) overlay.classList.remove('is-open');
-      if (prev && typeof prev.focus === 'function') { try { prev.focus(); } catch (e) { /* gone */ } }
+      if (prev && typeof prev.focus === 'function' && prev.isConnected !== false) { try { prev.focus(); } catch (e) { /* gone */ } }
+      if (!prev || prev.isConnected === false || document.activeElement !== prev) setTimeout(function () {          // what had the keyboard is gone (the screen was rebuilt): land on the first control, not the page (0.9)
+        var a = document.activeElement, t;
+        if (cards.length || (a && a !== document.body && a.isConnected !== false)) return;
+        t = document.querySelector('.sy-strip-open, main .kt-btn, main button, main input, .dk-hits:not([inert]) .dk-hit');
+        if (t) try { t.focus({ preventScroll: true }); } catch (e) { /* fine */ }
+      }, 120);
       if (typeof o.onClose === 'function') o.onClose();
     }
     box = h('div', { class: 'sb-card' + (o.wide ? ' sb-card--wide' : ''), role: 'dialog', tabindex: '-1', 'aria-modal': 'true', aria: { label: o.label || null } }, content);
@@ -236,21 +244,63 @@
     return ('g-' + base).slice(0, 40);   // SPEC?: 05-interface names no slot rule; one slot per career, named by its seed
   }
 
-  var saveWarned = false;
+  var saveWarned = false, startAsking = false;
+
+  /* Two tabs on one slot would overwrite each other (0.2): each tab stamps the slot it plays in localStorage every save,
+   * and a tab that finds another's fresh stamp warns and does not write. */
+  var TAB = 't' + Math.random().toString(36).slice(2, 9), lockSlot = null, leaving = false;
+  function lockKey(sl) { return 'sb.lock.' + sl; }
+  function lockTaken(sl) {
+    var v;
+    try {
+      v = JSON.parse(localStorage.getItem(lockKey(sl)) || 'null');
+      return !!(v && v.tab !== TAB && Date.now() - v.at < 20000);
+    } catch (e) { return false; }
+  }
+  function stampLock(sl) { try { localStorage.setItem(lockKey(sl), JSON.stringify({ tab: TAB, at: Date.now() })); lockSlot = sl; } catch (e) { /* no storage: no lock */ } }
+  function releaseLock() {
+    try {
+      if (lockSlot && JSON.parse(localStorage.getItem(lockKey(lockSlot)) || 'null').tab === TAB) localStorage.removeItem(lockKey(lockSlot));
+    } catch (e) { /* fine */ }
+    lockSlot = null;
+  }
   function saveFailed() {
     if (saveWarned) return;
     saveWarned = true;
     toast("Couldn't save. Export your game from Settings.", 'no');
   }
 
+  /* "Not saved" stays on the desk until a save works (0.1): one toast and then nothing was easy to miss */
+  function saveLine(on, msg) {
+    var d = typeof document !== 'undefined' ? document : null, e;
+    if (!d || !d.body || !SB.UI.h) return;
+    e = d.getElementById ? d.getElementById('savewarn') : null;
+    if (!on) { if (e && e.parentNode) e.parentNode.removeChild(e); return; }
+    if (e) return;
+    e = SB.UI.h('p', { id: 'savewarn', role: 'status', text: msg || 'Not saved. Your last moves are only in this tab. Export your game from Settings.',
+                       style: { position: 'fixed', left: '8px', bottom: '8px', zIndex: '9999', margin: '0', padding: '6px 10px', background: '#111', color: '#ffd23f', font: '700 13px/1.3 sans-serif', maxWidth: '90vw' } });
+    d.body.appendChild(e);
+  }
+
   function doSave() {
     saveTimer = null;
     if (!state || !SB.Save) return;
     saveAt = now();
+    if (lockTaken(slot || slotFor(state))) { saveLine(true, 'This game is open in another tab. This tab is not saving, so it will not overwrite the other one. Close one of the two.'); return; }
     try {
+      if (!leaving) stampLock(slot || slotFor(state));
       var r = SB.Save.save(state, slot || slotFor(state), saveAt);
-      if (r && r.ok === false) { SB.log('warn', 'SB.UI.autosave', r.why || 'not saved'); saveFailed(); }
-    } catch (e) { SB.log('warn', 'SB.UI.autosave', String(e && e.message)); saveFailed(); }
+      if (r && r.ok === false) { SB.log('warn', 'SB.UI.autosave', r.why || 'not saved'); saveFailed(); saveLine(true); }
+      else {
+        saveWarned = false; saveLine(false);
+        if (r && typeof r.bytes === 'number' && r.bytes > 2500000) SB.log('warn', 'SB.UI.autosave', 'the save is ' + Math.round(r.bytes / 1024) + ' KB');
+      }
+    } catch (e) { SB.log('warn', 'SB.UI.autosave', String(e && e.message)); saveFailed(); saveLine(true); }
+  }
+  /** flush(): write the save now, whatever the throttle says (leaving the page, a cutscene, a night called). */
+  function flush() {
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    doSave();
   }
   /** At most once a second. */
   function autosave() {
@@ -262,8 +312,8 @@
 
   /** act(fn): the only way state changes. Runs fn(state). An SBError (or any throw) shows the error card; a Result with
    *  ok: false is toasted and returned; otherwise it autosaves, redraws the desk and calls the screen's update. */
-  function act(f) {
-    var r;
+  function act(f, opts) {
+    var r, line;
     if (typeof f !== 'function') SB.fail('SB.UI.act', 'act needs a function');
     try { r = f(state); }
     catch (e) { showError(e); return null; }
@@ -271,6 +321,11 @@
       if (r.why) toast(r.why, 'no');
       return r;
     }
+    /* every press says what it did (2.12): a result carrying `said`, or a caller passing { say: text | fn(result) }, toasts one sentence */
+    try {
+      line = opts && opts.say !== undefined ? (typeof opts.say === 'function' ? opts.say(r) : opts.say) : (r && typeof r.said === 'string' ? r.said : '');
+      if (line) toast(String(line), 'info');
+    } catch (e) { /* the press still counts */ }
     autosave();
     refresh();
     storyPump();
@@ -285,9 +340,26 @@
 
   /** Redraw the desk and call the current screen's update. */
   function refresh() {
+    /* keep the keyboard on the control it was on, or the one that replaced it, when a press rebuilds a list (0.9) */
+    var d = typeof document !== 'undefined' ? document : null, a = d ? d.activeElement : null, fk = null, ref = null, i, list, back;
+    try {
+      if (a && a.getAttribute && a !== d.body && a.closest && a.closest('.sb-main')) { fk = a.getAttribute('data-fk'); ref = a.getAttribute('data-tut-ref'); }
+    } catch (e) { fk = null; }
     renderShell();
     if (current && current.hooks && typeof current.hooks.update === 'function') {
       try { current.hooks.update(); } catch (e) { showError(e); }
+    }
+    if (fk && d && d.querySelector) {
+      try {
+        a = d.activeElement;
+        if (!a || a === d.body || a.isConnected === false) {
+          list = d.querySelectorAll('.sb-main [data-fk="' + String(fk).replace(/"/g, '') + '"]');
+          back = null;
+          for (i = 0; i < list.length; i++) if (!ref || list[i].getAttribute('data-tut-ref') === ref) { back = list[i]; break; }
+          if (!back && list.length) back = list[0];
+          if (back && back.focus) back.focus({ preventScroll: true });
+        }
+      } catch (e) { /* the keyboard stays where the browser put it */ }
     }
   }
 
@@ -349,6 +421,19 @@
     try { document.title = (title && title !== def.title ? title + ' · ' : '') + 'Scene Booker'; } catch (e) { /* no title */ }
     renderShell();
     if (main && typeof main.focus === 'function' && !cards.length) { try { main.focus({ preventScroll: true }); } catch (e) { /* fine */ } }
+    /* the desk's own page is empty, so main cannot hold the keyboard there: land on the thing just put down (back from the
+       phone, the phone), or the first control on the desk, not on the page (keyboard play, 0.9) */
+    if (name === 'desk' && !cards.length) setTimeout(function () {
+      var a = document.activeElement, t = null, hits;
+      if (current && current.name !== 'desk') return;
+      if (a && a !== document.body && a !== main && a.isConnected !== false && a.tagName !== 'MAIN') return;
+      hits = document.querySelectorAll('.dk-hits:not([inert]) .dk-hit');
+      if (was && SB.Desk && SB.Desk.objects) {
+        SB.Desk.objects().forEach(function (o) { if (!t && o.route === was) { var i; for (i = 0; i < hits.length; i++) if (hits[i].getAttribute('data-obj') === o.id) t = hits[i]; } });
+      }
+      t = t || document.querySelector('.sy-strip-open') || hits[0];
+      if (t) try { t.focus({ preventScroll: true }); } catch (e) { /* fine */ }
+    }, 60);
     storyPump();
   }
 
@@ -364,8 +449,29 @@
   /** back(): the previous screen. */
   function back() {
     var prev = trail.pop();
+    /* never back out of a game in play onto the title or the town picker (0.2): the desk is the floor */
+    while (prev && state && PREGAME.indexOf(prev.name) >= 0) prev = trail.pop();
     if (!prev) { mount(state ? 'desk' : 'start', {}); return; }
     mount(prev.name, prev.params);
+  }
+  var PREGAME = ['start', 'city', 'tune'];
+
+  /** leave(): the one way out of a game in play. It saves, and asks once: "Your game is saved. Go back to the title?" */
+  var leaving = null;
+  function leave() {
+    var box, close;
+    if (!state) { quit(); return; }
+    if (leaving) return;
+    doSave();
+    box = h('div', { class: 'sb-leave' }, [
+      h('p', { class: 'sb-leave-t', text: S('leaveAsk') }),
+      h('div', { class: 'sb-leave-b' }, [
+        h('button', { type: 'button', class: 'pz-hl', data: { fk: 'leave-yes' }, text: S('leaveYes'), on: { click: function () { close(); quit(); } } }),
+        h('button', { type: 'button', class: 'pz-hl', data: { fk: 'leave-no' }, text: S('leaveNo'), on: { click: function () { close(); } } })
+      ])
+    ]);
+    close = card(box, { label: S('leaveAsk'), onClose: function () { leaving = null; } });
+    leaving = close;
   }
 
   /** A route typed in the address bar, or reached with the browser's back and forward buttons. Only routes that need no
@@ -376,6 +482,7 @@
     return m ? m[1] : null;
   }
   function routeOk(name) {
+    if (state && PREGAME.indexOf(name) >= 0) return false;             // a game in play is left only through leave() (0.2)
     if (name === 'start' || (!state && name === 'city')) return !!SB.UI.screens[name];
     return !!state && (name === 'desk' || RAIL.indexOf(name) >= 0);
   }
@@ -385,6 +492,7 @@
     if (!routeOk(name)) {
       /* put the address back to the screen that is showing, without a new history entry */
       try { if (current && history && history.replaceState) history.replaceState(null, '', '#/' + current.name); } catch (e) { /* fine */ }
+      if (state && PREGAME.indexOf(name) >= 0) leave();               // the browser's Back from the desk asks, it never leaves
       return;
     }
     cards.slice().forEach(function (c) { c.close(); });
@@ -396,8 +504,23 @@
   function game() { return state; }
 
   /** start(state, slot): begin playing a new or loaded state: sit down at the desk. */
-  function start(s, slotName) {
+  function start(s, slotName, opts) {
     if (!s || typeof s !== 'object' || !s.clock) SB.fail('SB.UI.start', 'not a game state');
+    /* opening another game over one in play asks first (0.2); the one in play is written before it is put away */
+    if (opts && opts.ask && state && state !== s && !startAsking) {
+      var close;
+      startAsking = true;
+      doSave();
+      close = card(h('div', { class: 'sb-leave' }, [
+        h('p', { class: 'sb-leave-t', text: S('openAsk') }),
+        h('div', { class: 'sb-leave-b' }, [
+          h('button', { type: 'button', class: 'pz-hl', data: { fk: 'open-yes' }, text: S('openYes'), on: { click: function () { close(); startAsking = false; start(s, slotName); } } }),
+          h('button', { type: 'button', class: 'pz-hl', data: { fk: 'open-no' }, text: S('leaveNo'), on: { click: function () { close(); } } })
+        ])
+      ]), { label: S('openAsk'), onClose: function () { startAsking = false; } });
+      return;
+    }
+    releaseLock();
     state = s;
     SB.text.off = !!(s.settings && s.settings.noText);
     slot = slotName || slotFor(s);
@@ -414,6 +537,7 @@
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
     doSave();
     cards.slice().forEach(function (c) { c.close(); });
+    releaseLock();
     state = null; slot = null; playing = false; trail = [];
     mount('start', {});
   }
@@ -435,9 +559,27 @@
 
   /* Call it a night: the evening's hours are done with; the loop plays the night out to the next evening (or a
    * decision, a show night, the end of the week). */
+  function tonightShow() {
+    var k, x;
+    if (!state || !state.shows || !state.clock) return false;
+    for (k in state.shows) { x = state.shows[k]; if (x && x.status === 'CONFIRMED' && x.day === state.clock.day) return true; }
+    return false;
+  }
   function callNight() {
-    var r = act(function (s) { return SB.Week.endNight(s); });
-    if (!r || r.ok === false) return;
+    flush();                                                    // the evening's work is written before the night plays (0.1)
+    var showNight = tonightShow(), r = act(function (s) { return SB.Week.endNight(s); }), k, st, sid = null, x;
+    /* a press never does nothing: a refusal with no reason of its own still says so (0.11) */
+    if (!r) return;
+    if (r.ok === false) { if (!r.why) toast('The night could not be called yet. Open the phone or the show to see what is waiting.', 'no'); return; }
+    if (r.settled && r.settled.length) toast(r.settled[0] + (r.settled.length > 1 ? ' (and ' + (r.settled.length - 1) + ' more left undone.)' : ''), 'no');
+    /* on a show's own night, play straight to the doors rather than trusting the loop of another screen to be listening */
+    for (k = 0; k < 8 && showNight && state && state.clock && !state.clock.stop; k++) {
+      x = act(function (s) { return SB.Week.step(s); });
+      if (!x || x.ok === false) break;
+    }
+    st = state && state.clock ? state.clock.stop : null;
+    if (st && st.kind === 'SHOW_NIGHT') sid = st.showId;
+    if (sid && state.shows[sid] && state.shows[sid].status === 'CONFIRMED') { go('night', { showId: sid }); return; }
     if (!current || (current.name !== 'week' && current.name !== 'desk')) go('desk');
     sendPlay('resume');
   }
@@ -534,12 +676,45 @@
     /* Escape anywhere else (the desk, the title, the night): the quick menu (js/ui/pause.js), not while loading */
     if (k === 'Escape' && SB.Pause && (!SB.Boot || SB.Boot.done())) { e.preventDefault(); SB.Pause.open(); return; }
     if (!state || (current && current.def && current.def.full)) return;
+    /* P is the phone from anywhere, the desk and every close-up included (fix list 0.9) */
+    if ((k === 'p' || k === 'P') && current && current.name !== 'inbox' && !document.body.classList.contains('nt-playing')) { e.preventDefault(); go('inbox'); return; }
+    /* C puts the keyboard on the clock's main button (call it a night, go to the show, close the week): focus only, so a
+     * stray key never ends a night by itself (fix list 0.9: it was 9 to 18 Tab stops from a show card) */
+    if ((k === 'c' || k === 'C') && !document.body.classList.contains('nt-playing')) {
+      var ck = document.querySelector('button.ck-call:not(.ck-stay):not(.ck-skip):not(.ck-act)');
+      if (ck) { e.preventDefault(); ck.focus(); return; }
+    }
     if (/^[0-9]$/.test(k)) {
       idx = k === '0' ? 9 : parseInt(k, 10) - 1;
       if (RAIL[idx]) { e.preventDefault(); go(RAIL[idx]); }
       return;
     }
     if (k === '?') { e.preventDefault(); go('notebook', { page: 'HOW' }); }
+  }
+
+  /* A press that rebuilds the control under the keyboard (the clock, a strip, a card) must not drop it on the page: when the
+     focused control is removed and nothing took the focus, the same control (by label, key or class) gets it back (0.9). */
+  var keptAt = 0;
+  function keepKeyboard(e) {
+    var t = e && e.target, lab, fk, ob, cls;
+    if (!t || !t.getAttribute || e.relatedTarget || !state) return;
+    lab = t.getAttribute('aria-label'); fk = t.getAttribute('data-fk'); ob = t.getAttribute('data-obj'); cls = String(t.className || '');
+    setTimeout(function () {
+      var a = document.activeElement, list, i, pick = null, ok;
+      if (t.isConnected !== false || (a && a !== document.body) || cards.length || pop) return;
+      if (SB.Cutscene && SB.Cutscene.playing && SB.Cutscene.playing()) return;
+      if (Date.now() - keptAt < 40) return;
+      list = document.querySelectorAll(FOCUSABLE);
+      ok = function (n) { return !n.closest('[inert],[hidden],[aria-hidden="true"]') && n.getClientRects().length > 0; };
+      for (i = 0; i < list.length && !pick; i++) if (lab && list[i].getAttribute('aria-label') === lab && ok(list[i])) pick = list[i];
+      for (i = 0; i < list.length && !pick; i++) if (ob && list[i].getAttribute('data-obj') === ob && ok(list[i])) pick = list[i];
+      for (i = 0; i < list.length && !pick; i++) if (fk && list[i].getAttribute('data-fk') === fk && ok(list[i])) pick = list[i];
+      if (!pick && cls && /\bck-call\b/.test(cls)) for (i = 0; i < list.length && !pick; i++) if (/\bck-call\b/.test(list[i].className) && ok(list[i])) pick = list[i];
+      if (!pick && current && current.name === 'night') {   // the night screen's own pieces come and go: land on the note, the skip button or the report
+        pick = document.querySelector('.nt-note .nt-tab:not([disabled]), [data-fk="skip"], [data-fk="open"], .nt-tab:not([disabled])');
+      }
+      if (pick) { keptAt = Date.now(); try { pick.focus({ preventScroll: true }); } catch (x) { /* fine */ } }
+    }, 60);
   }
 
   function onTerm(e) {
@@ -553,7 +728,8 @@
       if (!t.getAttribute('aria-label') && !t.getAttribute('aria-describedby')) t.setAttribute('aria-description', tip);
     }
     if (state && state.notebook && state.notebook.terms && state.notebook.terms[term] === undefined && SB.Notebook && SB.Notebook.seeTerm) {
-      act(function (s) { return SB.Notebook.seeTerm(s, term); });
+      /* no redraw: a rebuild under a focused word dropped the keyboard on the page (0.9) */
+      try { SB.Notebook.seeTerm(state, term); autosave(); } catch (x) { SB.log('warn', 'SB.UI.term', String(x && x.message)); }
     }
   }
 
@@ -586,6 +762,7 @@
       else { missingPage(missing); return; }
     }
     SB.UI.on(document, 'keydown', onKey);
+    SB.UI.on(document, 'focusout', keepKeyboard);
     SB.UI.on(document, 'mouseover', onTerm);
     SB.UI.on(document, 'focusin', onTerm);
     SB.UI.on(document, 'sb-play', function (e) {
@@ -594,13 +771,21 @@
       else if (cmd === 'resume') setPlaying(true);
     });
     SB.UI.on(document, 'themechange', function () { renderShell(); });
-    if (typeof window !== 'undefined') SB.UI.on(window, 'hashchange', onHash);
+    /* the tab is closed or put away: write the game now, not up to a second from now (0.1) */
+    SB.UI.on(document, 'visibilitychange', function () { if (document.visibilityState === 'hidden') flush(); });
+    /* leaving the page: write the game, then give up the slot's lock for good, so a save that runs after (the
+     * visibilitychange that follows a reload) cannot stamp it again and make the reloaded tab think another one has it */
+    if (typeof window !== 'undefined') {
+      SB.UI.on(window, 'pagehide', function () { flush(); releaseLock(); leaving = true; });
+      SB.UI.on(window, 'pageshow', function () { leaving = false; });
+      SB.UI.on(window, 'hashchange', onHash);
+    }
     renderShell();
     mount('start', {});
   }
 
   SB.UI.extend({
-    go: go, back: back, act: act, game: game, toast: toast, start: start, quit: quit, card: card, popover: popover, keys: keys,
+    go: go, back: back, act: act, game: game, toast: toast, start: start, quit: quit, leave: leave, flush: flush, card: card, popover: popover, keys: keys,
     /** SPEC?: 07-desk section 3 (the lamp). label() -> { key, text } of what pulling the chain does; pull() does it. */
     lamp: { label: lampLabel, pull: lampPull },
     /** SPEC?: not in 05-interface 1.1; whether the week screen's play loop should be running (see the file head). */

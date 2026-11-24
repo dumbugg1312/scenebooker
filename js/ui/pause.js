@@ -114,7 +114,7 @@
         row(L('motion'), choices(L('motion'), p.get('motion') === 'reduce' || p.get('motion') === 'full' ? p.get('motion') : 'auto',
           ['auto', 'reduce', 'full'].map(function (k) { return [k, L('motions.' + k)]; }), function (k) { p.set('motion', k); }))
       ]),
-      game && SB.UI.quit ? h('button', { type: 'button', class: 'pm-quit pz-hl', on: { click: function () { close(true); SB.UI.quit(); } } }, L('quit')) : null
+      game && SB.UI.quit ? h('button', { type: 'button', class: 'pm-quit pz-hl', on: { click: function () { close(true); (SB.UI.leave || SB.UI.quit)(); } } }, L('quit')) : null
     ]);
     closeFn = SB.UI.card(content, { label: L('label'), onClose: function () {
       D.removeEventListener('fullscreenchange', onFs);

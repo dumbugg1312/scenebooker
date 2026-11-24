@@ -238,7 +238,9 @@ SB.module('Bands', function (SB) {
 
   function heatOf(state, genre) { return (state.truth && state.truth.heat && state.truth.heat[genre]) || 0; }
 
-  function feeOf(state, b, zoneId) {
+  function feeOf(state, b, zoneId, roomId) {
+    if (b.isPlayer) return { pay: 'FREE', amount: 0 };   // your own band plays for nothing
+    var rm = roomId && state.rooms ? state.rooms[roomId] : null;
     var P = packOf(state), t = tier(state, b, zoneId || b.zoneId || 'city'), tv = trust(state, b.id).value;
     var lohi = C.BAND_ASK[Math.max(0, Math.min(4, t))];
     var at = b.hid.feeAt === undefined ? 0.5 : b.hid.feeAt;
@@ -246,6 +248,8 @@ SB.module('Bands', function (SB) {
                  (C.MOTIVE_ASK[b.motive] || 1) * (1 - tv / C.TRUST_ASK) *
                  (1 + C.HOT_ASK_PER_HALF_POINT * 2 * Math.max(0, heatOf(state, b.genre)));
     if (tv >= C.TRUST_AT.close) amount *= 1 - C.TRUST_AT.closeDiscount;
+    /* L.6: a local band at a house, a shop or a yard (or asked before any room is held) asks for gas money, not a club's fee (a $435 local at a 45-person house); a bar, club or hall keeps the full ask */
+    if (roomId !== undefined && (!rm || C.SMALL_ROOM_FEE.kinds.indexOf(rm.kind) >= 0)) amount = Math.min(C.SMALL_ROOM_FEE.max, amount * C.SMALL_ROOM_FEE.mul);
     amount = Math.max(0, Math.round(amount / 5) * 5);
     var pay = amount <= 0 ? 'FREE' : (amount <= 30 ? 'GAS' : ((b.ask && b.ask.pay === 'SHARE') ? 'SHARE' : 'FLAT'));
     return { pay: pay, amount: amount };
@@ -256,7 +260,7 @@ SB.module('Bands', function (SB) {
     /* the guided first show: the big local draw plays for a cut of the door (SB.Tutorial.ask) */
     var first = s && SB.Tutorial && SB.Tutorial.ask ? SB.Tutorial.ask(state, bandId, showId) : null;
     if (first) return first;
-    return feeOf(state, b, s ? s.zoneId : null);
+    return feeOf(state, b, s ? s.zoneId : null, s ? (s.roomId || null) : undefined);
   }
 
   function waitDays(tv) {
@@ -270,6 +274,56 @@ SB.module('Bands', function (SB) {
     var w = waitDays(trust(state, bandId).value), known = (b.shows || []).length > 0;
     var lo = Math.max(1, Math.round(w * 0.6)), hi = Math.max(lo + 1, Math.round(w * (known ? 1.4 : 1.8)));
     return { lo: lo, hi: hi };
+  }
+
+  /* How a yes looks, in a word for the ask row (fix list 2.19): LIKELY, GOOD, EVEN or LONG; BOOKED when they are out
+   * that night; OWN for the player's own band. No numbers leave here. */
+  function yesWords(state, bandId, showId, slot) {
+    var b = getBand(state, bandId, 'Bands.yesWords'), show = showId && state.shows ? state.shows[showId] : null, f, j, tv, k;
+    if (b.isPlayer) return { k: 'OWN', yes: 1 };
+    if (!show) return null;
+    if (!isFreeExcept(state, b, show.day, show.id)) return { k: 'BOOKED', yes: 0 };
+    /* the guided first show: a band the texts name will say yes (SB.Tutorial.rig), so the row does not call it a long shot */
+    if (SB.Tutorial && SB.Tutorial.rig && SB.Tutorial.rig(state, { kind: 'BAND_PLAY', toId: bandId, showId: showId })) return { k: 'LIKELY', yes: 1 };
+    f = fee(state, bandId, showId);
+    j = judge(state, b, { payload: { showId: showId, wantSlot: slot || wantedSlot(state, b), fee: f ? f.amount : 0 } });
+    tv = j.trust;
+    if (j.room < 0) return { k: 'LONG', yes: 0.05 };
+    k = j.yes >= 0.7 ? 'LIKELY' : (j.yes >= 0.5 ? 'GOOD' : (j.yes >= 0.3 ? 'EVEN' : 'LONG'));
+    if (tv < C.TRUST_AT.noAnswer && k !== 'LONG') k = 'EVEN';
+    return { k: k, yes: Math.round(j.yes * 100) / 100 };
+  }
+
+  /* The text a local band gets when you asked several of them for one slot and somebody else said yes first. */
+  function filledLine(state, bandId, showId, winnerId) {
+    var b = getBand(state, bandId, 'Bands.filledLine'), show = state.shows && state.shows[showId], w = winnerId && state.bands[winnerId],
+        g = contactGen(state, b), slots = bandSlots(state, b, show, { other: w ? w.name : 'the other band' });
+    return say(state, 'requests.filled.' + g, slots);
+  }
+
+  /* What a band says when the player tells them the show is off. */
+  function cancelLine(state, bandId, showId) {
+    var b = getBand(state, bandId, 'Bands.cancelLine'), show = state.shows && state.shows[showId];
+    return say(state, 'requests.cancelReply.' + contactGen(state, b), bandSlots(state, b, show));
+  }
+
+  /* The player's own band (fix list 4.9). state.player.band = { name, genre } is written by the setup question; the
+   * record here is a free local act with a few friends who come, which grows with the shows it plays (afterShow), and which
+   * never breaks up on its own. Safe to call any time: nothing happens without a name, and it makes the record once. */
+  function ensurePlayerBand(state) {
+    var pb = state.player && state.player.band, genre, id, b;
+    if (!pb || typeof pb.name !== 'string' || !pb.name.trim()) return null;
+    if (pb.id && state.bands && state.bands[pb.id]) return pb.id;
+    if (!SB.WorldGen || !SB.WorldGen.band) return null;
+    genre = typeof pb.genre === 'string' ? (E.GENRE[pb.genre] ? pb.genre : (E.GENRE[pb.genre.toUpperCase()] ? pb.genre.toUpperCase() : null)) : null;
+    id = SB.WorldGen.band(state, { genre: genre || undefined, zoneId: 'city', tier: 0, stage: 'NEW', draw: 7, gen: 1 });
+    b = state.bands[id];
+    b.name = pb.name.trim();
+    b.isPlayer = true; b.playerBand = true; b.motive = 'FUN'; b.stage = 'NEW';
+    b.hid.freeRate = 1; b.hid.feeAt = 0; b.hid.needs = []; b.hid.cohesion = 1; b.hid.live = Math.max(b.hid.live || 0, 55);
+    b.followers = Math.max(b.followers || 0, 20);
+    pb.id = id;
+    return id;
   }
 
   function card(state, bandId) {
@@ -303,7 +357,7 @@ SB.module('Bands', function (SB) {
                vsPar: s && s.result ? s.result.vsPar : (rec0 ? rec0.vsPar : null) };
     });
     return {
-      id: b.id, name: b.name, local: b.local, home: home, genre: b.genre, genre2: b.genre2, style: b.style || b.genre,
+      id: b.id, name: b.name, local: b.local, own: !!b.isPlayer, home: home, genre: b.genre, genre2: b.genre2, style: b.style || b.genre,
       years: Math.max(0, SB.time.year(day) - b.formedYear), stage: b.stage, followers: b.followers, tierPublic: b.tierPublic,
       members: members, past: past,
       trust: { value: tr.value, stage: tr.stage }, ask: b.ask ? U.copy(b.ask) : null,
@@ -384,7 +438,7 @@ SB.module('Bands', function (SB) {
     var want = wantedSlot(state, b), asked = pl.wantSlot || 'MIDDLE';
     if (asked === want) slotS = 1;
     else if (myTier >= 2 && SLOT_RANK[asked] < SLOT_RANK[want]) slotS = -1;
-    var f = feeOf(state, b, show ? show.zoneId : null);
+    var f = feeOf(state, b, show ? show.zoneId : null, show ? (show.roomId || null) : undefined);
     moneyS = U.clamp(((pl.fee || 0) - f.amount) / Math.max(f.amount, C.YES.moneyFloor), -1, 1);
     if (show && playedRoomWell(state, b, show.roomId)) roomS = 1;
     if (refusesRoom(state, b, show)) roomS = -1;
@@ -777,8 +831,25 @@ SB.module('Bands', function (SB) {
     return out;
   }
 
+  function addPlayerBand(state, spec) {
+    var name = String((spec && spec.name) || '').replace(/\s+/g, ' ').trim().slice(0, 48), genre = spec && spec.genre, id, b, k;
+    if (!state || !name) return null;
+    for (k in state.bands) if (state.bands[k].playerBand || state.bands[k].isPlayer) return state.bands[k];
+    if (!E.GENRE || !E.GENRE[genre]) genre = null;
+    id = SB.WorldGen.band(state, { zoneId: 'city', tier: 0, genre: genre || undefined, draw: 10, stage: 'NEW', how: 'your friends' });
+    b = state.bands[id];
+    /* both flags: isPlayer is what the bill, the ask and the weekly wear read (ensurePlayerBand), playerBand the setup's */
+    b.name = name; b.playerBand = true; b.isPlayer = true; b.genre2 = null; b.motive = 'FUN';
+    b.hid.freeRate = 1; b.hid.feeAt = 0; b.hid.needs = []; b.hid.cohesion = 1;
+    b.ask = { pay: 'FREE', amount: 0 };
+    b.hid.honest = 1; b.hid.rel = 1;
+    state.player.band = { name: name, genre: b.genre, id: id };
+    return b;
+  }
+
   function weekly(state) {
     var out = [], r = rb(state), wk = week(state), day = today(state), P = packOf(state);
+    ensurePlayerBand(state);
     var churn = (P.scene && P.scene.memberChurn) || 0;
 
     /* other bookers' played shows wear the bands too (Bands is the one writer of band.plays) */
@@ -831,6 +902,8 @@ SB.module('Bands', function (SB) {
         b.playedOutUntil = wk + C.PLAYED_OUT.tagWeeks;
       }
 
+      /* the player's own band keeps going: it does not break up or change lineup on its own */
+      if (b.isPlayer) return;
       /* life stages */
       if (b.stage === 'ON_ICE') {
         if (r.chance(C.BAND_END.ON_ICE)) { out = out.concat(endBand(state, b, 'ICE')); return; }
@@ -995,9 +1068,12 @@ SB.module('Bands', function (SB) {
 
   return {
     get: get, list: list, card: card, tier: tier, publicDraw: publicDraw, fresh: fresh, isFree: isFree, fee: fee,
-    replyWindow: replyWindow, answerAsk: answerAsk, addTrust: addTrust, trust: trust, removeMember: removeMember,
+    replyWindow: replyWindow, yesWords: yesWords, filledLine: filledLine, cancelLine: cancelLine, ensurePlayerBand: ensurePlayerBand, answerAsk: answerAsk, addTrust: addTrust, trust: trust, removeMember: removeMember,
     afterShow: afterShow, weekly: weekly,
     trim: trim,
+    /* the player's own band (fix list 4.9): a free local act with a small crowd of friends, flagged playerBand, made once
+       at setup. It plays by the same rules as the other locals (trust, wear, growth); only its ask is nothing. */
+    addPlayerBand: addPlayerBand,
     /* extras (not in the manifest) */
     draw: function (state, bandId, zoneId) { return drawIn(state, getBand(state, bandId, 'Bands.draw'), zoneId || 'city'); },
     gen: function (state, bandId) { return genTruth(state, getBand(state, bandId, 'Bands.gen')); }

@@ -24,6 +24,20 @@
         "127.0.0.1"
       ],
       "port": 8796
+    },
+    {
+      "name": "desk-one-job",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8798",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "/Users/grover/Documents/PROGRAMS/scenebooker/.claude/worktrees/desk-one-job"
+      ],
+      "port": 8798
     }
   ]
 }

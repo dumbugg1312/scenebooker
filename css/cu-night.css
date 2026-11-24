@@ -7,7 +7,9 @@
  * Prefix nt- (night), st- (start). */
 
 /* ======================= the night ======================= */
-.nt { z-index: 40; background: var(--pitch); display: flex; align-items: center; justify-content: center;
+/* the board's toner runs out to the window's edges, past the stage: no black bars (user 2026-11-23) */
+body.is-full .sb-main:has(> .nt.sb-stage) { background: var(--toner); }
+.nt { z-index: 40; background: var(--toner); display: flex; align-items: center; justify-content: center;
   --cb-focus: var(--pp-bond); color: var(--toner); animation: nt-lamp 700ms steps(3, end) both; }
 @keyframes nt-lamp { 0% { filter: brightness(1.8); } 34% { filter: brightness(.05); } 67% { filter: brightness(.05); } 100% { filter: brightness(1); } }
 .nt strong { font-weight: 400; }

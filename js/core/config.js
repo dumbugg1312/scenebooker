@@ -143,7 +143,8 @@
     MIN: 0.7, MAX: 1.2,
     /* R2. How many copies: what it costs and how many routes it can cover (handouts need any print run).
      * BIG is what reaches the feeder-town routes as well as the city's. */
-    PRINT: { SMALL: { copies: 100, cost: 12, routes: 2 }, USUAL: { copies: 250, cost: 25, routes: 4 }, BIG: { copies: 500, cost: 45, routes: 99 } },
+    /* L.9 (balance-notes.md): a copy-shop run of 250 is about $20 and a carport show does not need a $25 flyer bill */
+    PRINT: { SMALL: { copies: 100, cost: 10, routes: 2 }, USUAL: { copies: 250, cost: 20, routes: 4 }, BIG: { copies: 500, cost: 40, routes: 99 } },
     PAID_ARTIST: [0, 40]
   };
 
@@ -187,6 +188,9 @@
 
   /* 1.9 The room, the order, the night score */
   C.OVERSELL = 1.1;
+  /* L.3: of the crowd the door could not take, this share actually showed up and was sent away; the rest heard it was
+   * full and stayed home. The reported number was the whole excess (103 turned away from a 45 room). */
+  C.TURNED_SHARE = 0.3;
   C.EARLY = [.90, .80, .75];
   C.STAY = [.85, .78, .62];
   C.STAY_FIT = { base: .4, span: .6 };
@@ -297,7 +301,7 @@
   C.READING_TRUE = 0.85;
   C.COMMENTS = { base: 4, surprises: 3, controlled: 1, regularAt: 15, debrief: 2 };
   C.KNOW_AT = [1, 2];              // true comments heard on a cause and context: 1 learning, 2 knows
-  C.CALL_K = 1.3;
+  C.CALL_K = 0.9;   // L.4: was 1.3; the shown range held the night's result 95% of the time and was about 46% of its middle wide
 
   /* ============================== 3. THE WEEK (mechanics 3) ============================== */
 
@@ -350,6 +354,18 @@
    * rides     PROMISE jobs only: the job it is ticked on and done with; its hours are added there
    * optional  true: never part of "the usual", never counted late, no skipped line. It exists to be chosen.
    * A need on a repeated job is met when every instance of it is DONE or MOOT. */
+  /* 1.11 (design call D4): when a show is booked inside a job's ideal, the job's on-time day becomes a staggered plan
+   * across the days left. by: days after the booking (flyer and announce in the first 2, print by day 3, the runs by
+   * day 6); last: the final stretch (invites and the push in the last 3 days). Never earlier than the job's own ideal. */
+  /* 1.22 (D6): the touring band's food, two buttons with their prices */
+  C.FOOD = { HOME: { cost: 15 }, OUT: { cost: 30 } };   // L.9: a pizza run for a van of four, not $40
+  C.JOB_STAGGER = {
+    AGREE_TERMS: { by: 2 }, ASK_LOCALS: { by: 3 }, MAKE_FLYER: { by: 2 }, ANNOUNCE: { by: 2 }, PRINT: { by: 3 }, BANDS_SHARE: { by: 3 },
+    FLYER_RUN: { by: 6 }, LISTINGS: { by: 4 }, LOCAL_AD: { by: 4 }, MAILING_LIST: { by: 5 },
+    INVITES: { last: 3 }, WEEK_PUSH: { last: 3 }
+  };
+  /* 1.11 step 4: the short-notice note only shows for a date inside about three weeks */
+  C.SHORT_NOTICE_DAYS = 21;
   C.JOBS = {
     ANSWER_REQUEST: { mode: 'MESSAGE', group: 'GETTING', hours: 0, half: 'ANY', clock: 'REQUEST' },
     VET_LISTEN:     { mode: 'HOURS', group: 'GETTING', hours: 1, half: 'ANY', clock: 'CONFIRM' },
@@ -358,7 +374,9 @@
     VET_ASK_BOOKER: { mode: 'MESSAGE', group: 'GETTING', hours: 0, half: 'ANY', clock: 'CONFIRM' },
     VET_ASK_AROUND: { mode: 'HOURS', group: 'GETTING', hours: 1, half: 'ANY', clock: 'CONFIRM' },
     HOLD_ROOM:      { mode: 'MESSAGE', group: 'GETTING', hours: 0, half: 'ANY', clock: 'REQUEST' },
-    AGREE_TERMS:    { mode: 'MESSAGE', group: 'GETTING', hours: 0, half: 'ANY', clock: 'CONFIRM', needs: ['HOLD_ROOM'] },
+    /* 1.11: terms run off the show date (about two weeks out), not off the confirm, so a show booked 40 days out is
+     * never late on day two. A short show gets the stagger below. */
+    AGREE_TERMS:    { mode: 'MESSAGE', group: 'GETTING', hours: 0, half: 'ANY', clock: 'SHOW', opens: null, ideal: 14, missed: -1, needs: ['HOLD_ROOM'] },
     /* R2. Locals are asked a week before the bill has to lock, so an on-time ask can give an on-time lock. */
     ASK_LOCALS:     { mode: 'MESSAGE', group: 'GETTING', hours: 0, half: 'ANY', clock: 'SHOW', opens: null, ideal: 35, missed: 0, repeat: 'BAND',
                       by: { HOUSE: { ideal: 28 }, SHOP: { ideal: 28 }, OUTDOOR: { ideal: 28 }, CLUB: { ideal: 49 } } },
@@ -379,7 +397,7 @@
                       needs: ['MAKE_FLYER'], opt: 'PRINT_RUN', cost: [12, 45] },
     /* R2. One instance per route the print run can cover; `again: 1` lets the player add a second run of a route
      * to freshen it (FLYER_STALE). A town route costs a paid runner PAY.HELPER_RUN_TOWN. */
-    FLYER_RUN:      { mode: 'HOURS', group: 'TELLING', hours: 2, half: 'DAY', clock: 'SHOW', opens: 42, ideal: 18, missed: 1,
+    FLYER_RUN:      { mode: 'HOURS', group: 'TELLING', hours: 1.5, half: 'DAY', clock: 'SHOW', opens: 42, ideal: 18, missed: 1,
                       needs: ['PRINT'], helper: 'RUNNER', repeat: 'ROUTE', again: 1, cost: [15, 40] },
     LISTINGS:       { mode: 'HOURS', group: 'TELLING', hours: 0.5, half: 'ANY', clock: 'SHOW', opens: 49, ideal: 12, missed: 11,
                       needs: ['CONFIRM_ROOM'], helper: 'CIRCLE', helperStage: 3 },
@@ -495,7 +513,8 @@
     RETURN: { p: .6, hostAbove: .3, weeks: [26, 60] },
     SWAP: { perContact: .03, contactAt: 50 },                        // R2: per contact at this strength or better
     LOCAL_ASK_PER_WEEK: .25,                                         // about one a month, from the first week (R2)
-    REPLY_BY: [3, 10],                                               // days the band will wait
+    REPLY_BY: [2, 5],                                                  // days the band will wait (L.10: was 3 to 10; real bookers answer in a day or two)
+    GUARANTEE_MAX: 120,                                              // L.7: a touring band's ask at a small room never exceeds what a full house can pay
     FOLLOWUP_DAYS: [8, 14],
     DATES: [1, 3],
     LEAD_DAYS: [21, 70],                                             // how far ahead a tour asks; RESCUE is 3 to 6
@@ -509,7 +528,7 @@
   C.VAN_COST = { perMile: .21, perMember: 10, dayOff: .6, hosted: 40, wordBase: 1.15, wordSpan: .3 };
   C.ASK_OVER_FLOOR = [1.3, 2.0];
   C.HANDSHAKE_DISPUTE = 0.25;
-  C.DOOR_DEAL_PCT = [.6, .8];
+  C.DOOR_DEAL_PCT = [.55, .75];   // L.2: was [.6, .8]; a touring band at a house show asks for most of the door after costs, not four fifths of it
   C.PLUS_SHARE = 0.5;              // "guarantee plus": this share of what is left after costs
 
   /* 4.6 When the door does not cover it. trust / word / rel are changes; share is how much of the gap it covers. */
@@ -539,6 +558,8 @@
   C.TIERS = [10, 36, 96, 240];     // draw at which a band becomes tier 1, 2, 3, 4, for a scene of 2,400 (scaled by scene size)
   C.BAND_ASK = [[0, 0], [0, 40], [50, 120], [150, 400], [500, 900]];   // dollars by tier, x the city's price index
   C.MOTIVE_ASK = { MONEY: 1.3, GROW: .5, FUN: .3 };
+  /* L.6: what a local band asks at a house, a shop or a yard: gas money, scaled down and capped */
+  C.SMALL_ROOM_FEE = { kinds: ['HOUSE', 'DIY', 'SHOP', 'OUTDOOR'], mul: .6, max: 60 };
   C.TRUST_ASK = 250;               // ask x (1 - trust / 250)
   C.HOT_ASK_PER_HALF_POINT = 0.15;
   /* base was .35 and bill .15: a local band whose sound fits the bill said yes to a new booker 40% of the time (free bands, 500 asks);

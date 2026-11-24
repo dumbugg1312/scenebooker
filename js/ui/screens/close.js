@@ -21,6 +21,7 @@
     tornOff: 'torn off',
     idx: { shows: 'the shows', money: 'money', said: 'what people said', learned: 'what you learned', people: 'people', you: 'you', bills: 'bills', next: 'next week' },
     noShow: 'No show this week.',
+    noShowNext: 'Next: {date} at {room}.', noShowNextNoRoom: 'Next: {date}.',
     came: 'came',
     expected: 'the town expected',
     perHead: 'one head = {n} people',
@@ -35,12 +36,42 @@
     moneyIn: 'in',
     moneyOut: 'out',
     net: 'this week',
+    bankSay: 'You have {bank} in your account.',
+    netSay: 'This week {in} came in and {out} went out, so the account {went} {net}.',
+    netUp: 'went up', netDown: 'went down', netFlat: 'stayed the same',
+    srcLine: '{what}: {amount}.',
+    src: { WAGES: 'Day job pay', DOOR: 'Door money', HAT: 'Extra at the door for gas', DEPOSIT: 'A deposit back', LOCAL: 'From a local band', TOURING: 'From a touring band',
+           LOAN: 'A loan', EVENT: 'Something that happened', MOVE: 'Money moved', OTHER: 'Other money', ROOM: 'Room', SOUND: 'Sound', SECURITY: 'Security',
+           INSURANCE: 'Insurance', DAMAGES: 'Damages', HOST: 'The host', PRINT: 'Printing', PROMO: 'Getting the word out', FOOD: 'Food', HELPER: 'Helpers',
+           FLYER: 'Flyers', MOTEL: 'A motel', THEFT: 'Theft', BILLS: 'Bills', FEE: 'Fees' },
     owed: 'promised costs, next eight weeks (rooms, sound, guarantees)',
+    owedSay: 'In the next 8 weeks you have promised {n}: rooms, sound and guarantees.',
+    owedNone: 'In the next 8 weeks you have not promised any money to anyone.',
+    lateLine: '{n} late, past the day it was due: {what}.',
+    lateOne: '{job} was not done by the day it was due',
+    trustBecause: '{who} trusts you {more} because {why}.',
+    trustMore: 'more', trustLess: 'less',
+    why: { PAID_AGREED: 'you paid them what you said', PAID_MORE: 'you paid them more than you said', GAVE_ALL: 'you gave them everything you made',
+           GOOD_SLOT: 'you gave them a good slot', GOOD_NIGHT: 'their night went well', FIRST_SHOW: 'you gave them their first show',
+           WITH_HERO: 'you put them on with a band they love', DETAILS: 'you sent the details', FED: 'you fed them', THANKED: 'you thanked them',
+           REBOOKED: 'you booked them again', TOUR_BOOKED: 'you booked their tour date', COLD_BOOKED: 'you booked them when they did not know you',
+           CAME_OUT: 'you came out to see them', UNANSWERED: 'you left them without an answer', DROPPED_ASK: 'you dropped a show you had asked them to play',
+           BUMPED: 'you bumped them off a bill', EMPTY_ROOM: 'the room was empty', BAD_SOUND: 'the sound was bad', NOT_ADVANCED: 'you did not confirm the details with them',
+           PAID_SHORT: 'you paid them less than you said', TOOK_TOO_MUCH: 'you kept too much of the door', ASKED_TO_GIVE: 'you asked them to give something up',
+           CANCELLED: 'you cancelled on them', BAD_BILL: 'the bill did not make sense for them' },
+    cost: 'What this show cost you',
+    costMoney: 'In money: the show paid you {net} after everything.',
+    costLoss: 'In money: you lost {net} on this show.',
+    costTrust: 'In trust: {names} {verb}.',
+    costTrustNone: 'In trust: nobody changed how they feel about you.',
+    costStand: 'In standing: {text}',
+    standUp: 'the scene noticed a good night.', standDown: 'the scene noticed a rough one.', standFlat: 'it stayed about where it was.',
     nothingSaid: 'Nobody said much.',
     nothingLearned: 'Nothing new in the notebook.',
+    learnedH: { bands: 'About the bands', crowd: 'About the crowd', rooms: 'About the rooms and the night' },
     noPeople: 'Nobody moved much.',
     regulars: 'regulars',
-    stressWas: 'from {from}', stressLine: 'stress {to} of 100, was {from} last week', trustUp: 'trusts you more', trustDown: 'trusts you less',
+    stressWas: 'from {from}', stressLine: 'Your stress is {to} out of 100. Last week it was {from}.', trustUp: 'trusts you more', trustDown: 'trusts you less',
     causes: 'what wore on you',
     notebook: 'notebook',
     openNote: 'Open the notebook at {cause}',
@@ -55,16 +86,16 @@
     bank: 'in your account',
     after: 'after',
     short: 'There isn\'t enough. Pick a way through:',
-    payBills: 'pay the bills',
+    payBills: 'pay the bills', payAll: 'pay all the bills',
     paid: 'paid',
     whatChanged: 'WHAT WOULD HAVE CHANGED IT',
     irl: 'in real life',
-    next: '{open} jobs open, {late} late, {replies} answers due',
+    next: '{open} jobs open, {replies} answers due.',
     start: 'start week {n}',
     notClosed: 'The week is not closed yet.',
     toWeek: 'back to the week',
     year: 'the year',
-    coming: 'coming up',
+    aim: 'Next goal: {text}', coming: 'coming up', inDays: 'in {n} days',
     nothingComing: 'Nothing else on the calendar yet.',
     photo: 'A photo from the night: {band}',
     receipt: 'receipt',
@@ -161,6 +192,14 @@
       return h(o.tag || 'div', { class: 'cc-thing' + (cls ? ' ' + cls : ''), role: o.role || null, aria: o.aria || null }, [k().sheet(stk, seed, { torn: !!o.torn }), kids]);
     }
     function none(text) { return h('p', { class: 'cc-none', text: text }); }
+    /* "No show this week." says what is next when a show is coming (fix-list 3.8) */
+    function noShowLine() {
+      var s = SB.UI.game(), list = safe(function () { return SB.Shows.list(s, { status: ['DRAFT', 'CONFIRMED'], fromDay: s.clock.day }); }, []) || [], sh = null, room = '';
+      list.filter(function (x) { return !x.by || x.by === 'player'; }).forEach(function (x) { if (!sh || x.day < sh.day) sh = x; });
+      if (!sh) return L('noShow');
+      room = s.rooms && sh.roomId && s.rooms[sh.roomId] ? s.rooms[sh.roomId].name : '';
+      return L('noShow') + ' ' + (room ? L('noShowNext', { date: SB.time.fmt(sh.day, 'short'), room: room }) : L('noShowNextNoRoom', { date: SB.time.fmt(sh.day, 'short') }));
+    }
 
     function render() {
       var s = SB.UI.game(), rep, W, kt = k(), sc = root.closest ? root.closest('.cu-in') : null, top = sc ? sc.scrollTop : 0;
@@ -180,6 +219,7 @@
       root.appendChild(h('div', { class: 'cc-close', style: { '--hot': HOT, '--board': tex ? 'url(' + tex + ')' : null } }, [
         kt.defsEl(),
         head(s, rep),
+        topGo(s, rep),
         /* the week's show: its photo is the one loud thing, so it has the room and no label (the page already says it is the shows) */
         (rep.shows || []).length ? h('section', { class: 'cc-hero-row', id: 'sb-close-shows', tabindex: '-1', aria: { label: L('idx.shows') } }, [h('h2', { class: 'sb-vh', text: L('idx.shows') }), shows(s, rep)]) : null,
         h('div', { class: 'cc-board' }, [
@@ -253,7 +293,7 @@
           h('span', { class: 'sb-vh', text: L('title') + ', ' + SB.time.fmt(from, 'week') })
         ]),
         h('ol', { class: 'cc-wk', aria: { hidden: 'true' } }, days),
-        !(rep.shows || []).length ? thing('bone', 'noshow', 'cc-noshow', h('span', { text: L('noShow') }), { torn: true }) : null
+        !(rep.shows || []).length ? thing('bone', 'noshow', 'cc-noshow', h('span', { text: noShowLine() }), { torn: true }) : null
       ]);
     }
     /** One day of the torn-off row: its number, a show circled with its flyer stuck in, bills scrawled. */
@@ -272,7 +312,7 @@
 
     function shows(s, rep) {
       var ids = rep.shows || [];
-      if (!ids.length) return none(L('noShow'));
+      if (!ids.length) return none(noShowLine());
       return h('div', { class: 'cc-row' }, ids.map(function (id) { return showSheet(s, id); }));
     }
 
@@ -301,6 +341,7 @@
         ]),
         h('div', { class: 'cc-show-main', data: { tut: 'closeout-read', 'tut-ref': id } }, [
           r.verdictLine ? h('p', { class: 'cc-verdict-line pz-paper', text: r.verdictLine }) : null,
+          safe(function () { return costBlock(s, r); }, null),
           h('div', { class: 'cc-crowdcard' }, [kt.sheet('white', 'crowd' + id), crowd(r)]),
           ledger(r),
           safe(function () { return irlBlock(r); }, null),
@@ -311,6 +352,20 @@
           ])
         ])
       ]);
+    }
+
+    /** "What this show cost you" (4.5): the money, the trust and the standing in sentences, beside the bank figure. */
+    function costBlock(s, r) {
+      var rep = (s.week && s.week.report) || {}, ppl = rep.people || [], net = num(r.playerNet) ? r.playerNet : null, lines = [], down = [], up = [], stand;
+      if (net !== null) lines.push(net >= 0 ? L('costMoney', { net: money(net) }) : L('costLoss', { net: money(Math.abs(net)) }));
+      ppl.forEach(function (p) { if (p && p.name) (p.d < 0 ? down : up).push(p.name); });
+      if (down.length) lines.push(L('costTrust', { names: down.join(', '), verb: 'trust you less' }));
+      if (up.length) lines.push(L('costTrust', { names: up.join(', '), verb: 'trust you more' }));
+      if (!down.length && !up.length) lines.push(L('costTrustNone'));
+      stand = r.vsPar === 'OVER' || r.vsPar === 'WAY_OVER' || r.verdict === 'GOOD' || r.verdict === 'TALKED' || r.verdict === 'WALL' ? L('standUp')
+            : (r.vsPar === 'UNDER' || r.vsPar === 'WELL_UNDER' || r.verdict === 'ROUGH' || r.verdict === 'THIN' ? L('standDown') : L('standFlat'));
+      lines.push(L('costStand', { text: stand }));
+      return h('div', { class: 'cc-cost pz-paper' }, [h('h3', { class: 'cc-ledger-k', text: L('cost') }), lines.map(function (t) { return h('p', { style: { margin: 'calc(var(--p) * 3) 0 0' }, text: t }); })]);
     }
 
     /** Came against expected: two rows of heads, solid for kids, halftone for the middle, open for old heads. */
@@ -432,7 +487,7 @@
                              on: { click: function () { SB.UI.go('show', { showId: sh.id }); } } }, [
           h('span', { class: 'cc-pin', aria: { hidden: 'true' } }, kt.pic(30, 32, pinArt(i % 2 ? '#ECD668' : '#e7ddc4'))),
           h('span', { class: 'cc-flyer-img' }, thumb || C().ShowBadge({ show: sh, size: 40 })),
-          h('span', { class: 'cc-coming-d', text: SB.time.fmt(sh.day, 'short').toUpperCase() })
+          h('span', { class: 'cc-coming-d', text: SB.time.fmt(sh.day, 'short').toUpperCase() + ' · ' + L('inDays', { n: safe(function () { return SB.Week.daysTo(s, sh.day); }, sh.day - to) }) })
         ]);
       }));
     }
@@ -449,13 +504,24 @@
     function learned(s, rep) {
       var kt = k(), list = rep.learned || [];
       if (!list.length) return none(L('nothingLearned'));
-      return h('div', { class: 'cc-learned' }, list.map(function (l, i) {
-        return thing('white', 'learn' + i, '', [
+      /* three headings, not a pile of links (fix-list 4.6): the bands, the crowd and the town, the rooms and the night */
+      var GROUP = { draw: 'bands', cross: 'bands', live: 'bands', rel: 'bands', promo: 'bands', honest: 'bands',
+                    aff: 'crowd', night: 'crowd', chan: 'crowd', heat: 'crowd', roomgen: 'rooms', roomcap: 'rooms', roomfit: 'rooms' },
+          groups = { bands: [], crowd: [], rooms: [] }, kids = [];
+      list.forEach(function (l, i) {
+        var g = GROUP[String(l.key || '').split(':')[0]] || 'rooms';
+        groups[g].push(thing('white', 'learn' + i, '', [
           h('p', { class: 'cc-learned-l', text: l.text || l.label || '' }),
           l.key ? h('button', { type: 'button', class: 'pz-hl', aria: { label: L('openNote', { cause: l.text || l.label || '' }) },
                                 on: { click: function () { SB.UI.go('notebook', { key: l.key }); } } }, kt.strip(L('notebook'))) : null
-        ], { torn: true });
-      }));
+        ], { torn: true }));
+      });
+      ['bands', 'crowd', 'rooms'].forEach(function (g) {
+        if (!groups[g].length) return;
+        kids.push(h('h4', { class: 'cc-learned-h', text: L('learnedH.' + g) }));
+        kids.push(h('div', { class: 'cc-learned-g' }, groups[g]));
+      });
+      return h('div', { class: 'cc-learned' }, kids);
     }
 
     /* ---------------- money, people, you ---------------- */
@@ -489,7 +555,16 @@
     function moneyPart(s, rep) {
       var kt = k(), m = rep.money || {}, owed = m.owedAhead || { total: null, lines: [] };
       function rline(a, b, cls) { return h('span', { class: 'cc-rc-l' + (cls ? ' ' + cls : '') }, [h('span', { text: a }), h('b', { text: b })]); }
+      var showOwed = !SB.Rungs || SB.Rungs.shows(s, 'promisedCosts');
+      /* every figure on this page has a sentence that says what it is and where it came from (1.16) */
+      var says = h('div', { class: 'cc-says', style: { margin: '0 0 calc(var(--p) * 6)' } }, [
+        num(m.bank) ? h('p', { class: 'cc-say', text: L('bankSay', { bank: money(m.bank) }) }) : null,
+        num(m.net) ? h('p', { class: 'cc-say', text: L('netSay', { in: money(m.in), out: money(m.out), went: L(m.net > 0 ? 'netUp' : (m.net < 0 ? 'netDown' : 'netFlat')), net: money(Math.abs(m.net)) }) }) : null,
+        (m.inLines || []).map(function (x) { return h('p', { class: 'cc-say cc-say--src', text: L('srcLine', { what: (SB.Content.ui.close.src || {})[x.cat] || String(x.cat).toLowerCase(), amount: money(x.amount) }) }); }),
+        showOwed ? h('p', { class: 'cc-say', text: num(owed.total) && owed.total > 0 ? L('owedSay', { n: money(owed.total) }) : L('owedNone') }) : null
+      ]);
       return h('div', { class: 'cc-money' }, [
+        says,
         h('div', { class: 'cc-figure cc-env', role: 'img', aria: { label: word('pot.FUND', 'fund') + ' ' + money(m.fund) } }, [
           envelope(), h('span', { class: 'cc-env-amt' }, counted('fund', m.fund, 34, 'money')), h('span', { class: 'cc-env-k', text: word('pot.FUND', 'fund') })
         ]),
@@ -504,14 +579,20 @@
           num(m.net) && m.net > 0 && SB.NightScene && SB.NightScene.object ? safe(function () { return SB.NightScene.object('pile', { n: Math.max(1, Math.min(6, Math.round(m.net / 90))), bill: '20', seed: 'close', size: 0.85 }); }, null) : kt.pic(80, 84, cashArt(m.net)),
           h('span', { class: 'cc-net-tape' }, [counted('net', m.net, 30, 'moneys'), h('span', { text: L('net') })])
         ]),
-        thing('pink', 'owed', 'cc-owed', [
+        !showOwed ? null : thing('pink', 'owed', 'cc-owed', [
           h('span', { class: 'cc-ledger-k', text: L('owed') }),
           kt.mk(money(owed.total), 22),
           owed.lines && owed.lines.length ? h('ul', { class: 'cc-ious' }, owed.lines.map(function (l) {
-            return h('li', null, [h('span', { text: SB.time.fmt(l.day, 'md') + ' ' + (l.label || '') }), h('b', { text: money(l.amount) })]);
+            return h('li', null, [h('span', { text: SB.time.fmt(l.day, 'short') + ' ' + (l.label || '') }), h('b', { text: money(l.amount) })]);
           })) : null
         ], { torn: true })
       ]);
+    }
+
+    /* "Ash Rite trusts you more because you paid them what you said." (1.16): a reason on every trust line */
+    function trustWhy(r, up) {
+      var why = (SB.Content.ui.close.why || {})[r.k];
+      return why ? L('trustBecause', { who: r.name || '', more: L(up ? 'trustMore' : 'trustLess'), why: why }) : (r.name || '') + ' ' + L(up ? 'trustUp' : 'trustDown') + '.';
     }
 
     function hasPeople(s, rep) { return (rep.people || []).length > 0 || ((s.week && s.week.log) || []).some(function (r) { return r.t === 'REGULARS'; }); }
@@ -523,10 +604,9 @@
           var p = r.id && s.people ? s.people[r.id] : null, b = !p && r.id && s.bands ? s.bands[r.id] : null, up = r.d >= 0;
           return thing('white', 'tr' + i, 'cc-person', [
             p ? C().PersonStamp({ person: p, size: 30 }) : (b ? C().BandMark({ band: b, size: 30 }) : null),
-            h('span', { text: r.name || '' }),
             h('span', { class: 'cc-person-d', role: 'img', aria: { label: up ? SB.text.label('ui.c.more') : SB.text.label('ui.c.less') } },
               kt.pic(22, 22, SB.DeskKit.arrow(11, up ? 20 : 2, 11, up ? 2 : 20, { seed: 'ta' + i, sw: 3, head: 8 }))),
-            h('span', { class: 'cc-person-why', text: L(up ? 'trustUp' : 'trustDown') }),
+            h('span', { class: 'cc-person-why', text: trustWhy(r, up) }),
             r.stageChanged && r.stage ? h('span', { text: word('stage.' + r.stage, String(r.stage).toLowerCase()) }) : null
           ]);
         }),
@@ -556,7 +636,7 @@
         h('div', { class: 'cc-figure cc-mug', role: 'img', aria: { label: zone + ', ' + (num(x.from) ? x.from : '?') + ' > ' + (num(x.to) ? x.to : '?') } }, [
           kt.pic(290, 200, coffeeArt(x.to)),
           h('span', { class: 'cc-mug-tape' }, [kt.mk(zone.toUpperCase(), 26, { say: false }),
-            h('span', { text: L('stressLine', { to: num(x.to) ? x.to : '?', from: num(x.from) ? x.from : '?' }) })])
+            !SB.Rungs || SB.Rungs.shows(s, 'stressLine') ? h('span', { text: L('stressLine', { to: num(x.to) ? x.to : '?', from: num(x.from) ? x.from : '?' }) }) : null])
         ]),
         x.causes && x.causes.length ? h('div', { class: 'cc-causes', role: 'group', aria: { label: L('causes') } }, x.causes.map(function (c, i) {
           return h('span', { class: 'cc-causechip' }, [kt.sheet(i % 2 ? 'bone' : 'white', 'cz' + i), h('span', { text: (c.label || '') + ' ' + kt.chipText({ k: 'STRESS', v: c.d }) })]);
@@ -625,15 +705,46 @@
       ]);
     }
 
+    /* The way on, in view without scrolling (0.7): at the top of the page, START WEEK n, or PAY ALL THE BILLS while the month's
+     * bills are still due (they come first). The same presses as the ones lower down, which stay. */
+    function payAll(s, rep) {
+      var bv = safe(function () { return SB.Money.billsView(s); }, null) || rep.bills || {}, ch;
+      if (choice.pay === null) choice.pay = (bv.lines || []).map(function (l) { return l.k; });
+      ch = { pay: (bv.lines || []).map(function (l) { return l.k; }), late: [], ladder: choice.ladder.slice() };
+      SB.UI.act(function (x) { return SB.Week.payBills(x, ch); });
+    }
+    function startNext() {
+      var r = SB.UI.act(function (x) { return SB.Week.nextWeek(x); });
+      if (r && r.ok !== false) SB.UI.go('week');
+    }
+    function topGo(s, rep) {
+      var kt = k(), owing = rep.bills && !billRecords(s).length, label = owing ? L('payAll') : L('start', { n: rep.week + 2 });
+      return h('div', { class: 'cc-go cc-go--top', style: { position: 'sticky', top: '0', zIndex: '5' } }, [
+        kt.tab({ label: label, lead: kt.mk(label.toUpperCase(), 30, { say: false, cls: 'cc-go-mk' }), hot: true, cls: 'cc-tab--sign', tut: 'closeout-done',
+                 on: owing ? function () { payAll(s, rep); } : startNext })
+      ]);
+    }
+
+    /* " 1 late: Announce the show was not done by the day it was due." Names the job (1.16). */
+    function lateText(s, n) {
+      var names = (n.lateJobs || []).map(function (id) { var v = safe(function () { return SB.Jobs.get(s, id); }, null); return v && v.label ? v.label : ''; }).filter(Boolean);
+      if (!(n.late > 0)) return '';
+      return ' ' + L('lateLine', { n: n.late, what: names.length ? names.join(', ') : L('lateOne', { job: 'A job' }) });
+    }
+
+    /* the aim, in a sentence, on every week page after show one (4.1) */
+    function aimLine(s) {
+      var a = (s.player && s.player.showsPlayed > 0) ? safe(function () { return SB.Chapters.aim(s); }, null) : null;
+      return a ? h('p', { class: 'cc-aim', style: { fontWeight: '700' }, text: L('aim', { text: a.text }) }) : null;
+    }
+
     function next(s, rep) {
       var kt = k(), n = rep.next || {};
       return h('div', { class: 'cc-go' }, [
         kt.tab({ label: L('start', { n: rep.week + 2 }), lead: kt.mk(L('start', { n: rep.week + 2 }).toUpperCase(), 38, { say: false, cls: 'cc-go-mk' }),
-                 hot: !(rep.bills && !billRecords(s).length), cls: 'cc-tab--big cc-tab--sign', tut: 'closeout-done', on: function () {
-          var r = SB.UI.act(function (x) { return SB.Week.nextWeek(x); });
-          if (r && r.ok !== false) SB.UI.go('week');
-        } }),
-        h('p', { class: 'cc-go-line', text: L('next', { open: n.open || 0, late: n.late || 0, replies: n.repliesDue || 0 }) })
+                 hot: !(rep.bills && !billRecords(s).length), cls: 'cc-tab--big cc-tab--sign', on: startNext }),
+        aimLine(s),
+        h('p', { class: 'cc-go-line', text: L('next', { open: n.open || 0, replies: n.repliesDue || 0 }) + lateText(s, n) })
       ]);
     }
 

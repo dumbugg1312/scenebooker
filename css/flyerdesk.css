@@ -141,10 +141,10 @@
 .sb-fd-tog input:focus-visible { background: var(--hl-solid); }
 
 /* the check: typed on a strip along the bottom */
-.sb-fd-stage .sb-fd-checkwrap { position: absolute; z-index: 10; width: calc(var(--p) * 800); padding: calc(var(--p) * 8) calc(var(--p) * 14); --paper: var(--pp-buff); --edge: var(--edge-torn-b); }
-.sb-fd-check { display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 4) calc(var(--p) * 12); }
+.sb-fd-stage .sb-fd-checkwrap { position: absolute; top: auto !important; bottom: calc(var(--p) * 6); z-index: 10; width: calc(var(--p) * 800); padding: calc(var(--p) * 8) calc(var(--p) * 14); --paper: var(--pp-buff); --edge: var(--edge-torn-b); }
+.sb-fd-check { display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--p) * 3) calc(var(--p) * 8); }
 .sb-fd-check-title { padding: calc(var(--p) * 3) calc(var(--p) * 7); background: var(--toner); color: var(--pp-bond); font: calc(var(--fs) * 12)/1 var(--f-type); letter-spacing: .08em; text-transform: uppercase; }
-.sb-fd-check-list { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 3) calc(var(--p) * 14); list-style: none; margin: 0; padding: 0; font: calc(var(--fs) * 13)/1.25 var(--f-type); }
+.sb-fd-check-list { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 3) calc(var(--p) * 9); list-style: none; margin: 0; padding: 0; font: calc(var(--fs) * 12)/1.25 var(--f-type); }
 .sb-fd-check-list li { display: inline-flex; align-items: center; gap: calc(var(--p) * 4); }
 .sb-fd-mark { font: calc(var(--fs) * 17)/1 var(--f-gothic); }
 .sb-fd-check-list .is-ok { color: var(--toner-mid); }
@@ -156,8 +156,26 @@
 /* the two ways out */
 .sb-fd-actions { position: absolute; z-index: 12; width: calc(var(--p) * 320); height: calc(var(--p) * 92); }
 .sb-fd-stage .sb-fd-use { position: absolute; left: 0; top: calc(var(--p) * 4); width: calc(var(--p) * 236); height: calc(var(--p) * 66); padding: calc(var(--p) * 6) calc(var(--p) * 12); border: 0; border-radius: 0; --paper: var(--toner); --edge: var(--edge-cut-2);
-  display: flex; align-items: center; justify-content: center; transform: rotate(-1.6deg); }
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--p) * 3); transform: rotate(-1.6deg); }
 .sb-fd-use .sb-fd-mk { color: var(--pp-bond); }
+.sb-fd-use-sub { font: calc(var(--fs) * 12)/1.1 var(--f-type); letter-spacing: .03em; text-transform: uppercase; color: var(--pp-bond); text-align: center; }
+/* from show two: rough / standard / sharp, each a button that says what it buys */
+.sb-fd-actions--pick { height: calc(var(--p) * 112); }
+.sb-fd-stage .sb-fd-actions--pick .sb-fd-use--pick { position: absolute; top: calc(var(--p) * 2); width: calc(var(--p) * 100); height: calc(var(--p) * 72); padding: calc(var(--p) * 5) calc(var(--p) * 6);
+  gap: calc(var(--p) * 2); transform: none; --paper: var(--pp-bond); --edge: var(--edge-cut-2); color: var(--toner); }
+.sb-fd-actions--pick .sb-fd-use--pick:nth-child(1) { left: 0; transform: rotate(-1.4deg); }
+.sb-fd-actions--pick .sb-fd-use--pick:nth-child(2) { left: calc(var(--p) * 108); transform: rotate(.8deg); }
+.sb-fd-actions--pick .sb-fd-use--pick:nth-child(3) { left: calc(var(--p) * 216); transform: rotate(-.6deg); }
+.sb-fd-stage .sb-fd-actions--pick .sb-fd-use--pick.is-main { --paper: var(--toner); color: var(--pp-bond); }
+.sb-fd-pick-name { font: calc(var(--fs) * 14)/1 var(--f-type); text-transform: uppercase; letter-spacing: .05em; }
+.sb-fd-pick-hrs { font: calc(var(--fs) * 12)/1 var(--f-mono); }
+.sb-fd-pick-says { font: calc(var(--fs) * 11)/1.15 var(--f-type); text-align: center; opacity: .9; }
+.sb-fd-stage .sb-fd-actions--pick .sb-fd-let { left: 0; top: calc(var(--p) * 78); height: calc(var(--p) * 30); transform: rotate(-.6deg); }
+.sb-fd-stage .sb-fd-let.sb-fd-reprint { left: 0; top: calc(var(--p) * 10); width: calc(var(--p) * 300); height: calc(var(--p) * 46); white-space: normal; line-height: 1.1; text-align: left; transform: rotate(-1deg); color: var(--toner); }
+/* the overnight slip, the new-patch card and the clock's one-liner sit over the bottom right of the stage: while the desk is
+   open they keep to the top, so "Use this flyer" can always be pressed (0.10) */
+body:has(.sb-fd) .on-slip { bottom: auto; top: calc(var(--u) * 24); right: calc(var(--u) * 24); }
+body:has(.sb-fd) .nc-say { bottom: auto; top: 100%; margin: calc(var(--u) * 14) 0 0; }
 .sb-fd-stage .sb-fd-let { position: absolute; left: calc(var(--p) * 244); top: calc(var(--p) * 44); min-height: 0; height: calc(var(--p) * 34); padding: 0 calc(var(--p) * 12); border: 0; border-radius: 0; --paper: var(--pp-bond);
   font: calc(var(--fs) * 13)/1 var(--f-type); text-transform: uppercase; letter-spacing: .04em; color: var(--toner-mid); transform: rotate(3deg); }
 

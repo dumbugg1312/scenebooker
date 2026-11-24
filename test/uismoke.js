@@ -730,7 +730,8 @@ function main() {
       const lock = Object.keys(st.jobs).map(k => st.jobs[k]).filter(j => j.type === 'LOCK_BILL' && j.showId)[0], adv = Object.keys(st.jobs).map(k => st.jobs[k]).filter(j => j.type === 'ADVANCE' && j.showId)[0];
       if (!lock || lock.status !== 'DONE' || !adv || adv.status !== 'DONE') throw new Error('the first show: bill lock ' + (lock && lock.status) + ', advance ' + (adv && adv.status));
       if (st.player.dayJob !== 'FULL') throw new Error('a guided start works its shifts from day one, got ' + st.player.dayJob);
-      if (onDesk.length && (onDesk.indexOf('notebook') < 0 || onDesk.indexOf('tin') >= 0)) throw new Error('desk after one show: ' + onDesk.join(','));
+      /* the tin (bank only) is on the desk from night one (fix-list 1.17) */
+      if (onDesk.length && (onDesk.indexOf('notebook') < 0 || onDesk.indexOf('tin') < 0)) throw new Error('desk after one show: ' + onDesk.join(','));
       report('tutorial (ten steps by the tape; ' + walk.log[walk.log.length - 2] + '; friend did ' + byMentor.map(j => j.type).join(' ') + '; desk ' + onDesk.join(',') + ')');
     } catch (e) { report('tutorial, at "' + where + '"', e); }
   }

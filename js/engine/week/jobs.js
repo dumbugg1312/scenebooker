@@ -312,7 +312,7 @@ SB.module('Jobs', function (SB) {
   var JOB_GRACE = 2;
   function computeWindow(state, job, onDay) {
     var c = cfg(job.type), show = showOf(state, job), mode = modeOf(state, job), carrier, w, req, nd, ov, T,
-        opensDay, idealUntil, missedAt, st, fp, len, k, exp;
+        opensDay, idealUntil, missedAt, st, fp, len, k, exp, graced = false, stg;
     if (job.status === 'MOOT') return view('NONE', null, null, null, onDay);
     if (mode === 'PROMISE') {
       carrier = carrierOf(state, job);
@@ -340,7 +340,16 @@ SB.module('Jobs', function (SB) {
         /* not confirmed yet: nothing is late, the grace runs from tonight (user 2026-11-22: "it says 2 is late even
            though i just started the game"). A show without a room is a rumor; its clock starts at the confirm. */
         exp = nd.day != null ? nd.day : (show.confirmedDay != null ? show.confirmedDay : onDay);
-        if (idealUntil != null && exp != null && idealUntil < exp + JOB_GRACE) idealUntil = Math.max(idealUntil, Math.min(exp + JOB_GRACE, show.day - 1));
+        graced = idealUntil != null && exp != null && idealUntil < exp + JOB_GRACE;
+        if (graced) idealUntil = Math.max(idealUntil, Math.min(exp + JOB_GRACE, show.day - 1));
+        /* 1.11 (D4): a show booked inside the job's ideal gets the staggered plan across its days left, so nothing is
+         * called late (or due tomorrow) for days it never had. Fixed from the booking day, so the label moves once. */
+        stg = SB.Config.JOB_STAGGER && SB.Config.JOB_STAGGER[job.type];
+        if (stg && idealUntil != null && show.confirmedDay != null) {
+          if (stg.by != null) k = Math.min(show.confirmedDay + stg.by, show.day - 1);
+          else k = show.day - 1;
+          if (k > idealUntil && idealUntil < show.confirmedDay + (stg.by != null ? stg.by : 3)) { idealUntil = k; graced = true; }
+        }
         if (ov.m != null && T <= ov.m) st = 'MISSED';
         else if (!nd.met || (ov.o != null && T > ov.o)) st = 'EARLY';
         else if (idealUntil == null || onDay <= idealUntil) {
@@ -352,7 +361,9 @@ SB.module('Jobs', function (SB) {
         if (c.optional && st === 'LATE') st = 'OPEN';
         if (job.status === 'SKIPPED') st = 'MISSED';
         w = view(st, opensDay, idealUntil, missedAt, onDay);
+        if (graced) w.graced = true;   // booked short: the on-time day is the grace, not the show's real schedule (Week.crunch)
         if (st === 'LATE' && c.group === 'TELLING' && SB.Forecast && SB.Forecast.jobLoss) w.loss = SB.Forecast.jobLoss(state, job.id, onDay);
+        if (st === 'LATE' && !c.optional) w.lateCost = SB.text.label(c.group === 'TELLING' ? 'window.lateCostTell' : 'window.lateCost');   // 1.11: LATE always says what it costs
         return w;
       case 'REQUEST':
         req = state.requests ? state.requests[job.type === 'ANSWER_REQUEST' ? job.key : (show && show.requestId)] : null;
@@ -414,8 +425,20 @@ SB.module('Jobs', function (SB) {
        * it waits (WAITING) and settles on the ensure that finds its needs met. No job is ever DONE before its needs. */
       if (settled && !needsOf(state, job).met) { job.status = 'WAITING'; return; }
       if (settled) {
-        w = computeWindow(state, job, day);
-        finishDone(state, job, day, w.state === 'LATE' || w.state === 'MISSED' ? 'LATE' : 'ON_TIME', 'player');
+        /* L.5: the player's part of an ask is sending it, so it is on time or late by the day it went out, not by the
+         * day the band wrote back (answers take 2 to 7 days and were reading as late jobs the player did on time) */
+        var sentOn = day;
+        asks.forEach(function (a) { if (a.sentDay != null && a.sentDay < sentOn && (a.status === 'YES' || a.status === 'NO' || a.status === 'COUNTER' || a.status === 'WITHDRAWN')) sentOn = a.sentDay; });
+        w = computeWindow(state, job, job.type === 'ASK_LOCALS' ? sentOn : day);
+        /* a replacement ask goes out because another band said no: it is on time when it goes out within the grace of
+         * that no, whatever the show's calendar says */
+        var repl = false;
+        if (job.type === 'ASK_LOCALS' && (w.state === 'LATE' || w.state === 'MISSED')) {
+          asksFor(state, show.id, ['BAND_PLAY']).forEach(function (a) {
+            if (a.toId !== job.key && (a.status === 'NO' || a.status === 'WITHDRAWN') && a.hid && a.hid.answerDay != null && a.hid.answerDay <= sentOn && sentOn - a.hid.answerDay <= JOB_GRACE) repl = true;
+          });
+        }
+        finishDone(state, job, day, !repl && (w.state === 'LATE' || w.state === 'MISSED') ? 'LATE' : 'ON_TIME', 'player');
         if (job.status === 'DONE' && job.type !== 'ANSWER_REQUEST') job.text = line(state, 'jobs.' + job.type + '.' + job.timing, textSlots(state, show, job, {}));
       } else if (job.status !== 'SKIPPED') job.status = out ? 'WAITING' : 'TODO';
     });
@@ -634,7 +657,7 @@ SB.module('Jobs', function (SB) {
     if (!LIVE[job.status]) return;
     job.status = 'SKIPPED';
     job.timing = 'SKIPPED';
-    job.text = line(state, 'jobs.' + job.type + '.SKIPPED', show ? textSlots(state, show, job, {}) : {});
+    job.text = line(state, 'jobs.' + job.type + '.SKIPPED', show ? textSlots(state, show, job, {}) : looseSlots(state, job));
     if (job.type === 'ADVANCE' || job.type === 'RUN_SHOW') ridersOf(state, job).forEach(function (r) { skip(state, r, day); });
   }
 
@@ -646,12 +669,9 @@ SB.module('Jobs', function (SB) {
     var b = show.bill && show.bill.billing && show.bill.billing.length ? show.bill.billing.slice() : null, slots;
     slots = show.bill && show.bill.slots ? show.bill.slots : [];
     if (b) return b.filter(function (id) { return slots.some(function (s) { return s.bandId === id; }); });
-    return slots.slice().sort(function (a, c) {
-      var ta = a.role === 'TOURING' ? 1 : 0, tc = c.role === 'TOURING' ? 1 : 0, ba, bc;
-      if (ta !== tc) return tc - ta;
-      ba = bandOf(state, a.bandId); bc = bandOf(state, c.bandId);
-      return ((bc && bc.tierPublic) || 0) - ((ba && ba.tierPublic) || 0);
-    }).map(function (s) { return s.bandId; });
+    /* no billing order written: the flyer lists the set order from the top, the headliner (the last slot) first and biggest,
+     * the way the mentor and the night run it (fix-list 3.8: the flyer must not name the opener first) */
+    return slots.slice().reverse().map(function (s) { return s.bandId; });
   }
   function topBandName(state, show) {
     var b = billingOf(state, show)[0], band = b ? bandOf(state, b) : null;
@@ -661,6 +681,19 @@ SB.module('Jobs', function (SB) {
     var d = show.door || {};
     if (d.donation) return 'donation' + (d.suggested ? ' (' + SB.text.money(d.suggested) + ')' : '');
     return d.price ? SB.text.money(d.price) : 'free';
+  }
+  var DAY_WORDS = ['no days', 'a day', 'two days', 'three days', 'four days', 'five days', 'six days', 'seven days', 'eight days', 'nine days', 'ten days', 'eleven days', 'twelve days', 'thirteen days'];
+  /* "weeks to go" only when there are weeks; else the days */
+  function leadPhrase(n) { return n >= 14 ? 'weeks to go' : (n <= 0 ? 'no days to go' : DAY_WORDS[n] + ' to go'); }
+
+  var NUM_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+  function billLine(n) { return n <= 0 ? 'bands TBA' : n === 1 ? 'one band' : (NUM_WORDS[n] || String(n)) + ' bands'; }
+  function allBands(n) { return n <= 1 ? (n === 1 ? 'The band' : 'The bands') : n === 2 ? 'Both bands' : 'All ' + (NUM_WORDS[n] || n) + ' bands'; }
+
+  /* the slots a loose job (a look-up, an answer) can fill with no show behind it: the band it is about */
+  function looseSlots(state, job) {
+    var rq = job && LOOSE_TYPES[job.type] === 1 && state.requests ? state.requests[job.key] : null, b = rq ? bandOf(state, rq.bandId) : null;
+    return b ? { band: b.name } : {};
   }
   function textSlots(state, show, job, extra) {
     var room = roomOf(state, show), t = SB.time.date(show.day), r, slots, k, slotsList = show.bill && show.bill.slots ? show.bill.slots : [];
@@ -683,7 +716,12 @@ SB.module('Jobs', function (SB) {
       house: !!(room && room.kind === 'HOUSE'), bar: !!(room && room.kind === 'BAR'), hall: !!(room && room.kind === 'HALL'),
       touring: slotsList.some(function (s) { return s.role === 'TOURING'; }),
       askAPunk: !!(show.door && show.door.address === 'ASK'), addressOut: !!(show.door && show.door.address === 'FULL'),
-      firstTime: false
+      firstTime: false, homeCost: dollars(state, (C.FOOD || { HOME: { cost: 15 } }).HOME.cost), outCost: dollars(state, (C.FOOD || { OUT: { cost: 40 } }).OUT.cost), home: !!(job && job.type === 'FOOD' && job.opt !== 'OUT'), out: !!(job && job.type === 'FOOD' && job.opt === 'OUT'),
+      /* 3.1: the calendar words follow the real days left, so a ten-day show never says weeks */
+      weeksOut: show.day - today(state) >= 14, lead: leadPhrase(show.day - today(state)),
+      /* 3.2: never "no bands" or "one bands" */
+      billLine: billLine(slotsList.length), tbaNote: slotsList.length ? '' : ' The bands get written in when they say yes.',
+      allBands: allBands(slotsList.length), bandCount: slotsList.length ? billLine(slotsList.length) : 'no bands yet'
     };
     /* read only by the lines that say "the first time"; the scan of every job is paid when one of them asks */
     Object.defineProperty(slots, 'firstTime', { enumerable: true, configurable: true, get: function () {
@@ -692,12 +730,26 @@ SB.module('Jobs', function (SB) {
       for (id in state.jobs) { o = state.jobs[id]; if (o.id !== job.id && o.type === job.type && o.status === 'DONE' && !o.waived) return false; }
       return true;
     } });
+    /* the band a looking-up job is about is the requester, not whoever tops the bill (and may be all there is) */
+    var lb = looseSlots(state, job);
+    if (lb.band) slots.band = lb.band;
+    var sq = show.requestId && state.requests ? state.requests[show.requestId] : null;
+    if (sq) {
+      if (!slots.band && bandOf(state, sq.bandId)) slots.band = bandOf(state, sq.bandId).name;
+      if (sq.ask && sq.ask.members) slots.n = sq.ask.members;
+    }
+    if (slots.n == null) slots.n = show.deal && show.deal.members ? show.deal.members : 4;
+    /* the print lines name how many copies and what they cost: from the size the job used (the usual when none was picked) */
+    if (job && job.type === 'PRINT') {
+      var pr = C.FLYER.PRINT[job.opt] || C.FLYER.PRINT[C.USUAL.print] || C.FLYER.PRINT.USUAL;
+      slots.copies = pr.copies; slots.cost = pr.cost;
+    }
     for (k in extra) slots[k] = extra[k];
     return slots;
   }
 
   /* ------------------------------------------------------------------ */
-  /* Views                                                               */
+  /* Views                                                              */
   /* ------------------------------------------------------------------ */
 
   function catalog(type) {
@@ -730,6 +782,41 @@ SB.module('Jobs', function (SB) {
     return 0;
   }
 
+  /* 1.12: the jobs kept behind "more ways to get the word out" until the show-one extras come in (D1: promoOptional) */
+  var MORE_TYPES = { LISTINGS: 1, LOCAL_AD: 1, MAILING_LIST: 1, HAND_OUT: 1 };
+  function isMore(state, job) {
+    var show, runs, first;
+    if (!job.showId || (SB.Rungs && SB.Rungs.shows(state, 'promoOptional'))) return false;
+    if (MORE_TYPES[job.type]) return true;
+    if (job.type === 'INVITES') return String(job.key) === '2';
+    if (job.type === 'FLYER_RUN') {
+      show = state.shows && state.shows[job.showId];
+      if (!show) return false;
+      runs = (show.jobs || []).map(function (id) { return state.jobs[id]; }).filter(function (j) { return j && j.type === 'FLYER_RUN' && j.status !== 'MOOT' && !isAgain(j.key); });
+      first = runs.length ? runs.sort(function (a, b) { return a.id < b.id ? -1 : 1; })[0] : null;
+      return !!first && first.id !== job.id;
+    }
+    return false;
+  }
+  /* 1.12 step 4: "needs 2 hrs, you have 1" before the press, for a job that is the player's own and will not fit tonight */
+  function fitNote(state, job, status, onDay) {
+    var r, h;
+    if (status !== 'TODO' || modeOf(state, job) !== 'HOURS' || (onDay != null && onDay !== today(state)) || !state.week || !SB.Week || !SB.Week.fits) return null;
+    try {
+      h = hoursOf(state, job);
+      if (!(h > 0)) return null;
+      r = SB.Week.fits(state, h);
+    } catch (e) { return null; }
+    if (!r || r.ok !== false || r.code !== 'NO_TIME') return null;
+    return label('jobs.notice.noFit', { need: hrs(h), left: hrs(typeof r.left === 'number' ? r.left : 0) }, '');
+  }
+  function hrs(n) { return n === 0.5 ? 'half an hour' : (n === 1 ? '1 hr' : n + ' hrs'); }
+  /* 1.12 step 2: what a greyed job waits on, by name */
+  function blockerLine(nd) {
+    var m = nd.missing && nd.missing[0];
+    return m ? label('jobs.blocker.' + m, {}, label('jobs.' + m + '.label', {}, '')) : '';
+  }
+
   function jobView(state, job, onDay) {
     var c = cfg(job.type), show = showOf(state, job), mode = modeOf(state, job), plan = plannedItem(state, job.id),
         status = job.status, nd = needsOf(state, job), riders = [], helperOk, slots, cov = coveredJob(state, job),
@@ -737,20 +824,25 @@ SB.module('Jobs', function (SB) {
     if (status === 'TODO' && plan) status = 'PLANNED';
     if (job.type === 'ADVANCE' || job.type === 'RUN_SHOW') riders = ridersOf(state, job).map(function (r) { return jobView(state, r, onDay); });
     helperOk = !!c.helper && stage(state) >= (c.helperStage || C.STAGE_HELPERS);
-    slots = show ? textSlots(state, show, job, {}) : {};
+    slots = show ? textSlots(state, show, job, {}) : looseSlots(state, job);
     return {
       id: job.id, type: job.type, group: c.group, mode: mode, showId: job.showId, key: job.key,
-      label: label('jobs.' + job.type + '.label', slots, job.type), why: label('jobs.' + job.type + '.why', slots, ''),
+      /* the same route twice (the early run gets covered) reads as the second run, not a copy of the first */
+      label: label('jobs.' + job.type + ((job.type === 'FLYER_RUN' && /#2$/.test(job.key || '')) || (job.type === 'INVITES' && String(job.key) === '2') ? '.labelAgain' : '.label'), slots, job.type), why: label('jobs.' + job.type + '.why', slots, ''),
       hours: hoursOf(state, job), half: c.half, status: status, timing: job.timing, by: job.by || (plan ? plan.by : null),
       byName: (job.by || (plan && plan.by)) && (job.by || plan.by) !== 'player' ? personName(state, job.by || plan.by) : null,
       planned: plan ? { dayIdx: plan.dayIdx, half: plan.half, by: plan.by } : null,
       rides: ridesOn(state, job), riders: riders, optional: !!c.optional, waived: job.waived || null,
-      opt: optMenu(state, job, show),
+      opt: job.type === 'FOOD' ? foodMenu(state, job) : optMenu(state, job, show),
       window: win, due: win.idealUntil == null ? null : win.idealUntil,   // due: the last on-time day, as a day number (spec 10)
       needs: nd.list, helper: c.helper || null, helperOk: helperOk,
       cost: c.cost ? { lo: dollars(state, c.cost[0]), hi: dollars(state, c.cost[1]) } : null,
       text: job.text, covered: cov, coveredBy: coverBy, coveredName: coverBy ? personName(state, coverBy) : null,
-      hidden: !!(SB.Rungs && SB.Rungs.hides(state, job.type))
+      hidden: !!(SB.Rungs && SB.Rungs.hides(state, job.type)),
+      more: isMore(state, job),
+      blocker: nd.met ? '' : blockerLine(nd),
+      reach: label('jobs.reach.' + job.type, {}, ''),
+      noFit: fitNote(state, job, status, onDay)
     };
   }
 
@@ -859,7 +951,7 @@ SB.module('Jobs', function (SB) {
     if (!nd.met) {
       /* names the missing job: `missing` is its type ('BANDS' when LOCK_BILL lacks two confirmed bands), `missingLabel` its name */
       missing = nd.missing[0];
-      var no = U.no('NEEDS', missing === 'BANDS' && job.type !== 'LOCK_BILL' ? label('jobs.notice.needBands', {}, SB.text.label('refuse.NEEDS')) : SB.text.label('refuse.NEEDS'));
+      var no = U.no('NEEDS', missing === 'BANDS' && job.type !== 'LOCK_BILL' ? label('jobs.notice.needBands', {}, SB.text.label('refuse.NEEDS')) : (blockerLine(nd) || SB.text.label('refuse.NEEDS')));
       no.missing = missing;
       no.missingLabel = missing === 'BANDS' ? null : label('jobs.' + missing + '.label', {}, missing);
       return no;
@@ -889,7 +981,7 @@ SB.module('Jobs', function (SB) {
     return best ? { show: best, aff: bestA < 0 ? 0 : bestA } : null;
   }
 
-  function promise(state, jobId, on) {
+  function promise(state, jobId, on, opt) {
     var job = getJob(state, jobId, 'Jobs.promise'), carrier;
     if (modeOf(state, job) !== 'PROMISE') return U.no('INVALID', SB.text.label('refuse.INVALID'));
     if (job.waived) return U.no('ALREADY', SB.text.label('refuse.ALREADY'));
@@ -901,6 +993,10 @@ SB.module('Jobs', function (SB) {
         state.shows[job.showId].day === today(state) && SB.Week.eveningOpen(state)) {
       var h = hoursOf(state, job), fit;
       if (h > 0 && SB.Week.fits) { fit = SB.Week.fits(state, h); if (!fit.ok) return U.no('NO_TIME', fit.text || SB.text.label('refuse.NO_TIME')); }
+    }
+    if (job.type === 'FOOD' && on) {
+      if (opt && C.FOOD && C.FOOD[opt]) job.opt = opt;
+      else if (!job.opt || !(C.FOOD && C.FOOD[job.opt])) job.opt = 'HOME';
     }
     job.status = on ? 'PROMISED' : 'TODO';
     return U.yes({ status: job.status });
@@ -1071,7 +1167,7 @@ SB.module('Jobs', function (SB) {
     var extra = apply(state, job, show, ctx, timing, effect, opt) || [];
     finishDone(state, job, day, timing, by);
     slots = show ? textSlots(state, show, job, { helper: by !== 'player' ? personName(state, by) : null, different: job.outcome === 'DIFFERENT',
-                                                 paid: payCost > 0, amount: cost + payCost, cost: cost }) : { helper: null };
+                                                 paid: payCost > 0, amount: cost + payCost, cost: cost }) : Object.assign({ helper: null }, looseSlots(state, job));
     job.text = (by !== 'player' && has('jobs.' + job.type + '.helper')) ? line(state, 'jobs.' + job.type + '.helper', slots)
                                                                        : line(state, 'jobs.' + job.type + '.' + timing, slots);
     var chips = [];
@@ -1094,6 +1190,20 @@ SB.module('Jobs', function (SB) {
     return records;
   }
 
+  /* 1.22: the touring band's food is one of two buttons, each with its price (home pot, or a meal out) */
+  function foodCost(state, job) {
+    var f = C.FOOD || {}, o = f[job.opt] || f.HOME || { cost: C.JOBS.FOOD.cost[0] };
+    return dollars(state, o.cost);
+  }
+  function foodMenu(state, job) {
+    var f = C.FOOD || {}, chosen = job.opt || null;
+    return { kind: 'FOOD', chosen: job.status === 'PROMISED' ? chosen : null, choices: Object.keys(f).map(function (k) {
+      var cost = dollars(state, f[k].cost), ok = SB.Money && SB.Money.canCover ? SB.Money.canCover(state, cost) : true;
+      return { key: k, label: label('jobs.FOOD.opts.' + k + '.label', { cost: cost }, k), cost: cost, chips: [{ k: 'MONEY', v: -cost, who: null }], enabled: ok,
+               why: ok ? null : SB.text.label('refuse.NO_MONEY') };
+    }) };
+  }
+
   function resolveRider(state, job, ctx, timing) {
     var show = showOf(state, job), records = [], cost = 0, extra, r;
     if (!LIVE[job.status]) return records;
@@ -1101,14 +1211,14 @@ SB.module('Jobs', function (SB) {
      * before its needs, so it is skipped. SPEC?: 5.2 is silent; JOB_BLOCKED with NEEDS as for a job that cannot run. */
     if (!needsOf(state, job).met) { skip(state, job, ctx.day); return blocked(state, job, ctx, 'NEEDS'); }
     if (job.type === 'FOOD') {
-      cost = dollars(state, Math.round((C.JOBS.FOOD.cost[0] + C.JOBS.FOOD.cost[1]) / 2));   // SPEC?: the middle of FOOD's range
+      cost = foodCost(state, job);   // 1.22: the one the player chose, priced on its button (home pot or a meal out)
       if (SB.Money && SB.Money.canCover && !SB.Money.canCover(state, cost)) { skip(state, job, ctx.day); return blocked(state, job, ctx, 'NO_MONEY'); }
       r = SB.Money.spend(state, cost, 'FOOD', memo(state, job, null), { showId: job.showId, jobId: job.id });
       if (r && r.ok === false) { skip(state, job, ctx.day); return blocked(state, job, ctx, 'NO_MONEY'); }
     }
     extra = apply(state, job, show, ctx, timing, 1, null) || [];
     finishDone(state, job, ctx.day, timing, 'player');
-    job.text = line(state, 'jobs.' + job.type + '.' + timing, show ? textSlots(state, show, job, { amount: cost }) : {});
+    job.text = line(state, 'jobs.' + job.type + '.' + timing, show ? textSlots(state, show, job, { amount: cost }) : looseSlots(state, job));
     records.push(rec('JOB_DONE', ctx.day, ctx.half, job.showId, job.text, { jobId: job.id, type: job.type, key: job.key, by: 'player',
       timing: timing, chips: cost ? [{ k: 'MONEY', v: -cost, who: null }] : [], thumb: null }));
     return records.concat(extra);
@@ -1399,10 +1509,39 @@ SB.module('Jobs', function (SB) {
     return U.yes();
   }
 
+  /* 3.2 step 2: a printed flyer made again and reprinted in one press. The new recipe goes in, the print job opens again and is
+   * done now (its money and hours as for any print); if it cannot be done tonight nothing is changed. */
+  function reprint(state, showId, recipe, houseStyle) {
+    var show = getShow(state, showId, 'Jobs.reprint'), pj = find(state, show, 'PRINT'), size, cost, fit, snap, r, was;
+    if (show.status !== 'CONFIRMED') return U.no('LOCKED', SB.text.label('refuse.LOCKED'));
+    if (!pj || pj.status !== 'DONE') return U.no('INVALID', SB.text.label('refuse.INVALID'));
+    size = (show.promo && show.promo.print) || C.USUAL.print;
+    cost = optCost(state, 'PRINT', size);
+    if (cost > 0 && SB.Money && SB.Money.canCover && !SB.Money.canCover(state, cost)) return U.no('NO_MONEY', SB.text.label('refuse.NO_MONEY'));
+    if (SB.Week && SB.Week.fits && state.week) { fit = SB.Week.fits(state, hoursOf(state, pj)); if (fit && fit.ok === false) return fit; }
+    snap = { pj: U.copy(pj), printed: show.promo.printed, recipe: show.flyer && show.flyer.recipe ? U.copy(show.flyer.recipe) : null, style: state.player ? U.copy(state.player.houseStyle || null) : null };
+    if (!show.flyer) show.flyer = { recipe: null, spec: null };
+    show.flyer.recipe = recipe == null ? null : U.copy(recipe);
+    if (houseStyle && state.player) state.player.houseStyle = U.copy(houseStyle);
+    pj.status = 'TODO'; pj.doneDay = null; pj.timing = null; pj.by = null; pj.slip = null; pj.text = null;
+    show.promo.printed = null;
+    r = SB.Week.doNow(state, pj.id, { opt: size });
+    if (!r || r.ok === false) {
+      Object.keys(pj).forEach(function (k) { delete pj[k]; });
+      Object.keys(snap.pj).forEach(function (k) { pj[k] = snap.pj[k]; });
+      show.promo.printed = snap.printed;
+      show.flyer.recipe = snap.recipe;
+      if (state.player) state.player.houseStyle = snap.style;
+      return r || U.no('INVALID', SB.text.label('refuse.INVALID'));
+    }
+    return r;
+  }
+
   return {
-    catalog: catalog, ensure: ensure, refreshAll: refreshAll, get: get, forShow: forShow, tray: tray, freeJobs: freeJobs,
+    reprint: reprint, catalog: catalog, ensure: ensure, refreshAll: refreshAll, get: get, forShow: forShow, tray: tray, freeJobs: freeJobs,
     window: windowView, canDo: canDo, promise: promise, resolve: resolve, flyerSpec: flyerSpec, setFlyer: setFlyer,
     /* internals outside the manifest (see the header) */
+    skip: function (state, jobId, day) { var j = state.jobs && state.jobs[jobId]; if (j && LIVE[j.status]) skip(state, j, day); return j ? j.text || '' : ''; },
     add: add, drop: drop, modeOf: function (state, job) { return modeOf(state, typeof job === 'string' ? getJob(state, job) : job); }
   };
 });

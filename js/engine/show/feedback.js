@@ -307,11 +307,25 @@ SB.module('Feedback', function (SB) {
   function commentText(state, cause, voice, d, level, slots) {
     var base = 'feedback.comments.' + cause + '.', tail = '.' + (d > 0 ? 'UP' : 'DOWN') + '.' + level;
     if (SB.text.off) return '';
+    if (cause === 'PROMO_FLYER' && d < 0 && slots && slots.daysOut === '') return SB.text.label('noFlyerLine');   // 0.10: no flyer was ever made
     if (SB.text.has(base + voice + tail)) return SB.text.line(base + voice + tail, slots, textRng(state));
     return SB.text.has(base + 'ANY' + tail) ? SB.text.line(base + 'ANY' + tail, slots, textRng(state)) : '';
   }
 
   /* ---------------- the ledger (7.9) ---------------- */
+
+  /* the settle's "How you told people" names the flyer and the jobs behind it (fix list 2.7): ' (the flyer, a flyer run)' or '' */
+  function toldBy(state, show) {
+    var names = [], seen = {}, ids = show.jobs || EMPTY, i, j, v;
+    if (SB.text.off) return '';
+    for (i = 0; i < ids.length; i++) {
+      j = state.jobs && state.jobs[ids[i]];
+      if (!j || j.status !== 'DONE' || !C.JOBS[j.type] || C.JOBS[j.type].group !== 'TELLING') continue;
+      v = SB.text.has('jobs.' + j.type + '.verb') ? String(SB.text.label('jobs.' + j.type + '.verb', {})) : '';
+      if (v && !seen[v]) { seen[v] = true; names.push(v.toLowerCase()); }
+    }
+    return names.length ? ' (' + names.slice(0, 5).join(', ') + (names.length > 5 ? ', and more' : '') + ')' : '';
+  }
 
   function ledger(state, show, fin, luckOut) {
     return SB.Model.batch ? SB.Model.batch(state, function () { return ledgerRuns(state, show, fin, luckOut); }) : ledgerRuns(state, show, fin, luckOut);
@@ -324,7 +338,7 @@ SB.module('Feedback', function (SB) {
     promo = exact(F.ablate(state, show.id, 'PROMO')); hidden = exact(F.ablate(state, show.id, 'HIDDEN'));
     yours = Math.round(promo - parRun); hid = Math.round(hidden - promo);
     rows.push({ col: 'PAR', label: label('PAR'), d: fin.par.heads, cause: null });
-    rows.push({ col: 'YOURS', label: label('YOURS'), d: yours, cause: null });
+    rows.push({ col: 'YOURS', label: label('YOURS') + toldBy(state, show), d: yours, cause: null });
     rows.push({ col: 'HIDDEN', label: label('HIDDEN'), d: hid, cause: null });
     sum = fin.par.heads + yours + hid;
     (dem.luck || EMPTY).forEach(function (x) { if (x.k === 'RAIN' || x.k === 'HEAT' || x.k === 'COLD') weather = x; else draws.push(x); });
@@ -439,7 +453,12 @@ SB.module('Feedback', function (SB) {
 
     tier = fin.verdict === 'WALL' ? 'TALKED' : fin.verdict;
     slots = slotsFor(state, show, { cause: 'NIGHT', ctx: '', d: 0 }, fin, dem);
-    vLine = SB.text.off ? '' : (line(state, 'strings.verdict.count.' + fin.vsPar, slots) + ' ' + line(state, 'strings.verdict.tier.' + tier, slots)).replace(/^\s+|\s+$/g, '');
+    /* a night that went over the room's size, or that nearly nobody came to, is told as that: never "a normal night" (playtest 2026-11-23) */
+    var rm = roomOf(state, show), capN = rm ? num(rm.cap, 0) : 0, packed = fin.outcome.turnedAway > 0 && SB.text.has('strings.verdict.tier.PACKED'),
+        empty = !packed && capN > 0 && fin.outcome.heads <= capN * 0.2 && SB.text.has('strings.verdict.tier.EMPTY');
+    if (packed) { tier = 'PACKED'; slots.turned = Math.round(fin.outcome.turnedAway); }
+    if (empty) tier = 'EMPTY';
+    vLine = SB.text.off ? '' : ((packed && fin.vsPar === 'ABOUT' ? '' : line(state, 'strings.verdict.count.' + fin.vsPar, slots) + ' ') + line(state, 'strings.verdict.tier.' + tier, slots)).replace(/^\s+|\s+$/g, '');
     return { ledger: rows, comments: comments, luck: luckOut, verdictLine: vLine, learned: learned, causes: list };
   }
 

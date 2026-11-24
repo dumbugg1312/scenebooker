@@ -30,10 +30,12 @@ SB.module('Forecast', function (SB) {
    * room. Until then the forecast counts the band that asked: that band is the reason the show exists (7.15). */
   function assumeBill(state, show) {
     var req, band, slots, s, k, at;
-    if (!show || show.status !== 'DRAFT' || !show.requestId || !state.requests) return show;
+    /* a room's yes books the night before the offer goes out, so the band asked about is assumed on any show still ahead */
+    if (!show || show.status === 'PLAYED' || show.status === 'CANCELLED' || !show.requestId || !state.requests) return show;
     req = state.requests[show.requestId]; band = req && state.bands ? state.bands[req.bandId] : null;
     slots = (show.bill && show.bill.slots) || EMPTY;
     if (!band || slots.some(function (x) { return x.bandId === band.id; })) return show;
+    if (show.status !== 'DRAFT' && req.status !== 'NEW' && req.status !== 'REPLIED' && req.status !== 'NEGOTIATING') return show;   // a band that said no or walked is not assumed
     s = {};
     for (k in show) if (Object.prototype.hasOwnProperty.call(show, k)) s[k] = show[k];
     s.bill = {};
@@ -434,6 +436,79 @@ SB.module('Forecast', function (SB) {
     return out;
   }
 
+  /* ---------------- what each piece of promotion is worth (fix list 2.7) ---------------- */
+
+  var EFFECT_FIELDS = { FLYER: ['flyer'], ANNOUNCE: ['announce'], POSTERS: ['printed', 'runs'], LISTINGS: ['listings'], AD: ['ad'], MAIL: ['mail'], INVITES: ['invites'],
+                        PUSH: ['push', 'paid'], DAYOF: ['dayOf'], ROOM: ['roomPosted'], SHARES: ['shares'], HANDOUTS: ['handouts'] };
+  var EFFECT_ORDER = ['FLYER', 'ANNOUNCE', 'POSTERS', 'LISTINGS', 'AD', 'MAIL', 'INVITES', 'PUSH', 'DAYOF', 'ROOM', 'SHARES', 'HANDOUTS'];
+
+  function nightOf(state, show, p, L) {
+    var s2 = withPromo(show, p), r = SB.Model.resolve(state, s2, L, s2.mods || {});
+    return { heads: num(r.night.exact, r.night.heads), gens: exactGens(r) };
+  }
+
+  function clearField(p, key) {
+    var v = p[key];
+    if (Array.isArray(v)) p[key] = [];
+    else if (typeof v === 'boolean') p[key] = false;
+    else if (v && typeof v === 'object') p[key] = (key === 'runs' || key === 'shares') ? {} : null;
+    else p[key] = null;
+  }
+
+  /* promoEffects(state, showId) -> [{ kind, heads, gen, done }]: for each piece of promotion in the plan (done or planned), how many more
+   * people the guess has because of it, and which crowd it mostly reaches (0 kids, 1 the middle, 2 old heads, null when mixed).
+   * Read from the same Call the card shows, so the line and the range move together. */
+  function promoEffects(state, showId) {
+    var show = assumeBill(state, showOf(state, showId, 'Forecast.promoEffects')), out = [], p, L, base, i, k, f, q, r, g, d, top, tot, was, field, has, v0;
+    if (!ready(state, show) || show.status === 'PLAYED' || show.status === 'CANCELLED') return out;
+    p = assumed(state, show, 'PLAN', null); L = lens(state, 'CALL', null); L.lite = true;
+    base = nightOf(state, show, p, L);
+    for (i = 0; i < EFFECT_ORDER.length; i++) {
+      k = EFFECT_ORDER[i]; field = EFFECT_FIELDS[k]; q = copy(p); has = false;
+      for (f = 0; f < field.length; f++) {
+        v0 = p[field[f]];
+        if (v0 !== null && v0 !== undefined && v0 !== false && !(Array.isArray(v0) && !v0.length) && !(typeof v0 === 'object' && !Array.isArray(v0) && !Object.keys(v0).length)) has = true;
+        clearField(q, field[f]);
+      }
+      if (!has) continue;
+      if (k === 'FLYER') q.announceHadFlyer = false;
+      r = nightOf(state, show, q, L);
+      d = base.heads - r.heads;
+      if (!(d >= 0.5)) continue;
+      tot = 0; top = 0;
+      for (g = 0; g < 3; g++) { tot += base.gens[g] - r.gens[g]; if (base.gens[g] - r.gens[g] > base.gens[top] - r.gens[top]) top = g; }
+      was = show.promo || {};
+      var v1 = was[field[0]], done = !(v1 === null || v1 === undefined || v1 === false || (Array.isArray(v1) && !v1.length) || (typeof v1 === 'object' && !Array.isArray(v1) && !Object.keys(v1).length));
+      out.push({ kind: k, heads: Math.round(d), gen: tot > 0 && (base.gens[top] - r.gens[top]) >= 0.5 * tot ? top : null, done: done });
+    }
+    return out;
+  }
+
+  /* flyerEfforts(state, showId) -> { ROUGH, STANDARD, SHARP }: how many people more (or fewer) than a standard flyer each way of making it brings */
+  function flyerEfforts(state, showId) {
+    var show = assumeBill(state, showOf(state, showId, 'Forecast.flyerEfforts')), out = {}, p, L, kind, day, k, q, base;
+    if (!ready(state, show) || show.status === 'PLAYED' || show.status === 'CANCELLED') return null;
+    kind = roomOf(state, show).kind;
+    p = assumed(state, show, 'PLAN', null); L = lens(state, 'CALL', null); L.lite = true;
+    day = p.flyer && typeof p.flyer.day === 'number' ? p.flyer.day : show.day - jobDays('MAKE_FLYER', kind, 'ideal');
+    function at(quality) {
+      q = copy(p); q.flyer = { day: day, quality: quality * (show.bill && show.bill.locked ? 1 : C.FLYER.TBA), by: 'player', tba: !(show.bill && show.bill.locked) };
+      if (typeof q.announce === 'number') q.announceHadFlyer = day <= q.announce;
+      return nightOf(state, show, q, L).heads;
+    }
+    base = at(C.FLYER.QUALITY.STANDARD);
+    for (k in C.FLYER.QUALITY) if (Object.prototype.hasOwnProperty.call(C.FLYER.QUALITY, k)) out[k] = Math.round(at(C.FLYER.QUALITY[k]) - base);
+    return out;
+  }
+
+  /* nobodyCall(state, showId) -> { lo, hi, mid }: the guess for the night if nothing more is done to tell people (only what is done already) */
+  function nobodyCall(state, showId) {
+    var show = assumeBill(state, showOf(state, showId, 'Forecast.nobodyCall')), s = {}, k;
+    for (k in show) if (Object.prototype.hasOwnProperty.call(show, k)) s[k] = show[k];
+    s.jobs = [];
+    return callOf(state, s);
+  }
+
   /* ---------------- the card, and "what if" ---------------- */
 
   function unknownPairs(state, show) {
@@ -463,6 +538,10 @@ SB.module('Forecast', function (SB) {
     return out;
   }
 
+  function safeNobody(state, showId) {
+    try { var n = nobodyCall(state, showId); return { lo: n.lo, hi: n.hi, mid: n.mid }; } catch (e) { return null; }
+  }
+
   function card(state, showId) {
     var show = assumeBill(state, showOf(state, showId, 'Forecast.card')), room = roomOf(state, show), p = par(state, showId), c = call(state, showId), ex = null, door = show.door || {};
     var price, comps, total, pace = 'OK', loDoor, midDoor, ok = ready(state, show), played = show.status === 'PLAYED' || show.status === 'CANCELLED';
@@ -473,7 +552,7 @@ SB.module('Forecast', function (SB) {
       loDoor = Math.max(0, c.lo - comps) * price; midDoor = Math.max(0, c.mid - comps) * price;
       pace = loDoor >= total ? 'OK' : (midDoor >= total ? 'TIGHT' : 'SHORT');
     }
-    return { par: p, call: c, cap: room ? num(room.cap, 0) : 0, exposure: total, breakEven: ex && typeof ex.breakEven === 'number' ? ex.breakEven : null,
+    return { par: p, call: c, nobody: ok && !played ? safeNobody(state, showId) : null, cap: room ? num(room.cap, 0) : 0, exposure: total, breakEven: ex && typeof ex.breakEven === 'number' ? ex.breakEven : null,
              guaranteePace: pace, reach: played ? { gens: [0, 1, 2].map(function () { return { heard: { lo: 0, hi: 0 }, reachable: { lo: 0, hi: 0 }, usual: 0, missed: 0 }; }) } : reachStrip(state, showId),
              unknownPairs: ok ? unknownPairs(state, show) : [], flow: ok && !played ? flowOf(state, show) : null };
   }
@@ -527,7 +606,69 @@ SB.module('Forecast', function (SB) {
 
   /* ---------------- the break-even line (13-real-booking, part 3) ---------------- */
 
-  /* breakEven(state, showId, over) -> { even, price, owed, lo, hi, shape, hat, split }. Reads only; stores nothing.
+  /* what a show will still cost that the settle cannot see yet (fix list 1.5): sound nobody is hired for (the usual person's
+   * rate), event insurance not bought yet, printing and pushes on the plan, and a meal promised to the touring band.
+   * Once any of it is paid it is in the ledger and the settle counts it, so nothing here is counted twice.
+   * -> { sound: the rate guessed (0 when sound is settled), extra: dollars outside the box, list: [{ k, amount, guess }] } */
+  function priceIndexOf(state) {
+    var p = null;
+    try { p = SB.Cities.pack(state); } catch (e) { p = null; }
+    return p && p.money && typeof p.money.priceIndex === 'number' ? p.money.priceIndex : 1;
+  }
+
+  function usualSound(state) {
+    var ids = Object.keys(state.people || {}), i, p, best = null;
+    for (i = 0; i < ids.length; i++) {
+      p = state.people[ids[i]];
+      if (!p || (p.state && p.state !== 'ACTIVE') || (p.roles || EMPTY).indexOf('SOUND') < 0 || p.met === null || p.met === undefined || typeof p.rate !== 'number') continue;
+      if (!best || (p.rel || 0) > (best.rel || 0)) best = p;
+    }
+    return best ? best.rate : Math.round(C.PAY.SOUND[0] * priceIndexOf(state));
+  }
+
+  function plannedCosts(state, show, over) {
+    var room = roomOf(state, show), crew = show.crew || {}, out = { sound: 0, extra: 0, list: [] }, pi = priceIndexOf(state), plan = (state.week && state.week.plan) || EMPTY;
+    var led = (state.money && state.money.ledger) || EMPTY, terms = null, R = null, planned = {}, ids = show.jobs || EMPTY, i, j, job, c, meal, spent = false;
+    function add(k, amount, guess) {
+      amount = Math.round(amount || 0);
+      if (!(amount > 0)) return;
+      out.list.push(guess ? { k: k, amount: amount, guess: true } : { k: k, amount: amount });
+      if (k === 'SOUND') out.sound = amount; else out.extra += amount;
+    }
+    function optCost(type, opt) {
+      var jd = C.JOBS[type], v = 0;
+      if (!jd || !jd.opt || !opt) return 0;
+      if (jd.opt === 'PRINT_RUN' && C.FLYER.PRINT[opt]) v = C.FLYER.PRINT[opt].cost;
+      else if (jd.opt === 'PUSH' && CH.PAID_PUSH[opt]) v = CH.PAID_PUSH[opt].cost;
+      else if (jd.opt === 'AD' && CH.LOCAL_AD[opt]) v = CH.LOCAL_AD[opt].cost;
+      return Math.round(v * pi);
+    }
+    if (!room) return out;
+    if (!crew.sound) {
+      try { terms = SB.Rooms.terms(state, room.id, show.id); } catch (e) { terms = null; }
+      if (!(terms && num(terms.soundFee, 0) > 0)) add('SOUND', usualSound(state), true);
+    }
+    try { R = SB.Rooms.crewRules(state, room.id, show.id).insurance; } catch (e) { R = null; }
+    if (R && (show.insure || R.required) && !(R.bought > 0)) add('INSURANCE', R.cost);
+    for (i = 0; i < plan.length; i++) {
+      job = state.jobs && state.jobs[plan[i].jobId];
+      if (!job || job.showId !== show.id || job.status === 'DONE') continue;
+      planned[job.id] = true;
+      if (plan[i].opt) add(C.JOBS[job.type] && C.JOBS[job.type].opt === 'PRINT_RUN' ? 'PRINT' : 'PROMO', optCost(job.type, plan[i].opt));
+      if (plan[i].pay && plan[i].pay.kind === 'CASH') add('HELPER', plan[i].pay.amount || 0);
+    }
+    /* a print run still to do and not on the plan yet: the usual run */
+    for (i = 0; i < ids.length; i++) {
+      j = state.jobs && state.jobs[ids[i]];
+      if (j && j.type === 'PRINT' && OPEN_STATUS[j.status] && !planned[j.id] && !(C.JOBS.PRINT && C.JOBS.PRINT.optional)) add('PRINT', C.FLYER.PRINT[C.USUAL.print].cost * pi);
+    }
+    meal = over && typeof over.meal === 'boolean' ? over.meal : !!(show.deal && show.deal.meal);
+    for (i = 0; i < led.length; i++) if (led[i].showId === show.id && led[i].cat === 'FOOD' && led[i].amount < 0) spent = true;
+    if (meal && !spent && C.JOBS.FOOD) add('FOOD', (C.JOBS.FOOD.cost[0] + C.JOBS.FOOD.cost[1]) / 2 * pi);
+    return out;
+  }
+
+  /* breakEven(state, showId, over) -> { even, price, owed, lo, hi, shape, hat, split, guess, nobody, extras }. Reads only; stores nothing.
    * `over` previews choices not saved yet: { price, guarantee, shape, share } (share is the band's part of the door, 0 to 1,
    * or 0 to 100). The money is Night's own settle (Night.figureAt), so there is one copy of the rules.
    *   even   the fewest paying people at which everyone promised is paid and the player's own costs are back
@@ -537,7 +678,7 @@ SB.module('Forecast', function (SB) {
    *   hat    true when the door is a hat passed round: nobody is promised a number
    *   split  on a door deal, at the middle of the guess: { at, offTop, band, you } (at = paying people), else null */
   function breakEven(state, showId, over) {
-    var show = assumeBill(state, showOf(state, showId, 'Forecast.breakEven')), s = {}, k, door, deal, c, hat, price, shape, f, lo, hi, mid, even = null, owed = 0, split = null, at, changed = false;
+    var show = assumeBill(state, showOf(state, showId, 'Forecast.breakEven')), s = {}, k, door, deal, c, hat, price, shape, f, lo, hi, mid, even = null, owed = 0, split = null, at, changed = false, X, stX, gs = null, none = null;
     over = over || {};
     for (k in show) if (Object.prototype.hasOwnProperty.call(show, k)) s[k] = show[k];
     door = s.door = copy(show.door || {}); deal = s.deal = copy(show.deal || {});
@@ -546,6 +687,7 @@ SB.module('Forecast', function (SB) {
       else { if (num(door.price, 0) !== over.price) changed = true; door.price = over.price; }
     }
     if (over.shape && E.DEAL[over.shape]) deal.shape = over.shape;
+    if (over.donation === true && !door.donation) { door.donation = true; door.suggested = num(door.suggested, 0) || num(door.price, 0); }
     if (typeof over.guarantee === 'number') deal.guarantee = Math.max(0, Math.round(over.guarantee));
     if (typeof over.share === 'number') deal.pct = clamp(over.share > 1 ? over.share / 100 : over.share, 0, 1);
     shape = deal.shape || 'DOOR';
@@ -554,9 +696,22 @@ SB.module('Forecast', function (SB) {
     /* the guess moves with the price, so a previewed price is forecast afresh; anything else reads the show's Call */
     c = changed && show.status !== 'PLAYED' && show.status !== 'CANCELLED' ? callOf(state, s) : call(state, showId);
     if (!ready(state, s) || !SB.Night || typeof SB.Night.figureAt !== 'function') {
-      return { even: null, price: price, owed: 0, lo: c.lo, hi: c.hi, shape: shape, hat: hat, split: null };
+      return { even: null, price: price, owed: 0, lo: c.lo, hi: c.hi, shape: shape, hat: hat, split: null, guess: null, nobody: null, extras: [] };
     }
-    function ok(n) { var x = SB.Night.figureAt(state, s, n); return x.gap === 0 && x.net >= 0; }
+    /* what is still to come that the settle cannot see yet (planned costs, usual sound): counted here so the line holds to the real receipt.
+     * With nobody on sound, the usual person is put on the night in a view of the state that has them; nothing real is changed. */
+    X = plannedCosts(state, s, over);
+    stX = state;
+    if (X.sound > 0) {
+      try {
+        stX = Object.create(state); stX.people = Object.assign({}, state.people || {});
+        stX.people.__usualSound = { id: '__usualSound', first: '', rate: X.sound, state: 'ACTIVE', roles: ['SOUND'] };
+        s.crew = copy(s.crew || {}); s.crew.sound = '__usualSound';
+        if (!SB.Night.figureAt(stX, s, 0)) throw new Error('no figure');
+      } catch (e) { stX = state; s.crew = copy(show.crew || {}); X.extra += X.sound; X.sound = 0; }
+    }
+    function fig(n) { return SB.Night.figureAt(stX, s, n); }
+    function ok(n) { var x = fig(n); return x.gap === 0 && x.net - X.extra >= 0; }
     if (price > 0 && !hat) {
       /* more people at the door never leaves the player worse off, so the first door that covers it is found by halving */
       hi = 1;
@@ -569,16 +724,70 @@ SB.module('Forecast', function (SB) {
       }
     }
     at = Math.max(0, Math.round((c.lo + c.hi) / 2) - Math.max(0, Math.round(num(door.comps, 0))));
-    f = SB.Night.figureAt(state, s, even === null ? at : even);
+    f = fig(even === null ? at : even);
     /* on a door deal the band's part is a share of whatever comes in, not a promise: it is not in what is owed */
-    owed = f.offTop + f.locals + f.costs + (shape === 'DOOR' || shape === 'HAT' ? 0 : f.touring);
-    if (shape === 'DOOR' && !hat) {
-      f = SB.Night.figureAt(state, s, at);
-      split = { at: at, offTop: f.offTop, band: f.touring + f.locals, you: f.keep };
+    owed = f.offTop + f.locals + f.costs + X.extra + (shape === 'DOOR' || shape === 'HAT' ? 0 : f.touring);
+    f = fig(at);
+    gs = { at: at, offTop: f.offTop, touring: f.touring, locals: f.locals, band: f.touring, keep: f.keep, you: f.net - X.extra, door: f.door };
+    if (shape === 'DOOR' && !hat) split = { at: at, offTop: f.offTop, band: f.touring + f.locals, you: f.net - X.extra };
+    none = fig(0);
+    return { even: even, price: price, owed: owed, lo: c.lo, hi: c.hi, shape: shape, hat: hat, split: split, guess: gs, nobody: -(none.offTop + none.touring + none.locals + none.costs + X.extra), extras: X.list };
+  }
+
+  /* dealOptions(state, showId, ask, over) -> [{ shape, guarantee, pct, band, you, nobody, even, asked }]: the deals worth putting to the touring band.
+   * The band is never asked to take less than they asked: a deal is listed only when it pays them at least what their own ask pays at the middle of
+   * the guess (fix list 1.4, design call D2). The first is always the ask itself. `ask` is { shape, guarantee, pct }; `over` as breakEven's (price, meal). */
+  function dealOptions(state, showId, ask, over) {
+    var out = [], base, floor, shape, pct, tries, g, b, i, pool, need, hatPool, hb;
+    over = over || {};
+    ask = ask || {};
+    function one(shp, guarantee, share, asked, donation) {
+      var o = {}, k, r;
+      for (k in over) if (Object.prototype.hasOwnProperty.call(over, k)) o[k] = over[k];
+      o.shape = shp; o.guarantee = guarantee; o.share = share;
+      if (donation) o.donation = true;
+      r = breakEven(state, showId, o);
+      if (!r || !r.guess) return null;
+      return { shape: shp, guarantee: guarantee, pct: share, band: r.guess.band, you: r.guess.you, nobody: r.nobody, even: r.even, at: r.guess.at, asked: !!asked, hat: r.hat,
+               lo: r.lo, hi: r.hi, door: r.guess.door, offTop: r.guess.offTop };
     }
-    return { even: even, price: price, owed: owed, lo: c.lo, hi: c.hi, shape: shape, hat: hat, split: split };
+    function ceil5(x) { return Math.max(5, Math.ceil(x / 5) * 5); }
+    /* the smallest share, in fives of a percent, that pays `floor` out of `pool`; over 100 percent means it cannot */
+    function pctFor(pool) { return pool > 0 ? Math.ceil(floor / pool * 20 - 1e-9) / 20 : 2; }
+    shape = ask.shape || 'DOOR'; pct = typeof ask.pct === 'number' ? ask.pct : 1;
+    base = one(shape, Math.round(num(ask.guarantee, 0)), pct, true);
+    if (!base) return out;
+    out.push(base);
+    floor = base.band;
+    pool = Math.max(0, base.door - base.offTop);
+    need = pctFor(pool);
+    if (shape !== 'DOOR' && need <= 1 && floor > 0) { b = one('DOOR', 0, Math.max(0.05, need), false); if (b && b.band >= floor) out.push(b); }
+    if (shape !== 'GUARANTEE' && floor > 0) out.push(one('GUARANTEE', ceil5(floor), 0, false));
+    if (shape !== 'GUARANTEE_PLUS' && floor > 0) {
+      /* the smallest guarantee, in fives, whose plus-share still pays them what they asked */
+      for (g = ceil5(floor), i = 0; g >= 5 && i < 12; g -= 5, i++) { b = one('GUARANTEE_PLUS', g, 0); if (!b || b.band < floor) break; tries = g; }
+      if (tries) out.push(one('GUARANTEE_PLUS', tries, 0, false));
+    }
+    if (shape !== 'VERSUS' && floor > 0 && need <= 1) { b = one('VERSUS', ceil5(floor * 0.8), Math.max(0.05, need), false); if (b && b.band >= floor) out.push(b); }
+    if (shape !== 'HAT' && floor > 0) {
+      /* asking at the door for a few extra: only when what people give at the door would still pay them what they asked */
+      hb = one('HAT', 0, 1, false, true);
+      if (hb) {
+        hatPool = Math.max(0, hb.door - hb.offTop);
+        if (pctFor(hatPool) <= 1) { b = one('HAT', 0, Math.max(0.05, pctFor(hatPool)), false, true); if (b && b.band >= floor) out.push(b); }
+      }
+    }
+    return out.filter(Boolean);
+  }
+
+  /* the floor a guarantee can be lowered to without paying the band less than their ask at the guess, in dollars (fives) */
+  function guaranteeFloor(state, showId, ask, shape, over) {
+    var opts = dealOptions(state, showId, ask, over), i;
+    for (i = 0; i < opts.length; i++) if (opts[i].shape === shape) return opts[i].guarantee;
+    return null;
   }
 
   return { lens: lens, usual: usual, par: par, call: call, ablate: ablate, card: card, what: what, reachStrip: reachStrip, jobLoss: jobLoss,
-           reference: reference, parOf: parOf, callOf: callOf, breakEven: breakEven };
+           reference: reference, parOf: parOf, callOf: callOf, breakEven: breakEven, dealOptions: dealOptions, guaranteeFloor: guaranteeFloor, plannedCosts: plannedCosts,
+           promoEffects: promoEffects, flyerEfforts: flyerEfforts, nobodyCall: nobodyCall };
 });

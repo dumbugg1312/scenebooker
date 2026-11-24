@@ -431,7 +431,44 @@ SB.module('Rooms', function (SB) {
                kind: i.kind, fading: w - i.week >= C.STANDING.cleanWeeks };
     });
     v.canHold = holdGate(state, room, null);
+    /* the card says plainly what stands in the way; the owner's own words come only after you ask (fix list 2.17) */
+    if (v.canHold && v.canHold.ok === false && v.canHold.code === 'RELATIONSHIP') v.canHold = U.no('RELATIONSHIP', '');
+    v.facts = facts(state, roomId);
+    v.howIn = howIn(state, room);
     return v;
+  }
+
+  /* What kind of night the room allows, as plain facts: how many fit, when the music stops, who runs it, where to park,
+   * what the neighbors are like, whether there is a PA, who can come in. Only what the room's own record or its city
+   * pack says: a house carries the plain facts a house has (fictional), a named venue carries nothing the pack does not. */
+  function facts(state, roomId) {
+    var room = getRoom(state, roomId, 'Rooms.facts'), pk = null, i, rs, r = rel(state, roomId), house = room.kind === 'HOUSE' || room.kind === 'OUTDOOR';
+    try { rs = SB.Cities.pack(state).rooms || []; for (i = 0; i < rs.length; i++) if (rs[i].id === room.packId) pk = rs[i]; } catch (e) { pk = null; }
+    return {
+      cap: room.cap, curfew: typeof room.curfew === 'number' ? room.curfew : null,
+      host: personName(state, room.ownerId), hostStage: r.stage, hostKind: ownerKind(state, room),
+      parking: (pk && pk.parking) || (room.kind === 'HOUSE' ? 'street' : null),
+      neighbor: (pk && pk.neighbor) || (room.kind === 'HOUSE' ? 'close' : null),
+      pa: room.soundFee > 0 ? 'HOUSE_SOUND' : (room.pa >= 0.6 ? 'REAL' : (room.pa >= 0.4 ? 'SMALL' : 'NONE')),
+      soundFee: room.soundFee || 0, ages: (room.ages || ['ALL']).slice(), outdoor: !!room.outdoor, house: house,
+      drinks: room.kind === 'BAR' || room.kind === 'CLUB' || room.kind === 'HALL' && (room.ages || []).indexOf('A21') >= 0
+    };
+  }
+
+  /* what stands between the player and a night here: the steps, each with whether it is done (fix list 4.2) */
+  function howIn(state, room) {
+    var r = typeof room.ownerRel === 'number' ? room.ownerRel : C.OWNER.start, out = [], need;
+    if (!room.open) return { ok: false, closed: true, steps: [] };
+    if (r < C.OWNER.stranger) out.push({ k: 'KNOW', met: false });
+    if ((room.kind === 'BAR' || room.kind === 'CLUB') && r < C.OWNER.weeknights) out.push({ k: 'WEEKNIGHTS', met: false });
+    if ((room.kind === 'BAR' || room.kind === 'CLUB') && r < C.OWNER.weekends) out.push({ k: 'WEEKENDS', met: false });
+    if ((room.kind === 'DIY' || room.kind === 'SHOP' || room.kind === 'OUTDOOR') && !(room.deposit > 0) && r < C.OWNER.vouched) out.push({ k: 'VOUCH', met: false });
+    try { need = confirmNeeds(state, room, null); } catch (e) { need = []; }
+    need.forEach(function (n) {
+      if (n.k === 'HOST_TRUSTS_YOU' || n.k === 'ASK_NICELY' || out.some(function (x) { return x.k === n.k; })) return;
+      out.push({ k: n.k, met: !!n.met, text: n.text });
+    });
+    return { ok: out.every(function (x) { return x.met; }), steps: out };
   }
 
   function calendar(state, roomId, fromDay, n) {
@@ -1259,7 +1296,7 @@ SB.module('Rooms', function (SB) {
   }
 
   return {
-    get: get, list: list, card: card, calendar: calendar, terms: terms, answerAsk: answerAsk, confirm: confirm, firmUp: firmUp,
+    get: get, list: list, card: card, calendar: calendar, facts: facts, howIn: function (state, roomId) { return howIn(state, getRoom(state, roomId, 'Rooms.howIn')); }, terms: terms, answerAsk: answerAsk, confirm: confirm, firmUp: firmUp,
     release: release, challenge: challenge, rel: rel, adjustRel: adjustRel, otherShows: otherShows, bookers: bookers,
     bookerRel: bookerRel, adjustBookerRel: adjustBookerRel, afterShow: afterShow, daily: daily, weekly: weekly,
     /* internal outside the manifest: security and event insurance (Shows, Money, Night read them) */

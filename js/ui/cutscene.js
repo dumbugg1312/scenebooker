@@ -128,10 +128,12 @@ SB.module('Cutscene', function (SB) {
     var sr = el('span', 'cs-sr', box, (name ? name + ': ' : '') + say);
     void sr;
     if (name) el('span', 'cs-who', box, name);
-    var size = small ? 13 : 17, L = lettering(say, size, who === 'crowd' ? 14 : (small ? 24 : 20), seed), pad = small ? 11 : 15;
-    var W = Math.ceil(L.w + pad * 2), H = Math.ceil(L.h + pad * 2), burst = who === 'crowd';
+    /* the words are what tells the player what to do (user 2026-11-23: "small and in awkward places"): lettered big */
+    var size = small ? 18 : 24, L = lettering(say, size, who === 'crowd' ? 16 : (small ? 26 : 36), seed), pad = small ? 13 : 18;
+    /* wider than tall, so the squared-off corners clear the first and last letters of a line */
+    var padX = pad + Math.round(size * 0.5), W = Math.ceil(L.w + padX * 2), H = Math.ceil(L.h + pad * 2), burst = who === 'crowd';
     var tailDir = side === 'right' ? 1 : -1;
-    var tailH = small ? 16 : H * 0.55 + 14;
+    var tailH = small ? 16 : Math.min(H * 0.3 + 12, 40);
     var bx = burst ? W * 0.2 : 4, by = burst ? H * 0.25 : 4, VW = W + bx * 2, VH = H + by * 2 + (burst ? 0 : tailH);
     var svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', '0 0 ' + VW.toFixed(0) + ' ' + VH.toFixed(0));
@@ -142,14 +144,17 @@ SB.module('Cutscene', function (SB) {
     shape.setAttribute('d', outline(W, H, burst ? 'burst' : 'balloon', seed, burst ? 0 : tailDir, tailH));
     shape.setAttribute('class', 'cs-balloon-shape');
     g.appendChild(shape);
-    L.svg.setAttribute('x', pad); L.svg.setAttribute('y', pad);
+    L.svg.setAttribute('x', padX); L.svg.setAttribute('y', pad);
     L.svg.setAttribute('width', Math.ceil(L.w) + 2); L.svg.setAttribute('height', Math.ceil(L.h) + 6);
     L.svg.setAttribute('overflow', 'visible');
     g.appendChild(L.svg);
     svg.appendChild(g);
     box.appendChild(svg);
+    box._h = VH + (name ? 28 : 0);   /* its height in --p, for fitting a panel's picture under it */
     return box;
   }
+  /* which side a line sits on: your own lines on the right, everyone else's on the left, so they read top to bottom */
+  function sideOf(ln) { return ln && ln.who === 'you' ? 'right' : 'left'; }
 
   /* Typed captions name bands the way a caption would: a band that writes its name all in small letters gets capitals
    * here ("Field Trip Rider Canceled opened."), so the sentence can be read. Speech and tags keep the band's own way. */
@@ -281,10 +286,11 @@ SB.module('Cutscene', function (SB) {
 
   function play(cutscene, slots, onDone, opts) {
     if (current) current.close(true);
+    try { if (SB.UI && SB.UI.flush) SB.UI.flush(); } catch (e) { /* a cutscene still plays */ }   // save before it, so a closed tab comes back here (0.1)
     cutscene = cutscene || {}; slots = slots || {}; opts = opts || {};
     /* a frame with an `ask` waits for the player's reply when opts.ask is on (the setup questions on the way in);
        otherwise the reply picked before (opts.answers[ask.id]) is shown as a plain line */
-    var asking = !!opts.ask, answers = {}, prior = opts.answers || null, waiting = null;
+    var asking = !!opts.ask, answers = {}, prior = opts.answers || null, waiting = null, advancing = false;
     var frames = (cutscene.frames || []).filter(Boolean), kind = String(cutscene.kind || 'PANELS').toUpperCase();
     if (kind !== 'SCENE' && kind !== 'DROP') kind = 'PANELS';
     var counts = {}, ctxs = frames.map(function (f) { return artCtx(f, slots, counts); });
@@ -309,6 +315,8 @@ SB.module('Cutscene', function (SB) {
       if (!still) mv(tt, 'slap', 300);
       tt.appendChild(tl.svg);
     }
+    /* skip is pressable on every beat; on a cutscene already seen it is first in tab order (fix list 2.20) */
+    var skipBtn = opts.seen ? el('button', 'cs-btn cs-skip pz-hl', box, 'skip') : null;
     var bar = el('div', 'cs-bar', box);
     var strip = el('span', 'cs-strip pz-paper', bar);
     var count = el('span', 'cs-count', strip);
@@ -316,8 +324,8 @@ SB.module('Cutscene', function (SB) {
     void hint;
     var nextBtn = el('button', 'cs-btn cs-next pz-hl', bar, 'next');
     nextBtn.type = 'button';
-    var skipBtn = el('button', 'cs-btn cs-skip pz-hl', box, 'skip');
-    skipBtn.type = 'button'; skipBtn.setAttribute('aria-label', asking ? 'Skip to the next question' : 'Skip this cutscene');
+    if (!skipBtn) skipBtn = el('button', 'cs-btn cs-skip pz-hl', box, 'skip');
+    skipBtn.type = 'button'; skipBtn.setAttribute('aria-label', asking ? 'Skip this question and take the usual answer' : 'Skip this cutscene');
     /* opts.back: { label, on }: a way out before the questions are answered (the way in goes back to the map) */
     var backBtn = opts.back ? el('button', 'cs-btn cs-back pz-hl', box, opts.back.label || 'back') : null;
     if (backBtn) backBtn.type = 'button';
@@ -334,12 +342,13 @@ SB.module('Cutscene', function (SB) {
       var t = base || 0;
       if (f.caption) { var cp = caption(capFill(f.caption, slots)); if (!still) mv(cp, 'slap', t); into.appendChild(cp); t += 500; }
       (f.lines || []).forEach(function (ln, i) {
-        var sp = speech(ln, slots, x, key + ':' + idx + ':' + i, i % 2 ? 'right' : 'left');
-        sp.classList.add(i % 2 ? 'cs-right' : 'cs-left');
+        var side = sideOf(ln), sp = speech(ln, slots, x, key + ':' + idx + ':' + i, side);
+        sp.classList.add('cs-' + side);
         if (!still) mv(sp, 'slap', t); t += 700;
         into.appendChild(sp);
       });
-      if (f.ask) t = reply(f, x, into, t);
+      /* the replies are pressable at once, while the words are still going up (fix list 1.18) */
+      if (f.ask) t = reply(f, x, into, asking ? 0 : t);
     }
 
     /* A frame that asks the player something: the replies are "you" balloons to press, each with a typed note of what
@@ -360,9 +369,13 @@ SB.module('Cutscene', function (SB) {
         into.appendChild(sp);
         return t + 700;
       }
-      waiting = idx; nextBtn.disabled = true; skipBtn.disabled = true; skipBtn.title = 'Answer first'; hint.textContent = 'answer';
+      waiting = idx; nextBtn.hidden = true; hint.textContent = 'pick an answer';
+      skipBtn.disabled = false;
+      if (a.options && a.options.length) skipBtn.title = 'Take the usual answer'; else skipBtn.title = 'Type a name first';
       wrap = el('div', 'cs-ask' + (a.kind ? ' cs-ask-' + a.kind : ''), into);
-      wrap.setAttribute('role', 'group'); wrap.setAttribute('aria-label', 'Your answer');
+      wrap.setAttribute('role', 'group'); wrap.setAttribute('aria-label', a.q ? fill(a.q, slots) : 'Your answer');
+      /* the question as a plain sentence above the answers (fix list 1.18) */
+      if (a.q) el('p', 'cs-q', wrap, fill(a.q, slots));
       if (!still) mv(wrap, 'slap', t);
       widget = a.kind && opts.widgets ? opts.widgets[a.kind] : null;
       if (widget) {
@@ -376,13 +389,14 @@ SB.module('Cutscene', function (SB) {
         b.type = 'button';
         var lvl = o.level ? String(o.level).toLowerCase() : '', nEl;
         b.setAttribute('aria-label', say + (lvl ? ', ' + lvl : '') + (note ? ' (' + note + ')' : ''));
-        b.appendChild(speech({ who: 'you', say: o.say }, slots, x, key + ':' + idx + ':o' + i, 'right', true));
         if (note || lvl) {
+          /* the effect first, in words, then the voice line under it */
           nEl = el('span', 'cs-note', b, '');
           /* the difficulty stamped first on the strip: EASY / NORMAL / HARD */
           if (lvl) el('b', 'cs-level cs-level-' + lvl, nEl, lvl);
           if (note) nEl.appendChild(document.createTextNode(note));
         }
+        b.appendChild(speech({ who: 'you', say: o.say }, slots, x, key + ':' + idx + ':o' + i, 'right', true));
         if (!still) mv(b, 'slap', t + 150 + i * 160);
         b.addEventListener('click', function (e) { e.stopPropagation(); answer(a, o.v, b); });
       });
@@ -395,19 +409,30 @@ SB.module('Cutscene', function (SB) {
       if (done || waiting === null) return;
       answers[a.id] = v;
       if (typeof opts.onAnswer === 'function') try { opts.onAnswer(a.id, v, slots); } catch (e) { /* the answer is kept anyway */ }
-      waiting = null; nextBtn.disabled = false; skipBtn.disabled = false; skipBtn.removeAttribute('title'); hint.textContent = 'click or space';
+      waiting = null; advancing = true; nextBtn.hidden = false; skipBtn.disabled = false; skipBtn.removeAttribute('title'); hint.textContent = 'click or space';
       if (btn && btn.parentNode) {
         Array.prototype.forEach.call(btn.parentNode.children, function (c) { c.disabled = true; if (c !== btn) c.classList.add('is-dropped'); });
         btn.classList.add('is-picked');
       }
       var at = idx;
-      setTimeout(function () { if (!done && idx === at) go(idx + 1); }, still ? 0 : 520);
+      setTimeout(function () { advancing = false; if (!done && idx === at) go(idx + 1); }, still ? 0 : 520);
+    }
+    /* the answer a skipped question takes: the one marked def, else NORMAL, else the first */
+    function usual(a) {
+      var o = a.options || [], i;
+      for (i = 0; i < o.length; i++) if (o[i].def) return o[i];
+      for (i = 0; i < o.length; i++) if (String(o[i].level || '').toUpperCase() === 'NORMAL') return o[i];
+      return o[0] || null;
     }
     /* skip: with questions to answer, on to the next one (never past it); otherwise the end */
     function skip() {
       var j;
       if (!asking) { finish(true); return; }
-      if (waiting !== null) { var b = box.querySelector('.cs-ask button, .cs-ask input'); if (b) try { b.focus(); } catch (e) { /* fine */ } return; }
+      if (waiting !== null) {
+        var fa = frames[waiting] && frames[waiting].ask, u = fa && fa.options ? usual(fa) : null;
+        if (u) { var pb = box.querySelectorAll('.cs-reply'), k2 = (fa.options || []).indexOf(u); answer(fa, u.v, pb[k2] || null); return; }
+        var b = box.querySelector('.cs-ask button, .cs-ask input'); if (b) try { b.focus(); } catch (e) { /* fine */ } return;
+      }
       for (j = idx + 1; j < frames.length; j++) if (frames[j].ask) { go(j); return; }
       finish(true);
     }
@@ -443,18 +468,26 @@ SB.module('Cutscene', function (SB) {
       fig.style.setProperty('--from', (r.chance(0.5) ? 1 : -1) * r.range(8, 14).toFixed(1) + 'deg');
       var says = el('div', 'cs-says', fig);
       var pic = el('div', 'cs-pic pz-paper', fig);
-      if (f.caption) fig.appendChild(caption(capFill(f.caption, slots), 'cs-cap-panel'));
-      var cssW = Math.min((1280 - 120) / perSpread - 40, 760);
-      cssW = Math.min(cssW, (800 - 230 - 20) / 0.75);
+      var capText = f.caption ? capFill(f.caption, slots) : '';
+      if (capText) fig.appendChild(caption(capText, 'cs-cap-panel'));
+      var saysH = 0;
+      (f.lines || []).forEach(function (ln, i) {
+        var side = sideOf(ln), sp = speech(ln, slots, x, key + ':' + idx + ':' + i, side, true);
+        sp.classList.add('cs-' + side);
+        if (!still) mv(sp, 'slap', 450 + i * 600);
+        says.appendChild(sp); saysH += (sp._h || 0) + 2;
+      });
+      /* the picture takes what the words leave: the spread is 636 tall (kept 36 spare), the balloons hang 30 over the picture's top,
+         and the caption (19 type, about 10.5 a letter) wraps to the picture's width */
+      var cssW = Math.min((1280 - 120) / perSpread - 40, 760), capH, room;
+      for (var pass = 0; pass < 2; pass++) {
+        capH = capText ? Math.ceil(capText.length * 10.5 / Math.max(cssW, 200)) * 28.5 + 22 : 0;
+        room = 600 - 20 - Math.max(0, saysH - 30) - capH;
+        cssW = Math.max(200, Math.min(cssW, room / 0.75));
+      }
       var px = {}, k; for (k in x) px[k] = x[k];
       px.paper = ['canary', 'pink', 'blue', 'green', 'salmon', 'lilac'][(idx + (key.length || 0)) % 6]; /* a photocopy on coloured copy paper, the same pass as the night scene */
       pic.appendChild(picture(f, px, cssW, cssW * 0.75, 'cs-art', true));
-      (f.lines || []).forEach(function (ln, i) {
-        var sp = speech(ln, slots, x, key + ':' + idx + ':' + i, i % 2 ? 'right' : 'left', true);
-        sp.classList.add(i % 2 ? 'cs-right' : 'cs-left');
-        if (!still) mv(sp, 'slap', 450 + i * 600);
-        says.appendChild(sp);
-      });
     }
 
     function showDrop(f, x) {
@@ -466,7 +499,7 @@ SB.module('Cutscene', function (SB) {
       o.style.setProperty('--dy', P(r.range(-32, 32)));
       var lines = f.lines || [], txt = lines.map(function (l) { return fill(l.say, slots); });
       if (obj === 'note') {
-        var L = lettering(txt.join(' ') || capFill(f.caption, slots), 20, 22, 'note:' + key + idx);
+        var L = lettering(txt.join(' ') || capFill(f.caption, slots), 24, 24, 'note:' + key + idx);
         L.svg.setAttribute('viewBox', '0 -2 ' + Math.ceil(L.w + 4) + ' ' + Math.ceil(L.h + 8)); sized(L.svg, Math.ceil(L.w + 4), Math.ceil(L.h + 8));
         L.svg.setAttribute('aria-hidden', 'true'); o.appendChild(L.svg);
       } else if (obj === 'text') {
@@ -476,7 +509,7 @@ SB.module('Cutscene', function (SB) {
         var dims = obj === 'polaroid' ? [300, 300] : obj === 'flyer' ? [300, 388] : obj === 'tape' ? [150, 150] : [420, 280];
         o.appendChild(picture(f, x, dims[0], dims[1], 'cs-art', true));
         if (obj !== 'flyer' && txt.length) {
-          var M = lettering(txt.join(' '), obj === 'polaroid' ? 16 : 15, obj === 'polaroid' ? 24 : 30, 'drop:' + key + idx);
+          var M = lettering(txt.join(' '), obj === 'polaroid' ? 17 : 19, obj === 'polaroid' ? 24 : 28, 'drop:' + key + idx);
           M.svg.setAttribute('viewBox', '0 -2 ' + Math.ceil(M.w + 4) + ' ' + Math.ceil(M.h + 8)); sized(M.svg, Math.ceil(M.w + 4), Math.ceil(M.h + 8));
           M.svg.setAttribute('aria-hidden', 'true');
           var wr = el('div', 'cs-scrawl', o); wr.appendChild(M.svg);
@@ -499,19 +532,19 @@ SB.module('Cutscene', function (SB) {
       nextBtn.textContent = i + 1 >= frames.length ? 'done' : 'next';
       announce(f);
     }
-    function next() { if (started && waiting === null) go(idx + 1); }
+    function next() { if (started && waiting === null && !advancing) go(idx + 1); }
     function onKey(e) {
       if (done) return;
       var k = e.key;
       if (k === 'Escape') { e.preventDefault(); skip(); return; }
       if (k === 'Tab') { /* keep focus inside: the buttons, and a question's replies or field */
-        var f = Array.prototype.filter.call(box.querySelectorAll('button, input'), function (b) { return !b.disabled; }), at = f.indexOf(document.activeElement);
+        var f = Array.prototype.filter.call(box.querySelectorAll('button, input'), function (b) { return !b.disabled && b.getClientRects().length > 0; }), at = f.indexOf(document.activeElement);
         e.preventDefault(); if (f.length) f[(at + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
         return;
       }
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;   // typing a name
       if (e.target && e.target.tagName === 'BUTTON' && (k === ' ' || k === 'Enter')) return;
-      if (k === ' ' || k === 'Enter' || k === 'ArrowRight' || k === 'PageDown') { e.preventDefault(); next(); }
+      if (k === ' ' || k === 'Space' || k === 'Spacebar' || k === 'Enter' || k === 'ArrowRight' || k === 'PageDown') { e.preventDefault(); next(); }
     }
     function onClick(e) {
       if (e.target.closest('.cs-btn') || e.target.closest('.cs-ask')) return;
@@ -539,7 +572,16 @@ SB.module('Cutscene', function (SB) {
       if (root.parentNode) root.parentNode.removeChild(root);
       inerted.forEach(function (c) { try { c.inert = false; } catch (e) { /* gone */ } });
       if (current && current.root === root) current = null;
-      if (lastFocus && lastFocus.focus) try { lastFocus.focus(); } catch (e) { /* gone */ }
+      if (lastFocus && lastFocus.focus && lastFocus.isConnected !== false) try { lastFocus.focus(); } catch (e) { /* gone */ }
+      /* the control it came from is gone (a new screen was built under the scene): put the keyboard on the first thing
+         that can be pressed, not on the page (fix list 0.9) */
+      setTimeout(function () {
+        var a = document.activeElement, t;
+        if (a && a !== document.body && a.isConnected !== false) return;
+        if (document.querySelector('[role="dialog"]:not([hidden])')) return;
+        t = document.querySelector('.sy-strip-open, main .kt-btn, main button, main input, .dk-hits:not([inert]) .dk-hit');
+        if (t) try { t.focus({ preventScroll: true }); } catch (e) { /* fine */ }
+      }, 120);
       if (SB.CutsceneAudio) SB.CutsceneAudio.end(!!silent || wasSkipped);
     }
 

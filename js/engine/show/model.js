@@ -788,7 +788,7 @@ SB.module('Model', function (SB) {
     }
     cap = Math.max(1, num(lens.get('roomcap:' + room.id), num(room.cap, 1)) * Math.max(0, num(mods.capMul, 1)));
     through = mods.uncapped ? total : Math.min(total, C.OVERSELL * cap);
-    turned = Math.max(0, total - through);
+    turned = Math.max(0, total - through) * C.TURNED_SHARE;
     a = total > 0 ? through / total : 0;
     for (g = 0; g < 3; g++) { scale[g] *= a; byGenX[g] = num(d.byGen && d.byGen[g], 0) * scale[g]; }
 

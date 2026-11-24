@@ -265,6 +265,11 @@ SB.module('Effects', function (SB) {
       if (!o.room && room) o.room = room.name;
       if (!o.owner && room && room.ownerId) o.owner = nameOf(state, room.ownerId);
       ['sound', 'security', 'floor'].forEach(function (c) { if (!o[c] && show.crew && show.crew[c]) o[c] = nameOf(state, show.crew[c]); });
+      /* what the crew on this show charges, so a choice that swaps them can say the price (fix list 1.22) */
+      ['sound', 'security'].forEach(function (c) {
+        var pr = show.crew && show.crew[c] && show.crew[c] !== 'player' && state.people ? state.people[show.crew[c]] : null;
+        if (pr && typeof pr.rate === 'number') o[c + 'Rate'] = pr.rate;
+      });
       o.date = SB.time.date(show.day).d;
       o.dow = SB.time.fmt(show.day, 'dow');
       o.dateLong = SB.time.fmt(show.day, 'long');
@@ -366,7 +371,7 @@ SB.module('Effects', function (SB) {
              lodging: false, meal: false, members: band && band.members ? band.members.length || 4 : 4 },
       statedDraw: null, referrerId: spec.referrerId || null, localAsk: spec.localAsk || null, status: E.REQ.NEW,
       offers: [], followups: 0, messageId: null, showId: null, vetted: {}, signals: [],
-      shortNotice: dates[0] - day < C.JOBS.ANNOUNCE.ideal, hid: { raced: false, gone: null, wants: shape }
+      shortNotice: dates[0] - day < (C.SHORT_NOTICE_DAYS || C.JOBS.ANNOUNCE.ideal), hid: { raced: false, gone: null, wants: shape }
     };
     state.requests[id] = req;
     tpl = 'requests.templates.' + req.template;
@@ -567,8 +572,17 @@ SB.module('Effects', function (SB) {
           break;
         case 'DROP_BAND':
           bandsOf(state, refIds(state, ctx, eff.who)).forEach(function (b) {
-            res = SB.Shows.dropBand(state, needShow(show, 'DROP_BAND').id, b, E.CANCEL.BAND);
+            var dshow = needShow(show, 'DROP_BAND'), was = dshow.bill && dshow.bill.slots ? dshow.bill.slots.filter(function (sl) { return sl.bandId === b; })[0] : null, hadSlot = !!was;
+            res = SB.Shows.dropBand(state, dshow.id, b, E.CANCEL.BAND);
             if (res && res.records) out = out.concat(res.records);
+            /* a band that leaves the bill leaves a note on it, so the bill can say who went and why, and a band that is still willing can be put back */
+            if (res && res.ok !== false && hadSlot && dshow.bill) {
+              if (!Array.isArray(dshow.bill.dropped)) dshow.bill.dropped = [];
+              var dow = '';
+              try { dow = SB.time.fmt(dshow.day, 'dow'); } catch (e0) { dow = ''; }
+              dshow.bill.dropped.push({ bandId: b, why: String(eff.why || 'they couldn\'t make it').replace(/\{dow\}/g, dow), willing: !!eff.willing, day: dshow.day,
+                                        role: was.role, pay: was.pay, fee: was.fee, want: was.want || null });   // the terms, so a put-back keeps the promise
+            }
           });
           break;
         case 'ADD_BAND':
@@ -751,6 +765,8 @@ SB.module('Effects', function (SB) {
       pid = SB.WorldGen.person(state, { roles: [R === 'LODGING' ? 'LODGING' : R], gen: 1, zoneId: 'city' });
       p = state.people && state.people[pid];
       if (p) {
+        /* a friend filling in for the usual person asks what they asked (rate: 'SAME'), so the choice can say the price */
+        if (eff.rate === 'SAME' && show.crew && show.crew[role] && state.people && state.people[show.crew[role]] && typeof state.people[show.crew[role]].rate === 'number') p.rate = state.people[show.crew[role]].rate;
         p.hid = p.hid || {};
         p.hid.skill = p.hid.skill || {};
         if (typeof eff.skill === 'number') p.hid.skill[R] = eff.skill;
@@ -761,7 +777,7 @@ SB.module('Effects', function (SB) {
       b = slotBands(show).length ? state.bands[slotBands(show)[slotBands(show).length - 1].bandId] : null;
       pid = b ? (b.contactId || (b.members && b.members[0] && b.members[0].personId) || null) : null;
       p = pid && state.people ? state.people[pid] : null;
-      if (p) { p.hid = p.hid || {}; p.hid.skill = p.hid.skill || {}; if (typeof eff.skill === 'number' || p.hid.skill[R] === undefined) p.hid.skill[R] = typeof eff.skill === 'number' ? eff.skill : .35; }
+      if (p) { p.hid = p.hid || {}; p.hid.skill = p.hid.skill || {}; if (typeof eff.skill === 'number' || p.hid.skill[R] === undefined) p.hid.skill[R] = typeof eff.skill === 'number' ? eff.skill : .35; p.rate = 0; }   // the band runs it off their own PA: nobody is paid
     } else if (to === 'PLAYER') pid = 'player';
     else if (to) pid = refIds(state, ctx, to)[0] || null;
     /* the event hands you this person (a stand-in, the closer's PA): they are on the show without an ask of their own.

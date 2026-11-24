@@ -100,6 +100,11 @@
 .cc-close .cc-learned .cc-thing:nth-child(3n+1) { transform: rotate(-1.3deg); }
 .cc-close .cc-learned .cc-thing:nth-child(3n+2) { transform: rotate(.9deg); }
 .cc-close .cc-learned .cc-thing:nth-child(3n) { transform: rotate(-.4deg); }
+/* the notebook scraps under three headings (fix-list 4.6) */
+.cc-learned.cc-learned { flex-direction: column; flex-wrap: nowrap; }
+.cc-learned-h { margin: 0; font: 400 calc(var(--fs) * 13)/1.2 var(--f-gothic); letter-spacing: .08em; text-transform: uppercase; }
+.cc-learned-g { display: flex; flex-wrap: wrap; gap: calc(var(--p) * 22) calc(var(--p) * 20); }
+.cc-learned-g .cc-thing { flex: 1 1 calc(var(--p) * 190); max-width: calc(var(--p) * 232); }
 
 /* people: strips of masking tape with a name on */
 .cc-close .cc-people { gap: calc(var(--p) * 12) calc(var(--p) * 14); }

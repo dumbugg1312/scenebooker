@@ -12,6 +12,7 @@
  * opened(state, id)     the player opened it
  * covers(state, type)   does the friend do this job type for the player right now (the bill lock: only once it is ready)
  * hides(state, type)    is this (optional) job kept off the player's list for now
+ * shows(state, feature) does a screen draw this extra control yet (SHOWS below; unknown features: true)
  * mentor(state)         the person id who covers
  * billsWaiting(state)   the rent has not started yet (the day job has: it starts on day one)
  * cover(state, day)     the daily pass: the friend does every covered job that is due and doable -> records
@@ -24,14 +25,21 @@ SB.module('Rungs', function (SB) {
   /* shows played -> rung. 0: the first show. 1: what you learned. 2: your own bill. 3: money. 4: your week. 5: the town. */
   var AT = [0, 1, 2, 4, 5, 8];
   /* the rung each desk object comes out at (absent: always out) */
-  var DESK = { notebook: 1, stickers: 2, keys: 2, tin: 3, mug: 4, map: 5, book: 5, flyers: 5, jacket: 5 };
+  var DESK = { notebook: 1, stickers: 2, keys: 2, tin: 0, mug: 4, map: 5, book: 5, flyers: 5, jacket: 5 };
   /* the friend does these until the rung named: then they are the player's. Getting the word out is the player's from
    * the first show (user, 2026-11-21: the night clock should bite from night one): the friend only does the bill lock
    * and the running-the-night chores a first-timer would not know about. */
   var COVER = { LOCK_BILL: 2, HOUSE_RULES: 4, NEIGHBORS: 4, ADVANCE: 4, THANKS: 4 };
   /* optional extras kept off the list until the rung named */
   var HIDE = { LOCAL_AD: 4, HAND_OUT: 4 };
-  var BILLS_AT = 4;
+  /* The rent starts at rung 3 (four shows in), or at the first month end after week 8 whichever comes first: a slow
+   * start does not keep the bank rising forever (fix list L.1: failure was free while the rent waited for rung 4). */
+  var BILLS_AT = 3, BILLS_BY_WEEK = 8;
+  /* the rung each in-screen extra comes out at (fix list 1.1, 2026-11-23). Show one keeps to what that show needs; the
+   * extras arrive from show two (rung 1) on, the bookkeeping later. Absent: always drawn. */
+  var SHOWS = { dealTypes: 1, flyerPickers: 1, promoOptional: 1, bandListAll: 1, vetButtons: 1, crowdSegments: 1,
+                trustChips: 1, security: 1, insurance: 1, houseRulesPick: 1, askSeveral: 1, notebookGrid: 2,
+                stressLine: 3, promisedCosts: 3 };
 
   function on(state) { return !!(state && state.settings && state.settings.ladder); }
   function played(state) { return (state && state.player && state.player.showsPlayed) || 0; }
@@ -72,6 +80,11 @@ SB.module('Rungs', function (SB) {
     return on(state) && HIDE[type] !== undefined && rung(state) < HIDE[type];
   }
 
+  function shows(state, feature) {
+    if (!on(state) || SHOWS[feature] === undefined) return true;
+    return rung(state) >= SHOWS[feature];
+  }
+
   function mentor(state) {
     var d = state && state.director, id = d && d.cast ? d.cast.outgoing : null;
     return id && state.people && state.people[id] ? id : null;
@@ -80,7 +93,8 @@ SB.module('Rungs', function (SB) {
   /* The rent waits for the desk to fill in; the day job does not (user, 2026-11-21: the clock bites from night one, so
    * a guided start works its shifts from day one). A save from before that still has the job put off (dayJobLater). */
   function billsWaiting(state) {
-    return on(state) && !!(state.settings && state.settings.bills) && rung(state) < BILLS_AT;
+    return on(state) && !!(state.settings && state.settings.bills) && rung(state) < BILLS_AT &&
+           !(state.clock && (state.clock.week || 0) >= BILLS_BY_WEEK);
   }
 
   /* The friend does a covered job on the first day it is doable: its window open and what it needs done. */
@@ -120,8 +134,8 @@ SB.module('Rungs', function (SB) {
     return [];
   }
 
-  return { rung: rung, onDesk: onDesk, isNew: isNew, opened: opened, covers: covers, hides: hides, mentor: mentor,
+  return { rung: rung, onDesk: onDesk, isNew: isNew, opened: opened, covers: covers, hides: hides, shows: shows, mentor: mentor,
            billsWaiting: billsWaiting, cover: cover, weekly: weekly,
            /* tables, for tests and the desk */
-           AT: AT, DESK: DESK, COVER: COVER, HIDE: HIDE, BILLS_AT: BILLS_AT };
+           AT: AT, DESK: DESK, COVER: COVER, HIDE: HIDE, SHOWS: SHOWS, BILLS_AT: BILLS_AT, BILLS_BY_WEEK: BILLS_BY_WEEK };
 });

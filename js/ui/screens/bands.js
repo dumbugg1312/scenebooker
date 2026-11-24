@@ -19,8 +19,9 @@
     tabTouring: 'OUT OF TOWN',
     tabTouringL: 'Touring bands you have met',
     search: 'Find a band',
-    pileL: 'Only the {g} pile',
-    allPiles: 'Every pile',
+    pileL: 'Only {g} bands',
+    allPiles: 'Every kind of band',
+    yours: 'This is your band. They play for nothing, a few friends come to see them, and more come the more shows they play.',
     stateActive: 'PLAYING',
     stateOut: 'OUT',
     stateEnded: 'ENDED',
@@ -444,7 +445,10 @@
             h('div', { class: 'rb-markrow' }, dd.art(sticker(c, 180), 180, Math.round(180 * 0.42) + 8)),
             h('p', { class: 'cb-typed', text: ex }),
             h('p', { class: 'cb-typed cb-small', text: [styleName(c), c.genre2 ? genreName(c.genre2) : ''].filter(Boolean).join(' + ').toUpperCase() + (c.trend === 'UP' ? '  ^' : c.trend === 'DOWN' ? '  v' : '') }),
+            c.own ? h('p', { class: 'cb-typed', text: L('yours') }) : null,
             dd.listen ? dd.listen({ band: c, text: L('listen'), stopText: L('listenStop'), label: L('listenL', { name: c.name }), fk: 'hear-' + c.id }) : null,
+            /* what it sounds like in words, beside the play button (fix-list 3.8) */
+            SB.text.has('strings.genreSound.' + c.genre) ? h('p', { class: 'cb-typed cb-small', text: SB.text.label('genreSound.' + c.genre) }) : null,
             c.stage === 'ENDED' || c.out || c.playedOut ? h('div', { class: 'cb-row' }, [
               c.stage === 'ENDED' ? dd.art(dd.stamp(L('ended'), 4, 4, 14, { rot: -5 }), dd.stampW(L('ended'), 14) + 12, 38) : null,
               c.out ? h('p', { class: 'cb-typed cb-small', text: L('outLine') }) : null,

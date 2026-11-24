@@ -52,8 +52,18 @@ SB.module('Chapters', function (SB) {
       sound: person(state, cast.sound), host: person(state, cast.host || (room && room.ownerId)), room: room ? room.name : '',
       curfew: room && typeof room.curfew === 'number' ? SB.time.clock(room.curfew) : ''
     };
+    /* the setup's rent answer says the real numbers (fix-list 1.17 step 3): what you start with and the rent, for this town */
+    (function () {
+      var C = SB.Config, pm = pack && pack.money ? pack.money : {}, bills = pm.bills || (C.CITY && C.CITY.BILLS) || {};
+      var cash = typeof pm.startCash === 'number' ? pm.startCash : (C.CITY && C.CITY.START_CASH);
+      if (typeof cash === 'number') o.startCash = '$' + Math.round(cash).toLocaleString('en-US');
+      if (typeof bills.RENT === 'number') o.rent = '$' + Math.round(bills.RENT).toLocaleString('en-US');
+    })();
     if (typeof more === 'string') return storySlots(state, more, o);
     if (more) for (k in more) if (more[k] !== undefined && more[k] !== null) o[k] = more[k];
+    /* a scene about a played show names who really ran its sound (the first pick can cancel and be replaced) */
+    if (o.showId && state.shows && state.shows[o.showId] && state.shows[o.showId].crew && state.shows[o.showId].crew.sound && state.shows[o.showId].crew.sound !== 'player')
+      o.sound = person(state, state.shows[o.showId].crew.sound) || o.sound;
     return o;
   }
 
@@ -487,7 +497,34 @@ SB.module('Chapters', function (SB) {
       .concat(SB.Moments && SB.Moments.milestones ? SB.Moments.milestones(state) : []);   // the milestones are kept too
   }
 
-  return { check: check, nextCutscene: nextCutscene, markSeen: markSeen, list: list,
+  /* The aim on the week page (4.1, D13): one thing to grow toward, with how far along it is. It follows the real scene: a second
+   * house show, then a night at a real venue (about two rooms run Thursday to Saturday), then a house show every month, then a
+   * touring band at a venue. -> { id, text, have, need } (reads only). Always names one aim. */
+  var HOUSE = { HOUSE: 1, DIY: 1, SHOP: 1, OUTDOOR: 1 };
+  function aim(state) {
+    var shows = state.shows || {}, rooms = state.rooms || {}, ids = Object.keys(shows), played = [], i, sh, kind, months = {}, venueShows = 0, touring = 0,
+        monthNow = SB.time.date(today(state)).m, k, y = SB.time.date(today(state)).y;
+    for (i = 0; i < ids.length; i++) {
+      sh = shows[ids[i]];
+      if (!sh || sh.status !== 'PLAYED') continue;
+      kind = rooms[sh.roomId] ? rooms[sh.roomId].kind : null;
+      played.push(sh);
+      if (kind && !HOUSE[kind]) {
+        venueShows++;
+        if ((sh.bill && sh.bill.slots || []).some(function (s) { return s.role === 'TOURING'; })) touring++;
+      } else { k = SB.time.date(sh.day); months[k.y + '-' + k.m] = 1; }
+    }
+    if (played.length < 2) return { id: 'SECOND_HOUSE', have: played.length, need: 2, text: 'Play a second house show. Shows played: ' + played.length + ' of 2.' };
+    if (venueShows < 1) return { id: 'FIRST_VENUE', have: 0, need: 1, text: 'Book a night at a real venue: get on a room’s calendar. Venue nights played: 0 of 1.' };
+    var run = 0;
+    for (i = 0; i < 3; i++) { k = monthNow - i; var yy = y; while (k < 1) { k += 12; yy--; } if (months[yy + '-' + k]) run++; }
+    if (run < 3) return { id: 'MONTHLY_HOUSE', have: run, need: 3, text: 'Keep a house show going every month: ' + run + ' of the last 3 months had one.' };
+    if (touring < 1) return { id: 'TOURING_VENUE', have: 0, need: 1, text: 'Bring a touring band to a venue night. Touring nights played: 0 of 1.' };
+    return { id: 'KEEP_GOING', have: played.length, need: played.length, text: 'Keep the scene going: ' + played.length + ' shows played so far.' };
+  }
+
+  return { check: check, nextCutscene: nextCutscene, markSeen: markSeen, list: list, aim: aim,
+           /* beyond the manifest */
            /* beyond the manifest */
            blank: blank, ensure: ensure, slots: slots, walk: walk, billOrder: billOrder, drops: drops, IDS: IDS, DROP_IDS: DROP_IDS };
 });

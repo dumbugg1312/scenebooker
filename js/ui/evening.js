@@ -100,11 +100,13 @@
   }
 
   function redraw() {
-    var s = game(), nb;
+    var s = game(), nb, a = document.activeElement, fk = a && a.getAttribute ? a.getAttribute('data-fk') : null, again;
     if (!bodyEl || !s) return;
     nb = body(s);
     if (bodyEl.parentNode) bodyEl.parentNode.replaceChild(nb, bodyEl);
     bodyEl = nb;
+    /* keep the keyboard on the control it was on (fix list 0.9) */
+    if (fk && nb.querySelector) { again = nb.querySelector('[data-fk="' + fk + '"]'); if (again && again.focus) try { again.focus({ preventScroll: true }); } catch (e) { /* fine */ } }
   }
 
   /* pressing does it now: a refusal is toasted by SB.UI.act; what happened is toasted here */
@@ -137,5 +139,11 @@
     ]), { label: L('label'), wide: true, onClose: function () { closeFn = null; bodyEl = null; if (SB.NightClock) SB.NightClock.preview(0, null); } });
   }
 
-  SB.UI.evening = { open: open, redraw: redraw };
+  /* the top n things that can be done now with hours left: for the clock's own buttons on an open night (2.6) */
+  function quick(n) {
+    var s = game(), list = s ? (safe(function () { return SB.Evening.list(s); }, []) || []) : [];
+    return list.filter(function (v) { return v.ok && v.hours > 0 && v.type !== 'BED_EARLY'; }).slice(0, n || 2);
+  }
+
+  SB.UI.evening = { open: open, redraw: redraw, quick: quick, press: press };
 })(SB);

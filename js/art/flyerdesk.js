@@ -19,16 +19,29 @@
   SB.Content.ui.flyerdesk = {
     title: 'Flyer desk',
     closed: 'The desk opens once the room is confirmed.',
-    printed: 'This one is printed. It stays as it is.',
+    printed: 'Printed. The bands get written in by hand as they say yes.',
+    reprint: 'Make a new one and reprint ({cost}, {hrs})',
+    reprintSay: 'Make a new one and reprint: {cost} and {hrs} for the copies',
+    reprinted: 'Reprinted. The old copies are still on the walls.',
+    lockTip: 'Lock the parts you like, then roll the rest.',
+    lockFirst: 'Lock the parts you like, then roll the rest. Last rolls: press an old one to take it back.',
     plain: 'Plain flyers are on in settings, so every flyer is the rush job.',
     rough: 'One hour on it: roll and ink, that is all there is time for.',
     madeBy: '{name} made this one.',
     roll: 'Roll', rollPicture: 'New picture', rollType: 'New letters', rolls: 'Last rolls', knobs: 'Knobs', lock: 'lock',
+    /* 2.7: what the knobs change, said plainly (they are the look; the effort and the timing are the turnout) */
+    looksOnly: 'This changes how the flyer looks. How many people see it comes from the effort you put in and how early it goes up.',
+    prev: 'Previous {what}', next: 'Next {what}', lockAria: 'Lock the {what}', copyN: 'Copy of a copy, {n} of 5', toggle: 'Show {what} on the flyer',
     layout: 'Layout', type: 'Letters', ink: 'Ink', paper: 'Paper', picture: 'Picture', copies: 'Copies', extras: 'Extras', tags: 'Tags',
     setTimes: 'set times', rules: 'house rules', doors: 'doors time',
-    check: 'Check', presenter: 'presents', bands: 'bands ({n}, billing order)', room: 'room', date: 'date', price: 'price', ages: 'ages',
-    fix: 'fix it',
-    use: 'Use this flyer', letItBe: 'Let it be', saved: 'Flyer saved. It goes out when the flyer job gets done.',
+    check: 'Check', presenter: 'presents', bands: 'bands ({n}, headliner biggest)', room: 'room', date: 'date', price: 'price', ages: 'ages',
+    fix: 'fix it', fixL: 'Fix it: {what}',
+    use: 'Use this flyer', useMake: 'and make it tonight, {hrs}', useSay: 'Use this flyer and make it tonight ({hrs})',
+    letItBe: 'Leave it as it is', letItBeSay: 'Leave it as it is: save this flyer and make it later',
+    saved: 'Flyer saved. It goes out when you make it.', made: 'Flyer\'s made.',
+    effortTitle: 'How much work', effortRough: 'Rough, {hrs}: quick and plain, fewer people stop', effortStd: 'Standard, {hrs}: a flyer people read', effortSharp: 'Sharp, {hrs}: people stop and read it',
+    effortWord: { ROUGH: 'Rough', STANDARD: 'Standard', SHARP: 'Sharp' },
+    noTime: 'Saved. It does not fit tonight: {why}',
     blank: 'no flyer yet', asText: 'Read it as text', back: 'Back',
     shuffle: 'shuffle the pile', pileEmpty: 'old rolls land here', copyOf: 'copy of a copy', taped: 'taped',
     gen: ['1st', '2nd', '3rd', '4th', '5th'],
@@ -42,6 +55,14 @@
                lavender: 'lavender', brick: 'brick' },
     paperName: { copyWhite: 'copy white', newsprint: 'newsprint', goldenrod: 'goldenrod', pastelPink: 'pink', pastelBlue: 'blue',
                  pastelGreen: 'green', kraft: 'kraft', cardboard: 'cardboard', blackStock: 'black stock' },
+    /* the picture knob names what is in the picture, in a few words (never the code name) */
+    pictureName: { crowd: 'A crowd: people packed in front of a stage', van: 'The van: a tour van with its doors open',
+                   carport: 'The carport: a house show under a tin roof', palmSky: 'Palm trees against the sky',
+                   bridgeSpan: 'A bridge: steel spans over the water', skateRamp: 'A skate ramp, black and white',
+                   guitarist: 'A guitarist mid-swing', storm: 'A storm coming in over the coast', bayou: 'The bayou: trees and still water',
+                   basement: 'A basement show: low ceiling, bare bulb', rowhouses: 'Row houses on a city block',
+                   grainElevator: 'Grain elevator: a tall farm silo, black and white', mesa: 'A mesa out in the desert',
+                   pines: 'Pines: a stand of tall trees' },
     variant: '{tpl} · {v}'
   };
 
@@ -235,9 +256,9 @@
   /* where things sit on the board: [left, top, turn] */
   var AT = {
     head: [14, 6, -0.6], win: [690, 8, 1], rolls: [16, 46, 0], roll: [22, 246, -2.2], rollPic: [228, 246, 2], rollType: [230, 294, -1.5],
-    layout: [14, 372, -1.2], type: [186, 376, 1.4], sheet: [378, 36, -3.2], note: [14, 574, -1], text: [250, 590, 1.2],
-    paper: [852, 56, -1], ink: [1012, 62, 1.4], picture: [850, 270, 1.2], copies: [1008, 274, -1], extras: [852, 480, -0.8],
-    check: [14, 636, -0.4], actions: [858, 590, 0]
+    layout: [14, 372, -1.2], type: [186, 376, 1.4], sheet: [378, 36, -3.2], note: [14, 548, -1], text: [250, 566, 1.2],
+    paper: [852, 56, -1], ink: [1012, 62, 1.4], picture: [850, 270, 1.2], copies: [1008, 274, -1], extras: [852, 478, -0.8],
+    check: [14, 604, -0.4], actions: [858, 576, 0]
   };
   function at(name, extra) {
     var p = AT[name] || [0, 0, 0], s = { left: pu(p[0]), top: pu(p[1]), '--rot': p[2] + 'deg' }, k;
@@ -246,7 +267,7 @@
   }
 
   function mount(root, params) {
-    var showId = params && params.showId, rec = null, spec = null, rolls = [], offs = [], big = null, readOnly = false, closed = null, note = null;
+    var showId = params && params.showId, rec = null, spec = null, rolls = [], offs = [], big = null, readOnly = false, closed = null, note = null, reprinting = false, printedOn = false, banner = null;
     var h = SB.UI.h, C = SB.UI.C || {}, stage = null, pending = { first: true, flyer: true }, lastRes = 0;
 
     function state() { return SB.UI.game(); }
@@ -260,9 +281,15 @@
       if (SB.UI.prefs && SB.UI.prefs.get && SB.UI.prefs.get('plainFlyers')) { spec.plain = true; note = L('plain'); }
       jobs = SB.Jobs.forShow(s, showId) || [];
       pj = jobs.filter(function (j) { return j.type === 'PRINT'; })[0];
-      readOnly = show.status === 'PLAYED' || show.status === 'CANCELLED' || (show.promo && show.promo.printed != null) || !!(pj && pj.status === 'DONE');
-      if (readOnly) { spec = show.flyer && show.flyer.spec ? show.flyer.spec : spec; note = L('printed'); }
+      printedOn = (show.promo && show.promo.printed != null) || !!(pj && pj.status === 'DONE');
+      readOnly = show.status === 'PLAYED' || show.status === 'CANCELLED' || (printedOn && !reprinting);
+      if (show.status === 'PLAYED' || show.status === 'CANCELLED') { spec = show.flyer && show.flyer.spec ? show.flyer.spec : spec; }
+      /* 3.2: a printed flyer shows as it is now, the bands who have said yes written in; it is not a dead sheet */
+      else if (printedOn && !reprinting) note = L('printed');
       else if (spec.finish === 'ROUGH') note = L('rough');
+      /* 3.7: the first visit says what Lock and Last rolls are for, in the note's own place on the board */
+      if (!note && !(show.flyer && show.flyer.recipe) && !(show.promo && show.promo.flyer)) note = L('lockFirst');
+      if (banner) note = banner;
       if (!rec) rec = show.flyer && show.flyer.recipe ? show.flyer.recipe : SB.Flyer.recipe(spec);
     }
 
@@ -306,20 +333,62 @@
       }
     }
 
+    function pickable() { var s = state(); return !(SB.Rungs && SB.Rungs.shows && s) || SB.Rungs.shows(s, 'flyerPickers'); }
+    function hrsText(n) { return n === 0.5 ? 'half an hour' : (n === 1 ? '1 hr' : n + ' hrs'); }
+    function effortHours(k) { var H = (SB.Config.FLYER && SB.Config.FLYER.HOURS) || {}; return typeof H[k] === 'number' ? H[k] : 2; }
+    function usualEffort() { return (SB.Config.USUAL && SB.Config.USUAL.effort) || 'STANDARD'; }
+
+    /* 1.10: one press saves this flyer and makes it tonight (the job's hours are spent on the spot), then back to the card */
+    function useNow(effort) {
+      var r, mj, r2, can;
+      if (closed || readOnly) return;
+      r = SB.UI.act(function (s) { return SB.Jobs.setFlyer(s, showId, rec, SB.Flyer.learn(s.player ? s.player.houseStyle : {}, rec)); });
+      if (!r || r.ok === false) return;
+      mj = makerJob();
+      if (!mj || (mj.status !== 'TODO' && mj.status !== 'PLANNED') || mj.covered || (mj.planned && mj.planned.by && mj.planned.by !== 'player')) {
+        if (SB.UI.toast) SB.UI.toast(L('saved'), 'info');
+        if (SB.UI.go) SB.UI.go('show', { showId: showId, row: 'flyer' });
+        return;
+      }
+      r2 = SB.UI.act(function (s) { return SB.Week.doNow(s, mj.id, { effort: effort || usualEffort() }); });
+      if (r2 && r2.ok !== false) {
+        if (SB.UI.toast) SB.UI.toast(L('made'), 'info');
+        if (SB.UI.go) SB.UI.go('show', { showId: showId, row: 'promo' });      // made: the card moves on to getting the word out
+        return;
+      }
+      /* saved, but it does not fit tonight (or is refused): stay on the desk and say why on the note */
+      banner = L('noTime', { why: (r2 && r2.why) || '' });
+      load(); draw();
+    }
+
+    /* 3.2 step 2: a printed flyer can be made again and reprinted: the price and hours are on the button */
+    function reprintInfo() {
+      var s = state(), pjv = (SB.Jobs.forShow(s, showId) || []).filter(function (j) { return j.type === 'PRINT'; })[0], ch, cost = 0;
+      if (pjv && pjv.opt && pjv.opt.choices) { ch = pjv.opt.choices.filter(function (c) { return c.key === (pjv.opt.chosen || 'USUAL'); })[0]; cost = ch ? ch.cost : 0; }
+      return { cost: SB.text.money ? SB.text.money(cost) : '$' + cost, hrs: hrsText(pjv ? pjv.hours : 1) };
+    }
+    function reprintNow() {
+      var r = SB.UI.act(function (s) { return SB.Jobs.reprint(s, showId, rec, SB.Flyer.learn(s.player ? s.player.houseStyle : {}, rec)); });
+      if (!r || r.ok === false) return;
+      reprinting = false;
+      if (SB.UI.toast) SB.UI.toast(L('reprinted'), 'info');
+      if (SB.UI.go) SB.UI.go('show', { showId: showId, row: 'flyer' });
+    }
+
     /* one knob as a thing on the table: its typed label, the thing itself, the value on a strip of tape, the two
        arrows either side, and the lock as a tab of masking tape (taped down = it stays when you roll) */
     function knob(label, valueText, aspect, prev, next, extra, art, name) {
       var rough = spec && spec.finish === 'ROUGH' && aspect !== 'ink', off = readOnly || rough, locked = rec.lock && rec.lock.indexOf(aspect) >= 0;
       return h('div', { class: 'sb-fd-knob sb-fd-st sb-fd-st--' + name + (off ? ' is-off' : '') + (locked ? ' is-locked' : ''), style: at(name) }, [
-        h('span', { class: 'sb-fd-knob-label', text: label }),
+        h('span', { class: 'sb-fd-knob-label', text: label, title: L('looksOnly') }),
         art || null,
         h('div', { class: 'sb-fd-st-row' }, [
-          h('button', { type: 'button', class: 'sb-fd-step pz-hl', disabled: off || !prev, aria: { label: label + ' ◂' }, on: { click: prev || function () {} } }, '◂'),
+          h('button', { type: 'button', class: 'sb-fd-step pz-hl', disabled: off || !prev, aria: { label: L('prev', { what: label.toLowerCase() }) }, on: { click: prev || function () {} } }, '◂'),
           h('span', { class: 'sb-fd-knob-value pz-paper' }, [extra || null, h('span', { text: valueText })]),
-          h('button', { type: 'button', class: 'sb-fd-step pz-hl', disabled: off || !next, aria: { label: label + ' ▸' }, on: { click: next || function () {} } }, '▸')
+          h('button', { type: 'button', class: 'sb-fd-step pz-hl', disabled: off || !next, aria: { label: L('next', { what: label.toLowerCase() }) }, on: { click: next || function () {} } }, '▸')
         ]),
-        aspect ? h('label', { class: 'sb-fd-lock' }, [
-          h('input', { type: 'checkbox', checked: locked, disabled: off, on: { change: function () { toggleLock(aspect); } } }),
+        aspect ? h('label', { class: 'sb-fd-lock', title: L('lockTip') }, [
+          h('input', { type: 'checkbox', checked: locked, disabled: off, aria: { label: L('lockAria', { what: label.toLowerCase() }) }, on: { change: function () { toggleLock(aspect); } } }),
           h('span', { text: L('lock') }),
           h('b', { class: 'sb-fd-lock-on', aria: { hidden: 'true' }, text: L('taped') })
         ]) : null
@@ -359,7 +428,7 @@
         pile.appendChild(pcv);
         paintPile(pcv, got.picture, got.inks, colors.papers[got.paper], seed);
       });
-      out.push(knob(L('picture'), String(got.picture || ''), 'picture', s[0], s[1], null, pile, 'picture'));
+      out.push(knob(L('picture'), word('pictureName', got.picture), 'picture', s[0], s[1], null, pile, 'picture'));
       var offG = readOnly || spec.finish === 'ROUGH';
       out.push(h('div', { class: 'sb-fd-knob sb-fd-st sb-fd-st--copies' + (offG ? ' is-off' : ''), style: at('copies') }, [
         h('span', { class: 'sb-fd-knob-label', text: L('copies') }),
@@ -368,14 +437,14 @@
           var a = DIAL.a[g - 1] * Math.PI / 180;
           return h('button', { type: 'button', class: 'sb-fd-gen pz-hl' + (got.grit === g ? ' is-on' : ''), disabled: offG,
                                style: { left: pu(DIAL.cx + Math.cos(a) * DIAL.r - 19), top: pu(DIAL.cy + Math.sin(a) * DIAL.r - 12) },
-                               aria: { pressed: got.grit === g ? 'true' : 'false' }, on: { click: function () { edit(function (r) { r.over.grit = g; }); } } },
-                   (SB.Content.ui.flyerdesk.gen || [])[g - 1] || String(g));
+                               title: L('copyN', { n: g }), aria: { pressed: got.grit === g ? 'true' : 'false', label: L('copyN', { n: g }) }, on: { click: function () { edit(function (r) { r.over.grit = g; }); } } },
+                   String(g));
         }))
       ]));
       var ex = [];
       function tog(key, labelKey, on) {
         return h('label', { class: 'sb-fd-tog pz-hl' }, [
-          h('input', { type: 'checkbox', checked: on, disabled: readOnly || spec.finish === 'ROUGH',
+          h('input', { type: 'checkbox', checked: on, disabled: readOnly || spec.finish === 'ROUGH', aria: { label: L('toggle', { what: L(labelKey) }) },
                        on: { change: function (e) { var v = !!e.target.checked; edit(function (r) { r.over.show = r.over.show || {}; r.over.show[key] = v; }); } } }),
           h('span', { text: L(labelKey) })
         ]);
@@ -388,7 +457,7 @@
       if (spec.tags && spec.tags.length) {
         card.push(h('div', { class: 'sb-fd-knob sb-fd-knob--wrap' }, [h('span', { class: 'sb-fd-knob-label', text: L('tags') }),
           h('span', { class: 'sb-fd-togs' }, [h('label', { class: 'sb-fd-tog' }, [
-            h('input', { type: 'checkbox', checked: shw.tags !== false, disabled: readOnly,
+            h('input', { type: 'checkbox', checked: shw.tags !== false, disabled: readOnly, aria: { label: L('toggle', { what: L('tags').toLowerCase() }) },
                          on: { change: function (e) { var v = !!e.target.checked; edit(function (r) { r.over.show = r.over.show || {}; r.over.show.tags = v; }); } } }),
             h('span', { text: spec.tags.map(function (t) { return SB.text.label('flyer.tag.' + t); }).join(', ') })
           ])])]));
@@ -409,9 +478,48 @@
           return h('li', { class: ok ? 'is-ok' : 'is-bad' }, [h('span', { class: 'sb-fd-mark', aria: { hidden: 'true' }, text: ok ? '✓' : '✗' }), h('span', { text: it[1] })]);
         }).concat(c.soft.map(function (w) {
           return h('li', { class: 'is-warn' }, [h('span', { class: 'sb-fd-mark', aria: { hidden: 'true' }, text: '!' }), h('span', { text: w.text }),
-            w.fix && !readOnly ? h('button', { type: 'button', class: 'sb-fd-fix pz-hl', on: { click: function () { push(SB.Flyer.settle(w.fix, spec)); } } }, L('fix')) : null]);
+            /* each FIX IT says what it fixes (3.7: no two controls with the same name) */
+            w.fix && !readOnly ? h('button', { type: 'button', class: 'sb-fd-fix pz-hl', aria: { label: L('fixL', { what: w.text }) }, on: { click: function () { push(SB.Flyer.settle(w.fix, spec)); } } }, L('fix')) : null]);
         })))
       ]);
+    }
+
+    /* the way out: one press uses the flyer and makes it tonight; from show two, rough / standard / sharp say what each buys */
+    function actions() {
+      var s = state(), efforts, kids = [], info;
+      if (closed) return null;
+      if (reprinting) {
+        info = reprintInfo();
+        return h('div', { class: 'sb-fd-actions', style: at('actions') }, [
+          h('button', { type: 'button', class: 'sb-fd-use pz-paper pz-hl', data: { tut: 'flyer-make', 'tut-ref': showId }, aria: { label: L('reprintSay', info) }, on: { click: reprintNow } }, [
+            h('span', { class: 'sb-fd-mk', aria: { hidden: 'true' }, html: markerSvg(L('use'), 28, { seed: 'use', maxWidth: 206 }) }),
+            h('span', { class: 'sb-fd-use-sub', text: L('reprint', info) })])
+        ]);
+      }
+      if (readOnly) {
+        if (!(s && s.shows && s.shows[showId] && s.shows[showId].status === 'CONFIRMED' && printedOn)) return null;
+        info = reprintInfo();
+        return h('div', { class: 'sb-fd-actions', style: at('actions') }, [
+          h('button', { type: 'button', class: 'sb-fd-let sb-fd-reprint pz-paper pz-hl', aria: { label: L('reprintSay', info) }, on: { click: function () { reprinting = true; load(); draw(); } } }, L('reprint', info))
+        ]);
+      }
+      efforts = pickable() ? ['ROUGH', 'STANDARD', 'SHARP'] : [usualEffort()];
+      efforts.forEach(function (k) {
+        var hrs = hrsText(effortHours(k)), say = L('useSay', { hrs: hrs }), main = efforts.length === 1 || k === usualEffort();
+        if (efforts.length === 1) {
+          kids.push(h('button', { type: 'button', class: 'sb-fd-use pz-paper pz-hl', data: { tut: 'flyer-make', 'tut-ref': showId }, aria: { label: say }, on: { click: function () { useNow(k); } } }, [
+            h('span', { class: 'sb-fd-mk', aria: { hidden: 'true' }, html: markerSvg(L('use'), 28, { seed: 'use', maxWidth: 206 }) }),
+            h('span', { class: 'sb-fd-use-sub', text: L('useMake', { hrs: hrs }) })]));
+        } else {
+          kids.push(h('button', { type: 'button', class: 'sb-fd-use sb-fd-use--pick pz-paper pz-hl' + (main ? ' is-main' : ''), data: main ? { tut: 'flyer-make', 'tut-ref': showId } : null,
+                                  aria: { label: say + '. ' + L(k === 'ROUGH' ? 'effortRough' : k === 'SHARP' ? 'effortSharp' : 'effortStd', { hrs: hrs }) }, on: { click: function () { useNow(k); } } }, [
+            h('span', { class: 'sb-fd-pick-name', text: word('effortWord', k) }),
+            h('span', { class: 'sb-fd-pick-hrs', text: hrs }),
+            h('span', { class: 'sb-fd-pick-says', text: (L(k === 'ROUGH' ? 'effortRough' : k === 'SHARP' ? 'effortSharp' : 'effortStd', { hrs: hrs }).split(': ')[1]) || '' })]));
+        }
+      });
+      kids.push(h('button', { type: 'button', class: 'sb-fd-let pz-paper pz-hl', aria: { label: L('letItBeSay') }, on: { click: function () { save(true); } } }, L('letItBe')));
+      return h('div', { class: 'sb-fd-actions' + (efforts.length > 1 ? ' sb-fd-actions--pick' : ''), style: at('actions') }, kids);
     }
 
     function draw() {
@@ -466,16 +574,15 @@
           note ? h('p', { class: 'sb-fd-note', text: note }) : null]) : null,
         h('details', { class: 'sb-fd-text', style: at('text') }, [h('summary', { class: 'pz-paper pz-hl', text: L('asText') }), h('p', { text: SB.Flyer.text(spec) })])
       ]);
-      right = h('section', { class: 'sb-fd-knobs', aria: { label: L('knobs') } }, [h('h2', { class: 'sb-fd-h sb-fd-sr', text: L('knobs') })].concat(knobs()));
+      right = h('section', { class: 'sb-fd-knobs', aria: { label: L('knobs') } }, [h('h2', { class: 'sb-fd-h sb-fd-sr', text: L('knobs') }), h('p', { class: 'sb-fd-sr', text: L('looksOnly') })].concat(knobs()));
       foot = h('footer', { class: 'sb-fd-foot' }, [
-        h('div', { class: 'sb-fd-checkwrap pz-paper', style: at('check') }, checkBar()),
-        readOnly ? null : h('div', { class: 'sb-fd-actions', style: at('actions') }, [
-          h('button', { type: 'button', class: 'sb-fd-use pz-paper pz-hl', data: { tut: 'flyer-make', 'tut-ref': showId }, on: { click: function () { save(false); } } }, [
-            h('span', { class: 'sb-fd-mk', aria: { hidden: 'true' }, html: markerSvg(L('use'), 28, { seed: 'use', maxWidth: 206 }) }), h('span', { class: 'sb-fd-sr', text: L('use') })]),
-          h('button', { type: 'button', class: 'sb-fd-let pz-paper pz-hl', on: { click: function () { save(true); } } }, L('letItBe'))
-        ])
+        h('div', { class: 'sb-fd-checkwrap pz-paper', style: at('check') }, checkBar())
       ]);
       stage.appendChild(head);
+      /* the way out comes right after the header in the page order, so it is a few Tab presses away instead of the 31st
+       * (fix list 0.9); it is placed absolutely on the stage, so where it sits on screen does not change */
+      var acts = actions();
+      if (acts) stage.appendChild(acts);
       stage.appendChild(h('div', { class: 'sb-fd-body' }, [left, center, right]));
       stage.appendChild(foot);
       lastRes = res();
@@ -499,6 +606,19 @@
 
     load();
     draw();
+    /* 0.10: the keyboard commits the flyer too, from anywhere that is not a control that wants the key itself */
+    if (typeof document !== 'undefined' && document.addEventListener) {
+      var onUse = function (e) {
+        var t = e.target, tag = t && t.tagName;
+        if (closed || readOnly || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+        if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || tag === 'SUMMARY' || tag === 'A') return;
+        if (SB.UI.route && SB.UI.route() !== 'flyerdesk') return;
+        if (document.querySelector('[role="dialog"]:not([hidden])')) return;
+        if (e.key === 'Enter' || e.key === 'u' || e.key === 'U' || e.key === ' ') { e.preventDefault(); useNow(usualEffort()); }
+      };
+      document.addEventListener('keydown', onUse);
+      offs.push(function () { document.removeEventListener('keydown', onUse); });
+    }
     if (SB.UI.keys) {
       offs.push(SB.UI.keys({
         r: function () { doRoll(null); },

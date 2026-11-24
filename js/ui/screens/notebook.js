@@ -72,6 +72,7 @@
     asksLeft: '{n} more people you could ask',
     listAdd: 'add someone',
     cellLabel: '{a} with {b}',
+    unseen: 'You haven\'t seen these crowds mix yet ({n}). Put two of them on one bill and the pair shows up here.',
     marks: { WORKS: 'goes together', DOESNT: 'does not mix', DEPENDS: 'not sure', NONE: 'nothing yet', SELF: 'the same crowd' },
     chapters: 'Chapters',
     tabSay: 'Turn to {page}',
@@ -103,6 +104,7 @@
   }
 
   var PAGES = ['CROWDS', 'BANDS', 'ROOMS', 'NIGHTS', 'HEAR', 'DOOR', 'TOWNS', 'MOVING', 'PEOPLE', 'HOW', 'LIST', 'CHAPTERS'];
+  var DATA_PAGES = ['CROWDS', 'BANDS', 'ROOMS', 'NIGHTS', 'HEAR', 'DOOR', 'TOWNS', 'PEOPLE'];
   /* CHAPTERS is the box (09 section 3): every chapter that has opened, each cutscene seen can be watched again (js/ui/story.js) */
   function pageName(p) { return p === 'CHAPTERS' ? L('chapters') : SB.text.label('notePage.' + p); }
   var TONER = '#141413', PAPER = '#f4f2ea', PENCIL = '#77756f';
@@ -209,6 +211,11 @@
         SB.UI.clear(tabs);
         PAGES.forEach(function (p, i) {
           var on = p === page, nw = !on && pageNew(p), name = pageName(p);
+          /* the book opens small: a page with nothing in it yet has no tab until it has something (the page you are on stays) */
+          if (!on && DATA_PAGES.indexOf(p) >= 0) {
+            var pgx = pageOf(p);
+            if (!pgx || (!pgx.rows.length && !(pgx.grid && anyKnown(pgx.grid)))) return;
+          }
           tabs.appendChild(h('button', { type: 'button', class: 'nb-ptab pz-paper pz-hl' + (on ? ' is-on' : '') + (nw ? ' is-new' : '') + (i % 2 ? ' is-alt' : ''), data: { page: p },
             aria: { pressed: on ? 'true' : 'false', label: L('tabSay', { page: name }) + (nw ? ', ' + L('newSince') : '') },
             on: { click: function () { pick(p); },
@@ -469,10 +476,18 @@
               pg.grid.colLabels = SB.Enums.GENRES.map(function (g) { return SB.text.label('genre.' + g + '.name'); });
               pg.grid.rowsLabels = pg.grid.colLabels.slice();
             }
-            if (pg.grid) kids.push(gridView(pg.grid, pg.grid.colLabels.length > 7 ? 28 : 40, page === 'HEAR' ? 110 : (pg.grid.colLabels.length > 7 ? 88 : 100)));
+            /* the big crowds grid opens small: only once the rung brings it out, and only when something in it is known; the empty
+             * pairs are one line with their count, never a hundred "nothing yet" buttons */
+            var bigGrid = !!(pg.grid && pg.grid.colLabels.length > 7), gridOn = !!pg.grid, unseenN = 0;
+            if (bigGrid) {
+              gridOn = anyKnown(pg.grid) && safe(function () { return !SB.Rungs || SB.Rungs.shows(game(), 'notebookGrid'); }, true);
+              pg.grid.cells.forEach(function (row) { row.forEach(function (c) { if (c.key && !c.conf) unseenN++; }); });
+            }
+            if (pg.grid && gridOn) kids.push(gridView(pg.grid, pg.grid.colLabels.length > 7 ? 28 : 40, page === 'HEAR' ? 110 : (pg.grid.colLabels.length > 7 ? 88 : 100)));
+            if (bigGrid && unseenN > 0) kids.push(h('p', { class: 'nb-line nb-unseen', text: L('unseen', { n: unseenN }) }));
             /* the squares open their own entries; what else the page holds (causes, notes) stays as margin notes */
             var inGrid = {}, rest;
-            if (pg.grid) pg.grid.cells.forEach(function (row) { row.forEach(function (c) { if (c.key) inGrid[c.key] = 1; }); });
+            if (pg.grid && gridOn) pg.grid.cells.forEach(function (row) { row.forEach(function (c) { if (c.key) inGrid[c.key] = 1; }); });
             rest = pg.rows.filter(function (r) { return !inGrid[r.key]; });
             if (rest.length) kids.push(rowsView(rest));
           }

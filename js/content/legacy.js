@@ -13,16 +13,16 @@ SB.Content.legacy = {
       subject: 'it\'s yours if you want it',
       body: 'I\'m doing it. I\'m moving to {bigCity} the first of the month. The job\'s real and the rent\'s not worse and I\'m tired.\n\n' +
             'Somebody has to answer the bands. I\'ve been forwarding everything to you since Christmas anyway, so this is just me saying it out loud. Here\'s what you need:\n\n' +
-            '{sound} runs sound. {soundRate:money} for a house. Always late and never misses.\n' +
-            '{security} does security when a show needs one. Big and calm, and {securityRate:money} a night. Bars and the big rooms want somebody like that before they\'ll confirm. Don\'t bring them to a house show.\n' +
-            'The door is yours. Cash box, stamp, the count. That\'s the whole job, so don\'t hand it off.\n' +
-            '{host} has {room}. Done by {curfew}, no exceptions.\n\n' +
-            'Three things I wish somebody told me:\n1. Answer everyone, even with a no.\n2. Don\'t promise a guarantee you can\'t pay out of your own pocket.\n3. Flyer the day you confirm. Not the week of. The day you confirm.\n\n' +
-            'I\'ll still answer my phone. Probably.\n{outgoingInitial}'
+            '{sound} runs sound and charges {soundRate:money} for a house show. They\'re late every single time, but they\'ve never missed one.\n' +
+            '{security} does security when a show needs it. They\'re big and calm and they get {securityRate:money} a night, and the bars and the bigger rooms want somebody like that before they\'ll confirm you. Don\'t bring them to a house show, though.\n' +
+            'The door is yours. You keep the cash box and the stamp and you do the count at the end, and don\'t hand that off to anybody.\n' +
+            '{host} has {room}. Everything there is done by {curfew}, and they\'ve never made an exception for me.\n\n' +
+            'Three things I wish somebody told me:\n1. Answer everyone, even with a no.\n2. Don\'t promise a guarantee you can\'t pay out of your own pocket.\n3. Make the flyer the same day you confirm. I mean the same day. Don\'t sit on it till the week of the show.\n\n' +
+            'I\'ll still answer my phone, probably.\n{outgoingInitial}'
     },
     notes: ['Answer everyone.', 'Flyer the day you confirm.', '{room}: done by {curfew}.'],     // the first three notebook notes, conf RUMOR
     script: [                              // the scripted first weeks (story 4.4), as 03-content section 10 gives them
-      { week: 0, day: 0, post: 'REQUEST', template: 'CAREFUL', first: true, from: 'PEER', dates: [31, 32], guided: [11, 12], ask: 'DOOR' },  // the first show: a band writes you (guided: a week and a half out)
+      { week: 0, day: 0, post: 'REQUEST', template: 'CAREFUL', first: true, from: 'PEER', dates: [18, 19], guided: [11, 12], ask: 'DOOR' },  // the first show: a band writes you (guided: a week and a half out)
       { week: 0, day: 0, post: 'LOCAL', path: 'people.band.FIRST_ASK', band: 'CLOSER' },
       { week: 0, day: 0, post: 'REQUEST', template: 'MASS' },
       { week: 0, day: 0, post: 'OWNER', path: 'people.owner.HOST.HELLO' },
@@ -34,8 +34,8 @@ SB.Content.legacy = {
       { week: 6, day: 1, post: 'REQUEST', template: 'FRIEND', from: 'SWAP_CIRCLE', if: 'SWAP_HOST_OK' },
       { week: 9, day: 0, post: 'REQUEST', template: 'RESCUE', lead: [5, 6] }
     ],
-    confirmLine: 'Confirmed. The show is real now. From today, every day you wait to tell people costs you some of them.',
-    rescueLabel: 'This one is short notice on purpose. Nobody books a full room in {daysOut:words} days. See what regulars and word of mouth can do.'
+    confirmLine: 'Confirmed, so the show is real now. Every day you wait to tell people from here on costs you some of them.',
+    rescueLabel: 'This one is short notice on purpose. Nobody books a full room in {daysOut:words} days, so see what your regulars and word of mouth can do.'
   },
 
   /* What a night gets called, by its distinctive detail (SB.Enums.MEMORY). Slots: band, touring, home, room, roomShort,
@@ -71,12 +71,12 @@ SB.Content.legacy = {
 
   /* A story coming back. Slots: story (its name), band, room, dow, otherBand, told, heads, n. */
   retell: {
-    ANNIVERSARY:  ['a year ago tonight, {story}. still not over it.', 'one year since {story}. i still have the flyer on my wall'],
-    BAND_RETURNS: ['Last time they were here was {story}. People are going to come for that.', 'They\'re back. Everybody remembers {story}.'],
-    OLD_HEAD:     ['Best thing in this town since {story}.', 'Haven\'t seen a room like that since {story}.'],
-    ROOM_CLOSES:  ['{room:cap}\'s last show is {dow}. Everybody\'s bringing up {story}.', 'They\'re closing {room}. People keep saying "remember {story}."'],
-    IN_REQUEST:   ['{otherBand} told us about {story}. We want in.', 'We heard about {story}. Is it true?'],
-    KID_ASKS:     ['you were at {story} right? my brother talks about that.', 'wait you booked {story}??'],
+    ANNIVERSARY:  ['a year ago tonight was {story} and i\'m still not over it', 'it\'s been a year since {story} and i still have the flyer up on my wall'],
+    BAND_RETURNS: ['Last time they were here was {story}. People are going to come for that.', 'They\'re coming back, and everybody still remembers {story}.'],
+    OLD_HEAD:     ['That\'s the best thing I\'ve seen in this town since {story}.', 'I haven\'t seen a room like that since {story}, and I\'ve been going to shows here a long time.'],
+    ROOM_CLOSES:  ['{room:cap}\'s last show is {dow}, and everybody\'s bringing up {story}.', 'They\'re closing {room}. People keep saying "remember {story}."'],
+    IN_REQUEST:   ['{otherBand} told us about {story}, and we\'d really love to play one of your shows if you\'ll have us.', 'Somebody on the road told us about {story}. Is that all true?'],
+    KID_ASKS:     ['you were at {story} right? my brother still talks about that', 'wait, you booked {story}? i thought that was somebody older'],
     TOLD:         ['They say {told} came. It was {heads}.', 'Everybody says they were at {story}. You counted {heads} at the door.'],
     RENAMED:      ['People used to call it {old}. Now it\'s {story}.']
   },
@@ -102,7 +102,7 @@ SB.Content.legacy = {
       ENDED:       ['Ended: {season}.']
     },
     BACK:      ['Playing again: {season}.'],
-    ENDED:     ['Broke up: {season}.', 'Done: {season}. Nobody said why, which is usually the reason.'],
+    ENDED:     ['Broke up: {season}.', 'Done: {season}. Nobody ever said why.'],
     LAST_SHOW: ['Last show you booked them: {slot} a {dow} at {room}, {heads} people.'],
     yourPart:  ['You booked them {n:words} times.', 'You booked {n:words} of their shows, the first one included.', 'You booked them {n:words} times. You never booked their first.']
   },
@@ -132,23 +132,23 @@ SB.Content.legacy = {
    * bookingName, region. */
   word: {
     SKIPPED:     { line: 'Bands drive through {city} on the way to somewhere. Most don\'t stop.',
-                   bands: ['We\'re just driving through.'],
+                   bands: ['We were just going to drive straight through there, we didn\'t know anybody did shows.'],
                    up: '{city} is a town bands drive through.' },
     FREE_NIGHT:  { line: 'Bands stop here when {peerCity} falls through, or when they need a Tuesday.',
-                   bands: ['We\'ve got a free Tuesday between {peerCity} and the next one.'],
+                   bands: ['Hey, we\'ve got a free Tuesday between {peerCity} and the next show and we\'d rather play than sit in a motel. Anything going on?'],
                    up: 'Bands started stopping in {city} when they had a night to fill.' },
     REAL_STOP:   { line: 'Bands on the {region} route plan a night here now. Some of them ask for you by name.',
-                   bands: ['Everybody says hit {city} and ask for {bookingName}.'],
-                   up: '{city} became a real stop. Bands plan a night here.' },
+                   bands: ['Every band we asked said if we\'re coming through {city} we should write {bookingName}.'],
+                   up: '{city} became a real stop, and bands plan a night here now.' },
     ASKED_FOR:   { line: 'Bands route around {city} instead of through it. Bookers in bigger cities ask if you\'ve got a date first.',
-                   bands: ['We\'d rather do {city} on a Wednesday than a big city on a Friday, honestly.'],
+                   bands: ['Honestly we\'d rather do {city} on a Wednesday than a big city on a Friday. The last two times there were some of the best nights of the tour.'],
                    up: 'Bands started asking for {city}.' },
     DESTINATION: { line: '{city} is a town bands talk about in vans. It\'s a night on a tour people look forward to.',
-                   bands: ['Is it true about the shows down there?', 'We\'re doing two nights there.'],
-                   up: '{city} is a destination now. Bands look forward to it.' },
+                   bands: ['We keep hearing about the shows down there from other bands. Is it really like that?', 'We asked for two nights there this time, because one went by too fast last tour.'],
+                   up: '{city} is a destination now, and bands look forward to it.' },
     down: '{city} slipped a step this year. Bands noticed before you did.',
     feeder: ['{town} had {n:words} shows this year. Last year it had none. {mine:words:cap} of them were yours.',
-             '{town} has a scene now. Some of your out-of-towners stopped driving in, which is how you know.']
+             '{town} has a scene now. You noticed when some of your out-of-towners stopped driving in for your shows.']
   },
 
   /* Stages: recognition, never permission (02-engine 7.22). */
@@ -166,7 +166,7 @@ SB.Content.legacy = {
     crowd: {
       UP:   ['More kids are coming up than {n:words} years ago.', 'The all-ages shows are fuller than they were.'],
       DOWN: ['Fewer kids are coming up than {n:words} years ago.', 'The kids\' shows are thinner. Some of them went to the bars.'],
-      FLAT: ['About the same crowd as last year. Older by a year.', 'Same faces, mostly. A few new ones.']
+      FLAT: ['About the same crowd as last year, all of them a year older.', 'Mostly the same faces as last year, and a few new ones.']
     },
     stories: ['Nights people still talk about: {stories}.', 'The ones that got names: {stories}.'],
     none:    ['No nights got a name this year. Most years are like that.'],
@@ -178,28 +178,28 @@ SB.Content.legacy = {
   offers: {
     ROOM: {
       subject: '{room}',
-      body: 'I\'ve been doing the numbers on your nights here. They\'re the best nights we have that aren\'t a holiday.\n\n' +
-            'I want you booking this room. {nights:words:cap} nights a week, your call on who plays. {salary:money} a month and a budget for guarantees. ' +
-            'You\'d have the calendar. You\'d also have the calendar: the slow Tuesdays, the cover band somebody\'s brother-in-law likes, the birthday parties.\n\n' +
-            'One thing, and I know it matters to you. The flyers say "{room} presents." You can put your name under it.\n\n' +
-            'Think about it. Not long.\n{owner}',
+      body: 'I\'ve been doing the numbers on your nights here, and outside of the holidays they\'re the best nights we have.\n\n' +
+            'I want you booking this room. It\'d be {nights:words} nights a week and you\'d decide who plays, for {salary:money} a month plus a budget for guarantees. ' +
+            'You\'d have the calendar, and I mean all of it: the slow Tuesdays, the cover band somebody\'s brother-in-law likes, the birthday parties.\n\n' +
+            'One more thing, because I know it matters to you. The flyers would say "{room} presents," but you can put your name under it.\n\n' +
+            'Think about it, but don\'t take too long.\n{owner}',
       accept: 'Take the room',
       decline: 'Stay independent',
       later: 'Not yet',
-      ends: 'Taking it ends this career. You\'d be booking a room, not a town. The box and the wall stay.'
+      ends: 'Taking it ends this career. You\'d be booking one room from now on, and the box and the wall stay as they are.'
     },
     BAND: {
       subject: 'ok so',
-      body: 'ok so. the label wants us on the road for basically all of spring and summer and the person they set us up with doesn\'t answer and doesn\'t know anybody. ' +
+      body: 'ok so the label wants us on the road for basically all of spring and summer, and the person they set us up with doesn\'t answer and doesn\'t know anybody. ' +
             'we want it to be you. you know every booker between here and anywhere and they all like you.\n\n' +
-            'we can pay you. not a lot. {cut}%.\n\n' +
-            'you\'d have to be gone some of the time. or not, you can do it from your phone mostly. we don\'t really know how it works. that\'s why we\'re asking you.\n{member} ({band})',
+            'we can pay you, it\'s not a lot, {cut}% of what we make.\n\n' +
+            'you\'d have to be gone some of the time, or maybe not, you could probably do most of it from your phone. we honestly don\'t know how any of it works, which is why we\'re asking you.\n{member} ({band})',
       accept: 'Run their shows',
       decline: 'Stay where you are',
       later: 'Not yet',
-      ends: 'Taking it ends this career. You\'d be booking a band, not a town. The box and the wall stay.'
+      ends: 'Taking it ends this career. You\'d be booking for one band from now on, and the box and the wall stay as they are.'
     },
-    declined: ['You said no to {room|them}. You\'re still booking {city}.', 'Not this time. The offer goes in the box with everything else.']
+    declined: ['You said no to {room|them}, so you\'re still booking {city}.', 'You turned it down this time, and the offer goes in the box with everything else.']
   },
 
   /* The epilogue: three to five plain sentences. Slots: years, shows, returned, toured, wordTier, city, owes, room, band, bookingName. */
@@ -210,15 +210,15 @@ SB.Content.legacy = {
     ],
     LAST_SHOW: [
       'That was the last one. {years:words:cap} [?oneYear: year | years], {shows} shows. {returned} touring bands came back a second time. {city} is {wordTier}. (?owes: You still owe {owes}.)',
-      '{shows} shows, and then the last one. {city} is {wordTier} now. Somebody will start answering the bands. It might take them a while.'
+      '{shows} shows, and then the last one. {city} is {wordTier} now. Somebody will start answering the bands, though it might take them a while.'
     ],
     TOOK_ROOM: [
       'You book {room} now. {years:words:cap} [?oneYear: year | years] and {shows} shows got you there. {city} is {wordTier}. The flyers say {room} presents, with your name under it.',
-      'You took the room. Four nights a week and a salary. The old scene says it feels different. Still good. Different.'
+      'You took the room, four nights a week and a salary. The old crowd says it feels different, still good but different.'
     ],
     TOOK_BAND: [
       'You run {band:poss} shows now. {years:words:cap} [?oneYear: year | years] and {shows} shows taught you every booker on the road. {city} is {wordTier}. You write the requests now.',
-      'You\'re on the band\'s side of the inbox now. {city} is {wordTier}. Somebody there will answer you, or they won\'t.'
+      'You\'re on the band\'s side of the inbox now. {city} is {wordTier}, and you\'ll find out whether whoever books there writes back.'
     ]
   },
 

@@ -137,7 +137,7 @@ module.exports = function (t) {
     const h = golden.build(SB, { notebook: true });
     const ex = SB.Money.exposure(h.state, 's1');
     t.ok(ex.total >= 150 + 225, 'exposure holds at least the guarantee and the rent (' + ex.total + ')');
-    t.eq(ex.breakEven, Math.ceil(ex.total / 10) + 9, 'breakEven is ceil(total / price) plus the comps');
+    t.eq(ex.breakEven, SB.Forecast.breakEven(h.state, 's1').even, 'breakEven is the one the offer shows (Forecast.breakEven: paying people, every cost, the band\'s share)');
     t.ok(ex.lines.some(l => /guarantee/i.test(l.label) || l.cat === 'TOURING'), 'exposure lists the guarantee');
   });
 

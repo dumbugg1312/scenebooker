@@ -797,7 +797,7 @@ SB.module('Cities', function (SB) {
   var ZONE_KEYS = ['id', 'kind', 'name', 'state', 'minutes', 'bearing', 'scene', 'pop', 'slug', 'note', 'lean', 'gens', 'bands', 'beyond', 'season', 'rooms'];
   var ROOM_KEYS = ['id', 'kind', 'hood', 'zone', 'cap', 'name', 'rent', 'deposit', 'soundFee', 'houseCosts', 'split', 'hostCut', 'pa', 'ages', 'matinee', 'curfew',
                    'ac', 'outdoor', 'lowLying', 'seated', 'following', 'sketch', 'standing', 'owner', 'notice', 'needs', 'pressure', 'start', 'note',
-                   'security', 'insurance'];
+                   'security', 'insurance', 'parking', 'neighbor'];
   var SCENE_KEYS = ['size', 'gens', 'genreShares', 'stack', 'roomTau', 'trendLag', 'glutAt', 'traffic', 'wordStart', 'memberChurn', 'kidIntake', 'transit'];
   var MONEY_KEYS = ['comfort', 'bills', 'shiftPay', 'startCash', 'priceIndex'];
   var WORD_KEYS = ['street', 'water', 'hood', 'thing', 'weather', 'order', 'surnames', 'bands'];

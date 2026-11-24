@@ -54,7 +54,7 @@ SB.module('Game', function (SB) {
       clock: { day: 0, week: 0, phase: E.PHASE.PLAY, cursor: { dayIdx: 0, half: E.HALF.DAY },
                opened: -1, done: 0, sent: -1, evening: -1, stop: null, pending: [] },
       player: {
-        bookingName: o.bookingName, mark: o.mark || null,
+        bookingName: o.bookingName, mark: o.mark || null, band: null,
         houseStyle: { templates: {}, inks: {}, papers: {}, treatments: {} },
         name: C.NAME_START, nameLine: [C.NAME_START], followers: C.FOLLOWERS_START, stage: 1,
         stress: C.STRESS.START, stressLog: [],
@@ -122,14 +122,15 @@ SB.module('Game', function (SB) {
   /* ------------------------------------------------------------------ */
 
   function strip(state) {
-    var W = state.week || {}, used = 0, capH = 0, i, word = (state.town && state.town.word) || 0, tier, inbox = 0, late = 0, night = null;
+    var W = state.week || {}, used = 0, capH = 0, i, word = (state.town && state.town.word) || 0, tier, inbox = 0, late = 0, lateJobs = [], night = null;
     for (i = 0; i < 7; i++) {
       if (W.used && W.used[i]) used += (W.used[i].DAY || 0) + (W.used[i].NIGHT || 0);
       if (W.cap && W.cap[i]) capH += (W.cap[i].DAY || 0) + (W.cap[i].NIGHT || 0);
     }
     try { tier = SB.Territory.tier(word); } catch (e) { tier = E.WORD_TIER.SKIPPED; }
     try { inbox = SB.Mail.needsYou(state).length; } catch (e) { inbox = 0; }
-    try { late = SB.Jobs.tray(state).late.length; } catch (e) { late = 0; }
+    /* only a late job the player can still press counts on the desk (0.4): not an automatic one, a covered one or one folded away */
+    try { lateJobs = SB.Jobs.tray(state).late.filter(function (j) { return j.mode === 'HOURS' && !j.more && !j.covered && !j.hidden && !j.optional; }); late = lateJobs.length; } catch (e) { late = 0; lateJobs = []; }
     try { night = SB.Week.tonight(state); } catch (e) { night = null; }   // the evening's clock, always on screen (spec 10)
     return {
       week: state.clock.week, from: state.clock.week * 7, to: state.clock.week * 7 + 6, phase: state.clock.phase,
@@ -137,7 +138,7 @@ SB.module('Game', function (SB) {
       hours: { used: used, cap: capH, over: Math.max(0, used - capH) }, tonight: night,
       stress: { value: Math.round(state.player.stress), zone: SB.Stress.zone(state) },
       name: Math.round(state.player.name), word: Math.round(word), wordTier: tier, stage: state.player.stage,
-      badges: { inbox: inbox, late: late }
+      badges: { inbox: inbox, late: late, lateWhat: lateJobs.length ? String(lateJobs[0].label || '') : '' }   // the desk names the one that is late
     };
   }
 
@@ -171,6 +172,8 @@ SB.module('Game', function (SB) {
       case 'fog': ok = !!E.FOG[value]; break;
       case 'windows': ok = !!E.WINDOWS[value]; break;
       case 'pauseOnReplies': case 'noText': ok = typeof value === 'boolean'; break;
+      /* the desk a little at a time (SB.Rungs): a skipped walkthrough turns it off; Settings can turn it back on (fix list 0.2) */
+      case 'ladder': ok = typeof value === 'boolean'; break;
       default: SB.fail('Game.setSetting', 'unknown setting ' + key);
     }
     if (!ok) return U.no(E.REFUSE.INVALID, label('refuse.INVALID'));

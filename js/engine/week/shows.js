@@ -120,6 +120,7 @@ SB.module('Shows', function (SB) {
     var req = null, day, id, show, k, ask;
     if (over(state)) return no('OVER');
     spec = spec || {};
+    if (SB.Bands && SB.Bands.ensurePlayerBand) SB.Bands.ensurePlayerBand(state);   // the player's own band, if setup named one
     if (!state.shows) state.shows = {};
     if (spec.requestId) {
       req = state.requests ? state.requests[spec.requestId] : null;
@@ -218,6 +219,7 @@ SB.module('Shows', function (SB) {
     if (!isPerm(order, b.slots.map(function (s) { return s.bandId; }))) return no('INVALID');
     b.slots.forEach(function (s, i) { oldIdx[s.bandId] = i; });
     b.slots = order.map(function (id) { return b.slots[oldIdx[id]]; });
+    if (bill.order && order.some(function (id, i) { return oldIdx[id] !== i; })) b.ordered = true;   // the player set the running order: the touring band stays where they put it
     if (bill.minutes) b.slots.forEach(function (s) { if (bill.minutes[s.bandId] != null) s.minutes = minutesOk(bill.minutes[s.bandId]); });
     if (bill.doors != null) {
       if (typeof bill.doors !== 'number' || !isFinite(bill.doors)) return no('INVALID');
@@ -335,7 +337,8 @@ SB.module('Shows', function (SB) {
     if (!live(show)) return no('LOCKED');
     if (personId == null || personId === '') { assignCrew(state, showId, role, null); return U.yes(); }
     if (personId === 'player') {
-      if (role !== 'floor' && role !== 'lodging') return no('INVALID');
+      /* sound too: the house PA, or a friend who knows a board, runs it for nothing (design call D2.16) */
+      if (role !== 'floor' && role !== 'lodging' && role !== 'sound') return no('INVALID');
       assignCrew(state, showId, role, 'player'); return U.yes();
     }
     if (!(state.people && state.people[personId]) && !(SB.People && SB.People.get(state, personId))) SB.fail('Shows.setCrew', 'unknown person "' + personId + '"');
@@ -355,7 +358,7 @@ SB.module('Shows', function (SB) {
     if (!live(show)) return no('LOCKED');
     bought = SB.Rooms && SB.Rooms.insuranceBought ? SB.Rooms.insuranceBought(state, show.id) : 0;
     if (!on) {
-      if (bought > 0) return no('LOCKED');
+      if (bought > 0) return U.no('LOCKED', SB.text.label('refuse.LOCKED_PAID'));
       show.insure = false;
       ensure(state, show);
       return U.yes();
@@ -370,6 +373,61 @@ SB.module('Shows', function (SB) {
     }
     show.insure = true;
     ensure(state, show);
+    return U.yes();
+  }
+
+  /* The touring band plays second to last on a bill of three or more, and on top of a bill of two: the room is fullest
+   * then (fix list 1.9, D3). Not once the player has set the running order themselves, and never after the lock. */
+  function settleTouring(show) {
+    var b = show.bill, t = -1, n = b.slots.length, want, e;
+    if (b.ordered || b.locked || n < 2) return;
+    b.slots.forEach(function (s, k) { if (s.role === 'TOURING' && t < 0) t = k; });
+    if (t < 0) return;
+    want = n >= 3 ? n - 2 : n - 1;
+    if (t === want) return;
+    e = b.slots.splice(t, 1)[0];
+    b.slots.splice(want, 0, e);
+  }
+
+  /* The player's own band onto the bill: no ask, no fee, a free local (fix list 4.9). It takes its place like any local
+   * band: the slot asked for. Refused when it is already on, or the bill is locked, or the band plays another show that night. */
+  function addOwnBand(state, showId, want) {
+    var show = getShow(state, showId, 'Shows.addOwnBand'), id, b;
+    if (over(state)) return no('OVER');
+    if (!live(show)) return no('LOCKED');
+    if (show.bill.locked) return no('LOCKED');
+    id = SB.Bands && SB.Bands.ensurePlayerBand ? SB.Bands.ensurePlayerBand(state) : null;
+    if (!id) return no('INVALID');
+    b = bandOf(state, id);
+    if (slotIndex(show, id) >= 0) return no('ALREADY');
+    if (b && SB.Bands.isFree && !SB.Bands.isFree(state, id, show.day)) return no('INVALID');
+    addBand(state, showId, id, { role: 'LOCAL', pay: 'FREE', fee: 0, want: want });
+    return U.yes();
+  }
+
+  /* A band that left the bill but is still willing goes back in with one press, on the terms it had (fix list 0.12). */
+  function putBack(state, showId, bandId) {
+    var show = getShow(state, showId, 'Shows.putBack'), list = show.bill.dropped || [], d = null, i;
+    if (over(state)) return no('OVER');
+    if (!live(show) || show.bill.locked) return no('LOCKED');
+    for (i = 0; i < list.length; i++) if (list[i].bandId === bandId && list[i].willing) { d = list[i]; break; }
+    if (!d || !bandOf(state, bandId)) return no('INVALID');
+    if (slotIndex(show, bandId) >= 0) return no('ALREADY');
+    if (SB.Bands.isFree && !SB.Bands.isFree(state, bandId, show.day)) return no('INVALID');
+    addBand(state, showId, bandId, { role: d.role || 'LOCAL', pay: d.pay || 'FREE', fee: d.fee || 0, want: d.want || undefined });
+    list.splice(i, 1);
+    return U.yes({ said: (bandOf(state, bandId).name || 'They') + ' are back on the bill.' });
+  }
+
+  /* The house rules the host puts on the flyer (fix list 2.18): the list a show carries. From show two the player picks them. */
+  var RULE_KEYS = ['ALL_AGES', 'NO_STREET_DRINKS', 'PARK_ON_STREET', 'MUSIC_OFF', 'GIVE_AT_DOOR', 'NO_GLASS', 'NO_SMOKING'];
+  function setHouseRules(state, showId, rules) {
+    var show = getShow(state, showId, 'Shows.setHouseRules'), out = [], i;
+    if (over(state)) return no('OVER');
+    if (!live(show)) return no('LOCKED');
+    if (!Array.isArray(rules)) return no('INVALID');
+    for (i = 0; i < rules.length; i++) if (RULE_KEYS.indexOf(rules[i]) >= 0 && out.indexOf(rules[i]) < 0) out.push(rules[i]);
+    show.houseRules = out;
     return U.yes();
   }
 
@@ -399,6 +457,7 @@ SB.module('Shows', function (SB) {
         if (entry.role === 'TOURING') b.billing.unshift(bandId); else b.billing.push(bandId);
       }
     }
+    settleTouring(show);
     retime(show);
     ensure(state, show);
     if (SB.Tutorial && SB.Tutorial.notify) SB.Tutorial.notify(state, 'BILL', { showId: show.id });
@@ -444,6 +503,10 @@ SB.module('Shows', function (SB) {
     show.bill.lockedDay = typeof day === 'number' ? day : today(state);
     if (!show.bill.billing || !show.bill.billing.length) show.bill.billing = defaultBilling(state, show);
     retime(show);
+    /* a flyer made with TBA gets the bands written in once the bill is full (the copies already up still say TBA) */
+    if (show.promo && show.promo.flyer && show.promo.flyer.tba && show.flyer && SB.Jobs && typeof SB.Jobs.flyerSpec === 'function') {
+      try { show.flyer.spec = SB.Jobs.flyerSpec(state, show.id); show.promo.flyer.tba = false; show.promo.flyer.filledDay = show.bill.lockedDay; } catch (e) { /* the old flyer stands */ }
+    }
   }
 
   function onConfirmed(state, showId, day) {
@@ -536,7 +599,7 @@ SB.module('Shows', function (SB) {
   }
 
   function cancel(state, showId, why) {
-    var show = getShow(state, showId, 'Shows.cancel'), out, tier, f, records = [], room, k, a, scaleT, scaleL;
+    var show = getShow(state, showId, 'Shows.cancel'), out, tier, f, records = [], room, k, a, scaleT, scaleL, affected = [];
     if (over(state)) return no('OVER');
     if (!live(show)) return no('ALREADY');
     why = why || 'PLAYER';
@@ -553,6 +616,9 @@ SB.module('Shows', function (SB) {
                     (show.promo && show.promo.announce != null);
     if (!committed) f = 0;
     room = roomOf(state, show);
+    /* who this reaches, so the player can be shown the cost and tell them (fix list 2.13) */
+    affected = show.bill.slots.filter(function (s) { return s.confirmed && bandOf(state, s.bandId) && !bandOf(state, s.bandId).isPlayer; })
+      .map(function (s) { return { bandId: s.bandId, name: bandOf(state, s.bandId).name, role: s.role }; });
     /* pending asks go away without a charge */
     if (state.asks) for (k in state.asks) {
       a = state.asks[k];
@@ -571,7 +637,7 @@ SB.module('Shows', function (SB) {
     if (committed && SB.Stress && SB.Stress.add) SB.Stress.add(state, C.CANCEL.stress, 'CANCELLED');
     if (SB.Rooms && SB.Rooms.release) SB.Rooms.release(state, show.id);   // any hold, even one the show never picked up (a yes for a night it had moved off)
     show.status = 'CANCELLED';
-    show.cancelled = { day: today(state), why: why };
+    show.cancelled = { day: today(state), why: why, affected: affected, room: room ? room.name : '', told: false, costs: f > 0, word: f > 0 && tier.word ? Math.round(tier.word * f) : 0 };
     show.hold = null;
     ensure(state, show);
     records = log(state, records);
@@ -579,10 +645,31 @@ SB.module('Shows', function (SB) {
     return U.yes({ records: records });
   }
 
+  /* "Tell everyone it's off": a text to each band that was booked, tonight, in the player's own words. They answer at once. */
+  function tellOff(state, showId) {
+    var show = getShow(state, showId, 'Shows.tellOff'), c = show.cancelled, r, records = [], day = today(state);
+    if (over(state)) return no('OVER');
+    if (show.status !== 'CANCELLED' || !c) return no('INVALID');
+    if (c.told) return no('ALREADY');
+    if (SB.Week && SB.Week.spend) {
+      r = SB.Week.spend(state, C.MAIL.hours);
+      if (r && r.ok === false) return r;
+      if (r && r.records) records = records.concat(r.records);
+    }
+    (c.affected || []).forEach(function (a) {
+      var b = bandOf(state, a.bandId), line = SB.Bands && SB.Bands.cancelLine ? SB.Bands.cancelLine(state, a.bandId, showId) : '';
+      if (!b || !line || !SB.Mail || !SB.Mail.post) return;
+      SB.Mail.post(state, { kind: 'BAND', fromId: b.contactId || null, fromName: b.name, subject: SB.time.fmt(show.day, 'dow') + ' the ' + SB.text.ordinal(SB.time.date(show.day).d), body: line, day: day,
+                            refs: { showId: show.id, bandId: b.id } });
+    });
+    c.told = true; c.toldDay = day;
+    return U.yes({ records: log(state, records) });
+  }
+
   return {
     create: create, get: get, list: list, view: view, setBill: setBill, setBilling: setBilling, setDoor: setDoor,
-    setLabel: setLabel, setDeal: setDeal, setCrew: setCrew, setInsurance: setInsurance, addBand: addBand, dropBand: dropBand, lock: lock,
-    onConfirmed: onConfirmed, move: move, cancel: cancel, notice: notice,
+    setLabel: setLabel, setDeal: setDeal, setCrew: setCrew, setInsurance: setInsurance, addBand: addBand, addOwnBand: addOwnBand, putBack: putBack, setHouseRules: setHouseRules, dropBand: dropBand, lock: lock,
+    onConfirmed: onConfirmed, move: move, cancel: cancel, tellOff: tellOff, notice: notice,
     /* internal outside the manifest (see the header) */
     assignCrew: assignCrew, billing: function (state, showId) { return billing(state, getShow(state, showId, 'Shows.billing')); }
   };

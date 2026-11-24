@@ -26,3 +26,19 @@
 @keyframes wd-in { from { opacity: 0; transform: rotate(-.8deg) translateY(-4px); } }
 :root[data-motion="reduce"] .wd-note { animation: none; }
 @media (prefers-reduced-motion: reduce) { :root:not([data-motion="full"]) .wd-note { animation: none; } }
+/* the note's own close button (fix-list 1.2): a visible way out, as big as a thumb */
+.wd-head { display: flex; justify-content: space-between; align-items: flex-start; gap: calc(var(--p, 1px) * 8); }
+.wd-x { flex: none; min-width: 32px; min-height: 32px; margin: calc(var(--p, 1px) * -6) calc(var(--p, 1px) * -8) 0 0;
+        background: transparent; color: var(--toner, #141413); border: 0; cursor: pointer;
+        font: 400 calc(var(--fs, 1px) * 20)/1 var(--f-gothic, inherit); }
+.wd-x:hover, .wd-x:focus-visible { background: rgba(0, 0, 0, .12); outline: none; }
+/* the plain meaning printed under a choice button (components.js) */
+.sb-opt-mean { display: block; font: 400 calc(var(--fs, 1px) * 12)/1.3 var(--f-type, system-ui, sans-serif); opacity: .8; margin-top: calc(var(--p, 1px) * 3); text-transform: none; letter-spacing: 0; }
+/* the small "say it another way" link beside NOT THIS TIME on the phone (inbox.js) */
+.ph-tab.ph-tab--small { opacity: .85; font-size: .8em; min-height: 32px; }
+.ph-qnote { text-align: left; }
+/* welcome back card (js/ui/story.js, fix-list 4.4) */
+.sy-wb { padding: calc(var(--p, 1px) * 14); max-width: calc(var(--p, 1px) * 420); font: 400 calc(var(--fs, 1px) * 15)/1.4 var(--f-type, system-ui, sans-serif); }
+.sy-wb-head { margin: 0 0 calc(var(--p, 1px) * 8); font: 400 calc(var(--fs, 1px) * 24)/1 var(--f-gothic, inherit); text-transform: uppercase; letter-spacing: .06em; }
+.sy-wb-line, .sy-wb-show, .sy-wb-next { margin: 0 0 calc(var(--p, 1px) * 8); }
+.sy-wb-go { min-height: 40px; padding: calc(var(--p, 1px) * 8) calc(var(--p, 1px) * 16); cursor: pointer; text-transform: uppercase; letter-spacing: .08em; }

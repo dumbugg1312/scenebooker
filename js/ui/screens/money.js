@@ -31,7 +31,9 @@
     toBank: 'Cash box to account',
     toFund: 'Account to cash box',
     owed: 'Owed ahead',
-    owedTotal: 'owed {amount}',
+    owedTotal: 'promised costs and bills, next 8 weeks: {amount}',
+    plainHave: 'You have {amount}.', plainDue: 'Bills of {first} are due {d1}.', plainThen: 'Another {amount} is due {day}.',
+    plainNone: 'Nothing is due in the next 8 weeks.', plainPay: 'Your day job pays {amount} a week.',
     owedNone: 'Nothing owed in the next eight weeks.',
     due: 'due {day}',
     ledger: 'The ledger',
@@ -144,6 +146,20 @@
       }
     }
 
+    /* One plain sentence before any figure (1.17): "You have $700. Bills of $1,450 are due Feb 1 and $1,450 on Mar 1. Your day job pays $440 a week." */
+    function plainLine(s, bills) {
+      var o = safe(function () { return SB.Money.owedAhead(s); }, null), lines = (o && o.lines || []).slice().sort(function (a, b) { return a.day - b.day; }), byDay = {}, days = [], out, pay, i;
+      out = L('plainHave', { amount: money(bills ? (s.money.bank || 0) : (s.money.fund || 0)) });
+      lines.forEach(function (l) { if (byDay[l.day] === undefined) { byDay[l.day] = 0; days.push(l.day); } byDay[l.day] += l.amount; });
+      if (days.length) {
+        out += ' ' + L('plainDue', { first: money(byDay[days[0]]), d1: SB.time.fmt(days[0], 'short') });
+        for (i = 1; i < Math.min(3, days.length); i++) out += ' ' + L('plainThen', { amount: money(byDay[days[i]]), day: SB.time.fmt(days[i], 'short') });
+      } else out += ' ' + L('plainNone');
+      pay = bills ? safe(function () { return SB.Money.weekPay(s); }, 0) : 0;
+      if (pay > 0) out += ' ' + L('plainPay', { amount: money(pay) });
+      return out;
+    }
+
     function render() {
       var s = SB.UI.game(), bills;
       SB.UI.clear(root);
@@ -152,6 +168,8 @@
       var bv = bills ? safe(function () { return SB.Money.billsView(s); }, null) : null;
       root.appendChild(h('div', { class: 'p2 p2-money', style: { '--hot': D().cityInk()[0] } }, [
         h('h1', { class: 'cb-sr', text: L('title') }),
+        h('p', { class: 'p2m-plain', style: { margin: '0 0 calc(var(--p) * 10)', padding: '0 calc(var(--p) * 16)', color: '#f4f2ea', fontSize: 'calc(var(--p) * 18)', position: 'relative', zIndex: '2' },
+                 text: plainLine(s, bills) }),
         h('div', { class: 'p2-cols p2-cols--money' }, [
           h('div', { class: 'p2-col' }, [envelope(s), bills ? slider(s) : null, bills ? statement(s) : null]),
           h('div', { class: 'p2-col' }, [spike(s), tape(s)]),
@@ -329,7 +347,7 @@
       return h('section', { class: 'p2-owed', aria: { label: L('owed') } }, [
         hero(o.total || 0, !!short),
         h('ul', { class: 'p2m-bills' }, lines.slice(0, 5).map(function (l, i) {
-          var due = L('due', { day: SB.time.fmt(l.day, 'md') }), days = l.day - s.clock.day, soon = i === 0 && days <= 7;
+          var due = L('due', { day: SB.time.fmt(l.day, 'short') }), days = l.day - s.clock.day, soon = i === 0 && days <= 7;
           return h('li', { class: 'p2m-billli', role: 'img', aria: { label: (l.label || '') + ', ' + money(l.amount) + ', ' + due } },
             card(i === 0 ? 'white' : (i % 2 ? 'bone' : 'canary'), 'p2m-bill-c' + (soon ? ' is-soon' : ''), [
               h('p', { class: 'p2m-bl', text: String(l.label || '').toUpperCase() }),

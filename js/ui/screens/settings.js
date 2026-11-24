@@ -30,6 +30,8 @@
     fog: 'how much you can see',
     windows: 'deadlines',
     pause: 'stop the week when an answer needs you',
+    ladder: 'bring out the desk a little at a time',
+    ladderHint: 'New things show up on the desk as you play more shows. Off, everything is out at once.',
     bills: 'personal bills',
     billsLocked: 'set when the career began.',
     display: 'Display',
@@ -189,6 +191,7 @@
         choices('fog', L('fog'), S.fog, Object.keys(SB.Enums.FOG).map(function (k) { return [k, word('fog.' + k, k.toLowerCase())]; }), function (v) { set('fog', v); }),
         choices('windows', L('windows'), S.windows, Object.keys(SB.Enums.WINDOWS).map(function (k) { return [k, word('windows.' + k, k.toLowerCase())]; }), function (v) { set('windows', v); }),
         tickBox('pause', L('pause'), S.pauseOnReplies !== false, function (v) { set('pauseOnReplies', v); }),
+        tickBox('ladder', L('ladder'), !!S.ladder, function (v) { set('ladder', v); }, { hint: L('ladderHint') }),
         tickBox('bills', L('bills'), !!S.bills, function (v) { set('bills', v); }, { disabled: !billsOpen, hint: billsOpen ? null : L('billsLocked') })
       ])),
       Kt().photo({ id: 'guitar-04', cut: true, w: 200, h: 250, rot: -1.6, seed: 'sf-cut2', cls: 'sf-cut2' })];
@@ -259,9 +262,16 @@
       try {
         SB.Cities.load(st.citySlug, function (err) {
           if (err) { msg = L('packBad'); render(); return; }
-          SB.UI.start(st);
+          SB.UI.start(st, null, { ask: true });
         });
       } catch (e) { msg = L('packBad'); render(); }
+    }
+
+    /* "Wed night, show in 9 days": what a save is sitting at, so it is not known by a code (fix-list 3.8) */
+    function sitsAt(x) {
+      var d = x && x.dow ? x.dow + ' night' : '', n = x && typeof x.showIn === 'number' ? x.showIn : null;
+      if (!d && n === null) return '';
+      return d + (d ? ', ' : '') + (n === null ? 'no show booked' : n === 0 ? 'show tonight' : n === 1 ? 'show tomorrow' : 'show in ' + n + ' days');
     }
 
     /* the saves: flyer stubs on coloured copy paper standing in the folder's pocket */
@@ -272,7 +282,7 @@
         h('div', { class: 'sf-stubtext' }, [
           h('p', { class: 'kt-small', text: [dateOf(x.savedAt), agoText(x.savedAt)].filter(Boolean).join(' · ') }),
           Kt().headline(name, { size: 20, max: 170, tag: 'h3', cls: 'sf-stubname' }),
-          h('p', { class: 'kt-type sf-stubcity', text: [city, L('weekN', { n: wk })].filter(Boolean).join(' · ') }),
+          h('p', { class: 'kt-type sf-stubcity', text: [city, L('weekN', { n: wk }), sitsAt(x)].filter(Boolean).join(' · ') }),
           mine ? h('p', { class: 'kt-pencil', text: L('thisOne') }) : null,
           Kt().button({ label: L('del'), say: L('delSay', { name: name, city: city, n: wk }), fk: 'del-' + x.slot, paper: 'white', cls: 'sf-del', on: function () {
             confirmCard(L('delSure', { name: name, city: city, n: wk }), L('delYes'), L('keep'), function () {

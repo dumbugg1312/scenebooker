@@ -269,6 +269,23 @@ SB.module('Save', function (SB) {
     return (z && z.name) || state.citySlug;
   }
 
+  /* the mentor's first name rides with the save: loading a slot brings back the same cast (0.2) */
+  function mentorName(state) {
+    try { var id = SB.Rungs && SB.Rungs.mentor ? SB.Rungs.mentor(state) : null; return id && state.people && state.people[id] ? state.people[id].first || null : null; } catch (e) { return null; }
+  }
+
+  /* what the save list says about a game beside its name: the weekday it sits at and how many days to its next show (fix-list 3.8) */
+  function sitsAt(state) {
+    var day = state.clock && typeof state.clock.day === 'number' ? state.clock.day : null, k, sh, best = null, dow = null;
+    if (day === null) return { dow: null, showIn: null };
+    try { dow = SB.time.fmt(day, 'dow'); } catch (e) { dow = null; }
+    for (k in (state.shows || {})) {
+      sh = state.shows[k];
+      if (sh && (sh.status === 'DRAFT' || sh.status === 'CONFIRMED') && (!sh.by || sh.by === 'player') && sh.day >= day && (best === null || sh.day < best)) best = sh.day;
+    }
+    return { dow: dow, showIn: best === null ? null : best - day };
+  }
+
   function save(state, slot, savedAt) {
     var ls = store(), text, list, sum;
     if (!state || typeof state !== 'object' || !state.clock) SB.fail('Save.save', 'not a game state');
@@ -279,7 +296,8 @@ SB.module('Save', function (SB) {
       text = JSON.stringify({ v: SB.SAVE_VERSION, state: state });
       ls.setItem(SLOT_PREFIX + slot, text);
       sum = { slot: slot, city: state.citySlug, cityName: cityName(state), bookingName: state.player.bookingName,
-              week: state.clock.week, savedAt: typeof savedAt === 'number' ? savedAt : null, v: SB.SAVE_VERSION };
+              mentor: mentorName(state), week: state.clock.week, savedAt: typeof savedAt === 'number' ? savedAt : null, v: SB.SAVE_VERSION };
+      sum.dow = sitsAt(state).dow; sum.showIn = sitsAt(state).showIn;
       list = readIndex(ls).filter(function (x) { return x && x.slot !== slot; });
       list.push(sum);
       ls.setItem(INDEX_KEY, JSON.stringify(list));
@@ -304,7 +322,7 @@ SB.module('Save', function (SB) {
     var ls = store();
     if (!ls) return no(E.REFUSE.INVALID);
     return readIndex(ls).filter(function (x) { return x && isSlot(x.slot); }).map(function (x) {
-      return { slot: x.slot, city: x.city, cityName: x.cityName, bookingName: x.bookingName, week: x.week, savedAt: x.savedAt, v: x.v };
+      return { slot: x.slot, city: x.city, cityName: x.cityName, bookingName: x.bookingName, mentor: x.mentor || null, week: x.week, savedAt: x.savedAt, v: x.v, dow: x.dow || null, showIn: typeof x.showIn === 'number' ? x.showIn : null };
     });
   }
 

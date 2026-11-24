@@ -326,7 +326,7 @@ SB.module('Night', function (SB) {
     if (amt > 0) add('SOUND', (show.crew && show.crew.sound) || room.ownerId, amt);
     amt = crewPay(state, show, 'security');
     if (amt > 0) add('SECURITY', show.crew.security, amt);
-    if (room.kind === 'HOUSE' && num(terms.hostCut, 0) > 0) add('HOST', room.ownerId, terms.hostCut);
+    if (room.kind === 'HOUSE' && num(terms.hostCut, 0) > 0) { x = add('HOST', room.ownerId, terms.hostCut); if (room.name && SB.text.has('strings.settle.HOST_FOR')) x.label = SB.text.label('settle.HOST_FOR', { room: room.name }); }
     for (i = 0; i < lines.length; i++) offTop += lines[i].amount;
     /* 2. the touring band */
     if (ts) {
@@ -354,15 +354,28 @@ SB.module('Night', function (SB) {
       trust = Math.round(S.ASK_LESS.trust[0] + (S.ASK_LESS.trust[1] - S.ASK_LESS.trust[0]) * hs01);
       hatAmt = out.q >= S.HAT.minQ && !night.hatPassed ? Math.round(num(night.hatPer, S.HAT.perHead[0]) * out.heads) : 0;
       why = SB.text.label('refuse.INVALID');
+      /* the locals give theirs up only when they offer it (they trust you): a booker never asks a band to take less than
+       * promised (the user, 2026-11-22; fix list D2/D5) */
+      var localsOffer = localSum > 0 && slots.every(function (s) {
+        if (s.role === 'TOURING' || !((s.pay === 'FLAT' || s.pay === 'GAS') && num(s.fee, 0) > 0)) return true;
+        return (has('Bands', 'trust') ? num((SB.Bands.trust(state, s.bandId) || {}).value, 0) : 0) >= S.LOCALS_GIVE.offerFreeAt;
+      });
+      /* a greyed answer says why, in the words of this night */
+      var whyOf = {
+        POCKET: SB.text.has('strings.settle.WHY_POCKET') ? SB.text.label('settle.WHY_POCKET') : why,
+        LOCALS_GIVE: localSum > 0 ? (SB.text.has('strings.settle.WHY_LOCALS_ASK') ? SB.text.label('settle.WHY_LOCALS_ASK') : why) : (SB.text.has('strings.settle.WHY_LOCALS') ? SB.text.label('settle.WHY_LOCALS') : why),
+        HAT: SB.text.has('strings.settle.' + (night.hatPassed ? 'WHY_HAT_ASKED' : 'WHY_HAT')) ? SB.text.label('settle.' + (night.hatPassed ? 'WHY_HAT_ASKED' : 'WHY_HAT')) : why,
+        OFF_RENT: SB.text.has('strings.settle.' + (room.kind === 'CLUB' ? 'WHY_RENT_CLUB' : 'WHY_RENT')) ? SB.text.label('settle.' + (room.kind === 'CLUB' ? 'WHY_RENT_CLUB' : 'WHY_RENT')) : why
+      };
       [['POCKET', gap, has('Money', 'canCover') ? SB.Money.canCover(state, gap) : true, [{ k: 'MONEY', v: -gap, who: null }, { k: 'STRESS', v: S.POCKET.stress, who: null }, { k: 'WORD', v: S.POCKET.word, who: null }]],
        ['ASK_LESS', Math.min(tNow, Math.round(share * gap)), !!ts && tNow > 0, [{ k: 'TRUST', v: trust, who: ts ? bandName(state, ts.bandId) : null }, { k: 'WORD', v: S.ASK_LESS.word, who: null }]],
-       ['LOCALS_GIVE', Math.min(gap, localSum), localSum > 0, [{ k: 'TRUST', v: S.LOCALS_GIVE.localTrust, who: null }]],
+       ['LOCALS_GIVE', Math.min(gap, localSum), localSum > 0 && localsOffer, [{ k: 'TRUST', v: 0, who: null }]],
        ['HAT', Math.min(gap, hatAmt), hatAmt > 0, [{ k: 'MONEY', v: [Math.round(S.HAT.perHead[0] * out.heads), Math.round(S.HAT.perHead[1] * out.heads)], who: null }]],
        ['SHORT_SILENT', gap, true, [{ k: 'TRUST', v: S.SHORT_SILENT.trust, who: ts ? bandName(state, ts.bandId) : null }, { k: 'WORD', v: S.SHORT_SILENT.word, who: null }]],
        ['OFF_RENT', Math.min(gap, room.kind === 'CLUB' ? 0 : rentDue), rentDue > 0 && room.kind !== 'CLUB', [{ k: 'REL', v: S.OFF_RENT.ownerRel, who: personName(state, room.ownerId) }]]
       ].forEach(function (o) {
         if (o[0] === 'ASK_LESS') return;   // not offered at all: asking a band to take less than promised is a disrespect no booker does (the user, 2026-11-22)
-        shortfall.push({ k: o[0], label: SB.text.label('shortfall.' + o[0] + '.name'), covers: Math.max(0, o[1]), costs: o[3], enabled: !!o[2] && o[1] > 0, why: o[2] && o[1] > 0 ? null : why });
+        shortfall.push({ k: o[0], label: SB.text.label('shortfall.' + o[0] + '.name'), covers: Math.max(0, o[1]), costs: o[3], enabled: !!o[2] && o[1] > 0, why: o[2] && o[1] > 0 ? null : (whyOf[o[0]] || why) });
       });
       if (!sf || !E.SHORTFALL[sf]) sf = shortfall[0].enabled ? 'POCKET' : 'SHORT_SILENT';
       if (!(shortfall.filter(function (o) { return o.k === sf; })[0] || {}).enabled) sf = shortfall[0].enabled ? 'POCKET' : 'SHORT_SILENT';
@@ -469,8 +482,9 @@ SB.module('Night', function (SB) {
     f = figure(state, show, night.shortfall ? { shortfall: night.shortfall } : null);
     return { door: { paid: f.out.paid, price: door.donation ? num(door.suggested, 0) : num(door.price, 0), gross: f.gross, hat: f.hat },
              lines: f.lines.map(function (l) { return { k: l.k, label: l.label, toId: l.toId, amount: l.amount, paid: NOT_FROM_THE_BOX[l.k] ? l.amount : l.paid, agreed: l.agreed, disputed: l.disputed }; }),
-             gap: f.gap, shortfall: f.gap > 0 ? previewShortfall(state, show, f) : f.shortfall, left: f.left, split: { custom: f.custom, keepMax: f.keepMax, fairMax: f.fairMax, fixed: f.fixed },
-             net: f.playerNet,
+             gap: f.gap, shortfall: f.gap > 0 ? previewShortfall(state, show, f) : f.shortfall, left: f.left, split: { custom: f.custom, keepMax: f.keepMax, fairMax: f.fairMax, fixed: f.fixed, to: f.touringBand ? (show.bill.slots.length > 1 ? 'locals' : 'touring') : 'locals', judged: !f.fixed },
+             turnedAway: num(f.out.turnedAway, 0),
+             net: f.playerNet, spent: Math.max(0, f.keep - f.playerNet),   // what this show cost you before the night: each keep choice less this is your real result
              dispute: night.dispute && !night.dispute.answered ? night.dispute.decision : null };
   }
 
@@ -734,7 +748,8 @@ SB.module('Night', function (SB) {
       byReason: SB.util.copy(night.demand.byReason || {}), sets: SB.util.copy(out.sets), q: out.q, run: out.run, verdict: verdict, vsPar: vsPar,
       par: { heads: par.heads, q: par.q, byGen: (par.byGen || EMPTY).slice() }, call: { lo: call.lo, hi: call.hi, mid: call.mid, unknowns: SB.util.copy(call.unknowns || []), inside: inside },
       beat: Math.round(beat * 100) / 100, door: { gross: out.gross, hat: num(settled.hat, out.hat), price: show.door ? num(show.door.price, 0) : 0, leak: out.leak },
-      accounts: night.accounts || (has('Money', 'showAccounts') ? SB.Money.showAccounts(state, showId) : null), playerNet: num(settled.playerNet, 0),
+      short: !!settled.short,   // somebody was not paid in full: the recap lines ask (js/ui/story.js afterFlags)
+      accounts: night.accounts || (has('Money', 'showAccounts') ? SB.Money.showAccounts(state, showId) : null), playerNet: num(settled.playerNet,0),
       luck: fb.luck || [], incidents: incs.map(function (x) { return { kind: x.kind, text: line(state, 'feedback.incident.' + x.kind, {}), q: x.q }; }),
       choices: night.choices.slice(), ledger: fb.ledger || [], comments: fb.comments || [], learned: learned, verdictLine: fb.verdictLine || '',
       posts: { count: out.posts, lines: posts }, hostScores: host.scores, regulars: { won: 0, lost: 0 }, name: { from: name0, to: name0 }, word: { from: word0, to: word0 },

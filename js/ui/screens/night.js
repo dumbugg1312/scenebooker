@@ -21,18 +21,20 @@
     toWeek: 'Back to the desk',
     open: 'Open the doors',
     skip: 'Skip to settle',
+    skipAhead: 'Skip ahead',
     doorsAt: 'Doors {t}',
     bill: 'On the bill',
-    callLine: 'Your call {lo}–{hi}',
-    parLine: 'Par {par}',
+    callLine: 'You guessed {lo} to {hi}.',
+    parLine: 'Most {dow}s there draw about {par}.',
     timeline: 'The set list',
-    hardStop: 'Hard stop {t}',
+    hardStop: 'The music has to stop by {t}.',
     curfew: 'the room\'s curfew',
     loadIn: 'load-in',
     doors: 'doors',
     door: 'Door count',
     heads: 'in the room',
-    turnedAway: '{n} turned away',
+    turnedAway: '{n} turned away at the door',
+    squeezed: '{n} squeezed in',
     cashBox: 'Cash box',
     cashPending: 'not counted yet',
     hat: 'and gas money',
@@ -41,7 +43,8 @@
     postHeld: 'a post went up',
     now: 'Now',
     nowSet: '{band} is on. {present} here.',
-    nowDoors: 'Doors are open. {heads} so far.',
+    nowDoors: 'Doors are open. {heads} so far. The night runs on its own from here, and if something needs you, a note slides onto the table.',
+    nowDoorsPlain: 'Doors are open. {heads} so far. The night runs on its own from here.',
     nowOver: 'The last set is done.',
     nowWait: 'Waiting for the doors.',
     roomLabel: 'The room from the door',
@@ -49,7 +52,7 @@
     kids: 'kids',
     middle: 'middle',
     old: 'old heads',
-    envelope: 'The envelope',
+    envelope: 'Settle up',
     result: 'How it went',
     after: 'After the night',
     yourName: 'Your name',
@@ -62,24 +65,37 @@
     tonight: 'Tonight',
     full: 'full',
     beer: 'Beer', soda: 'Soda', coffee: 'Coffee',
-    drinkSay: 'The {drink}. {n} sets in.',
+    drinkSay: 'The {drink}, yours for the night, so you have something in your hand at the door. {n} sets in.',
+    watchSay: 'Watch: stand in the back and see how the set goes. It\'s {t}.',
     stamp: 'Stamp',
     marker: 'Marker',
-    stampSay: 'The hand stamp and the marker: X on the under-21 hands at an all-ages door.',
-    stampSay21: 'The hand stamp: everybody gets one at the door.',
+    stampSay: 'Stamp: everybody gets a stamp on the hand at the door, and you mark an X on the hands of anyone under 21 with the marker.',
+    stampSay21: 'Stamp: everybody gets a stamp on the hand at the door, so you can tell who paid.',
     setsSay: '{n} on the bill. {cur}',
     cashSay: 'The cash box: {cash}.',
     cashSayPending: 'The cash box: counted at the end of the night.',
     counterSay: '{n} in the room: {k} kids, {m} in the middle, {o} old heads.',
     watch: 'Watch',
     peak: 'best set of the night',
-    heatSay: 'room got {n}/100 loud',
-    likely: 'likely',
+    heatSay: 'how loud the room got ({n} out of 100)',
     cannot: 'can\'t:',
-    keepCustom: 'the usual split',
-    keepFair: 'only what is fair',
-    keepNone: 'keep nothing',
-    youKeep: 'you keep {n}', youKeepRest: 'you keep {n}, the local bands split {rest}',
+    keepCustom: 'Pay {who} their usual share',
+    keepMore: 'Pay {who} more than usual',
+    keepNone: 'Give {who} everything left',
+    whoLocals: 'the locals', whoTouring: 'the touring band',
+    youKeep: 'you keep {n}', youKeepRest: '{who} split {rest}, you keep {n}',
+    onTheShow: '{t}, so with the {spent} you spent before the night you end {net}',
+    endUp: 'up {n}', endDown: 'down {n}', endEven: 'even',
+    netIs: 'On this show you\'re {dir}',
+    doorTook: 'The door took',
+    trustUsual: 'Nobody will think twice about it.',
+    trustMore: 'They\'ll notice they got more than usual.',
+    trustNone: 'The bands will remember you gave them everything left.',
+    awayNote: 'The room was full: {n} people couldn\'t get in.',
+    coachSound: 'Sound was {cost}, {share}. {fix}',
+    shareHalf: 'about half of the door', shareThird: 'about a third of the door', shareQuarter: 'about a quarter of the door',
+    coachDoor: 'A {price} door would have left you {net}.',
+    coachFriend: 'A friend on sound would have left you {net}.',
     doorLine: '{paid} paid × {price}',
     owedPaid: 'owed {owed}, paid {paid}',
     youPay: 'you pay {n}', bandGets: 'the band gets {n}', localsGet: 'the locals get {n}', roomGets: 'the room gets {n}',
@@ -203,7 +219,8 @@
         noBooze = !!(room && (room.owner === 'CHURCH_CONTACT' || /no alcohol/i.test(room.note || ''))), ages = show && show.door ? show.door.ages : 'ALL', v = Math.floor(r.next() * 4), light, drink;
     var LIGHTS = { HOUSE: ['porch', 'clamp'], DIY: ['trouble', 'string'], HALL: ['tube'], BAR: ['neon'], CLUB: ['clamp', 'neon'], SHOP: ['tube', 'clamp'], OUTDOOR: ['flash'], BIG: ['clamp'] };
     light = (LIGHTS[kind] || ['clamp'])[Math.floor(r.next() * (LIGHTS[kind] || ['clamp']).length)];
-    drink = noBooze ? 'coffee' : (kind === 'HALL' || kind === 'SHOP' ? (r.next() < 0.5 ? 'soda' : 'coffee') : 'beer');
+    /* an all-ages door never has beer on the table: soda or coffee only */
+    drink = noBooze ? 'coffee' : (kind === 'HALL' || kind === 'SHOP' || ages === 'ALL' ? (r.next() < 0.5 ? 'soda' : 'coffee') : 'beer');
     return { kind: kind, seed: id, v: v, light: light, rough: sketch >= 30, sketch: sketch, drink: drink, allAges: ages === 'ALL',
              curfew: room && num(room.curfew) ? room.curfew : null, neon: ['blue', 'pink', 'mint'][Math.floor(r.next() * 3)], r: r };
   }
@@ -270,6 +287,7 @@
           else if ((r.t === 'SET_START' || r.t === 'SET_END') && num(r.present)) staged.heads = r.present;
         });
         pump();
+        if (queue.length) paintButtons();       // the skip button is there while the night plays out
       }
       function step() {
         var r = queue.shift(), nx, gap, h0;
@@ -402,7 +420,7 @@
         if (!region.watch) return;
         SB.UI.clear(region.watch);
         put(region.watch, NS().parts.thing({ kind: 'watch', art: { time: t }, name: 'watch', cls: 'nt-watch nc-watch', label: L('watch') + ' ' + (num(model.now) ? clock(model.now) : ''),
-          onClick: function () { say(L('watch') + ' ' + t); } }, settling()));
+          onClick: function () { say(L('watchSay', { t: t })); } }, settling()));
       }
       function cashFigure() {
         var sh = curShow(), sv, gross = null, hat = null;
@@ -420,7 +438,7 @@
       function paintDoor() {
         var host = region.counter, c = cashFigure(), cash = c.gross === null ? '?' : money(c.gross) + (num(c.hat) && c.hat > 0 ? ' +' + money(c.hat) : ''), sx = settling(), P = NS().parts,
             sayCash = c.gross === null ? L('cashSayPending') : L('cashSay', { cash: money(c.gross) + (num(c.hat) && c.hat > 0 ? ' ' + L('hat') + ' ' + money(c.hat) : '') }),
-            counterSay = L('counterSay', { n: model.heads, k: model.byGen[0], m: model.byGen[1], o: model.byGen[2] }) + (model.ended && model.turnedAway > 0 ? ' ' + L('turnedAway', { n: model.turnedAway }) + '.' : ''),
+            counterSay = L('counterSay', { n: model.heads, k: model.byGen[0], m: model.byGen[1], o: model.byGen[2] }) + (num(model.cap) && model.cap > 0 && model.heads > model.cap ? ' ' + L('squeezed', { n: model.heads }) + '.' : '') + (model.ended && model.turnedAway > 0 ? ' ' + L('turnedAway', { n: model.turnedAway }) + '.' : ''),
             par = num(model.par) ? model.par : (fcard && fcard.par && num(fcard.par.heads) ? fcard.par.heads : null),
             call = model.call || (fcard && fcard.call ? fcard.call : null), cap = num(model.cap) && model.cap > 0 ? model.cap : (fcard && num(fcard.cap) && fcard.cap > 0 ? fcard.cap : null),
             drinkSay = L('drinkSay', { drink: L(look.drink).toLowerCase(), n: model.sets.length }), aria = [];
@@ -431,12 +449,12 @@
         countChip(region.counter, model.heads || 0, lastHeads, String);
         lastHeads = model.heads || 0;
         put(region.counter, P.strip(model.byGen[0] + ' ' + L('kids') + ' · ' + model.byGen[1] + ' ' + L('middle') + ' · ' + model.byGen[2] + ' ' + L('old'), 'gens', sx));
-        if (num(par)) aria.push(word('ui.c.par', 'par') + ' ' + par);
+        if (num(par)) aria.push(parWords(par));
         if (call) aria.push(L('callLine', { lo: call.lo, hi: call.hi }));
         if (cap) aria.push(SB.text.label('ui.c.cap', { n: cap }));
         if (model.ended && model.turnedAway > 0) aria.push(L('turnedAway', { n: model.turnedAway }));
-        if (aria.length) put(region.call, P.tally({ parLabel: word('ui.c.par', 'TOWN EXPECTS'), par: num(par) ? par : null, callLabel: word('ui.c.call', 'YOUR CALL'), lo: call ? call.lo : null, hi: call ? call.hi : null,
-          cap: cap ? SB.text.label('ui.c.cap', { n: cap }).toUpperCase() : '', away: model.ended && model.turnedAway > 0 ? L('turnedAway', { n: model.turnedAway }) : '', aria: aria.join('. ') + '.' }, sx));
+        if (aria.length) put(region.call, P.tally({ parLabel: num(par) ? parWords(par) : '', par: num(par) ? par : null, callLabel: call ? L('callLine', { lo: call.lo, hi: call.hi }) : '', lo: call ? call.lo : null, hi: call ? call.hi : null,
+          cap: cap ? SB.text.label('ui.c.cap', { n: cap }) : '', away: model.ended && model.turnedAway > 0 ? L('turnedAway', { n: model.turnedAway }) : '', aria: aria.join('. ') + '.' }, sx));
         put(region.cash, P.thing({ kind: 'tin', art: { fill: Math.min(1, (model.heads || 0) / Math.max(10, cap || 40)), empty: sx, seed: sx ? 'out' : 'in', size: 0.86 }, name: 'tin', cls: 'nt-cash',
           label: L('cashBox') + ': ' + sayCash, onClick: function () { say(sayCash); } }, sx));
         put(region.cash, P.chip(null, cash === '?' ? L('cashPending') : cash, 'cashChip'));
@@ -482,7 +500,11 @@
         else if (!model.started) line = L('nowWait');
         else if (model.ended) line = L('nowOver');
         else if (model.phase === 'set' && cur) line = L('nowSet', { band: cur.name, present: num(cur.present) ? cur.present : model.heads });
-        else line = L('nowDoors', { heads: model.heads });
+        else {
+          /* only promise a note on the table when the night really has a stop queued */
+          var shNow = curShow(), pending = shNow && shNow.night && shNow.night.stops && num(shNow.night.idx) && shNow.night.idx < shNow.night.stops.length;
+          line = L(pending ? 'nowDoors' : 'nowDoorsPlain', { heads: model.heads });
+        }
         host.appendChild(h('p', { class: 'cb-typed nt-now-line nc-now nc-piece', style: NS().layout.at(34, 768, -0.8) }, [line, !said && model.ticker.length ? h('span', { class: 'nt-now-tick', text: ' · ' + model.ticker[model.ticker.length - 1].text }) : null]));
       }
       function paint(r) {
@@ -498,8 +520,12 @@
         var host = region.actions, sh = curShow(), dec = stop && stop.kind === 'DECISION';
         if (!host) return;
         SB.UI.clear(host);
-        if (phase === 'night' && sh && sh.night && !dec && !model.ended)
-          host.appendChild(h('button', { type: 'button', class: 'nc-piece nc-btn pz-hl', style: NS().layout.at(1100, 762, -2), aria: { label: L('skip') }, data: { fk: 'skip' }, on: { click: skip } }, [h('span', { text: L('skip') })]));
+        /* while the night plays out toward a note, skipping only fast-forwards the playing; the note itself is always yours to answer */
+        var ahead = !!(dec && queue.length), lab = ahead ? L('skipAhead') : L('skip');
+        if (phase === 'night' && sh && sh.night && (!dec || ahead) && !model.ended)
+          host.appendChild(h('button', { type: 'button', class: 'nc-piece nc-btn pz-hl', style: NS().layout.at(1100, 762, -2), aria: { label: lab }, data: { fk: 'skip' }, on: { click: ahead ? flush : skip } }, [h('span', { text: lab })]));
+        /* the doors button is gone and nothing has the keyboard: it goes to skip, not the page (keyboard play, 0.9) */
+        if (document.activeElement === document.body || !document.activeElement) { var sk = host.querySelector('button'); if (sk) try { sk.focus({ preventScroll: true }); } catch (e) { /* fine */ } }
       }
 
       /* ---------- the note slid onto the surface, the envelope, how it went ---------- */
@@ -512,7 +538,7 @@
           h('span', { class: 'nt-tab-n', aria: { hidden: 'true' }, text: String(i + 1) }),
           h('span', { class: 'nt-tab-label', text: o.label || '' }),
           costs.length ? h('span', { class: 'nt-tab-costs' }, costs.map(function (c) { return h('span', { class: 'nt-cost', text: c }); })) : null,
-          o.likely ? h('span', { class: 'nt-tab-likely', text: L('likely') + ': ' + o.likely }) : null,
+          o.likely ? h('span', { class: 'nt-tab-likely', text: o.likely }) : null,
           dis && o.why ? h('span', { class: 'nt-tab-why', text: L('cannot') + ' ' + o.why }) : null
         ]);
       }
@@ -544,8 +570,33 @@
         if (p.unpaid > 0) t.push(L('leftUnpaid', { n: money(p.unpaid) }));
         return t.join(', ') || null;
       }
+      /* one coaching line from the night's real numbers, when a full room lost money or barely made any: what would have changed it.
+       * It never says to ask a band to take less. */
+      function dowOf(sh) { try { return sh ? SB.time.fmt(sh.day, 'dow') : 'night'; } catch (e) { return 'night'; } }
+      function parWords(par) { return L('parLine', { par: par, dow: dowOf(curShow()) }); }
+      function coachLine(v) {
+        var sh = curShow(), sound = 0, gross, share, fixT = '', s2, k, fa, base, price;
+        if (!v || !v.door || !sh || !num(v.door.gross) || v.door.gross <= 0 || !num(v.net) || v.net > 10) return '';
+        (v.lines || []).forEach(function (l) { if (l.k === 'SOUND' && num(l.amount)) sound += l.amount; });
+        gross = v.door.gross;
+        if (sound <= 0 || sound / gross < 0.25) return '';
+        share = sound / gross >= 0.45 ? L('shareHalf') : (sound / gross >= 0.3 ? L('shareThird') : L('shareQuarter'));
+        if (v.turnedAway > 0 && sh.door && !sh.door.donation && num(sh.door.price) && SB.Night && SB.Night.figureAt) {
+          try {
+            s2 = {}; for (k in sh) if (Object.prototype.hasOwnProperty.call(sh, k)) s2[k] = sh[k];
+            s2.door = {}; for (k in sh.door) if (Object.prototype.hasOwnProperty.call(sh.door, k)) s2.door[k] = sh.door[k];
+            price = Math.round(sh.door.price) + 3; s2.door.price = price;
+            fa = SB.Night.figureAt(S(), s2, v.door.paid); base = SB.Night.figureAt(S(), sh, v.door.paid);
+            if (fa && base && fa.net > base.net) fixT = L('coachDoor', { price: money(price), net: netWord(fa.net) });
+          } catch (e) { fixT = ''; }
+        }
+        if (!fixT) fixT = L('coachFriend', { net: netWord(v.net + sound) });
+        return L('coachSound', { cost: money(sound), share: share, fix: fixT });
+      }
+      function netWord(n) { return n > 0 ? L('endUp', { n: money(n) }) : (n < 0 ? L('endDown', { n: money(Math.abs(n)) }) : L('endEven')); }
       function envelope(v, lines, done) {
-        var kids = [], split, opts, shN = curShow(), hero, heroN, heroV, key, from;
+        var kids = [], split, opts, shN = curShow(), hero, heroN, heroV, key, from, heroEl = null;
+        var netFmt = function (n) { return L('netIs', { dir: n > 0 ? L('endUp', { n: money(n) }) : (n < 0 ? L('endDown', { n: money(Math.abs(n)) }) : L('endEven')) }); };
         var netV = done && shN ? (shN.result && num(shN.result.playerNet) ? shN.result.playerNet : (shN.night && shN.night.settled ? shN.night.settled.playerNet : null)) : null;
         kids.push(h('div', { class: 'nt-env-flap', aria: { hidden: 'true' } }));
         kids.push(D().word(L('envelope'), 26, { cls: 'nt-env-h' }));
@@ -553,13 +604,14 @@
         key = num(netV) ? 'net' : 'gross';
         heroV = key === 'net' ? netV : (v && v.door && num(v.door.gross) ? v.door.gross : null);
         if (heroV !== null) {
-          heroN = h('strong', { class: 'nt-fig nt-hero-n', text: (key === 'net' && heroV > 0 ? '+' : '') + money(heroV) });
-          hero = h('p', { class: 'nt-hero nt-hero--' + key, data: { n: String(heroV) } }, [key === 'net' ? h('span', { class: 'cb-typed nt-hero-k', text: SB.text.label('settle.NET') }) : null, heroN]);
-          kids.push(hero);
+          /* one big line: what the night came to for you in words, after the receipt (the door first, before you choose) */
+          heroN = h('strong', { class: 'nt-fig nt-hero-n', text: key === 'net' ? netFmt(heroV) : money(heroV) });
+          hero = h('p', { class: 'nt-hero nt-hero--' + key, data: { n: String(heroV) } }, [key === 'net' ? null : h('span', { class: 'cb-typed nt-hero-k', text: L('doorTook') + ' ' }), heroN]);
+          heroEl = hero;
           from = heroKey === key ? heroLast[key] : 0;
           if (F()) {
             if (heroKey !== key) F().move(hero, 'stamp', { cue: 'stamp', cueAt: 83, cueOpts: { gain: -5 } });
-            F().countUp(heroN, heroV, { from: from, delay: heroKey !== key ? 83 : 0, fmt: function (n) { return (key === 'net' && n > 0 ? '+' : '') + money(n); } });
+            F().countUp(heroN, heroV, { from: from, delay: heroKey !== key ? 83 : 0, fmt: function (n) { return key === 'net' ? netFmt(Math.round(n)) : money(n); } });
           }
           heroKey = key; heroLast[key] = heroV;
         }
@@ -572,11 +624,14 @@
           var shortL = num(l.owed) && num(l.paid) && l.paid < l.owed;     // paid less than agreed: say both
           return h('li', { class: 'nt-env-line' + (l.k === 'YOU' ? ' is-you' : '') + (shortL ? ' is-short' : '') + (fresh ? ' mv-slap' : ''), style: { '--i': String(Math.max(0, i - seenLines)) }, data: { tut: ({ ROOM: 'settle-pay-room', SOUND: 'settle-pay-sound', SHARE: 'settle-pay-touring', LOCAL: 'settle-pay-local' })[l.k] || null, 'tut-ref': showId || null } }, [
             h('span', { class: 'cb-typed nt-env-label' }, [l.label || '', shortL ? h('span', { class: 'nt-env-owed', text: L('owedPaid', { owed: money(l.owed), paid: money(l.paid) }) }) : null]),
-            h('span', { class: 'nt-fig', text: num(l.amount) ? (l.k === 'DEPOSIT' ? '+' : '') + money(l.amount) : '' }),
-            num(l.running) ? h('span', { class: 'nt-env-run', text: money(l.running) }) : null
+            h('span', { class: 'nt-fig', text: num(l.amount) ? (l.k === 'DEPOSIT' ? '+' : '') + money(l.amount) : '' })
           ]);
         })));
         seenLines = lines.length;
+        if (heroEl) kids.push(heroEl);
+        if (v && num(v.turnedAway) && v.turnedAway > 0) kids.push(h('p', { class: 'cb-typed nt-env-door nt-env-away', text: L('awayNote', { n: v.turnedAway }) }));
+        var coach = coachLine(v);
+        if (coach) kids.push(h('p', { class: 'cb-typed nt-env-coach', text: coach }));
         if (v && !done) {
           if (num(v.gap) && v.gap > 0) {
             var gapT = L('short', { gap: money(v.gap) }).toUpperCase(), gapW = K().markerWidth(gapT, 22) + 24;
@@ -587,10 +642,18 @@
             split = v.split || {};
             opts = [];
             /* what you don't keep goes to the local bands: say so, or the three choices read like three prices */
-            var keepT = function (n) { return num(v.left) && v.left - n > 0 ? L('youKeepRest', { n: money(n), rest: money(v.left - n) }) : L('youKeep', { n: money(n) }); };
-            if (split.custom && num(split.custom[2])) opts.push({ id: 'custom', label: L('keepCustom'), costs: [], likely: keepT(split.custom[2]), keep: split.custom[2] });
-            if (num(split.fairMax)) opts.push({ id: 'fair', label: L('keepFair'), costs: [], likely: keepT(split.fairMax), keep: split.fairMax });
-            opts.push({ id: 'none', label: L('keepNone'), costs: [], likely: keepT(0), keep: 0 });
+            var who = L(split.to === 'touring' ? 'whoTouring' : 'whoLocals'), fixedS = !!split.fixed, seenKeep = {};
+            var keepT = function (n, trust) {
+              var t = num(v.left) && v.left - n > 0 ? L('youKeepRest', { n: money(n), rest: money(v.left - n), who: who.charAt(0).toUpperCase() + who.slice(1) }) : L('youKeep', { n: money(n) });
+              /* the keep is not the whole story: printing, food and the rest came out before the night (playtest 2026-11-23) */
+              t = num(v.spent) && v.spent > 0 ? L('onTheShow', { t: t, spent: money(v.spent), net: netWord(n - v.spent) }) : t;
+              return t + '.' + (trust && !fixedS ? ' ' + L(trust) : '');
+            };
+            var addKeep = function (id, key, n, trust) { if (seenKeep[n]) return; seenKeep[n] = 1; opts.push({ id: id, label: L(key, { who: who }), costs: [], likely: keepT(n, trust), keep: n }); };
+            if (split.custom && num(split.custom[2])) addKeep('custom', 'keepCustom', split.custom[2], 'trustUsual');
+            /* never a smaller share than usual (real scene: never ask a band to take less, fix list D5): the middle choice pays them more */
+            if (split.custom && num(split.custom[2]) && split.custom[2] > 1) addKeep('more', 'keepMore', Math.floor(split.custom[2] / 2), 'trustMore');
+            addKeep('none', 'keepNone', 0, 'trustNone');
             kids.push(tabRow(opts, function (o) { settle({ shortfall: null, keep: o.keep }); }, L('envelope'), 'settle-done'));
           }
         }
@@ -603,7 +666,7 @@
         kids.push(D().word(L('result'), 26));
         if (r.verdictLine) kids.push(h('p', { class: 'cb-typed nt-verdict', text: r.verdictLine }));
         kids.push(h('p', { class: 'cb-typed nt-heads' }, [h('strong', { class: 'nt-fig', text: String(r.heads) }), ' ' + L('heads'),
-          r.call ? ' · ' + L('callLine', { lo: r.call.lo, hi: r.call.hi }) : '', r.par ? ' · ' + L('parLine', { par: r.par.heads }) : '',
+          r.call ? ' · ' + L('callLine', { lo: r.call.lo, hi: r.call.hi }) : '', r.par ? ' · ' + L('parLine', { par: r.par.heads, dow: dowOf(sh) }) : '',
           r.vsPar ? ' · ' + word('vsPar.' + r.vsPar, lower(r.vsPar)) : '']));
         if (Array.isArray(r.byGen)) kids.push(h('p', { class: 'nt-gens' }, r.byGen.map(function (n, g) { return h('span', { class: 'nt-gen' }, [SB.UI.C.GenGlyph({ gen: g, size: 13 }), ' ' + Math.round(n || 0)]); })));
         stamps = (r.memory && r.memory.stamps) || [];

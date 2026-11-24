@@ -26,7 +26,7 @@
     agoHour1: 'saved 1 hour ago', agoHour: 'saved {n} hours ago',
     agoDay1: 'saved yesterday', agoDay: 'saved {n} days ago',
     newScene: 'New scene',
-    newLabel: 'Book a show',
+    newLabel: 'Your show goes here: start a new game',
     wayTop: 'your name presents',
     wayA: 'YOUR',
     wayB: 'SHOW',
@@ -59,7 +59,7 @@
     whereGo: 'Where people drive for the big shows',
     inks: 'Inks',
     pick: 'Book here',
-    loading: 'Opening the town…',
+    loading: 'Opening the town. Its rooms, bands and streets are loading, and the first time it can take a few seconds.',
     checking: 'Looking for this town\'s pages…',
     unwritten: 'This town couldn\'t be opened. Pick another for now.',
     unwrittenStamp: 'can\'t open',
@@ -88,8 +88,18 @@
     markBlank: 'Your Name',
     done: 'That\'s the name',
     empty: 'Give it a name first.',
+    needName: 'Type a name to go on.',
     blocked: 'That name is somebody else\'s. Pick another.',
     preview: 'Your first flyer'
+  };
+  SB.Content.ui.band = {
+    nameField: 'Band name',
+    genre: 'What does it sound like?',
+    help: 'It goes on the bill as a free local act. It plays for nothing and brings some friends.',
+    done: 'That\'s my band',
+    none: 'I don\'t have one',
+    needName: 'Type your band\'s name to go on.',
+    blocked: 'That name is somebody else\'s. Pick another.'
   };
   SB.Content.ui.setup = {
     back: 'Back to the map',
@@ -221,11 +231,13 @@
   }
 
   /** Open a loaded or imported state: load its pack, then start. */
-  function openState(st, slot, fail) {
+  function openState(st, slot, fail, savedAt) {
     try {
       SB.Cities.load(st.citySlug, function (err) {
         if (err) { fail(L('start', 'packBad')); return; }
-        try { SB.UI.start(st, slot || null); } catch (e) { fail(L('start', 'loadBad')); }
+        try { SB.UI.start(st, slot || null); } catch (e) { fail(L('start', 'loadBad')); return; }
+        /* Continue: say where the game stands (night, days to each show, steps done, the next one, when it was saved) (fix-list 4.4) */
+        try { if (savedAt !== undefined && SB.UI.story && SB.UI.story.welcomeBack) SB.UI.story.welcomeBack(st, savedAt); } catch (e2) { SB.log('warn', 'SB.UI.start', 'welcome back: ' + (e2 && e2.message)); }
       });
     } catch (e) { fail(L('start', 'packBad')); }
   }
@@ -320,6 +332,12 @@
     d = Math.floor(h2 / 24);
     return L('start', d === 1 ? 'agoDay1' : 'agoDay', { n: d });
   }
+  /* "Wed night, show in 9 days": what a save is sitting at, so it is not known by a code (fix-list 3.8) */
+  function sitsAt(x) {
+    var d = x && x.dow ? x.dow + ' night' : '', n = x && typeof x.showIn === 'number' ? x.showIn : null;
+    if (!d && n === null) return '';
+    return d + (d ? ', ' : '') + (n === null ? 'no show booked' : n === 0 ? 'show tonight' : n === 1 ? 'show tomorrow' : 'show in ' + n + ' days');
+  }
   function tapeArt(s, i) {
     var k = K(), W = 300, H = 178, out = '', name = String(s.bookingName || '').toUpperCase() || '?', town = String(s.cityName || s.city || '').toUpperCase(),
         stk = TAPE_STOCK[(SB.rng.make('tp:' + s.slot).int(0, TAPE_STOCK.length - 1) + i) % TAPE_STOCK.length], inner = '';
@@ -345,10 +363,10 @@
       var r;
       try { r = SB.Save.load(s.slot); } catch (e) { r = null; }
       if (!r || !r.ok || !r.state) { fail(L('start', 'loadBad')); return; }
-      openState(r.state, s.slot, fail);
+      openState(r.state, s.slot, fail, s.savedAt);
     }
     function tape(s, i, wide) {
-      var a = drawn() ? tapeArt(s, i) : null, label = L('start', 'cont') + ': ' + (s.bookingName || '') + ', ' + (s.cityName || s.city || '') + ', ' + L('start', 'contWeek', { n: (s.week || 0) + 1 }) + (agoText(s.savedAt) ? ', ' + agoText(s.savedAt) : '');
+      var a = drawn() ? tapeArt(s, i) : null, label = L('start', 'cont') + ': ' + (s.bookingName || '') + ', ' + (s.cityName || s.city || '') + ', ' + L('start', 'contWeek', { n: (s.week || 0) + 1 }) + (sitsAt(s) ? ', ' + sitsAt(s) : '') + (agoText(s.savedAt) ? ', ' + agoText(s.savedAt) : '');
       return h('li', { class: 'st-tape', style: { '--rot': f(SB.rng.make('tr:' + s.slot).range(-5, 5)) + 'deg' } }, [
         h('button', { type: 'button', class: 'cb-thing st-tape-btn', aria: { label: label }, data: { fk: 'tape-' + s.slot }, on: { click: function () { cont(s); } } },
           a ? fit(art(a.svg, a.w, a.h), wide ? 150 : 200) : h('span', { text: label })),
@@ -559,13 +577,26 @@
         return !n || fold(e.name + ' ' + e.state + ' ' + SB.Cities.stateName(e.state) + ' ' + (e.aka || '')).indexOf(n) >= 0;
       });
       if (!items.length) return h('p', { class: 'st-typed st-none', text: L('city', 'none') });
-      return h('ul', { class: 'st-rack', role: 'listbox', aria: { label: L('city', 'title') } }, items.map(function (e, i) {
+      return roving(h('ul', { class: 'st-rack', role: 'listbox', aria: { label: L('city', 'title') } }, items.map(function (e, i) {
         var on = e.slug === sel, ps = packState(e.slug);
         return h('li', { role: 'presentation' }, Kt().slip({ role: 'option', on: on, label: e.name + ', ' + e.state, fk: 'city-' + e.slug, seed: 'city-' + e.slug,
           cls: 'st-rackcard' + (ps === 'no' ? ' is-no' : ''), struck: ps === 'no', paper: i % 2 ? 'white' : 'bone',
           tag: e.slug === 'pensacola' ? L('city', 'first') : (e.featured ? L('city', 'featured') : null), note: e.thin ? L('city', 'thinTag') : null,
           click: function () { choose(e.slug); }, keydown: rackKey }));
-      }));
+      })));
+    }
+    /* one tab stop for the whole list (the picked town); arrows move inside it, so BOOK HERE is a short Tab away (fix list 0.9) */
+    function roving(ul) {
+      var cards = Array.prototype.slice.call(ul.querySelectorAll('.st-rackcard')), at = null;
+      cards.forEach(function (c) { if (!at && c.classList.contains('is-on')) at = c; });
+      at = at || cards[0];
+      cards.forEach(function (c) { c.setAttribute('tabindex', c === at ? '0' : '-1'); });
+      ul.addEventListener('focusin', function (ev) {
+        var t = ev.target;
+        if (!t || !t.classList || !t.classList.contains('st-rackcard')) return;
+        cards.forEach(function (c) { c.setAttribute('tabindex', c === t ? '0' : '-1'); });
+      });
+      return ul;
     }
     function rackKey(ev) {
       var all, i;
@@ -577,6 +608,39 @@
       i = Math.max(0, Math.min(all.length - 1, i + (ev.key === 'ArrowDown' ? 1 : -1)));
       if (all[i]) all[i].focus();
     }
+    /* the postcard's tags, each with a plain gloss on hover or tap (fix list 3.9) */
+    var TRAIT_GLOSS = {
+      COLLEGE: 'A university in town, so lots of 18 to 22 year olds, and a lot of them leave in the summer.',
+      MILITARY: 'A military base nearby, so people move in and out and young adults with a paycheck are around.',
+      TOURIST: 'Busy with visitors in season and quiet the rest of the year; rooms book up with tourists.',
+      CAPITAL: 'The state capital, so offices, a university and more going on than a town this size usually has.',
+      PORT: 'A shipping port, with working-class neighborhoods and late-shift crowds.',
+      COASTAL: 'On the coast, which means beaches in summer and storms now and then.',
+      HURRICANE: 'Hurricanes can hit in late summer and fall. A show can get cancelled, and so can the week after it.',
+      SNOW: 'Real winters: snow and ice can keep people home or keep bands off the road.',
+      CHURCHED: 'Lots of churchgoing, so Sunday plans matter and some places are touchy about all-ages shows.',
+      BORDER: 'Right at the border, so there are bands and crowds from both sides.',
+      MILL: 'An old mill town, with factory-shift crowds and not much money to spare.',
+      TRANSIT: 'The buses run late or stop early, so people without cars have trouble getting to shows.',
+      REMOTE: 'A long drive from anywhere, so touring bands have to want to come.',
+      DESERT: 'Desert: hot days, far between towns, and shows that start late.',
+      MOUNTAIN: 'In the mountains, so roads can close and the drive is part of the night.',
+      RIVER: 'A river town, with the old downtown near the water.'
+    }, SIZE_GLOSS = { SMALL: 'A small town: few rooms, few bands, and everybody knows each other.', MID: 'A mid-sized town: a handful of rooms and a few dozen bands.', BIG: 'A big town: many rooms and bands, and more competition for the same crowd.', HUGE: 'A huge city: dozens of rooms and a big scene, with a lot going on the same night.' };
+    function tag(text, gloss) { return h('span', { class: 'st-tag', tabindex: '-1', data: { tip: gloss || '' }, text: text }); }   /* not a Tab stop: a postcard has ~8 of them and they stood between the list and BOOK HERE (fix list 0.9) */
+    function tagLine(e) {
+      var out = [], bits = [tag(L('city', 'size.' + e.size), SIZE_GLOSS[e.size])];
+      (e.traits || []).forEach(function (t) { bits.push(tag(word('trait.' + t, t.toLowerCase()), TRAIT_GLOSS[t])); });
+      bits.forEach(function (b, i) { if (i) out.push(' · '); out.push(b); });
+      return out;
+    }
+    function roomsLine(kinds) {
+      return Object.keys(kinds).map(function (k) {
+        var nm = word('room.' + k + '.name', k.toLowerCase()).replace(/^an? /, ''), n = kinds[k];
+        nm = k === 'OUTDOOR' ? 'outdoors' : (n === 1 ? nm : nm + 's');
+        return n + ' ' + nm;
+      }).join(', ');
+    }
     function packBits(slug) {
       var p = null, kinds = {}, out = [];
       if (!SB.Cities.isLoaded(slug)) return null;
@@ -585,7 +649,7 @@
       if ((p.zones || []).length > 1) out.push(h('p', { class: 'st-typed' }, [h('b', { text: L('city', 'feeders') + ': ' }),
         p.zones.slice(1).map(function (z) { return z.name; }).filter(Boolean).join(', ')]));
       if (Object.keys(kinds).length) out.push(h('p', { class: 'st-typed st-small-t' }, [h('b', { text: L('city', 'rooms') + ': ' }),
-        Object.keys(kinds).map(function (k) { return kinds[k] + ' × ' + word('room.' + k + '.name', k.toLowerCase()); }).join(', ')]));
+        roomsLine(kinds)]));
       if (draft.tune && draft.slug === slug && has('tune.tuned')) out.push(h('p', { class: 'st-typed st-quiet', text: word('tune.tuned', '') }));
       return out;
     }
@@ -605,7 +669,7 @@
           h('span', { class: 'st-typed st-post-st', text: e.state })
         ]),
         h('h2', { class: 'cb-sr', text: e.name + ', ' + e.state }),
-        h('p', { class: 'st-typed st-small-t', text: [L('city', 'size.' + e.size), (e.traits || []).map(function (t) { return word('trait.' + t, t.toLowerCase()); }).join(' · ')].filter(Boolean).join(' · ') }),
+        h('p', { class: 'st-typed st-small-t' }, tagLine(e)),
         drawn() ? swatch(e) : null,
         e.blurb ? h('p', { class: 'st-typed st-small-t', text: e.blurb }) : null,
         e.hard ? h('p', { class: 'st-typed st-hard' }, [h('b', { text: L('city', 'hard') + ': ' }), e.hard]) : null,
@@ -840,7 +904,7 @@
       keepFocus(function () {
         SB.UI.clear(marksBox);
         marksBox.appendChild(h('div', { class: 'st-stamps', role: 'radiogroup', aria: { label: L('name', 'marks') } }, draft.markSeeds.map(function (s, i) {
-          var on = draft.mark && draft.mark.seed === s, b = h('button', { type: 'button', role: 'radio', class: 'cb-thing st-stamp pz-hl' + (on ? ' is-on' : ''), aria: { checked: on ? 'true' : 'false' },
+          var on = draft.mark && draft.mark.seed === s, b = h('button', { type: 'button', role: 'radio', class: 'cb-thing st-stamp pz-hl' + (on ? ' is-on' : ''), aria: { checked: on ? 'true' : 'false', label: L('name', 'marks') + ' ' + (i + 1) + ' of ' + draft.markSeeds.length },
                                style: { '--rot': f(SB.rng.make('sr' + s).range(-6, 6)) + 'deg' },
                                data: { fk: 'mark-' + i }, on: { click: function () { draft.mark = { v: 1, seed: s }; thumped = s; marks(); flyer(); } } },
             C().BookerMark({ name: shown(), mark: { v: 1, seed: s }, size: 60 }));
@@ -863,10 +927,16 @@
       draft.bookingName = n;
       ctx.answer(n);
     }
+    var doneBtn, needMsg;
+    function sync() {
+      var has = !!String((input && input.value) || '').trim();
+      if (doneBtn) { doneBtn.disabled = !has; if (has) doneBtn.removeAttribute('title'); else doneBtn.title = L('name', 'needName'); }
+      if (needMsg) needMsg.hidden = has;
+    }
     var field = Kt().input({ label: L('name', 'field'), big: true, value: draft.bookingName || '', max: 48, fk: 'name-in', cls: 'st-namefield',
                              placeholder: L('name', 'markBlank').toUpperCase(),
                              onKey: function (e) { if (e.key === 'Enter') { e.preventDefault(); done(); } },
-                             onInput: function () { soon(); },
+                             onInput: function () { sync(); soon(); },
                              on: function () { draft.bookingName = input.value; } });
     input = field.field;
     msg = h('div', { aria: { live: 'polite' } });
@@ -879,7 +949,7 @@
         h('div', { class: 'st-ideas', role: 'group', aria: { label: L('name', 'ideas') } }, [
           h('p', { class: 'kt-small st-k', text: L('name', 'ideas') }),
           h('div', { class: 'st-ideas-row' }, sugg.map(function (s, i) {
-            return Kt().button({ label: s, fk: 'idea-' + i, paper: 'white', cls: 'st-idea', on: function () { input.value = s; draft.bookingName = s; marks(); flyer(); } });
+            return Kt().button({ label: s, fk: 'idea-' + i, paper: 'white', cls: 'st-idea', on: function () { input.value = s; draft.bookingName = s; sync(); marks(); flyer(); } });
           }))
         ]),
         h('p', { class: 'kt-small st-k', text: L('name', 'marks') }),
@@ -888,14 +958,57 @@
         h('div', { class: 'st-acts' }, [
           /* roll first, right under the marks it rolls; the big "that's the name" last, under it (user 2026-11-22) */
           Kt().button({ label: L('name', 'reroll'), fk: 'reroll', on: function () { draft.markSeeds = rollMarks(); draft.mark = { v: 1, seed: draft.markSeeds[0] }; thumped = draft.markSeeds[0]; marks(); flyer(); } }),
-          Kt().button({ label: L('name', 'done'), kind: 'primary', big: 22, fk: 'name-done', on: done })
+          Kt().button({ label: L('name', 'done'), kind: 'primary', big: 22, fk: 'name-done', on: done }),
+          h('p', { class: 'cs-name-help', role: 'status', text: L('name', 'needName') })
         ]),
         msg
       ]),
       flyBox
     ]));
-    marks(); flyer();
+    doneBtn = box.querySelector('[data-fk="name-done"]'); needMsg = box.querySelector('.cs-name-help');
+    marks(); flyer(); sync();
     setTimeout(function () { try { input.focus(); } catch (e) { /* fine */ } }, 400);
+  }
+
+  /* Your own band, asked in the going-away show after the booking name (fix list 4.9). Optional: "I don't have one" turns
+   * the scene on with no band. ctx.answer({ name, genre }) or ctx.answer(null). */
+  function bandWidget(box, ctx) {
+    var input, genre = '', gbox, msg, go, GE = (SB.Enums && SB.Enums.GENRES) || [];
+    function ready() { return !!String((input && input.value) || '').trim(); }
+    function sync() { if (go) { go.disabled = !ready(); if (ready()) go.removeAttribute('title'); else go.title = L('band', 'needName'); } }
+    function genres() {
+      SB.UI.clear(gbox);
+      gbox.appendChild(h('div', { class: 'st-ideas-row', role: 'radiogroup', aria: { label: L('band', 'genre') } }, GE.map(function (g, i) {
+        var on = genre === g, nm = SB.text.label('genre.' + g + '.name');
+        return h('button', { type: 'button', role: 'radio', class: 'cb-thing st-stamp pz-hl' + (on ? ' is-on' : ''), aria: { checked: on ? 'true' : 'false' }, data: { fk: 'bgenre-' + i },
+                             text: nm, on: { click: function () { genre = on ? '' : g; genres(); } } });
+      })));
+    }
+    function finish() {
+      var n = String(input.value || '').trim();
+      SB.UI.clear(msg);
+      if (!n) { msg.appendChild(errLine(L('band', 'needName'))); return; }
+      if (SB.text.blocked(n)) { msg.appendChild(errLine(L('band', 'blocked'))); return; }
+      ctx.answer({ name: n, genre: genre || null });
+    }
+    var field = Kt().input({ label: L('band', 'nameField'), big: true, value: '', max: 48, fk: 'band-in', cls: 'st-namefield',
+                             onKey: function (e) { if (e.key === 'Enter') { e.preventDefault(); finish(); } },
+                             onInput: function () { sync(); } });
+    input = field.field;
+    gbox = h('div', { class: 'st-markbox' }); msg = h('div', { aria: { live: 'polite' } });
+    box.appendChild(h('div', { class: 'cs-namecard cs-bandcard' }, [h('div', { class: 'cs-namecol' }, [
+      field,
+      h('p', { class: 'kt-pencil st-help', text: L('band', 'help') }),
+      h('p', { class: 'kt-small st-k', text: L('band', 'genre') }),
+      gbox,
+      h('div', { class: 'st-acts' }, [
+        Kt().button({ label: L('band', 'done'), kind: 'primary', big: 22, fk: 'band-done', on: finish, disabled: true, why: L('band', 'needName') }),
+        Kt().button({ label: L('band', 'none'), fk: 'band-none', on: function () { ctx.answer(null); } })
+      ]),
+      msg
+    ])]));
+    go = box.querySelector('[data-fk="band-done"]');
+    genres(); sync();
   }
 
   /* ---------------------------------------------------------------- */
@@ -922,13 +1035,16 @@
     } catch (e) { SB.log('error', 'SB.UI.start', String(e && e.message)); if (fail) fail(L('setup', 'bad')); return; }
     showing = true;
     point(null);
-    SB.UI.story.openingAsk(first, { widgets: { name: nameWidget }, back: { label: L('setup', 'back'), on: function () { showing = false; } } },
+    SB.UI.story.openingAsk(first, { widgets: { name: nameWidget, band: bandWidget }, back: { label: L('setup', 'back'), on: function () { showing = false; } } },
       function (a, bill) {
         var name = String(a.name || '').trim();
         if (!name) return null;
-        return SB.Game.newGame({ seed: seed, citySlug: draft.slug, bookingName: name, mark: draft.mark,
-                                 settings: { bills: a.bills !== false, fog: a.fog || 'NORMAL', windows: a.windows || 'NORMAL' },
-                                 tune: draft.tune || null, tutorial: a.walk !== false, goingAway: bill });
+        var made = SB.Game.newGame({ seed: seed, citySlug: draft.slug, bookingName: name, mark: draft.mark,
+                                     settings: { bills: a.bills !== false, fog: a.fog || 'NORMAL', windows: a.windows || 'NORMAL' },
+                                     tune: draft.tune || null, tutorial: a.walk !== false, goingAway: bill });
+        /* your own band, if you play in one (fix list 4.9): state.player.band and a playerBand record on the bill list */
+        if (made && a.band && a.band.name) { try { SB.Bands.addPlayerBand(made, a.band); } catch (e) { SB.log('warn', 'SB.UI.start', 'player band: ' + (e && e.message)); } }
+        return made;
       },
       function (st) {
         showing = false;

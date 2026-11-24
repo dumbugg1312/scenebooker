@@ -20,7 +20,7 @@
     allKinds: 'Every kind',
     key: '{name}, {kind}, holds about {cap}, {ages}{owner}{book}{mine}. Pick up the key.',
     bookable: ', you can ask',
-    locked: ', {why}',
+    locked: ', not yet{why}',
     gone: 'GONE',
     goneL: ', closed{last}',
     mineL: ', one of your shows is here',
@@ -73,6 +73,34 @@
     ownT: 'OWN',
     me: 'ME',
     unknown: '?',
+    /* the facts about a night here (fix list 2.17), as plain lines. {n} is how many fit */
+    facts: {
+      title: 'What a night here is like',
+      fits: 'Fits about {n}.',
+      curfew: 'Music off by {t}.',
+      host: '{host} runs it and {feel}.',
+      hostNo: 'Run by {host}.',
+      parkingStreet: 'Park on the street.',
+      neighborClose: 'The neighbors are close, so keep it quiet.',
+      paNone: 'No PA here. Your sound person brings one.',
+      paSmall: 'A small house PA that handles vocals and not much else.',
+      paReal: 'A real house PA.',
+      paSound: 'A sound person comes with the room, {fee}.',
+      ages: 'Who can come: {ages}.',
+      noDrinks: 'No drinking in the street.',
+      barDrinks: 'There is a bar, so IDs get checked at the door.'
+    },
+    feel: { SOUR: 'is sore at you', STRANGER: 'does not know you yet', WORKING: 'knows you a little', TRUSTED: 'trusts you', ALLY: 'would do anything for you' },
+    how: {
+      title: 'HOW TO GET A NIGHT HERE',
+      KNOW: 'Get to know the owner first. Dropping by in person is how, and an evening out at a show of theirs helps.',
+      VOUCH: 'Someone they know has to vouch for you, or you have to play two good shows here.',
+      WEEKNIGHTS: 'They give weeknights to people they have worked with a few times.',
+      WEEKENDS: 'Weekends come after a good run of weeknights.',
+      done: 'You can ask for a night here.',
+      closed: 'This room has closed.',
+      ladderLine: '{name}: {step}'
+    },
     heroNext: 'NEXT SHOW',
     heroL: 'Your next show is at {name} on {d}. Pick up the key.'
   };
@@ -91,6 +119,32 @@
   function kindName(k) { return SB.text.has('strings.room.' + k + '.name') ? SB.text.label('room.' + k + '.name') : lower(k); }
   function agesText(list) { return (list || []).map(function (a) { return SB.text.label('ages.' + a); }).join(', '); }
   function f(n) { return Math.round(n * 10) / 10; }
+  /* the facts of a night at this room, one plain sentence each (card.facts from Rooms.card) */
+  function roomFacts(card) {
+    var x = card && card.facts, out = [], stage, l = function (k, c) { return L('facts.' + k, c); };
+    if (!x) return out;
+    out.push(l('fits', { n: card.capRange && card.capRange.text ? card.capRange.text : x.cap }));
+    if (num(x.curfew)) out.push(l('curfew', { t: SB.time.clock(x.curfew) }));
+    /* a host you have never worked with is a stranger, not somebody sore at you */
+    stage = card.ownerStage === 'SOUR' && !(card.yours && card.yours.shows > 0) ? 'STRANGER' : card.ownerStage;
+    if (x.host) out.push(stage && L('feel.' + stage) ? l('host', { host: x.host, feel: L('feel.' + stage) }) : l('hostNo', { host: x.host }));
+    if (x.parking) out.push(x.parking === 'street' ? l('parkingStreet') : x.parking);
+    if (x.neighbor) out.push(x.neighbor === 'close' ? l('neighborClose') : x.neighbor);
+    out.push(x.pa === 'HOUSE_SOUND' ? l('paSound', { fee: money(x.soundFee) }) : l(x.pa === 'REAL' ? 'paReal' : (x.pa === 'SMALL' ? 'paSmall' : 'paNone')));
+    out.push(l('ages', { ages: agesText(x.ages) }));
+    out.push(x.drinks ? l('barDrinks') : (x.house ? l('noDrinks') : ''));
+    return out.filter(Boolean);
+  }
+  /* what stands between the player and a night here, as sentences (card.howIn from Rooms.card) */
+  function roomHow(card) {
+    var hw = card && card.howIn, out = [];
+    if (!hw) return out;
+    if (hw.closed) return [L('how.closed')];
+    hw.steps.forEach(function (st) { if (!st.met) out.push(safe(function () { return SB.text.has('strings.ui.rooms.how.' + st.k) ? L('how.' + st.k) : ''; }, '') || st.text || ''); });
+    return out.filter(Boolean);
+  }
+  SB.UI.roomFacts = roomFacts;
+  SB.UI.roomHow = roomHow;
   function piece(cls, stock, kids, o) {
     o = o || {};
     return h(o.tag || 'section', { class: 'cb-piece cb-stock-' + (stock || 'white') + (cls ? ' ' + cls : ''), role: o.role || null, aria: o.label ? { label: o.label } : null }, kids);
@@ -262,7 +316,7 @@
               var mine = hasMine(s, r.id), d = r.open === false ? lastShowDay(s, r.id) : null;
               var lab = L('key', { name: r.name, kind: kindName(r.kind), cap: r.capRange && r.capRange.text ? r.capRange.text : r.cap, ages: agesText(r.ages),
                 owner: r.ownerName ? ', ' + r.ownerName + ' (' + SB.text.label('stage.' + r.ownerStage) + ')' : '',
-                book: r.open === false ? L('goneL', { last: d !== null ? ' · ' + SB.time.fmt(d, 'short') : '' }) : (r.canHold && r.canHold.ok ? L('bookable') : L('locked', { why: (r.canHold && r.canHold.why) || '' })),
+                book: r.open === false ? L('goneL', { last: d !== null ? ' · ' + SB.time.fmt(d, 'short') : '' }) : (r.canHold && r.canHold.ok ? L('bookable') : L('locked', { why: (r.canHold && r.canHold.why) ? ': ' + r.canHold.why : (roomHow(r)[0] ? ': ' + roomHow(r)[0] : '') })),
                 mine: mine ? L('mineL') : '' });
               return h('div', { class: 'cb-keyhang', data: { tut: 'room-row' } }, keyCard(r, lab, mine));
             }))
@@ -345,7 +399,12 @@
         kids.push(h('div', { class: 'cb-owner', role: 'img', aria: { label: (card.ownerName || '') + (rel ? ', ' + SB.text.label('stage.' + rel.stage) : '') } }, [
           card.ownerId ? dd.art(dd.face(card.ownerId, 50), 52, 52) : null,
           dd.art(dd.type(L('owner'), 4, 14, 10, { bold: true }) + dd.marker(String(card.ownerName || '?').toUpperCase(), 4, 40, 18, { maxWidth: 170, seed: 'on' + card.id }) + (rel ? dd.heartMeter(rel.value, 206, 26, 34, 'own' + card.id) : ''), 230, 50)]));
-        if (card.canHold && card.canHold.ok === false) kids.push(h('p', { class: 'cb-typed cb-why', text: card.canHold.why || '' }));
+        /* what a night here is like, in words: how many fit, the curfew, the host, parking, neighbors, PA, who can come in */
+        kids.push(h('ul', { class: 'cb-needs rm-facts', aria: { label: L('facts.title') } }, roomFacts(card).map(function (t) { return h('li', null, [h('span', { class: 'cb-typed cb-small', text: t })]); })));
+        if (card.canHold && card.canHold.ok === false) {
+          if (card.canHold.why) kids.push(h('p', { class: 'cb-typed cb-why', text: card.canHold.why }));
+          else roomHow(card).forEach(function (t) { kids.push(h('p', { class: 'cb-typed cb-why', text: t })); });
+        }
         if (card.canHold && card.canHold.ok === false && card.ownerId && card.open !== false) kids.push(dd.act(L('visitT'), L('visit'), 'visit', function () { SB.UI.act(function (st) { return SB.Week.addJob(st, 'VISIT', { personId: card.ownerId }); }); }));
         /* needs */
         if (card.needs && card.needs.length) kids.push(h('ul', { class: 'cb-needs', aria: { label: L('needs') } }, card.needs.map(function (nd) {
@@ -447,6 +506,7 @@
         if (m) acts.push(dd.act(L('takeDown'), L('takeDownL', { d: ds }), 'takedown', function () { doRelease(d, cell); }));
         if (holds.some(function (x) { return !x.mine; })) acts.push(dd.act(L('askOff'), L('askOffL', { d: ds }), 'askoff', function () { doAsk(d, cell); }));
         kids.push(h('div', { class: 'cb-row', data: { tut: 'room-hold' } }, acts));
+        if (!m && canHold && !forShow) kids.push(h('p', { class: 'cb-typed cb-small cb-whynot', text: L('noDrafts') }));
         return piece('cb-holdpanel', 'manila', kids, { label: ds });
       }
 

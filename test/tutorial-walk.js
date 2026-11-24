@@ -269,7 +269,7 @@
      * word out (SB.Tutorial.current: PROMO while BILL or SOUND waits); the answers come in along the way */
     phase('flyer: use this flyer, on to getting the word out', null, function () {
       tap('#main [data-tut="flyer-make"]');
-      if (SB.UI.route() !== 'show' || card().getAttribute('data-sel') !== 'flyer') fail('USE THIS FLYER did not come back to the card\'s flyer row');
+      if (SB.UI.route() !== 'show' || card().getAttribute('data-sel') !== 'promo') fail('USE THIS FLYER did not make the flyer and come back to the card\'s promo row');
       clean();
       if (!/^(PROMO|BILL|SOUND):/.test(at())) fail('with the flyer made, the guide says ' + at());
     });
@@ -327,9 +327,13 @@
       var i, e;
       tap(fk('open'));
       for (i = 0; i < 60 && cur().step === 'DOOR'; i++) { e = tapedEl(); if (e) e.click(); flush(); }
+      /* a full room on the first show slides one note onto the table (DOORS_FULL): answer it with its first choice */
+      function answerNote() { var n = q('#main .nt-note .nt-tab:not([disabled])'); if (n) { n.click(); flush(); return true; } return false; }
+      answerNote();
       /* while the night plays out the guide keeps quiet (no tape: js/ui/story.js, body.nt-playing); the player skips to
        * the settle themselves, or lets it play */
-      for (i = 0; i < 60 && !q('#main .nt-tab[data-option="custom"]'); i++) {
+      for (i = 0; i < 400 && !q('#main .nt-tab[data-option="custom"]'); i++) {
+        if (answerNote()) continue;
         e = tapedEl() || q(fk('skip') + ':not([disabled])');
         if (e) e.click();
         flush();
@@ -364,9 +368,9 @@
       time(function () { return !S().story.tutorial.on; }, 'the close-out');
       if (S().story.tutorial.done === null) fail('the walkthrough did not finish');
       if (d.querySelector('.sy-tape')) fail('the tape is still up after the last step');
-      /* the outgoing booker's call came up for every thing the guide asked on the way (content story.coach) */
-      ['TUT_ANSWER_REPLY', 'TUT_HOLD_ASK', 'TUT_HOLD_WAIT', 'TUT_BILL_OFFER', 'TUT_BILL_KIDS', 'TUT_BILL_LOCAL', 'TUT_SOUND_ASK', 'TUT_FLYER_MAKE',
-       'TUT_PROMO_PLAN', 'TUT_WAIT_PLAY', 'TUT_DOOR', 'TUT_CLOSEOUT_READ'].forEach(function (k) {
+      /* the outgoing booker's call played as a cutscene for the two steps that keep one (fix-list 1.19: every other step's
+       * call is folded into the mentor's text on the strip, so it is never "seen" as a scene) */
+      ['TUT_ANSWER_REPLY', 'TUT_DOOR'].forEach(function (k) {
         if (S().story.seen.indexOf(k) < 0) fail('the call ' + k + ' never played (seen: ' + S().story.seen.join(', ') + ')');
       });
       log.push('settle ' + JSON.stringify(env.settle) + '; cutscenes ' + seenCuts.join(', ') + '; patches ' + Object.keys(S().patches).join(', '));

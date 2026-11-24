@@ -16,6 +16,10 @@
   --u: min(calc(100vw / 1600), calc(100vh / 1000));
   --p: calc(var(--u) * 1.25);                    /* one px of the old 1280 x 800 layout */
   --fs: calc(var(--p) * var(--scale, 1));        /* type: --p times the text-size setting */
+  /* how far the window runs past the stage on each side (user 2026-11-23: "no big black bars"): a screen's backdrop
+     is drawn out by this much so the 16:10 stage sits in a whole picture, never between black bars */
+  --bleed-x: calc((100vw - var(--u) * 1600) / 2);
+  --bleed-y: calc((100vh - var(--u) * 1000) / 2);
 
   /* copy paper, sampled from the 1987-96 flyers (design/reference/flyers-309-1987-1996.jpg) */
   --pp-white: #fbfaf3;   --pp-bond: #f3f0e6;   --pp-blue: #c2d0dc;  --pp-sky: #7bacd7;   --pp-green: #cde3bd;

@@ -33,11 +33,11 @@
       stickers: 'BANDS', notebook: 'NOTEBOOK', tin: 'MONEY', mug: 'COFFEE', book: 'PEOPLE', lamp: 'TAPE DECK', drawer: 'FILES', pad: 'SETTINGS', tonight: 'TONIGHT', jacket: 'JACKET'
     },
     state: {
-      week: 'WEEK {n}: {from}-{to}', late: '{n} LATE', lateOne: '1 LATE', flyersNone: 'NONE YET', flyers: '{n} MADE', flyersStar: '{n} MADE, {k} STARRED',
+      week: 'WEEK {n}: {from}-{to}', late: '{n} LATE', lateOne: '1 LATE', lateNamed: 'LATE: {what}', flyersNone: 'NONE YET', flyers: '{n} MADE', flyersStar: '{n} MADE, {k} STARRED',
       keysNone: 'NO KEYS YET', keys: '{n} [?one: ROOM | ROOMS]', keysHeld: '{n} [?one: ROOM | ROOMS], {k} HELD', phoneNone: 'QUIET', phone: '{n} NEED YOU',
       paperNone: 'NOTHING TO FLYER', paperTodo: '{when}: NOT MADE', paperDone: '{when}: MADE', clipsNone: 'NOTHING BOOKED: START ONE',
       clip: '{when}', clipDays: '{when} · {n} DAYS', clipToday: '{when} · TONIGHT', clipTomorrow: '{when} · TOMORROW',
-      stickers: '{n} LOCAL', stickersNone: 'NONE YET', notebook: '{n} THINGS', notebookNew: 'NEW PAGE', tin: '{total}', tinDue: '{what} IN {n} DAYS', tinToday: '{what} DUE TODAY',
+      stickers: '{n} LOCAL', stickersNone: 'NONE YET', notebook: '{n} THINGS', notebookNew: 'NEW PAGE', tin: '{total}', tinBank: 'BANK {bank}', tinDue: '{what} IN {n} DAYS', tinToday: '{what} DUE TODAY',
       mug: '{zone}', book: '{n} PEOPLE', bookNone: 'NONE', drawer: '', pad: '', tonight: '{left} LEFT', tonightNone: '', jacket: '{n} ON IT', jacketNone: 'BARE', new: 'NEW'
     },
     tag: {
@@ -48,7 +48,7 @@
       paperNone: 'nothing to flyer yet', paperTodo: 'flyer for {when}: not made', paperDone: 'flyer for {when}: made',
       clipsNone: 'no shows on the way: press to start one', clip: '{when}: {days}', today: 'tonight', tomorrow: 'tomorrow', days: '{n} days out',
       stickers: '{n} local bands', stickersNone: 'no local bands yet', notebook: '{n} things learned', notebookNew: 'something new in here',
-      tin: 'fund {fund}, bank {bank}', tinDue: 'fund {fund}, {what} due {when}', mug: 'stress: {zone}',
+      tin: 'fund {fund}, bank {bank}', tinBank: 'You have {bank} in the bank.', tinDue: 'fund {fund}, {what} due {when}', mug: 'stress: {zone}',
       book: '{n} people you can call', bookNone: 'nobody in here yet', drawer: 'settled shows and cheat sheets', pad: 'settings and saves', tonight: 'things to do with the rest of tonight', tonightOff: 'things to do, once it\u2019s evening', lampNight: 'call it a night on the clock in the corner',
       jacket: '{n} patches and buttons on it', jacketNone: 'nothing sewn on yet'
     },
@@ -171,9 +171,12 @@
       v.st = safe(function () { return SB.Game.strip(s); }, null) || { week: 0, from: today, to: today + 6, phase: 'PLAN', fund: 0, bank: 0, stress: { value: 0, zone: 'STEADY' }, badges: {} };
       v.wk = safe(function () { return SB.Week.view(s); }, null);
       v.today = today;
+      v.daysTo = function (day) { return safe(function () { return SB.Week.daysTo(s, day); }, day - today); };   // the one count (2.11)
+      v.moneyEarly = !!(s.settings && s.settings.ladder && SB.Rungs && SB.Rungs.rung(s) < 3);
       v.cursor = v.clock.cursor || { dayIdx: 0, half: 'DAY' };
       v.needs = safe(function () { return SB.Mail.needsYou(s).length; }, 0);
       v.late = (v.st.badges && v.st.badges.late) || 0;
+      v.lateWhat = (v.st.badges && v.st.badges.lateWhat) || '';
       pack = safe(function () { return SB.Cities.pack(s); }, null);
       v.pack = pack || {};
       v.entry = safe(function () { return SB.Cities.entry(pack.slug); }, null) || {};
@@ -253,11 +256,23 @@
     /* the table: black, scratched, a few gray scraps at the edges      */
     /* ---------------------------------------------------------------- */
 
-    function drawTable(v) {
-      var k = K(), out = '', r = k.rng(v.seed + 'table'), i, x, y, t = TABLE, bx = t.x, by = t.y, bw = t.w, bh = t.h, front = by + bh,
+    /* the table runs out to the window's edges (user 2026-11-23: "no big black bars"): the objects stay on the 16:10
+       stage, the table and floor are drawn bigger by the bleed, in desk units past each side of the stage */
+    function bleed() {
+      var u, ex = 0, ey = 0;
+      if (typeof window !== 'undefined' && stage && stage.clientWidth) {
+        u = stage.clientWidth / W;
+        ex = Math.max(0, Math.ceil(((window.innerWidth || 0) / u - W) / 2) + 2);
+        ey = Math.max(0, Math.ceil(((window.innerHeight || 0) / u - H) / 2) + 2);
+      }
+      return [-ex, -ey, W + 2 * ex, H + 2 * ey];
+    }
+    function drawTable(v, vb) {
+      vb = vb || [0, 0, W, H];
+      var k = K(), out = '', r = k.rng(v.seed + 'table'), i, x, y, t = TABLE, bx = t.x + vb[0], by = t.y + vb[1], bw = t.w + vb[2] - W, bh = t.h + vb[3] - H, front = by + bh,
           top = '#1e1c19', grain = '#272520', dark = '#121110', floor = '#050505';
       /* the floor, and the table's shadow on it */
-      out += '<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="' + floor + '"/>';
+      out += '<rect x="' + vb[0] + '" y="' + vb[1] + '" width="' + vb[2] + '" height="' + vb[3] + '" fill="' + floor + '"/>';
       out += '<defs><radialGradient id="dkPool" cx="' + f(LIGHT.x) + '" cy="' + f(LIGHT.y) + '" r="900" gradientUnits="userSpaceOnUse">' +
              '<stop offset="0" stop-color="#fff4d6" stop-opacity=".17"/><stop offset=".45" stop-color="#fff4d6" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>' +
              '<linearGradient id="dkLip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3833"/><stop offset=".18" stop-color="#151412"/><stop offset="1" stop-color="#0d0c0b"/></linearGradient>' +
@@ -267,7 +282,7 @@
              '<feColorMatrix values="0 0 0 0 .93  0 0 0 0 .91  0 0 0 0 .86  0 0 0 9 -7.4"/></filter>' +
              '<filter id="dkSoot" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="2" seed="3"/>' +
              '<feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 5 -3"/></filter></defs>';
-      out += '<rect x="' + (bx + 10) + '" y="' + (front + t.lip) + '" width="' + (bw - 20) + '" height="' + (H - front - t.lip) + '" fill="url(#dkLip)" opacity="0"/>';
+      out += '<rect x="' + (bx + 10) + '" y="' + (front + t.lip) + '" width="' + (bw - 20) + '" height="' + Math.max(0, vb[1] + vb[3] - front - t.lip) + '" fill="url(#dkLip)" opacity="0"/>';
       out += '<rect x="' + bx + '" y="' + (front + t.lip - 4) + '" width="' + bw + '" height="44" fill="url(#dkDrop)"/>';
       /* the top: a scuffed, xeroxed wood grain */
       out += '<path d="M' + bx + ' ' + (by + 6) + 'L' + (bx + 6) + ' ' + by + 'H' + (bx + bw - 6) + 'L' + (bx + bw) + ' ' + (by + 6) + 'V' + front + 'H' + bx + 'Z" fill="' + top + '"/>';
@@ -284,7 +299,7 @@
       /* toner soot and flecks, then the lamp's pool, falling off to the edges */
       out += '<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh + '" filter="url(#dkSoot)" opacity=".55"/>';
       out += '<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh + '" fill="url(#dkPool)"/>';
-      out += '<rect x="0" y="0" width="' + W + '" height="' + H + '" filter="url(#dkSpeck)" opacity=".7"/>';
+      out += '<rect x="' + vb[0] + '" y="' + vb[1] + '" width="' + vb[2] + '" height="' + vb[3] + '" filter="url(#dkSpeck)" opacity=".7"/>';
       /* the edges: the near edge catches the light and drops to the floor; the sides are a lit line */
       out += '<rect x="' + bx + '" y="' + front + '" width="' + bw + '" height="' + t.lip + '" fill="url(#dkLip)"/>';
       out += '<path d="M' + bx + ' ' + front + 'H' + (bx + bw) + '" stroke="#8a857a" stroke-width="3" stroke-opacity=".7"/>';
@@ -386,7 +401,7 @@
 
     /* the paste-up: the next show's flyer half pasted up on the cutting mat, scissors, glue stick, markers */
     function nextShow(v) { return v.upcoming.length ? v.upcoming[0] : null; }
-    function flyerDue(v) { var sh = nextShow(v); return !!(sh && !(sh.promo && sh.promo.flyer) && sh.day - v.today <= 21); }
+    function flyerDue(v) { var sh = nextShow(v); return !!(sh && !(sh.promo && sh.promo.flyer) && v.daysTo(sh.day) <= 21); }
     function drawPaper(v, s, b) {
       var k = K(), out = '', mx = b[0], my = b[1], mw = b[2], mh = b[3], i, inner = '', sh = nextShow(v), sp = sh ? v.specs[sh.id] : null, url = null,
           x = mx + 34, y = my + 40, w = 250, h = 324, cid, strip = '', nm;
@@ -438,7 +453,7 @@
         inner = k.marker(L('words.nothing'), x + w / 2, y + 100, 20, { anchor: 'middle', maxWidth: w - 20, seed: 'nb', rot: -8 }) + k.scrawl(x + 14, y + 150, w - 40, { seed: 'sl1' });
         return k.paper(x, y, w, h, { seed: 'sl0', stock: 'bone', inner: inner });
       }
-      sp = v.specs[sh.id] || {}; days = sh.day - v.today;
+      sp = v.specs[sh.id] || {}; days = v.daysTo(sh.day);
       lines = (sp.billing || []).slice(0, 5).map(function (bb, j) { return (j + 1) + '.' + short(String(bb.name || '').toUpperCase(), 13) + (bb.unconfirmed ? '?' : ''); });
       inner = '<path d="M' + (x - 4) + ' ' + (y - 4) + 'H' + (x + w + 4) + 'V' + (y + 40) + 'H' + (x - 4) + 'Z" fill="' + T + '"/>';
       inner += k.marker(dowShort(sh.day).toUpperCase() + ' ' + md(sh.day), x + 10, y + 32, 22, { seed: 'sd' + sh.id, maxWidth: w - 20, fill: PAPER });
@@ -717,7 +732,7 @@
                     hidden: !!(extra && extra.hidden) });
       }
       add('calendar', BOX.calendar, L('names.calendar'), v.late ? L('tag.late', { n: v.late }) : L('tag.week', { n: st.week + 1, from: md(st.from), to: md(st.to) }),
-          v.late ? L(v.late === 1 ? 'state.lateOne' : 'state.late', { n: v.late }) : L('state.week', { n: st.week + 1, from: md(st.from), to: md(st.to) }), v.late > 0, 'week');
+          v.late ? (v.late === 1 && v.lateWhat ? L('state.lateNamed', { what: String(v.lateWhat).toUpperCase() }) : L(v.late === 1 ? 'state.lateOne' : 'state.late', { n: v.late })) : L('state.week', { n: st.week + 1, from: md(st.from), to: md(st.to) }), v.late > 0, 'week');
       night = !!v.lamp && v.lamp.key === 'night';
       /* no tape deck on the desk any more (user 2026-11-22): the pinned clock calls the night and closes the week */
       void night; void clockSay;
@@ -729,7 +744,7 @@
           !sh ? 'shows' : (sh.status === 'CONFIRMED' ? 'flyerdesk' : 'show'), sh ? { showId: sh.id } : {});
       if (!clips.length) add('clips', clipBox(0), L('names.clips'), L('tag.clipsNone'), L('state.clipsNone'), false, 'shows');
       clips.forEach(function (c, i) {
-        var d = c.day - v.today, when = dowShort(c.day) + ' ' + md(c.day);
+        var d = v.daysTo(c.day), when = dowShort(c.day) + ' ' + md(c.day);
         add('clip' + i, clipBox(i), L('names.clip', { when: when }), L('tag.clip', { when: when, days: d <= 0 ? L('tag.today') : d === 1 ? L('tag.tomorrow') : L('tag.days', { n: d }) }),
             d <= 0 ? 'TONIGHT' : d === 1 ? 'TOMORROW' : d + ' DAYS', false, 'show', { showId: c.id });
       });
@@ -745,8 +760,9 @@
       add('stickers', BOX.stickers, L('names.stickers'), v.bands.length ? L('tag.stickers', { n: v.bands.length }) : L('tag.stickersNone'),
           v.bands.length ? L('state.stickers', { n: v.bands.length }) : L('state.stickersNone'), false, 'bands');
       add('book', BOX.book, L('names.book'), v.circle ? L('tag.book', { n: v.circle }) : L('tag.bookNone'), v.circle ? L('state.book', { n: v.circle }) : L('state.bookNone'), false, 'people');
-      add('tin', BOX.tin, L('names.tin'), billsNear(v) ? L('tag.tinDue', { fund: money(st.fund), what: due.label || 'bills', when: md(due.day) }) : L('tag.tin', { fund: money(st.fund), bank: money(st.bank || 0) }),
-          billsNear(v) ? (dd <= 0 ? L('state.tinToday', { what: what }) : L('state.tinDue', { what: what, n: dd })) : L('state.tin', { total: money((st.fund || 0) + (st.bank || 0)) }), billsNear(v), 'money');
+      /* the bank is on the desk from night one (1.17); the fund and the bills grow in at rung 3 */
+      add('tin', BOX.tin, L('names.tin'), v.moneyEarly ? L('tag.tinBank', { bank: money(st.bank || 0) }) : billsNear(v) ? L('tag.tinDue', { fund: money(st.fund), what: due.label || 'bills', when: md(due.day) }) : L('tag.tin', { fund: money(st.fund), bank: money(st.bank || 0) }),
+          v.moneyEarly ? L('state.tinBank', { bank: money(st.bank || 0) }) : billsNear(v) ? (dd <= 0 ? L('state.tinToday', { what: what }) : L('state.tinDue', { what: what, n: dd })) : L('state.tin', { total: money((st.fund || 0) + (st.bank || 0)) }), !v.moneyEarly && billsNear(v), 'money');
       add('drawer', BOX.drawer, L('names.drawer'), L('tag.drawer'), L('state.drawer'), false, 'files');
       add('pad', BOX.pad, L('names.pad'), L('tag.pad'), L('state.pad'), false, 'settings');
       /* the rest of tonight (spec 12): a torn to-do list; pressed, the things to do (js/ui/evening.js). Lit while an
@@ -851,7 +867,7 @@
         case 'phone': return [v.needs, st.from, v.cursor.dayIdx].join('|');
         case 'notebook': return learnedKey(v) + '|' + seenLearned;
         case 'stickers': return v.bands.slice(0, 3).map(function (b) { return b.id; }).join(',');
-        case 'tin': return [st.fund, st.bank, v.today, v.due ? v.due.day + ':' + v.due.amount : ''].join('|');
+        case 'tin': return [st.fund, st.bank, v.moneyEarly ? 'e' : '', v.today, v.due ? v.due.day + ':' + v.due.amount : ''].join('|');
         case 'lamp': return [deckDown(v), st.week, st.from].join('|');
         default: return '';
       }
@@ -1017,25 +1033,62 @@
 
     /** render(state, info): draw the desk for this state into #desk (info: { closeup: bool, full: bool }). */
     function render(s, info) {
-      var el = typeof document !== 'undefined' && document.getElementById ? document.getElementById('desk') : null, v, k2, svg;
+      var el = typeof document !== 'undefined' && document.getElementById ? document.getElementById('desk') : null, v, k2, svg, tb;
       if (!el) return;
-      if (!s || (info && info.full)) { el.hidden = true; return; }
+      if (!s || (info && info.full)) { el.hidden = true; topBar(false); return; }
       el.hidden = false;
       if (host !== el || !stage) build(el);
       sizeUnit();
       v = gather(s);
-      k2 = layerKey('table', v) + '|' + (stage.clientWidth || 0);
+      tb = bleed();
+      k2 = layerKey('table', v) + '|' + (stage.clientWidth || 0) + '|' + tb.join(',');
       if (memo.table !== k2) {
         memo.table = k2;
-        svg = svgDoc([0, 0, W, H], drawTable(v));
+        svg = svgDoc(tb, drawTable(v, tb));
         bgArt.innerHTML = svg;
-        raster('table', bgCv, svg, [0, 0, W, H], v.seed + 'table', function () { stage.classList.add('is-copied'); });
+        [bgArt, bgCv].forEach(function (e) {
+          if (!e || !e.style) return;
+          e.style.left = pct(tb[0], W); e.style.top = pct(tb[1], H); e.style.width = pct(tb[2], W); e.style.height = pct(tb[3], H);
+        });
+        raster('table', bgCv, svg, tb, v.seed + 'table', function () { stage.classList.add('is-copied'); });
       }
       lastV = v;
       placeHits(objects(v), v, s);
       el.classList.toggle('is-playing', !!v.playing);
       el.classList.toggle('is-under', !!(info && info.closeup));
       if (hits) { if (info && info.closeup) hits.setAttribute('inert', ''); else hits.removeAttribute('inert'); }
+      topBar(!!(info && info.closeup));
+    }
+
+    /* The top bar (0.9): while a close-up covers the desk, the phone, the show and the next flyer stay one press away in a
+     * strip above every page, so nobody goes back to the desk to find the phone. Pressing one opens its close-up in place. */
+    var barEl = null, barKey = '';
+    function topBar(on) {
+      var d = typeof document !== 'undefined' ? document : null, ids = ['phone', 'clips', 'clip0', 'clip', 'paper'], list = [], here, k, seen = {};
+      if (!d || !d.body) return;
+      if (!on) { if (barEl && barEl.parentNode) barEl.parentNode.removeChild(barEl); barEl = null; barKey = ''; return; }
+      here = SB.UI.route ? SB.UI.route() : null;
+      current.forEach(function (o) {
+        if (ids.indexOf(o.id) < 0 || o.hidden || !o.route || o.route === here || seen[o.route + (o.id === 'phone' ? 'p' : '')]) return;
+        seen[o.route + (o.id === 'phone' ? 'p' : '')] = 1;
+        list.push(o);
+      });
+      list = list.slice(0, 3);
+      k = here + '|' + list.map(function (o) { return o.id + ':' + (o.tag || '') + ':' + (o.state || ''); }).join(',');
+      if (barEl && barKey === k && barEl.isConnected !== false) return;
+      barKey = k;
+      if (barEl && barEl.parentNode) barEl.parentNode.removeChild(barEl);
+      if (!list.length) { barEl = null; return; }
+      barEl = h('nav', { class: 'dk-bar', aria: { label: 'Desk shortcuts' },
+                         style: { position: 'fixed', top: '0', right: '0', zIndex: '40', display: 'flex', gap: '6px', padding: '6px 8px', background: 'rgba(14,14,15,.9)' } },
+        list.map(function (o) {
+          return h('button', { type: 'button', class: 'dk-bar-b pz-hl' + (o.hot ? ' is-hot' : ''), data: { fk: 'bar-' + o.id },
+                               aria: { label: o.name + (o.tag ? ': ' + o.tag : ''), keyshortcuts: o.id === 'phone' ? 'P' : null },
+                               text: (o.id === 'phone' && o.state ? o.name + ' ' + o.state : o.name),
+                               on: { click: function () { SB.UI.go(o.route, o.params); } } });
+        }));
+      /* first in the document, so it is the first Tab stop on every page (keyboard play, 0.9), not the last after the whole page */
+      if (d.body.firstChild) d.body.insertBefore(barEl, d.body.firstChild); else d.body.appendChild(barEl);
     }
 
     /** open(id): pick up a thing on the desk: its route opens as a close-up, the tape deck plays the night out (at an

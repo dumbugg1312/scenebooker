@@ -7,7 +7,7 @@
 //   * a new week plays by itself (no PLAN stop), and a decision handed to Week.raise during nextWeek is the first stop on Monday;
 //   * after a show played through Night.begin, next and settle (not auto), state.week.log holds NIGHT_START, SET_START and SET_END, SETTLE_LINE,
 //     SHOW_RESULT, LEARNED and TRUST records exactly once each, and Week.close reports `learned` and `people` from them;
-//   * the scripted opening: the guided first show's first date is day 11 (the walkthrough); skipped, it is day 31 and every job of that show can be on time for a player who acts in week 0,
+//   * the scripted opening: the guided first show's first date is day 11 (the walkthrough); skipped, it is day 18 and every job of that show can be on time for a player who acts in week 0,
 //     and the Checklist bot reaches a PLAYED show by week 4 with a verdict against Par of ABOUT or better in 80 percent of seeds.
 // It needs the whole week machinery, so it runs when every module it names is a real file.
 const H = require('../helpers.js');
@@ -47,8 +47,8 @@ module.exports = function (t) {
     const q = openingRequest(state);
     t.ok(!!q, 'week 0 has the first show\'s request');
     if (!q) return;
-    t.eq(q.dates[0], 31, 'the swap\'s first date is day 31 when the walkthrough is skipped');
-    t.eq(SB.time.fmt(31, 'long'), 'Thursday, February 18', 'day 31 is Thursday, February 18');
+    t.eq(q.dates[0], 18, 'the swap\'s first date is day 18 (two and a half weeks out) when the walkthrough is skipped');
+    t.eq(SB.time.fmt(18, 'long'), 'Friday, February 5', 'day 18 is Friday, February 5');
     const d = draftShow(state);
     t.ok(!!d, 'a show can be drafted from the swap');
     if (!d) return;

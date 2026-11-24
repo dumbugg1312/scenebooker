@@ -17,7 +17,6 @@
     none: 'Nothing here.',
     more: 'more', less: 'less',
     rising: 'rising', falling: 'falling',
-    likely: 'Likely:',
     choose: 'Choose',
     cannot: 'Not possible:',
     plan: 'Plan it',
@@ -36,7 +35,7 @@
     starred: 'starred',
     known: 'known',
     actual: 'came',
-    cap: 'the room holds {n}',
+    cap: 'the room holds about {n}',
     overCap: 'over what the room holds',
     heard: 'heard',
     reachable: 'could hear',
@@ -50,9 +49,9 @@
     door: 'The door: {paid} paid at {price:money}, {gross:money}',
     hat: 'Gas money: {hat:money}',
     gap: 'Short by {gap:money}',
-    keepCustom: 'Split it the usual way (you keep {n:money})',
-    keepFair: 'Keep only what is fair ({n:money})',
-    keepNone: 'Keep nothing',
+    keepCustom: 'Pay the locals their usual share (you keep {n:money})',
+    keepMore: 'Pay the locals more than usual (you keep {n:money})',
+    keepNone: 'Give the locals everything left',
     playerNet: 'You',
     yours: 'yours',
     hold: 'Hold it', challenge: 'Challenge', release: 'Let it go', ask: 'Ask the room',
@@ -610,14 +609,17 @@
     p = p || {};
     var d = p.decision || { options: [] }, opts = (d.options || []).slice(0, 4), el, buttons;
     function choose(o) { if (o && o.enabled !== false && fn(p.onChoose)) p.onChoose(o.id); }
+    function meaning(o) { return o.mean || (SB.UI.words && SB.UI.words.meaning ? SB.UI.words.meaning(o.label) : ''); }
     buttons = opts.map(function (o, i) {
       return h('li', { class: 'sb-decision-opt' + (o.enabled === false ? ' is-disabled' : '') }, [
         h('button', { type: 'button', class: 'sb-btn pz-paper pz-hl sb-decision-btn', disabled: o.enabled === false, data: { option: o.id },
                       on: { click: function () { choose(o); } } }, [
-          h('span', { class: 'sb-key', text: String(i + 1) }), h('span', { class: 'sb-decision-label', text: o.label || '' })
+          h('span', { class: 'sb-key', text: String(i + 1) }), h('span', { class: 'sb-decision-label', text: o.label || '' }),
+          /* the plain meaning of the glossary word in the label, printed in the button so nobody has to tap to learn it (fix-list 1.2) */
+          meaning(o) ? h('span', { class: 'sb-opt-mean', text: meaning(o) }) : null
         ]),
         (o.costs && o.costs.length) ? h('span', { class: 'sb-chips' }, o.costs.map(function (c) { return C.CostChip({ chip: c }); })) : null,
-        o.likely ? h('p', { class: 'sb-decision-likely' }, [h('span', { class: 'sb-decision-likely-k', text: U('likely') + ' ' }), o.likely]) : null,
+        o.likely ? h('p', { class: 'sb-decision-likely', text: o.likely }) : null,
         o.enabled === false && o.why ? h('p', { class: 'sb-why', text: o.why }) : null
       ]);
     });
@@ -724,7 +726,7 @@
         split = v.split || {};
         kids.push(h('div', { class: 'sb-env-split' }, [
           split.custom && num(split.custom[2]) ? C.Button({ kind: 'primary', label: U('keepCustom', { n: split.custom[2] }), onClick: function () { p.onChoose({ shortfall: null, keep: split.custom[2] }); } }) : null,
-          num(split.fairMax) ? C.Button({ label: U('keepFair', { n: split.fairMax }), onClick: function () { p.onChoose({ shortfall: null, keep: split.fairMax }); } }) : null,
+          split.custom && num(split.custom[2]) && split.custom[2] > 1 ? C.Button({ label: U('keepMore', { n: Math.floor(split.custom[2] / 2) }), onClick: function () { p.onChoose({ shortfall: null, keep: Math.floor(split.custom[2] / 2) }); } }) : null,
           C.Button({ kind: 'quiet', label: U('keepNone'), onClick: function () { p.onChoose({ shortfall: null, keep: 0 }); } })
         ]));
       }

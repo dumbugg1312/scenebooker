@@ -17,14 +17,15 @@
     title: 'How it went',
     setlist: 'The set list',
     doors: 'DOORS {t}',
-    heat: 'heat {n}',
-    peak: 'peak',
+    heat: 'how loud the room got ({n} out of 100)',
+    peak: 'best set of the night',
     present: '{n} in the room',
-    stop: 'HARD STOP {t}',
+    stop: 'The music had to stop by {t}.',
     door: 'Through the door',
-    expects: 'TOWN EXPECTED',
-    call: 'YOUR CALL',
-    holds: 'THE ROOM HOLDS',
+    expects: 'Most {dow}s there draw about {par}.',
+    call: 'You guessed {lo} to {hi}.',
+    holds: 'The room holds about {n}.',
+    squeezed: '{n} squeezed in.',
     envelope: 'The envelope',
     said: 'What people said',
     learned: 'Learned',
@@ -179,7 +180,7 @@
   function tallyPiece(show, r, room) {
     var cap = room ? room.cap : null, over = num(cap) && num(r.heads) && r.heads > cap, w = r.vsPar ? word('vsPar.' + r.vsPar, lower(r.vsPar)) : '',
         lo = r.call && r.call.lo, hi = r.call && r.call.hi, par = r.par && r.par.heads, n = NS(), g = Array.isArray(r.byGen) ? r.byGen : null, aria, el;
-    aria = [num(lo) && num(hi) ? word('names.call', '') + ' ' + lo + '–' + hi : null, num(par) ? word('names.par', '') + ' ' + par : null,
+    aria = [num(lo) && num(hi) ? R('call', { lo: lo, hi: hi }) : null, num(par) ? R('expects', { par: par, dow: safe(function () { return SB.time.fmt(show.day, 'dow'); }, 'night') }) : null,
             num(r.heads) ? r.heads + ' ' + U('actual') : null, over ? U('overCap') : null, w || null].filter(Boolean).join(', ');
     el = h('section', { class: 'rc-piece rc-paper rc-tally', role: 'img', aria: { label: aria } });
     paper(el, 'pink', 'tl' + show.id, 'rb'); turn(el, -2.4);
@@ -192,9 +193,9 @@
     if (over) el.appendChild(h('p', { class: 'rc-tl-over', html: mk(U('overCap'), 15, { seed: 'ov' + show.id, maxWidth: 250 }) }));
     el.appendChild(h('div', { class: 'rc-tl-line', html: line({ lo: lo, hi: hi, par: par, actual: r.heads, cap: cap, over: over, seed: show.id }) }));
     el.appendChild(h('dl', { class: 'rc-tl-facts' }, [
-      num(par) ? h('dt', { class: 'rc-type', text: R('expects') }) : null, num(par) ? h('dd', { class: 'rc-type', text: String(par) }) : null,
-      num(lo) && num(hi) ? h('dt', { class: 'rc-type', text: R('call') }) : null, num(lo) && num(hi) ? h('dd', { class: 'rc-type', text: lo + '-' + hi }) : null,
-      num(cap) ? h('dt', { class: 'rc-type', text: R('holds') }) : null, num(cap) ? h('dd', { class: 'rc-type', text: String(cap) }) : null
+      num(par) ? h('dt', { class: 'rc-type', style: { gridColumn: '1 / -1' }, text: R('expects', { par: par, dow: safe(function () { return SB.time.fmt(show.day, 'dow'); }, 'night') }) }) : null,
+      num(lo) && num(hi) ? h('dt', { class: 'rc-type', style: { gridColumn: '1 / -1' }, text: R('call', { lo: lo, hi: hi }) }) : null,
+      num(cap) ? h('dt', { class: 'rc-type', style: { gridColumn: '1 / -1' }, text: R('holds', { n: cap }) + (over ? ' ' + R('squeezed', { n: r.heads }) : '') }) : null
     ]));
     if (g) el.appendChild(h('ul', { class: 'rc-gens' }, g.map(function (a, i) {
       var key = ['KIDS', 'MIDDLE', 'OLD'][i], name = word('gen.' + key + '.name', ['kids', 'middle', 'old heads'][i]);

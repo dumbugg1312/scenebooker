@@ -85,13 +85,13 @@ SB.module('Mail', function (SB) {
   /* ---- the half hour a message takes (spec 10) ---- */
   function clock() { return SB.Week && SB.Week.spend && SB.Week.fits ? SB.Week : null; }
   /* would one more message fit tonight? -> null, or the refusal (NO_TIME with what it takes and what is left) */
-  function noTime(state) {
-    var r = clock() ? clock().fits(state, C.MAIL.hours) : null;
+  function noTime(state, hours) {
+    var r = clock() ? clock().fits(state, hours || C.MAIL.hours) : null;
     return r && r.ok === false ? r : null;
   }
   /* charge it to tonight and remember it on the item; -> the records of the charge (staying up says so) */
-  function pay(state, item) {
-    var r = clock() ? clock().spend(state, C.MAIL.hours) : null;
+  function pay(state, item, hours) {
+    var r = clock() ? clock().spend(state, hours || C.MAIL.hours) : null;
     if (!r || r.ok === false || !r.hours) return [];
     item.paid = { day: r.day, hours: r.hours };
     return r.records || [];
@@ -177,6 +177,8 @@ SB.module('Mail', function (SB) {
     if (show && show.bill) show.bill.slots.forEach(function (s) { if (s.role === 'TOURING' && !touring) touring = bandOf(state, s.bandId); });
     if (!touring && show && show.requestId && state.requests && state.requests[show.requestId]) touring = bandOf(state, state.requests[show.requestId].bandId);
     b = bandOf(state, ask.toId) || bandOf(state, p.bandId);
+    /* an ask to a booker or contact is about the requesting band, who is not the one asked */
+    if (!b && p.requestId && state.requests && state.requests[p.requestId]) b = bandOf(state, state.requests[p.requestId].bandId);
     t = day != null ? SB.time.date(day) : null;
     return {
       dateLong: day != null ? SB.time.fmt(day, 'dow') + ' the ' + SB.text.ordinal(t.d) : null, dow: day != null ? SB.time.fmt(day, 'dow') : null,
@@ -334,7 +336,9 @@ SB.module('Mail', function (SB) {
       if (counterOf.status !== 'COUNTER') return no('INVALID');
     }
     if (payload.inPerson && burnt(state, today(state))) return no('BURNT_OUT');
-    if (!payload.noClock) { o = noTime(state); if (o) return o; }
+    /* a phone call to a band (payload.call) takes an hour of tonight, not a half hour, and is answered on the spot */
+    if (kind === 'BAND_PLAY' && payload.call) { payload.inPerson = true; payload.callHours = 1; }
+    if (!payload.noClock) { o = noTime(state, payload.callHours); if (o) return o; }
 
     id = U.newId(state, 'a');
     a = { id: id, kind: kind, toId: toId == null ? null : toId, showId: payload.showId || null, jobId: null,
@@ -342,7 +346,7 @@ SB.module('Mail', function (SB) {
           needBy: typeof payload.needBy === 'number' ? payload.needBy : null, window: null, chased: 0, answer: null, hid: {} };
     a.window = windowOf(state, a);
     state.asks[id] = a;
-    if (!payload.noClock) records = pay(state, a);
+    if (!payload.noClock) records = pay(state, a, payload.callHours);
     /* a counter is answered by the next ask of its kind to the same person: it keeps its status and its answer
        (nothing is lost) and no longer needs the player */
     for (k in state.asks) {
@@ -360,6 +364,13 @@ SB.module('Mail', function (SB) {
     }
     ensureShow(state, a.showId);
     if (!a.jobId) a.jobId = jobFor(state, a);
+    /* a second ask for the same opener or middle slot makes them a set: the first yes takes the slot (fix list 2.19) */
+    if (kind === 'BAND_PLAY' && show && (payload.wantSlot === 'OPEN' || payload.wantSlot === 'MIDDLE') && !payload.acceptCounter) {
+      var sib = Object.keys(state.asks).map(function (x) { return state.asks[x]; }).filter(function (x) {
+        return x.id !== id && x.kind === 'BAND_PLAY' && x.showId === show.id && OPEN[x.status] && x.status !== 'COUNTER' && x.payload && (x.payload.wantSlot || 'MIDDLE') === payload.wantSlot;
+      });
+      if (sib.length) { a.payload.several = true; sib.forEach(function (x) { x.payload.several = true; }); }
+    }
 
     if (counterOf) {
       /* accepting a counter: an ask with the counter's payload, answered YES at once */
@@ -419,6 +430,13 @@ SB.module('Mail', function (SB) {
   /* replies to requests                                                 */
   /* ------------------------------------------------------------------ */
 
+  /* is the guided first show waiting on a different request's answer? (the walkthrough's ANSWER step, its own request open) */
+  function guidedElse(state, req) {
+    var cur = null;
+    try { cur = SB.Tutorial && SB.Tutorial.current ? SB.Tutorial.current(state) : null; } catch (e) { cur = null; }
+    return !!cur && cur.step === 'ANSWER' && !!cur.requestId && cur.requestId !== req.id;
+  }
+
   function reply(state, requestId, action, args) {
     var req = state.requests ? state.requests[requestId] : null, m = mail(state), r, o;
     if (over(state)) return no('OVER');
@@ -426,6 +444,8 @@ SB.module('Mail', function (SB) {
     if (!E.REPLY[action]) SB.fail('Mail.reply', 'unknown reply "' + action + '"');
     if (req.status !== 'NEW' && req.status !== 'REPLIED' && req.status !== 'NEGOTIATING') return no('INVALID');
     args = args || {};
+    /* the walkthrough builds the one show it names: a yes to any other band waits until that show is played (fix-list 0.6) */
+    if ((action === 'INTERESTED' || action === 'OFFER') && guidedElse(state, req)) return no('FIRST_SHOW');
     if (m.out.some(function (o) { return o.kind === 'REPLY' && o.requestId === requestId && o.action === action; })) return no('ALREADY');
     if (action === 'OFFER') {
       if (!args.showId || !showOf(state, args.showId)) SB.fail('Mail.reply', 'OFFER needs args.showId');
@@ -620,7 +640,11 @@ SB.module('Mail', function (SB) {
           }
           break;
         case 'BAND_PLAY':
-          if (show) SB.Shows.addBand(state, show.id, a.toId, { role: 'LOCAL', pay: p.pay || 'FREE', fee: p.fee || 0, askId: a.id, minutes: p.minutes, want: p.wantSlot });
+          if (show) {
+            SB.Shows.addBand(state, show.id, a.toId, { role: 'LOCAL', pay: p.pay || 'FREE', fee: p.fee || 0, askId: a.id, minutes: p.minutes, want: p.wantSlot });
+            /* asked several for one slot (fix list 2.19): the first yes takes it, the others get a kind "we filled it" text */
+            if (p.several) records = records.concat(fillOthers(state, show, a, day, half));
+          }
           break;
         case 'ROOM_HOLD':
           if (show) {
@@ -672,6 +696,29 @@ SB.module('Mail', function (SB) {
     return { records: records.filter(Boolean), stop: stop };
   }
 
+  /* The other locals asked for the same slot when one said yes: asks still waiting are closed with a kind text (no trust
+   * cost: the player asked several on purpose); an ask that never went out is simply taken back, and its half hour returns. */
+  function fillOthers(state, show, winner, day, half) {
+    var out = [], k, o, line, msgId, from, slot = (winner.payload && winner.payload.wantSlot) || 'MIDDLE';
+    for (k in asks(state)) {
+      o = state.asks[k];
+      if (o.id === winner.id || o.kind !== 'BAND_PLAY' || o.showId !== show.id || (o.status !== 'QUEUED' && o.status !== 'SENT')) continue;
+      if (!(o.payload && o.payload.several) || ((o.payload.wantSlot) || 'MIDDLE') !== slot) continue;
+      if (o.status === 'QUEUED') { unpay(state, o); o.status = 'WITHDRAWN'; o.answer = { status: 'WITHDRAWN', day: day, counter: null, text: '' }; continue; }
+      line = SB.Bands && SB.Bands.filledLine ? SB.Bands.filledLine(state, o.toId, show.id, winner.toId) : '';
+      o.status = 'NO';
+      if (o.hid) o.hid.will = 'NO';
+      o.answer = { status: 'NO', day: day, counter: null, text: line, filled: true };
+      if (!line) continue;
+      from = fromOf(state, o);
+      msgId = post(state, { kind: MSG_FOR[o.kind] || 'GAME', fromId: from.id, fromName: from.name, subject: what(state, o), body: line, day: day, needs: false,
+                            refs: { askId: o.id, showId: o.showId, bandId: o.toId } });
+      out.push(rec('MESSAGE', day, half, o.showId, '', { messageId: msgId, kind: MSG_FOR[o.kind] || 'GAME', fromName: from.name, needs: false }));
+      out.push(rec('ASK_ANSWERED', day, half, o.showId, line, { askId: o.id, kind: o.kind, status: 'NO', toName: toName(state, o) }));
+    }
+    return out;
+  }
+
   function holdOf(state, roomId, day, showId) {
     var room = roomOf(state, roomId), cell, i, h, rank = 0;
     if (!room || !room.calendar || day == null) return null;
@@ -702,6 +749,8 @@ SB.module('Mail', function (SB) {
     for (k in asks(state)) list.push(state.asks[k]);
     list.forEach(function (x) {
       if (x.status !== 'SENT' || !x.hid) return;
+      /* an offer to a touring band is always answered, 4 days at most (fix-list 0.5): a silent one from an older save says no */
+      if (x.kind === 'TERMS' && x.hid.will === 'SILENT' && x.hid.answerDay != null && x.hid.answerDay + 1 <= day) x.hid.will = 'NO';
       if (x.hid.will !== 'SILENT' && x.hid.answerDay != null && x.hid.answerDay <= day) {
         r = deliverOne(state, x, day, half);
         records = records.concat(r.records);
@@ -748,7 +797,7 @@ SB.module('Mail', function (SB) {
       out.push({ id: o.id, kind: o.kind === 'CHASE' ? 'CHASE' : o.action, toId: req ? req.bandId : (a ? a.toId : null),
                  showId: a ? a.showId : null, requestId: o.requestId, status: 'QUEUED', queuedDay: o.queuedDay,
                  toName: req ? (bandOf(state, req.bandId) ? bandOf(state, req.bandId).name : '') : (a ? toName(state, a) : ''),
-                 what: o.kind === 'REPLY' ? line(state, o.action === 'PASS' ? 'requests.pass.' + ((o.args && o.args.tone) || 'SHORT') : 'requests.compose.' + o.action, {}, false) : '',
+                 what: o.kind === 'REPLY' ? line(state, o.action === 'PASS' ? 'requests.pass.' + ((o.args && o.args.tone) || 'SHORT') : 'requests.compose.' + o.action, o.action === 'PASS' ? passSlots(state, o.requestId) : {}, false) : '',
                  window: null, overdue: false });
     });
     return out;
@@ -791,11 +840,24 @@ SB.module('Mail', function (SB) {
     return out.sort(function (x, y) { return (x.by == null ? 1e9 : x.by) - (y.by == null ? 1e9 : y.by); });
   }
 
+  /* What is true about a request, for the reason a pass gives (fix-list 2.10): "I've got a show that night" only when the
+   * player has a live show on one of the nights asked for, "too soon" only for short notice. Nothing is made up. */
+  function passSlots(state, requestId) {
+    var q = state.requests && state.requests[requestId], clash = false, k, s;
+    if (!q) return { clash: false, soon: false };
+    for (k in (state.shows || {})) {
+      s = state.shows[k];
+      if (s && (s.status === 'DRAFT' || s.status === 'CONFIRMED') && s.requestId !== requestId && (q.dates || []).indexOf(s.day) >= 0) clash = true;
+    }
+    return { clash: clash, soon: !!q.shortNotice, city: null };
+  }
+
   return {
     inbox: inbox, message: message, markRead: markRead, reply: reply, ask: ask, withdraw: withdraw, chase: chase,
     setNeedBy: setNeedBy, waiting: waiting, needsYou: needsYou, outbox: outbox, post: post, flush: flush, deliver: deliver,
     unqueue: unqueue,
     /* internal outside the manifest (see the header) */
+    passSlots: passSlots,
     answerInPerson: answerInPerson
   };
 });

@@ -451,12 +451,12 @@ SB.module('NightScene', function (SB) {
       'The door: ' + (st.line > 0 ? st.line + ' waiting in line' : 'nobody left in line') + '.');
     add(parts.label(st.line > 0 ? 'THE LINE: ' + st.line : (settle ? 'LINE: GONE HOME' : 'THE LINE: 0'), 'lineLbl', settle));
     add(parts.label(st.phase === 'set' && bandsOn ? 'ON NOW: ' + bandsOn.name.toUpperCase() : (settle ? 'LIGHTS UP · ' + (st.now || '') : 'SOUNDCHECK: ' + String((st.bands[0] || {}).name || '').toUpperCase() + ' · DOORS ' + st.doors), 'onLbl', settle, true));
-    add(parts.setList({ doors: 'DOORS ' + st.doors + (st.loadIn ? '   load-in ' + st.loadIn : ''), stop: 'HARD STOP ' + st.hardStop,
-      bands: st.bands.map(function (b) { return { start: b.start, name: b.name, state: b.state, note: b.state === 'done' && b.heat != null ? 'heat ' + b.heat + (b.peak ? ' · peak' : '') : '' }; }) },
+    add(parts.setList({ doors: 'DOORS ' + st.doors + (st.loadIn ? '   load-in ' + st.loadIn : ''), stop: 'MUSIC STOPS BY ' + st.hardStop,
+      bands: st.bands.map(function (b) { return { start: b.start, name: b.name, state: b.state, note: b.state === 'done' && b.heat != null ? 'how loud the room got: ' + b.heat + ' of 100' + (b.peak ? ' · peak' : '') : '' }; }) },
       'The set list', function () { say(st.bands.length + ' on the bill.'); }, settle));
     var fc = st.forecast;
-    add(parts.tally({ parLabel: 'TOWN EXPECTS', par: fc.par, callLabel: 'YOUR CALL', lo: fc.lo, hi: fc.hi, cap: 'FULL AT ' + fc.cap, away: st.turnedAway ? st.turnedAway + ' turned away' : '',
-      aria: 'Town expects ' + fc.par + '. Your call ' + fc.lo + ' to ' + fc.hi + '.' }, settle));
+    add(parts.tally({ parLabel: 'MOST NIGHTS THERE DRAW', par: fc.par, callLabel: 'YOU GUESSED', lo: fc.lo, hi: fc.hi, cap: 'FULL AT ' + fc.cap, away: st.turnedAway ? st.turnedAway + ' turned away' : '',
+      aria: 'Most nights there draw about ' + fc.par + '. You guessed ' + fc.lo + ' to ' + fc.hi + '.' }, settle));
     add(parts.thing({ kind: 'watch', art: { time: st.now }, name: 'watch', cls: 'nc-watch', label: 'Watch ' + (st.now || ''), onClick: function () { say(st.now); } }, settle));
     add(parts.thing({ kind: 'stamp', art: { size: settle ? 0.62 : 1 }, name: 'stamp', label: 'Stamp, Marker', onClick: function () { say('The hand stamp.'); } }, settle));
     add(parts.thing({ kind: 'marker', art: { size: settle ? 0.7 : 1 }, name: 'marker' }, settle));
@@ -504,7 +504,7 @@ SB.module('NightScene', function (SB) {
     var row = h('div', { class: 'nc-tabs nt-tabs', role: 'group', 'aria-label': label || 'tear one off' });
     opts.forEach(function (o, i) {
       var dis = o.enabled === false;
-      row.appendChild(h('button', { class: 'nt-tab', type: 'button', disabled: dis, 'data-fk': 'opt-' + i, 'aria-label': (i + 1) + '. ' + o.label + (o.costs && o.costs.length ? '. ' + o.costs.join(', ') : '') + (o.likely ? '. likely: ' + o.likely : ''),
+      row.appendChild(h('button', { class: 'nt-tab', type: 'button', disabled: dis, 'data-fk': 'opt-' + i, 'aria-label': (i + 1) + '. ' + o.label + (o.costs && o.costs.length ? '. ' + o.costs.join(', ') : '') + (o.likely ? '. ' + o.likely : ''),
         on: { click: function () { if (!dis) pick(i); } } }, [
         h('span', { class: 'nt-tab-n', 'aria-hidden': 'true', text: String(i + 1) }),
         h('span', { class: 'nt-tab-label', text: o.label }),
